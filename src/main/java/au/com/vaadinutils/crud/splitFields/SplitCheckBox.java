@@ -5,6 +5,10 @@ import com.vaadin.ui.Label;
 
 public class SplitCheckBox extends CheckBox implements SplitField
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1573292123807845727L;
 	private Label label;
 
 	public SplitCheckBox(String label)
@@ -26,4 +30,9 @@ public class SplitCheckBox extends CheckBox implements SplitField
 		return label;
 	}
 
+	@Override
+	public String getCaption()
+	{
+		return label.getValue();
+	}
 }

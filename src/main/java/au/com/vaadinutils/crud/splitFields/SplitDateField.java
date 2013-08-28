@@ -30,4 +30,10 @@ public class SplitDateField extends DateField implements SplitField
 	{
 		return label;
 	}
+
+	@Override
+	public String getCaption()
+	{
+		return label.getValue();
+	}
 }

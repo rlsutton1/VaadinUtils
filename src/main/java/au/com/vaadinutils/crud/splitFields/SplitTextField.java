@@ -30,4 +30,10 @@ public class SplitTextField extends TextField implements SplitField
 		return label;
 	}
 
+	@Override
+	public String getCaption()
+	{
+		return label.getValue();
+	}
+
 }

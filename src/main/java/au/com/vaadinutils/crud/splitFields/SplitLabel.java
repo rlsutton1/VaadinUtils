@@ -4,7 +4,11 @@ import com.vaadin.ui.Label;
 
 public class SplitLabel extends Label implements SplitField
 {
-	private Label label;
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5824753575628319814L;
 
 	public SplitLabel(String label)
 	{

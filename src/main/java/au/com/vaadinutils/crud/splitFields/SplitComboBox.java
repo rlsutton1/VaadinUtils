@@ -37,4 +37,10 @@ public class SplitComboBox extends ComboBox implements SplitField
 	{
 		return label;
 	}
+
+	@Override
+	public String getCaption()
+	{
+		return label.getValue();
+	}
 }

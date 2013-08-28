@@ -267,4 +267,9 @@ public class FormHelper<E> implements Serializable
 		Notification.show(sb.toString(), Type.ERROR_MESSAGE);
 	}
 
+	public boolean isEntitymanagerSet()
+	{
+		return entityManagerFactory != null;
+	}
+
 }

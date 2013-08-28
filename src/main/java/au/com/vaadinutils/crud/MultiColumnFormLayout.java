@@ -29,8 +29,8 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	private ValidatingFieldGroup<E> fieldGroup;
 	private ArrayList<AbstractComponent> fieldList = new ArrayList<AbstractComponent>();
 	private FormHelper<E> formHelper;
-	
-	final private GridLayout grid ;
+
+	final private GridLayout grid;
 
 	public MultiColumnFormLayout(int columns, ValidatingFieldGroup<E> fieldGroup)
 	{
@@ -41,19 +41,18 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		this.fieldGroup = fieldGroup;
 		this.setSizeFull();
 		super.addComponent(grid);
-		
+
 		VerticalLayout filler = new VerticalLayout();
 		filler.setSizeFull();
 		super.addComponent(filler);
 		this.setExpandRatio(filler, 1.0f);
 		grid.setSpacing(true);
-		
-		for (int i = 1;i < columns*2;i+=2)
+
+		for (int i = 1; i < columns * 2; i += 2)
 		{
-			grid.setColumnExpandRatio(i, 1.0f/new Float(columns));	
+			grid.setColumnExpandRatio(i, 1.0f / new Float(columns));
 		}
-		
-		
+
 	}
 
 	private void init()
@@ -62,30 +61,29 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		super.setMargin(true);
 	}
 
-	@Override 
+	@Override
 	public void addComponent(Component component)
 	{
 		Preconditions.checkArgument(component instanceof SplitField);
 		internalAddComponent((SplitField) component);
 	}
-	
+
 	/**
 	 * Add a component to the grid. If colspan has been set then it is honoured.
 	 * If we are at the end of the row then automatically wrap this item to the
 	 * end of the next row.
 	 */
-	
+
 	public void internalAddComponent(SplitField splitComponent)
 	{
-//		SplitField splitComponent = (SplitField) component;
-	
+		// SplitField splitComponent = (SplitField) component;
 
 		int fieldWidth = 1;
 		if (splitComponent.getCaption() != null)
 		{
 			grid.addComponent(splitComponent.getLabel());
 			grid.setComponentAlignment(splitComponent.getLabel(), Alignment.MIDDLE_RIGHT);
-			
+
 		}
 		else
 		{
@@ -93,24 +91,24 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 			// width that the label normally occupies
 			fieldWidth = 2;
 		}
-		
-		if (grid.getCursorX()+fieldWidth >= columns )
+
+		if (grid.getCursorX() + fieldWidth >= columns)
 		{
 			newLine();
 		}
 
-		
-		System.out.println("X,y: "+grid.getCursorX()+" "+grid.getCursorY());
+		System.out.println("X,y: " + grid.getCursorX() + " " + grid.getCursorY());
 		if (colspan > 1)
-			grid.addComponent(splitComponent, grid.getCursorX(),grid. getCursorY(), grid.getCursorX() + (fieldWidth - 1)
-					+ ((colspan - 1) * 2), grid.getCursorY());
+			grid.addComponent(splitComponent, grid.getCursorX(), grid.getCursorY(), grid.getCursorX()
+					+ (fieldWidth - 1) + ((colspan - 1) * 2), grid.getCursorY());
 		else
-			grid.addComponent(splitComponent, grid.getCursorX(), grid.getCursorY(), grid.getCursorX() + (fieldWidth - 1), grid.getCursorY());
-		
+			grid.addComponent(splitComponent, grid.getCursorX(), grid.getCursorY(), grid.getCursorX()
+					+ (fieldWidth - 1), grid.getCursorY());
+
 		grid.setComponentAlignment(splitComponent, Alignment.MIDDLE_LEFT);
 
 		splitComponent.setSizeFull();
-		
+
 		this.colspan = 1;
 	}
 
@@ -185,6 +183,11 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		return field;
 	}
 
+	public void setEntityManager(EntityManagerFactory factory)
+	{
+		formHelper.setEntityManager(factory);
+	}
+
 	/**
 	 * 
 	 * @param fieldLabel
@@ -200,6 +203,9 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	 */
 	public <L> ComboBox bindEntityField(String fieldLabel, String fieldName, Class<L> listClazz, String listFieldName)
 	{
+		Preconditions.checkArgument(formHelper.isEntitymanagerSet(),
+				"You must provide the entity manager factory by calling setEntityManager first.");
+
 		ComboBox field = formHelper.bindEntityField(this, fieldGroup, fieldLabel, fieldName, listFieldName, listClazz);
 		this.fieldList.add(field);
 		return field;
