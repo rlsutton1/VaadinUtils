@@ -86,7 +86,7 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 	 * build the button layout aned editor panel
 	 */
 
-	protected abstract MultiColumnFormLayout<E> buildEditor(ValidatingFieldGroup<E> fieldGroup2);
+	protected abstract AbstractLayout buildEditor(ValidatingFieldGroup<E> fieldGroup2);
 
 	private void initLayout()
 	{
