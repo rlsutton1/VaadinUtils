@@ -268,9 +268,8 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 
 	}
 
-	public Long save()
+	public E save()
 	{
-		Long id = -1l;
 		try
 		{
 			commit();
@@ -279,11 +278,14 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 			
 			if (inNew)
 			{
-				id = (Long) container.addEntity(BaseCrudView.this.currentEntity);
+				Long id = (Long) container.addEntity(BaseCrudView.this.currentEntity);
 				BaseCrudView.this.entityTable.select(id);
 				inNew = false;
 
 			}
+			
+			//TODO: flush before announcing we've saved
+			
 			Notification.show("Changes Saved", "Any changes you have made have been saved.", Type.TRAY_NOTIFICATION);
 
 		}
@@ -291,7 +293,7 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 		{
 			FormHelper.showConstraintViolation(e);
 		}
-		return id;
+		return BaseCrudView.this.currentEntity;
 	}
 
 	/**
