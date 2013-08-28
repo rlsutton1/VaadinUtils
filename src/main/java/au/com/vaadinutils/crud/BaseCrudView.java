@@ -65,11 +65,11 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 	private VerticalLayout rightLayout;
 	private AbstractLayout editor;
 
-	protected void init( Class<E> entityClass, JPAContainer<E> container, List<HeadingToPropertyId> headings)
+	protected void init(Class<E> entityClass, JPAContainer<E> container, List<HeadingToPropertyId> headings)
 	{
 		this.entityClass = entityClass;
 		this.container = container;
-		fieldGroup = new ValidatingFieldGroup<E>(container,entityClass);
+		fieldGroup = new ValidatingFieldGroup<E>(container, entityClass);
 		fieldGroup.setBuffered(true);
 
 		entityTable = new EntityTable<E>(container, headings);
@@ -77,7 +77,7 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 
 		initLayout();
 		entityTable.init();
-			initSearch();
+		initSearch();
 		initButtons();
 		this.setVisible(true);
 	}
@@ -156,13 +156,11 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 		rightLayout.setExpandRatio(scroll, 1.0f);
 		rightLayout.setSizeFull();
 		rightLayout.setId("rightLayout");
-		
+
 		editor = buildEditor(fieldGroup);
 		mainEditPanel.addComponent(editor);
 		rightLayout.addComponent(buttonLayout);
-		
-		
-	
+
 		rightLayout.setVisible(false);
 	}
 
@@ -266,11 +264,10 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 
 			}
 
-			
 		});
 
 	}
-	
+
 	public Long save()
 	{
 		Long id = -1l;
@@ -278,13 +275,17 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 		{
 			commit();
 
+			interceptSaveValues(BaseCrudView.this.currentEntity);
+			
 			if (inNew)
 			{
 				id = (Long) container.addEntity(BaseCrudView.this.currentEntity);
 				BaseCrudView.this.entityTable.select(id);
 				inNew = false;
-				
+
 			}
+			Notification.show("Changes Saved", "Any changes you have made have been saved.", Type.TRAY_NOTIFICATION);
+
 		}
 		catch (ConstraintViolationException e)
 		{
@@ -293,6 +294,12 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 		return id;
 	}
 
+	/**
+	 * opportunity for implementing classes to modify or add data to the entity being saved
+	 * @param currentEntity2
+	 */
+	abstract public void interceptSaveValues(E entity);
+	
 	private void initSearch()
 	{
 
@@ -431,8 +438,6 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 			{
 				fieldGroup.commit();
 
-				Notification
-						.show("Changes Saved", "Any changes you have made have been saved.", Type.TRAY_NOTIFICATION);
 			}
 		}
 		catch (CommitException e)
