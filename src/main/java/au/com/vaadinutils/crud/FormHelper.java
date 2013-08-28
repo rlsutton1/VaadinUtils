@@ -144,6 +144,7 @@ public class FormHelper<E> implements Serializable
 			String fieldName, Class<?> clazz)
 	{
 		ComboBox field = new SplitComboBox(fieldLabel, createContainerFromEnumClass(fieldName, clazz));
+		field.setItemCaptionPropertyId(fieldName);
 		field.setNewItemsAllowed(false);
 		field.setNullSelectionAllowed(false);
 		field.setTextInputAllowed(false);
@@ -201,7 +202,7 @@ public class FormHelper<E> implements Serializable
 
 		field.setItemCaptionMode(ItemCaptionMode.PROPERTY);
 		Preconditions.checkState(container.getContainerPropertyIds().contains(listFieldName),
-				"valid listFieldNames are " + container.getContainerPropertyIds().toString());
+				listFieldName+ " is not valid, valid listFieldNames are " + container.getContainerPropertyIds().toString());
 		field.setItemCaptionPropertyId(listFieldName);
 		field.setContainerDataSource(container);
 		SingleSelectConverter<L> converter = new SingleSelectConverter<L>(field);

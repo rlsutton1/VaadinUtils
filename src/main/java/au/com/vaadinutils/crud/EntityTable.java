@@ -1,8 +1,11 @@
 package au.com.vaadinutils.crud;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.data.Property;
@@ -14,14 +17,14 @@ public class EntityTable<E> extends Table
 	private static final long serialVersionUID = 1L;
 	private JPAContainer<E> contactContainer;
 	private RowChangeListener<E> rowChangeListener;
-	private String[] visibleColumns;
+	private List<HeadingToPropertyId> visibleColumns;
 
-	EntityTable(JPAContainer<E> contactContainer, String[] visibleColumns)
+	EntityTable(JPAContainer<E> contactContainer, List<HeadingToPropertyId> headings)
 	{
 		this.contactContainer = contactContainer;
-		this.visibleColumns = visibleColumns;
+		this.visibleColumns = headings;
 	}
-	
+
 	public void setRowChangeListener(RowChangeListener<E> rowChangeListener)
 	{
 		this.rowChangeListener = rowChangeListener;
@@ -31,8 +34,24 @@ public class EntityTable<E> extends Table
 	{
 
 		this.setContainerDataSource(contactContainer);
-		this.setVisibleColumns((Object[]) visibleColumns);
+
+		List<String> colsToShow = new LinkedList<String>();
+		for (HeadingToPropertyId column : visibleColumns)
+		{
+			colsToShow.add(column.getPropertyId());
+			Preconditions.checkArgument(this.getContainerPropertyIds().contains(column.getPropertyId()),
+					column.getPropertyId() + " is not a valid property id, valid property ids are "
+							+ this.getContainerPropertyIds().toString());
+		}
+		System.out.println(this.getContainerPropertyIds().toString());
+		this.setVisibleColumns(colsToShow.toArray());
 		
+		for (HeadingToPropertyId column : visibleColumns)
+		{
+			this.setColumnHeader(column.getPropertyId(), column.getHeader());
+		}
+
+
 		this.setSelectable(true);
 		this.setImmediate(true);
 
@@ -48,7 +67,7 @@ public class EntityTable<E> extends Table
 				if (contactId != null) // it can be null when a row is being
 										// deleted.
 				{
-					EntityItem<E> contact = EntityTable.this.contactContainer.getItem(contactId); //.getEntity();
+					EntityItem<E> contact = EntityTable.this.contactContainer.getItem(contactId); // .getEntity();
 					EntityTable.this.rowChangeListener.rowChanged(contact);
 				}
 				else
@@ -65,9 +84,8 @@ public class EntityTable<E> extends Table
 	{
 		if (variables.containsKey("selected"))
 		{
-			
-			if (EntityTable.this.rowChangeListener != null
-					&& EntityTable.this.rowChangeListener.allowRowChange())
+
+			if (EntityTable.this.rowChangeListener != null && EntityTable.this.rowChangeListener.allowRowChange())
 				EntityTable.super.changeVariables(source, variables);
 			else
 				markAsDirty();
@@ -133,7 +151,5 @@ public class EntityTable<E> extends Table
 		}
 		return super.formatPropertyValue(rowId, colId, property);
 	}
-
-	
 
 }

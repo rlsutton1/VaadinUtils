@@ -2,8 +2,6 @@ package au.com.vaadinutils.crud;
 
 import java.util.ArrayList;
 
-import org.apache.log4j.Logger;
-
 import au.com.vaadinutils.crud.splitFields.SplitField;
 
 import com.google.gwt.thirdparty.guava.common.base.Preconditions;
@@ -21,7 +19,8 @@ import com.vaadin.ui.VerticalLayout;
 
 public class MultiColumnFormLayout<E> extends VerticalLayout
 {
-	private static Logger logger = Logger.getLogger(MultiColumnFormLayout.class);
+	// private static Logger logger =
+	// Logger.getLogger(MultiColumnFormLayout.class);
 	private static final long serialVersionUID = 1L;
 	private final int columns;
 	private int colspan = 1;
@@ -31,6 +30,9 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	private FormHelper<E> formHelper;
 
 	final private GridLayout grid;
+
+	int x = 0;
+	int y = 0;
 
 	public MultiColumnFormLayout(int columns, ValidatingFieldGroup<E> fieldGroup)
 	{
@@ -78,47 +80,43 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	{
 		// SplitField splitComponent = (SplitField) component;
 
-		int fieldWidth = 1;
-		if (splitComponent.getCaption() != null)
+		int fieldWidth = colspan;
+		int captionWidth = 0;
+		if (splitComponent.getCaption()!= null && splitComponent.getCaption().length()>=0)
 		{
-			grid.addComponent(splitComponent.getLabel());
+			captionWidth = 1;
+			System.out.println("'"+splitComponent.getCaption()+"'");
+		}else
+		{
+			System.out.println("No caption");
+		}
+		
+		
+		if (x + fieldWidth+captionWidth >= columns)
+		{
+			x = 0;
+			y++;
+			grid.insertRow(y);
+
+		}
+		if (captionWidth==1)
+		{
+			grid.addComponent(splitComponent.getLabel(), x, y, x, y);
 			grid.setComponentAlignment(splitComponent.getLabel(), Alignment.MIDDLE_RIGHT);
-
-		}
-		else
-		{
-			// Else if the label is null then we let the field take the full
-			// width that the label normally occupies
-			fieldWidth = 2;
+			x++;
 		}
 
-		if (grid.getCursorX() + fieldWidth >= columns)
-		{
-			newLine();
-		}
+		
 
-		System.out.println("X,y: " + grid.getCursorX() + " " + grid.getCursorY());
-		if (colspan > 1)
-			grid.addComponent(splitComponent, grid.getCursorX(), grid.getCursorY(), grid.getCursorX()
-					+ (fieldWidth - 1) + ((colspan - 1) * 2), grid.getCursorY());
-		else
-			grid.addComponent(splitComponent, grid.getCursorX(), grid.getCursorY(), grid.getCursorX()
-					+ (fieldWidth - 1), grid.getCursorY());
+		System.out.println(splitComponent.getCaption() + " X:" + x + " Y:" + y +" X1:"+(x+fieldWidth-1)+" Y1:"+y);
+		grid.addComponent(splitComponent, x , y, x + fieldWidth-1, y);
+		x += fieldWidth;
 
 		grid.setComponentAlignment(splitComponent, Alignment.MIDDLE_LEFT);
 
 		splitComponent.setSizeFull();
 
 		this.colspan = 1;
-	}
-
-	/**
-	 * Adds a new row to the grid and moves the cursor down one row.
-	 */
-	public void newLine()
-	{
-		grid.insertRow(grid.getRows());
-		grid.newLine();
 	}
 
 	/**
@@ -133,6 +131,14 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 
 	}
 
+	/**
+	 * 
+	 * @param fieldLabel
+	 *            - the label that will be displayed in the screen layout
+	 * @param fieldName
+	 *            - the column name of the field in the database
+	 * @return
+	 */
 	public TextField bindTextField(String fieldLabel, String fieldName)
 	{
 		TextField field = formHelper.bindTextField(this, fieldGroup, fieldLabel, fieldName);
@@ -141,6 +147,14 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		return field;
 	}
 
+	/**
+	 * 
+	 * @param fieldLabel
+	 *            - the label that will be displayed in the screen layout
+	 * @param fieldName
+	 *            - the column name of the field in the database
+	 * @return
+	 */
 	public TextArea bindTextAreaField(String fieldLabel, String fieldName, int rows)
 	{
 		TextArea field = formHelper.bindTextAreaField(this, fieldGroup, fieldLabel, fieldName, rows);

@@ -15,14 +15,15 @@ public class SplitComboBox extends ComboBox implements SplitField
 	public SplitComboBox(String label)
 	{
 		this.label = new Label(label);
-
+		
 	}
 
 	public SplitComboBox(String fieldLabel, Container createContainerFromEnumClass)
 	{
 
-		super("", createContainerFromEnumClass);
-		this.label = new Label(label);
+		super(null, createContainerFromEnumClass);
+		this.label = new Label(fieldLabel);
+		
 	}
 
 	@Override

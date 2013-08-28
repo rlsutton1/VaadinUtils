@@ -1,5 +1,7 @@
 package au.com.vaadinutils.crud;
 
+import java.util.List;
+
 import javax.validation.ConstraintViolationException;
 
 import org.apache.log4j.Logger;
@@ -60,14 +62,12 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 	/* User interface components are stored in session. */
 	private EntityTable<E> entityTable;
 	private VerticalLayout rightLayout;
-	private String[] headings;
 	private MultiColumnFormLayout<E> editor;
 
-	protected void init( Class<E> entityClass, JPAContainer<E> container, String[] headings)
+	protected void init( Class<E> entityClass, JPAContainer<E> container, List<HeadingToPropertyId> headings)
 	{
 		this.entityClass = entityClass;
 		this.container = container;
-		this.headings = headings;
 		fieldGroup = new ValidatingFieldGroup<E>(container,entityClass);
 		fieldGroup.setBuffered(true);
 
@@ -261,25 +261,35 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 
 			public void buttonClick(ClickEvent event)
 			{
-				try
-				{
-					commit();
-
-					if (inNew)
-					{
-						Long id = (Long) container.addEntity(BaseCrudView.this.currentEntity);
-						BaseCrudView.this.entityTable.select(id);
-						inNew = false;
-					}
-				}
-				catch (ConstraintViolationException e)
-				{
-					FormHelper.showConstraintViolation(e);
-				}
+				save();
 
 			}
+
+			
 		});
 
+	}
+	
+	public Long save()
+	{
+		Long id = -1l;
+		try
+		{
+			commit();
+
+			if (inNew)
+			{
+				id = (Long) container.addEntity(BaseCrudView.this.currentEntity);
+				BaseCrudView.this.entityTable.select(id);
+				inNew = false;
+				
+			}
+		}
+		catch (ConstraintViolationException e)
+		{
+			FormHelper.showConstraintViolation(e);
+		}
+		return id;
 	}
 
 	private void initSearch()
