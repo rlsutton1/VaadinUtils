@@ -16,6 +16,7 @@ import com.vaadin.data.Container.Filter;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
+import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.AbstractTextField.TextChangeEventMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -62,7 +63,7 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 	/* User interface components are stored in session. */
 	private EntityTable<E> entityTable;
 	private VerticalLayout rightLayout;
-	private MultiColumnFormLayout<E> editor;
+	private AbstractLayout editor;
 
 	protected void init( Class<E> entityClass, JPAContainer<E> container, List<HeadingToPropertyId> headings)
 	{
@@ -71,7 +72,7 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 		fieldGroup = new ValidatingFieldGroup<E>(container,entityClass);
 		fieldGroup.setBuffered(true);
 
-		entityTable = new EntityTable(container, headings);
+		entityTable = new EntityTable<E>(container, headings);
 		entityTable.setRowChangeListener(this);
 
 		initLayout();
