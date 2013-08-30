@@ -65,14 +65,14 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 	private VerticalLayout rightLayout;
 	private AbstractLayout editor;
 
-	protected void init(Class<E> entityClass, JPAContainer<E> container, List<HeadingToPropertyId> headings)
+	protected void init(Class<E> entityClass, JPAContainer<E> container, HeadingPropertySet headings)
 	{
 		this.entityClass = entityClass;
 		this.container = container;
 		fieldGroup = new ValidatingFieldGroup<E>(container, entityClass);
 		fieldGroup.setBuffered(true);
 
-		entityTable = new EntityTable<E>(container, headings);
+		entityTable = new EntityTable<E>(container, headings.getColumns());
 		entityTable.setRowChangeListener(this);
 
 		initLayout();
@@ -300,7 +300,7 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 	 * opportunity for implementing classes to modify or add data to the entity being saved
 	 * @param currentEntity2
 	 */
-	abstract public void interceptSaveValues(E entity);
+	abstract protected void interceptSaveValues(E entity);
 	
 	private void initSearch()
 	{
@@ -346,11 +346,8 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 		});
 	}
 
-	private Filter getContainerFilter()
-	{
-		return null;
-	}
-
+	abstract protected Filter getContainerFilter();
+	
 	@Override
 	/** Called when the currently selected row in the 
 	 *  table part of this view has changed.
