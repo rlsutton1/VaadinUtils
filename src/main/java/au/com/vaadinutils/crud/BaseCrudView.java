@@ -130,10 +130,10 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 
 		HorizontalLayout buttonLayout = new HorizontalLayout();
 		buttonLayout.setWidth("100%");
-		buttonLayout.addComponent(saveButton);
 		buttonLayout.addComponent(cancelButton);
-		buttonLayout.setComponentAlignment(cancelButton, Alignment.MIDDLE_RIGHT);
-		buttonLayout.setComponentAlignment(saveButton, Alignment.MIDDLE_LEFT);
+		buttonLayout.addComponent(saveButton);
+		buttonLayout.setComponentAlignment(saveButton, Alignment.MIDDLE_RIGHT);
+		buttonLayout.setComponentAlignment(cancelButton, Alignment.MIDDLE_LEFT);
 		buttonLayout.setHeight("40");
 
 		/* Put a little margin around the fields in the right side editor */
@@ -410,8 +410,10 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 
 			this.currentEntity = item.getEntity();
 			fieldGroup.setItemDataSource(item);
-			Preconditions.checkState(fieldGroup.getItemDataSource().getItemPropertyIds().contains("name"),
-					"valid listFieldNames are " + fieldGroup.getItemDataSource().getItemPropertyIds().toString());
+			
+			// removed as this doesn't make any sense particularly since the property id is hard coded to'name'.
+//			Preconditions.checkState(fieldGroup.getItemDataSource().getItemPropertyIds().contains("name"),
+//					"valid listFieldNames are " + fieldGroup.getItemDataSource().getItemPropertyIds().toString());
 
 		}
 		else
