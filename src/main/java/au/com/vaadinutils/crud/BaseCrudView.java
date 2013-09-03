@@ -1,7 +1,5 @@
 package au.com.vaadinutils.crud;
 
-import java.util.List;
-
 import javax.validation.ConstraintViolationException;
 
 import org.apache.log4j.Logger;
@@ -9,7 +7,6 @@ import org.vaadin.dialogs.ConfirmDialog;
 
 import au.com.vaadinutils.listener.ClickListenerLogged;
 
-import com.google.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.data.Container.Filter;
@@ -65,7 +62,7 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 	private VerticalLayout rightLayout;
 	private AbstractLayout editor;
 
-	protected void init(Class<E> entityClass, JPAContainer<E> container, HeadingPropertySet headings)
+	protected void init(Class<E> entityClass, JPAContainer<E> container, HeadingPropertySet<E> headings)
 	{
 		this.entityClass = entityClass;
 		this.container = container;
