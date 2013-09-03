@@ -7,13 +7,10 @@ import com.vaadin.ui.Button.ClickListener;
 
 public abstract class ClickListenerLogged implements ClickListener
 {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 7420365324169589382L;
 
 	Logger logger = Logger.getLogger(ClickListenerLogged.class);
+
 
 	abstract public void clicked(ClickEvent event);
 

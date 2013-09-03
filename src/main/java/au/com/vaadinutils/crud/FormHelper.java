@@ -13,6 +13,7 @@ import au.com.vaadinutils.crud.splitFields.SplitCheckBox;
 import au.com.vaadinutils.crud.splitFields.SplitComboBox;
 import au.com.vaadinutils.crud.splitFields.SplitDateField;
 import au.com.vaadinutils.crud.splitFields.SplitLabel;
+import au.com.vaadinutils.crud.splitFields.SplitPasswordField;
 import au.com.vaadinutils.crud.splitFields.SplitTextArea;
 import au.com.vaadinutils.crud.splitFields.SplitTextField;
 
@@ -21,6 +22,7 @@ import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.JPAContainerFactory;
 import com.vaadin.addon.jpacontainer.fieldfactory.SingleSelectConverter;
 import com.vaadin.data.Container;
+import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.AbstractLayout;
@@ -30,6 +32,7 @@ import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.DateField;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
@@ -59,6 +62,20 @@ public class FormHelper<E> implements Serializable
 			String fieldName)
 	{
 		TextField field = new SplitTextField(fieldLabel);
+		field.setWidth("100%");
+		field.setImmediate(true);
+		field.setNullRepresentation("");
+		field.setNullSettingAllowed(false);
+		if (group != null)
+			group.bind(field, fieldName);
+		form.addComponent(field);
+		return field;
+	}
+
+	
+	public PasswordField bindPasswordField(AbstractLayout form, FieldGroup group, String fieldLabel, String fieldName)
+	{
+		PasswordField field = new SplitPasswordField(fieldLabel);
 		field.setWidth("100%");
 		field.setImmediate(true);
 		field.setNullRepresentation("");
@@ -271,6 +288,16 @@ public class FormHelper<E> implements Serializable
 	public boolean isEntitymanagerSet()
 	{
 		return entityManagerFactory != null;
+	}
+
+	protected AbstractLayout getForm()
+	{
+		return form;
+	}
+
+	protected ValidatingFieldGroup<E> getFieldGroup()
+	{
+		return this.group;
 	}
 
 }
