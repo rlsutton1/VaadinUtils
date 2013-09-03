@@ -240,7 +240,7 @@ public class FormHelper<E> implements Serializable
 		if (fieldGroup != null)
 		{
 
-			Preconditions.checkState(fieldGroup.getContainer().getContainerPropertyIds().contains(listFieldName),
+			Preconditions.checkState(fieldGroup.getContainer().getContainerPropertyIds().contains(fieldName),
 					"valid listFieldNames are " + fieldGroup.getContainer().getContainerPropertyIds().toString());
 
 			fieldGroup.bind(field, fieldName);
