@@ -40,6 +40,7 @@ import com.vaadin.ui.TextField;
 public class FormHelper<E> implements Serializable
 {
 	private static final long serialVersionUID = 1L;
+	static EntityManagerFactory entityManagerFactory;
 
 	ArrayList<AbstractComponent> fieldList = new ArrayList<AbstractComponent>();
 	private AbstractLayout form;
@@ -50,6 +51,19 @@ public class FormHelper<E> implements Serializable
 		this.form = form;
 		this.group = group;
 	}
+	
+
+	/**
+	 * Provides a factory which allows the FormHelper to get the current EntityManager
+	 * as and when it needs it.
+	 * 
+	 * @param factory
+	 */
+	static public void setEntityManagerFactory(EntityManagerFactory factory)
+	{
+		entityManagerFactory = factory;
+	}
+
 
 	public TextField bindTextField(String fieldLabel, String fieldName)
 	{
@@ -201,12 +215,6 @@ public class FormHelper<E> implements Serializable
 		return field;
 	}
 
-	static EntityManagerFactory entityManagerFactory;
-
-	void setEntityManager(EntityManagerFactory factory)
-	{
-		entityManagerFactory = factory;
-	}
 
 	public <L> ComboBox bindEntityField(AbstractLayout form, ValidatingFieldGroup<E> fieldGroup, String fieldLabel,
 			String fieldName, String listFieldName, Class<L> listClazz)

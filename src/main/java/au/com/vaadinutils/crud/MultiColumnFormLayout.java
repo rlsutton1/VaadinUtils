@@ -255,7 +255,7 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 
 	public void setEntityManager(EntityManagerFactory factory)
 	{
-		formHelper.setEntityManager(factory);
+		formHelper.setEntityManagerFactory(factory);
 	}
 
 	/**
