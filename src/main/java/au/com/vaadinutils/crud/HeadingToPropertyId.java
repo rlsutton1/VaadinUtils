@@ -13,6 +13,19 @@ public class HeadingToPropertyId
 	 * @param heading
 	 * @param propertyId
 	 *            - the real field name
+	 */
+	public HeadingToPropertyId(String heading, String propertyId)
+	{
+		this.heading = heading;
+		this.propertyId = propertyId;
+		this.columnGenerator = null;
+	}
+
+	/**
+	 * 
+	 * @param heading
+	 * @param propertyId
+	 *            - the real field name
 	 * @param columnGenerator2 
 	 */
 	public HeadingToPropertyId(String heading, String propertyId, ColumnGenerator columnGenerator2)
