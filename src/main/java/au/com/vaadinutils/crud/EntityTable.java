@@ -20,13 +20,13 @@ public class EntityTable<E> extends Table
 	private JPAContainer<E> contactContainer;
 	private RowChangeListener<E> rowChangeListener;
 	private List<HeadingToPropertyId> visibleColumns;
-	
+
 	Logger logger = Logger.getLogger(EntityTable.class);
 
-	EntityTable(JPAContainer<E> contactContainer, List<HeadingToPropertyId> headings)
+	EntityTable(JPAContainer<E> contactContainer, List<HeadingToPropertyId> columns)
 	{
 		this.contactContainer = contactContainer;
-		this.visibleColumns = headings;
+		this.visibleColumns = columns;
 	}
 
 	public void setRowChangeListener(RowChangeListener<E> rowChangeListener)
@@ -43,9 +43,18 @@ public class EntityTable<E> extends Table
 		for (HeadingToPropertyId column : visibleColumns)
 		{
 			colsToShow.add(column.getPropertyId());
-			Preconditions.checkArgument(this.getContainerPropertyIds().contains(column.getPropertyId()),
-					column.getPropertyId() + " is not a valid property id, valid property ids are "
-							+ this.getContainerPropertyIds().toString());
+
+			if (column.isGenerated())
+			{
+				addGeneratedColumn(column.getPropertyId(),column.getColumnGenerator());
+			}
+			else
+			{
+
+				Preconditions.checkArgument(this.getContainerPropertyIds().contains(column.getPropertyId()),
+						column.getPropertyId() + " is not a valid property id, valid property ids are "
+								+ this.getContainerPropertyIds().toString());
+			}
 		}
 		System.out.println(this.getContainerPropertyIds().toString());
 		this.setVisibleColumns(colsToShow.toArray());
@@ -162,7 +171,7 @@ public class EntityTable<E> extends Table
 		}
 		catch (Exception e)
 		{
-			logger.error("value: "+property.getValue()+" type: " +property.getType());
+			logger.error("value: " + property.getValue() + " type: " + property.getType());
 			throw new RuntimeException(e);
 		}
 		return ret;

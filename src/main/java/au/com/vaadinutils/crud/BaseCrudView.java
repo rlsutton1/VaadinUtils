@@ -10,6 +10,8 @@ import au.com.vaadinutils.listener.ClickListenerLogged;
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.data.Container.Filter;
+import com.vaadin.data.Property.ValueChangeEvent;
+import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
@@ -19,6 +21,7 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.HorizontalSplitPanel;
 import com.vaadin.ui.Label;
@@ -62,6 +65,10 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 	private VerticalLayout rightLayout;
 	private AbstractLayout editor;
 	private HorizontalSplitPanel splitPanel;
+	private HorizontalLayout buttonLayout;
+	private AbstractLayout advancedSearchLayout;
+	private VerticalLayout searchLayout;
+	private HorizontalLayout basicSearchLayout;
 
 	protected void init(Class<E> entityClass, JPAContainer<E> container, HeadingPropertySet<E> headings)
 	{
@@ -72,6 +79,7 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 
 		entityTable = new EntityTable<E>(container, headings.getColumns());
 		entityTable.setRowChangeListener(this);
+		entityTable.setSortEnabled(true);
 
 		initLayout();
 		entityTable.init();
@@ -90,7 +98,7 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 	{
 		this.setSizeFull();
 
-		 splitPanel = new HorizontalSplitPanel();
+		splitPanel = new HorizontalSplitPanel();
 		this.addComponent(splitPanel);
 		this.setExpandRatio(splitPanel, 1);
 
@@ -99,10 +107,19 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 
 		// Start by defining the LHS which contains the table
 		splitPanel.addComponent(leftLayout);
-		HorizontalLayout bottomLeftLayout = new HorizontalLayout();
-		leftLayout.addComponent(bottomLeftLayout);
-		bottomLeftLayout.addComponent(searchField);
-		bottomLeftLayout.addComponent(newButton);
+		searchLayout = new VerticalLayout();
+
+		basicSearchLayout = new HorizontalLayout();
+		basicSearchLayout.setSizeFull();
+		searchLayout.addComponent(basicSearchLayout);
+
+		leftLayout.addComponent(searchLayout);
+		buildAdvancedSearch();
+		basicSearchLayout.addComponent(searchField);
+		basicSearchLayout.setExpandRatio(searchField, 1.0f);
+
+		basicSearchLayout.addComponent(newButton);
+		basicSearchLayout.setSpacing(true);
 		leftLayout.addComponent(entityTable);
 		leftLayout.setSizeFull();
 
@@ -118,15 +135,15 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 		 * after adding addNewContactButton. The height of the layout is defined
 		 * by the tallest component.
 		 */
-		bottomLeftLayout.setWidth("100%");
+		searchLayout.setWidth("100%");
 		searchField.setWidth("100%");
-		bottomLeftLayout.setExpandRatio(searchField, 1);
+		basicSearchLayout.setExpandRatio(searchField, 1);
 
 		// Now define the edit area
 		rightLayout = new VerticalLayout();
 		splitPanel.addComponent(rightLayout);
 
-		HorizontalLayout buttonLayout = new HorizontalLayout();
+		buttonLayout = new HorizontalLayout();
 		buttonLayout.setWidth("100%");
 		buttonLayout.addComponent(cancelButton);
 		buttonLayout.addComponent(saveButton);
@@ -162,11 +179,59 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 		rightLayout.setVisible(false);
 	}
 
+	private void buildAdvancedSearch()
+	{
+		advancedSearchLayout = getAdvancedSearchLayout();
+		if (advancedSearchLayout != null)
+		{
+			final CheckBox advancedSearchButton = new CheckBox("Advanced");
+
+			advancedSearchButton.setImmediate(true);
+			advancedSearchButton.addValueChangeListener(new ValueChangeListener()
+			{
+
+				/**
+				 * 
+				 */
+				private static final long serialVersionUID = -4396098902592906470L;
+
+				@Override
+				public void valueChange(ValueChangeEvent arg0)
+				{
+					advancedSearchLayout.setVisible(advancedSearchButton.getValue());
+
+				}
+			});
+
+			basicSearchLayout.addComponent(advancedSearchButton);
+			searchLayout.addComponent(advancedSearchLayout);
+			advancedSearchLayout.setVisible(false);
+		}
+	}
+
+	protected AbstractLayout getAdvancedSearchLayout()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	protected void showDelete(boolean show)
+	{
+
+		deleteButton.setVisible(show);
+	}
+
+	protected void showNew(boolean show)
+	{
+
+		newButton.setVisible(show);
+	}
+
 	protected void setSplitPosition(float pos)
 	{
 		splitPanel.setSplitPosition(pos);
 	}
-	
+
 	private void initButtons()
 	{
 		newButton.addClickListener(new ClickListenerLogged()
@@ -278,7 +343,7 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 			commit();
 
 			interceptSaveValues(BaseCrudView.this.currentEntity);
-			
+
 			if (inNew)
 			{
 				Long id = (Long) container.addEntity(BaseCrudView.this.currentEntity);
@@ -286,9 +351,9 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 				inNew = false;
 
 			}
-			
-			//TODO: flush before announcing we've saved
-			
+
+			// TODO: flush before announcing we've saved
+
 			Notification.show("Changes Saved", "Any changes you have made have been saved.", Type.TRAY_NOTIFICATION);
 
 		}
@@ -300,11 +365,13 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 	}
 
 	/**
-	 * opportunity for implementing classes to modify or add data to the entity being saved
+	 * opportunity for implementing classes to modify or add data to the entity
+	 * being saved
+	 * 
 	 * @param currentEntity2
 	 */
 	abstract protected void interceptSaveValues(E entity);
-	
+
 	private void initSearch()
 	{
 
@@ -324,6 +391,7 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 		 * soon as user stops writing for a moment.
 		 */
 		searchField.setTextChangeEventMode(TextChangeEventMode.LAZY);
+		searchField.setImmediate(true);
 
 		/*
 		 * When the event happens, we handle it in the anonymous inner class.
@@ -340,17 +408,35 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 
 			public void textChange(final TextChangeEvent event)
 			{
-
-				/* Reset the filter for the contactContainer. */
-				container.removeAllContainerFilters();
-				container.addContainerFilter(getContainerFilter());
+				applyFilter(getContainerFilter(event.getText()));
 			}
 
 		});
 	}
 
-	abstract protected Filter getContainerFilter();
-	
+	/**
+	 * you'll want to call this when implementing an "advanced search filter".
+	 * note you'll probably also want to call
+	 * getContainerFilter(getSearchFieldText()) first to use as your starting
+	 * point filter.
+	 * 
+	 * @param filter
+	 */
+	protected void applyFilter(final Filter filter)
+	{
+		/* Reset the filter for the contactContainer. */
+		container.removeAllContainerFilters();
+		container.addContainerFilter(filter);
+		container.discard();
+	}
+
+	protected String getSearchFieldText()
+	{
+		return searchField.getValue();
+	}
+
+	abstract protected Filter getContainerFilter(String string);
+
 	@Override
 	/** Called when the currently selected row in the 
 	 *  table part of this view has changed.
@@ -413,10 +499,12 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 
 			this.currentEntity = item.getEntity();
 			fieldGroup.setItemDataSource(item);
-			
-			// removed as this doesn't make any sense particularly since the property id is hard coded to'name'.
-//			Preconditions.checkState(fieldGroup.getItemDataSource().getItemPropertyIds().contains("name"),
-//					"valid listFieldNames are " + fieldGroup.getItemDataSource().getItemPropertyIds().toString());
+
+			// removed as this doesn't make any sense particularly since the
+			// property id is hard coded to'name'.
+			// Preconditions.checkState(fieldGroup.getItemDataSource().getItemPropertyIds().contains("name"),
+			// "valid listFieldNames are " +
+			// fieldGroup.getItemDataSource().getItemPropertyIds().toString());
 
 		}
 		else
