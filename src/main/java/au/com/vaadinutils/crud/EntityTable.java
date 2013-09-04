@@ -23,7 +23,7 @@ public class EntityTable<E> extends Table
 
 	Logger logger = Logger.getLogger(EntityTable.class);
 
-	EntityTable(JPAContainer<E> contactContainer, List<HeadingToPropertyId> columns)
+	public EntityTable(JPAContainer<E> contactContainer, List<HeadingToPropertyId> columns)
 	{
 		this.contactContainer = contactContainer;
 		this.visibleColumns = columns;
