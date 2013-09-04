@@ -8,6 +8,7 @@ import au.com.vaadinutils.crud.splitFields.SplitField;
 
 import com.google.gwt.thirdparty.guava.common.base.Preconditions;
 import com.vaadin.data.fieldgroup.FieldGroup;
+import com.vaadin.shared.ui.datefield.Resolution;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.CheckBox;
@@ -41,6 +42,7 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	public MultiColumnFormLayout(int columns, ValidatingFieldGroup<E> fieldGroup)
 	{
 		grid = new GridLayout(columns * 2, 1);
+		
 		this.columns = columns * 2;
 		formHelper = new FormHelper<E>(grid, fieldGroup);
 		init();
@@ -70,9 +72,14 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	@Override
 	public void addComponent(Component component)
 	{
-		if (!(component instanceof Label))
-			Preconditions.checkArgument(component instanceof SplitField);
-		internalAddComponent((SplitField) component);
+		if (component instanceof SplitField)
+		{
+			internalAddComponent((SplitField) component);
+		}
+		else
+		{
+			super.addComponent(component);
+		}
 	}
 
 	/**
@@ -91,7 +98,8 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		{
 			captionWidth = 1;
 			System.out.println("'"+splitComponent.getCaption()+"'");
-		}else
+		}
+		else
 		{
 			System.out.println("No caption");
 		}
@@ -111,9 +119,8 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 			x++;
 		}
 
-		
-
-		System.out.println(splitComponent.getCaption() + " X:" + x + " Y:" + y +" X1:"+(x+fieldWidth-1)+" Y1:"+y);
+		System.out.println(splitComponent.getCaption() + " X:" + x + " Y:" + y + " X1:" + (x + fieldWidth - 1) + " Y1:"
+				+ y);
 		grid.addComponent(splitComponent, x , y, x + fieldWidth-1, y);
 		x += fieldWidth;
 
@@ -219,9 +226,9 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		return field;
 	}
 
-	public DateField bindDateField(String fieldLabel, String fieldName)
+	public DateField bindDateField(String fieldLabel, String fieldName, String dateFormat, Resolution resolution)
 	{
-		DateField field = formHelper.bindDateField(this, fieldGroup, fieldLabel, fieldName);
+		DateField field = formHelper.bindDateField(this, fieldGroup, fieldLabel, fieldName, dateFormat, resolution);
 		this.fieldList.add(field);
 		return field;
 	}
@@ -287,7 +294,7 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		return this.fieldList;
 	}
 
-	public FieldGroup getFieldGroup()
+	public ValidatingFieldGroup<E> getFieldGroup()
 	{
 		return fieldGroup;
 	}

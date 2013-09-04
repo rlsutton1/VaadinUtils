@@ -3,7 +3,7 @@ package au.com.vaadinutils.dao;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 
-public class Transaction implements AutoCloseable
+public class Transaction 
 {
 	private EntityTransaction transaction;
 
@@ -13,7 +13,6 @@ public class Transaction implements AutoCloseable
 		transaction.begin();
 	}
 
-	@Override
 	public void close()
 	{
 		if (transaction.isActive())

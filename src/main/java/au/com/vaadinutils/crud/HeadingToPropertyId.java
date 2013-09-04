@@ -1,19 +1,25 @@
 package au.com.vaadinutils.crud;
 
+import com.vaadin.ui.Table.ColumnGenerator;
+
 public class HeadingToPropertyId
 {
 	private String heading;
 	private String propertyId;
+	private ColumnGenerator columnGenerator;
 
 	/**
 	 * 
 	 * @param heading
-	 * @param propertyId - the real field name
+	 * @param propertyId
+	 *            - the real field name
+	 * @param columnGenerator2 
 	 */
-	public HeadingToPropertyId(String heading, String propertyId)
+	public HeadingToPropertyId(String heading, String propertyId, ColumnGenerator columnGenerator2)
 	{
 		this.heading = heading;
 		this.propertyId = propertyId;
+		this.columnGenerator = columnGenerator2;
 	}
 
 	public String getPropertyId()
@@ -24,7 +30,18 @@ public class HeadingToPropertyId
 
 	public String getHeader()
 	{
-			return heading;
+		return heading;
+	}
+
+	public ColumnGenerator getColumnGenerator()
+	{
+
+		return columnGenerator;
+	}
+
+	public boolean isGenerated()
+	{
+		return columnGenerator != null;
 	}
 
 }

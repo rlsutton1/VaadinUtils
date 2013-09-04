@@ -24,6 +24,7 @@ import com.vaadin.addon.jpacontainer.fieldfactory.SingleSelectConverter;
 import com.vaadin.data.Container;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.IndexedContainer;
+import com.vaadin.shared.ui.datefield.Resolution;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.AbstractSelect.ItemCaptionMode;
@@ -129,10 +130,11 @@ public class FormHelper<E> implements Serializable
 	}
 
 	public DateField bindDateField(AbstractLayout form, ValidatingFieldGroup<E> group, String fieldLabel,
-			String fieldName)
+			String fieldName, String dateFormat, Resolution resolution)
 	{
 		DateField field = new SplitDateField(fieldLabel);
-		field.setDateFormat("yyyy-MM-dd");
+		field.setDateFormat(dateFormat);
+		field.setResolution(resolution);
 
 		field.setImmediate(true);
 		field.setWidth("100%");
@@ -140,6 +142,12 @@ public class FormHelper<E> implements Serializable
 			group.bind(field, fieldName);
 		form.addComponent(field);
 		return field;
+	}
+
+	public DateField bindDateField(AbstractLayout form, ValidatingFieldGroup<E> group, String fieldLabel,
+			String fieldName)
+	{
+		return bindDateField(form,group,fieldLabel,fieldName,"yyyy-MM-dd",Resolution.DAY);
 	}
 
 	public Label bindLabel(String fieldLabel)
@@ -240,8 +248,9 @@ public class FormHelper<E> implements Serializable
 		if (fieldGroup != null)
 		{
 
-			Preconditions.checkState(fieldGroup.getContainer().getContainerPropertyIds().contains(fieldName),
-					"valid listFieldNames are " + fieldGroup.getContainer().getContainerPropertyIds().toString());
+			Preconditions.checkState(fieldGroup.getContainer().getContainerPropertyIds().contains(fieldName), fieldName
+					+ " is not valid, valid listFieldNames are "
+					+ fieldGroup.getContainer().getContainerPropertyIds().toString());
 
 			fieldGroup.bind(field, fieldName);
 		}

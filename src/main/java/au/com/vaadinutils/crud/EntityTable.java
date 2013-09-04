@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
 import com.google.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
@@ -19,10 +21,12 @@ public class EntityTable<E> extends Table
 	private RowChangeListener<E> rowChangeListener;
 	private List<HeadingToPropertyId> visibleColumns;
 
-	EntityTable(JPAContainer<E> contactContainer, List<HeadingToPropertyId> headings)
+	Logger logger = Logger.getLogger(EntityTable.class);
+
+	EntityTable(JPAContainer<E> contactContainer, List<HeadingToPropertyId> columns)
 	{
 		this.contactContainer = contactContainer;
-		this.visibleColumns = headings;
+		this.visibleColumns = columns;
 	}
 
 	public void setRowChangeListener(RowChangeListener<E> rowChangeListener)
@@ -39,18 +43,26 @@ public class EntityTable<E> extends Table
 		for (HeadingToPropertyId column : visibleColumns)
 		{
 			colsToShow.add(column.getPropertyId());
-			Preconditions.checkArgument(this.getContainerPropertyIds().contains(column.getPropertyId()),
-					column.getPropertyId() + " is not a valid property id, valid property ids are "
-							+ this.getContainerPropertyIds().toString());
+
+			if (column.isGenerated())
+			{
+				addGeneratedColumn(column.getPropertyId(),column.getColumnGenerator());
+			}
+			else
+			{
+
+				Preconditions.checkArgument(this.getContainerPropertyIds().contains(column.getPropertyId()),
+						column.getPropertyId() + " is not a valid property id, valid property ids are "
+								+ this.getContainerPropertyIds().toString());
+			}
 		}
 		System.out.println(this.getContainerPropertyIds().toString());
 		this.setVisibleColumns(colsToShow.toArray());
-		
+
 		for (HeadingToPropertyId column : visibleColumns)
 		{
 			this.setColumnHeader(column.getPropertyId(), column.getHeader());
 		}
-
 
 		this.setSelectable(true);
 		this.setImmediate(true);
@@ -86,7 +98,9 @@ public class EntityTable<E> extends Table
 		{
 
 			if (EntityTable.this.rowChangeListener != null && EntityTable.this.rowChangeListener.allowRowChange())
+			{
 				EntityTable.super.changeVariables(source, variables);
+			}
 			else
 				markAsDirty();
 		}
@@ -144,12 +158,23 @@ public class EntityTable<E> extends Table
 		try
 		{
 			property.getValue();
+
 		}
 		catch (Exception e)
 		{
 			return null;
 		}
-		return super.formatPropertyValue(rowId, colId, property);
+		String ret = null;
+		try
+		{
+			ret = super.formatPropertyValue(rowId, colId, property);
+		}
+		catch (Exception e)
+		{
+			logger.error("value: " + property.getValue() + " type: " + property.getType());
+			throw new RuntimeException(e);
+		}
+		return ret;
 	}
 
 }
