@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
 import com.google.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
@@ -18,6 +20,8 @@ public class EntityTable<E> extends Table
 	private JPAContainer<E> contactContainer;
 	private RowChangeListener<E> rowChangeListener;
 	private List<HeadingToPropertyId> visibleColumns;
+	
+	Logger logger = Logger.getLogger(EntityTable.class);
 
 	EntityTable(JPAContainer<E> contactContainer, List<HeadingToPropertyId> headings)
 	{
@@ -45,12 +49,11 @@ public class EntityTable<E> extends Table
 		}
 		System.out.println(this.getContainerPropertyIds().toString());
 		this.setVisibleColumns(colsToShow.toArray());
-		
+
 		for (HeadingToPropertyId column : visibleColumns)
 		{
 			this.setColumnHeader(column.getPropertyId(), column.getHeader());
 		}
-
 
 		this.setSelectable(true);
 		this.setImmediate(true);
@@ -86,7 +89,9 @@ public class EntityTable<E> extends Table
 		{
 
 			if (EntityTable.this.rowChangeListener != null && EntityTable.this.rowChangeListener.allowRowChange())
+			{
 				EntityTable.super.changeVariables(source, variables);
+			}
 			else
 				markAsDirty();
 		}
@@ -144,12 +149,23 @@ public class EntityTable<E> extends Table
 		try
 		{
 			property.getValue();
+
 		}
 		catch (Exception e)
 		{
 			return null;
 		}
-		return super.formatPropertyValue(rowId, colId, property);
+		String ret = null;
+		try
+		{
+			ret = super.formatPropertyValue(rowId, colId, property);
+		}
+		catch (Exception e)
+		{
+			logger.error("value: "+property.getValue()+" type: " +property.getType());
+			throw new RuntimeException(e);
+		}
+		return ret;
 	}
 
 }

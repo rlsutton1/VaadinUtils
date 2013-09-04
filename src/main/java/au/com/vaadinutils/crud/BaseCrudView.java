@@ -1,7 +1,5 @@
 package au.com.vaadinutils.crud;
 
-import java.util.List;
-
 import javax.validation.ConstraintViolationException;
 
 import org.apache.log4j.Logger;
@@ -9,7 +7,6 @@ import org.vaadin.dialogs.ConfirmDialog;
 
 import au.com.vaadinutils.listener.ClickListenerLogged;
 
-import com.google.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.data.Container.Filter;
@@ -64,8 +61,9 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 	private EntityTable<E> entityTable;
 	private VerticalLayout rightLayout;
 	private AbstractLayout editor;
+	private HorizontalSplitPanel splitPanel;
 
-	protected void init(Class<E> entityClass, JPAContainer<E> container, HeadingPropertySet headings)
+	protected void init(Class<E> entityClass, JPAContainer<E> container, HeadingPropertySet<E> headings)
 	{
 		this.entityClass = entityClass;
 		this.container = container;
@@ -92,7 +90,7 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 	{
 		this.setSizeFull();
 
-		HorizontalSplitPanel splitPanel = new HorizontalSplitPanel();
+		 splitPanel = new HorizontalSplitPanel();
 		this.addComponent(splitPanel);
 		this.setExpandRatio(splitPanel, 1);
 
@@ -164,6 +162,11 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 		rightLayout.setVisible(false);
 	}
 
+	protected void setSplitPosition(float pos)
+	{
+		splitPanel.setSplitPosition(pos);
+	}
+	
 	private void initButtons()
 	{
 		newButton.addClickListener(new ClickListenerLogged()

@@ -2,9 +2,12 @@ package au.com.vaadinutils.crud;
 
 import java.util.ArrayList;
 
+import org.apache.log4j.Logger;
+
 import au.com.vaadinutils.crud.splitFields.SplitField;
 
 import com.google.gwt.thirdparty.guava.common.base.Preconditions;
+import com.vaadin.shared.ui.datefield.Resolution;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.CheckBox;
@@ -13,14 +16,15 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.DateField;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
 public class MultiColumnFormLayout<E> extends VerticalLayout
 {
-	// private static Logger logger =
-	// Logger.getLogger(MultiColumnFormLayout.class);
+	@SuppressWarnings("unused")
+	private static Logger logger = Logger.getLogger(MultiColumnFormLayout.class);
 	private static final long serialVersionUID = 1L;
 	private final int columns;
 	private int colspan = 1;
@@ -37,6 +41,7 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	public MultiColumnFormLayout(int columns, ValidatingFieldGroup<E> fieldGroup)
 	{
 		grid = new GridLayout(columns * 2, 1);
+		
 		this.columns = columns * 2;
 		formHelper = new FormHelper<E>(grid, fieldGroup);
 		init();
@@ -66,8 +71,14 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	@Override
 	public void addComponent(Component component)
 	{
-		Preconditions.checkArgument(component instanceof SplitField);
-		internalAddComponent((SplitField) component);
+		if (component instanceof SplitField)
+		{
+			internalAddComponent((SplitField) component);
+		}
+		else
+		{
+			super.addComponent(component);
+		}
 	}
 
 	/**
@@ -82,34 +93,33 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 
 		int fieldWidth = colspan;
 		int captionWidth = 0;
-		if (splitComponent.getCaption()!= null && splitComponent.getCaption().length()>=0)
+		if (splitComponent.getCaption() != null && splitComponent.getCaption().length() >= 0)
 		{
 			captionWidth = 1;
-			System.out.println("'"+splitComponent.getCaption()+"'");
-		}else
+			System.out.println("'" + splitComponent.getCaption() + "'");
+		}
+		else
 		{
 			System.out.println("No caption");
 		}
-		
-		
-		if (x + fieldWidth+captionWidth >= columns)
+
+		if (x + fieldWidth + captionWidth >= columns)
 		{
 			x = 0;
 			y++;
 			grid.insertRow(y);
 
 		}
-		if (captionWidth==1)
+		if (captionWidth == 1)
 		{
 			grid.addComponent(splitComponent.getLabel(), x, y, x, y);
 			grid.setComponentAlignment(splitComponent.getLabel(), Alignment.MIDDLE_RIGHT);
 			x++;
 		}
 
-		
-
-		System.out.println(splitComponent.getCaption() + " X:" + x + " Y:" + y +" X1:"+(x+fieldWidth-1)+" Y1:"+y);
-		grid.addComponent(splitComponent, x , y, x + fieldWidth-1, y);
+		System.out.println(splitComponent.getCaption() + " X:" + x + " Y:" + y + " X1:" + (x + fieldWidth - 1) + " Y1:"
+				+ y);
+		grid.addComponent(splitComponent, x, y, x + fieldWidth - 1, y);
 		x += fieldWidth;
 
 		grid.setComponentAlignment(splitComponent, Alignment.MIDDLE_LEFT);
@@ -117,6 +127,16 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		splitComponent.setSizeFull();
 
 		this.colspan = 1;
+
+	}
+
+	/**
+	 * Adds a new row to the grid and moves the cursor down one row.
+	 */
+	public void newLine()
+	{
+		grid.insertRow(grid.getRows());
+		grid.newLine();
 	}
 
 	/**
@@ -146,6 +166,49 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		this.fieldList.add(field);
 		return field;
 	}
+	
+	/** 
+	 * Adds a text field to the form without binding it to the FieldGroup
+	 * @param caption
+	 * @return
+	 */
+	public TextField addTextField(String caption)
+	{
+		TextField field = new TextField(caption);
+		field.setWidth("100%");
+		field.setImmediate(true);
+		field.setNullRepresentation("");
+		field.setNullSettingAllowed(false);
+		this.addComponent(field);
+		this.fieldList.add(field);
+		return field;
+	}
+
+
+	public PasswordField bindPasswordField(String fieldLabel, String fieldName)
+	{
+		PasswordField field = formHelper.bindPasswordField(this, fieldGroup, fieldLabel, fieldName);
+
+		this.fieldList.add(field);
+		return field;
+	}
+
+	/** 
+	 * Adds a text field to the form without binding it to the FieldGroup
+	 * @param caption
+	 * @return
+	 */
+	public PasswordField addPasswordField(String caption)
+	{
+		PasswordField field = new PasswordField(caption);
+		field.setWidth("100%");
+		field.setImmediate(true);
+		field.setNullRepresentation("");
+		field.setNullSettingAllowed(false);
+		this.addComponent(field);
+		this.fieldList.add(field);
+		return field;
+	}
 
 	/**
 	 * 
@@ -162,9 +225,9 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		return field;
 	}
 
-	public DateField bindDateField(String fieldLabel, String fieldName)
+	public DateField bindDateField(String fieldLabel, String fieldName, String dateFormat, Resolution resolution)
 	{
-		DateField field = formHelper.bindDateField(this, fieldGroup, fieldLabel, fieldName);
+		DateField field = formHelper.bindDateField(this, fieldGroup, fieldLabel, fieldName,dateFormat, resolution);
 		this.fieldList.add(field);
 		return field;
 	}
@@ -228,6 +291,11 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	public ArrayList<AbstractComponent> getFieldList()
 	{
 		return this.fieldList;
+	}
+
+	public FieldGroup getFieldGroup()
+	{
+		return fieldGroup;
 	}
 
 }
