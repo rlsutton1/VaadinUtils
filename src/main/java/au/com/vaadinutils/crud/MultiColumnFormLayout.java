@@ -70,7 +70,8 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	@Override
 	public void addComponent(Component component)
 	{
-		Preconditions.checkArgument(component instanceof SplitField);
+		if (!(component instanceof Label))
+			Preconditions.checkArgument(component instanceof SplitField);
 		internalAddComponent((SplitField) component);
 	}
 
@@ -255,7 +256,7 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 
 	public void setEntityManager(EntityManagerFactory factory)
 	{
-		formHelper.setEntityManagerFactory(factory);
+		FormHelper.setEntityManagerFactory(factory);
 	}
 
 	/**
