@@ -87,6 +87,20 @@ public class FormHelper<E> implements Serializable
 		return field;
 	}
 
+	
+	public PasswordField bindPasswordField(AbstractLayout form, FieldGroup group, String fieldLabel, String fieldName)
+	{
+		PasswordField field = new SplitPasswordField(fieldLabel);
+		field.setWidth("100%");
+		field.setImmediate(true);
+		field.setNullRepresentation("");
+		field.setNullSettingAllowed(false);
+		if (group != null)
+			group.bind(field, fieldName);
+		form.addComponent(field);
+		return field;
+	}
+
 	public TextArea bindTextAreaField(String fieldLabel, String fieldName, int rows)
 	{
 		TextArea field = bindTextAreaField(form, group, fieldLabel, fieldName, rows);

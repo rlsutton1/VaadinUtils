@@ -127,7 +127,6 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		splitComponent.setSizeFull();
 
 		this.colspan = 1;
-
 	}
 
 	/**
