@@ -7,7 +7,6 @@ import org.apache.log4j.Logger;
 import au.com.vaadinutils.crud.splitFields.SplitField;
 
 import com.google.gwt.thirdparty.guava.common.base.Preconditions;
-import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.shared.ui.datefield.Resolution;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.Alignment;
