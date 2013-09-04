@@ -72,21 +72,6 @@ public class FormHelper<E> implements Serializable
 		form.addComponent(field);
 		return field;
 	}
-
-	
-	public PasswordField bindPasswordField(AbstractLayout form, FieldGroup group, String fieldLabel, String fieldName)
-	{
-		PasswordField field = new SplitPasswordField(fieldLabel);
-		field.setWidth("100%");
-		field.setImmediate(true);
-		field.setNullRepresentation("");
-		field.setNullSettingAllowed(false);
-		if (group != null)
-			group.bind(field, fieldName);
-		form.addComponent(field);
-		return field;
-	}
-
 	
 	public PasswordField bindPasswordField(AbstractLayout form, FieldGroup group, String fieldLabel, String fieldName)
 	{
