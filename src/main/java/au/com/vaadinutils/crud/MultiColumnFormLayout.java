@@ -2,6 +2,8 @@ package au.com.vaadinutils.crud;
 
 import java.util.ArrayList;
 
+import javax.persistence.metamodel.SingularAttribute;
+
 import org.apache.log4j.Logger;
 
 import au.com.vaadinutils.crud.splitFields.SplitField;
@@ -23,7 +25,6 @@ import com.vaadin.ui.VerticalLayout;
 
 public class MultiColumnFormLayout<E> extends VerticalLayout
 {
-	@SuppressWarnings("unused")
 	private static Logger logger = Logger.getLogger(MultiColumnFormLayout.class);
 	private static final long serialVersionUID = 1L;
 	private final int columns;
@@ -37,12 +38,19 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 
 	int x = 0;
 	int y = 0;
+	private int labelWidth;
 
-	public MultiColumnFormLayout(int columns, ValidatingFieldGroup<E> fieldGroup)
+	public MultiColumnFormLayout(int columns, ValidatingFieldGroup<E> fieldGroup, int labelWidth)
 	{
-		grid = new GridLayout(columns * 2, 1);
-		
+		super.setDescription("MultiColumnFormLayout");
 		this.columns = columns * 2;
+		this.labelWidth = labelWidth;
+		
+		grid = new GridLayout(columns * 2, 1);
+		grid.setDescription("Grid within MultiColumnLayout");
+		grid.setSizeFull();
+		grid.setSpacing(true);
+		
 		formHelper = new FormHelper<E>(grid, fieldGroup);
 		init();
 		this.fieldGroup = fieldGroup;
@@ -50,14 +58,16 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		super.addComponent(grid);
 
 		VerticalLayout filler = new VerticalLayout();
+		filler.setDescription("MultiColumnFormLayout - vertical filler");
 		filler.setSizeFull();
 		super.addComponent(filler);
 		this.setExpandRatio(filler, 1.0f);
-		grid.setSpacing(true);
+		//grid.setSpacing(true);
 
 		for (int i = 1; i < columns * 2; i += 2)
 		{
-			grid.setColumnExpandRatio(i, 1.0f / new Float(columns));
+			//grid.setColumnExpandRatio(i, 1.0f / new Float(columns));
+			grid.setColumnExpandRatio(i, 1.0f );
 		}
 
 	}
@@ -96,11 +106,11 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		if (splitComponent.getCaption()!= null && splitComponent.getCaption().length()>=0)
 		{
 			captionWidth = 1;
-			System.out.println("'"+splitComponent.getCaption()+"'");
+			logger.debug("'"+splitComponent.getCaption()+"'");
 		}
 		else
 		{
-			System.out.println("No caption");
+			logger.warn("No caption");
 		}
 		
 		
@@ -115,17 +125,19 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		{
 			grid.addComponent(splitComponent.getLabel(), x, y, x, y);
 			grid.setComponentAlignment(splitComponent.getLabel(), Alignment.MIDDLE_RIGHT);
+			splitComponent.getLabel().setWidth(""+this.labelWidth);
 			x++;
 		}
 
-		System.out.println(splitComponent.getCaption() + " X:" + x + " Y:" + y + " X1:" + (x + fieldWidth - 1) + " Y1:"
+		logger.debug(splitComponent.getCaption() + " X:" + x + " Y:" + y + " X1:" + (x + fieldWidth - 1) + " Y1:"
 				+ y);
 		grid.addComponent(splitComponent, x , y, x + fieldWidth-1, y);
 		x += fieldWidth;
 
 		grid.setComponentAlignment(splitComponent, Alignment.MIDDLE_LEFT);
 
-		splitComponent.setSizeFull();
+		//splitComponent.setSizeFull();
+		splitComponent.setWidth("100%");
 
 		this.colspan = 1;
 	}
@@ -283,10 +295,22 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		Preconditions.checkArgument(formHelper.isEntitymanagerSet(),
 				"You must provide the entity manager factory by calling setEntityManager first.");
 
-		ComboBox field = formHelper.bindEntityField(this, fieldGroup, fieldLabel, fieldName, listFieldName, listClazz);
+		ComboBox field = formHelper.bindEntityField(this, fieldGroup, fieldLabel, fieldName, listClazz, listFieldName);
 		this.fieldList.add(field);
 		return field;
 	}
+	
+
+	public <L> ComboBox bindEntityField(String fieldLabel, SingularAttribute<E, String> fieldName, Class<L> listClazz, SingularAttribute<L, String> listFieldName)
+	{
+		Preconditions.checkArgument(formHelper.isEntitymanagerSet(),
+				"You must provide the entity manager factory by calling setEntityManager first.");
+
+		ComboBox field = formHelper.bindEntityField(this, fieldGroup, fieldLabel, fieldName, listClazz, listFieldName);
+		this.fieldList.add(field);
+		return field;
+	}
+
 
 	public ArrayList<AbstractComponent> getFieldList()
 	{
