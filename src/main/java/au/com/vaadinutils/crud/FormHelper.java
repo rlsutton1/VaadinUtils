@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import javax.persistence.metamodel.SingularAttribute;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
@@ -216,16 +217,23 @@ public class FormHelper<E> implements Serializable
 
 	}
 
-	public ComboBox bindEntityField(String fieldLabel, String fieldName, String listFieldname, Class<E> listClazz)
+	public ComboBox bindEntityField(String fieldLabel, String fieldName, Class<E> listClazz, String listFieldname)
 	{
-		ComboBox field = bindEntityField(form, group, fieldLabel, fieldName, listFieldname, listClazz);
+		ComboBox field = bindEntityField(form, group, fieldLabel, fieldName, listClazz, listFieldname);
 		this.fieldList.add(field);
 		return field;
 	}
 
+	
+	public <L> ComboBox bindEntityField(AbstractLayout form, ValidatingFieldGroup<E> fieldGroup, String fieldLabel
+			, SingularAttribute<E, String> fieldName, Class<L> listClazz, SingularAttribute<L, String> listFieldName)
+	{
+		return bindEntityField( form,  fieldGroup,  fieldLabel,	 fieldName.getName(),  listClazz, listFieldName.getName());
+
+	}
 
 	public <L> ComboBox bindEntityField(AbstractLayout form, ValidatingFieldGroup<E> fieldGroup, String fieldLabel,
-			String fieldName, String listFieldName, Class<L> listClazz)
+			String fieldName, Class<L> listClazz, String listFieldName)
 	{
 		Preconditions
 				.checkNotNull(entityManagerFactory, "You must provide the entity manager factory by calling setEntityManager first.");
