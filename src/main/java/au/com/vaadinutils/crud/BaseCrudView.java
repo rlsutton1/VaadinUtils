@@ -10,6 +10,8 @@ import au.com.vaadinutils.listener.ClickListenerLogged;
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.data.Container.Filter;
+import com.vaadin.data.Container.PropertySetChangeEvent;
+import com.vaadin.data.Container.PropertySetChangeListener;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
@@ -81,12 +83,16 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 		entityTable = new EntityTable<E>(container, headings.getColumns());
 		entityTable.setRowChangeListener(this);
 		entityTable.setSortEnabled(true);
+		
+	
 
 		initLayout();
 		entityTable.init();
 		initSearch();
 		initButtons();
 		this.setVisible(true);
+		entityTable.select(entityTable.firstItemId());
+
 	}
 
 	/*
@@ -441,6 +447,9 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 		container.removeAllContainerFilters();
 		container.addContainerFilter(filter);
 		container.discard();
+		
+		entityTable.select(entityTable.firstItemId());
+		
 	}
 
 	protected String getSearchFieldText()
