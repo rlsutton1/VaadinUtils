@@ -158,7 +158,7 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 
 		/* Put a little margin around the fields in the right side editor */
 		Panel scroll = new Panel();
-		mainEditPanel.setMargin(true);
+		mainEditPanel.setDescription("BaseCrud:MainEditPanel");
 		mainEditPanel.setVisible(true);
 		mainEditPanel.setSizeFull();
 		scroll.setSizeFull();
