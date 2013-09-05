@@ -171,8 +171,8 @@ public class EntityTable<E> extends Table
 		}
 		catch (Exception e)
 		{
-			logger.error("value: " + property.getValue() + " type: " + property.getType());
-			throw new RuntimeException(e);
+			logger.error("value: " + property.getValue() + " type: " + property.getType(),e);
+			ret = e.getMessage();
 		}
 		return ret;
 	}
