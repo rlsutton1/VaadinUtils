@@ -69,6 +69,7 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 	private AbstractLayout advancedSearchLayout;
 	private VerticalLayout searchLayout;
 	private HorizontalLayout basicSearchLayout;
+	private CheckBox advancedSearchButton;
 
 	protected void init(Class<E> entityClass, JPAContainer<E> container, HeadingPropertySet<E> headings)
 	{
@@ -184,7 +185,7 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 		advancedSearchLayout = getAdvancedSearchLayout();
 		if (advancedSearchLayout != null)
 		{
-			final CheckBox advancedSearchButton = new CheckBox("Advanced");
+			advancedSearchButton = new CheckBox("Advanced");
 
 			advancedSearchButton.setImmediate(true);
 			advancedSearchButton.addValueChangeListener(new ValueChangeListener()
@@ -199,6 +200,8 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 				public void valueChange(ValueChangeEvent arg0)
 				{
 					advancedSearchLayout.setVisible(advancedSearchButton.getValue());
+
+					triggerFilter();
 
 				}
 			});
@@ -408,21 +411,31 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 
 			public void textChange(final TextChangeEvent event)
 			{
-				applyFilter(getContainerFilter(event.getText()));
+				Filter filter = getContainerFilter(event.getText());
+				if (advancedSearchButton.getValue())
+				{
+					filter = getAdvancedContainerFilter(filter);
+				}
+				applyFilter(filter);
 			}
 
 		});
 	}
 
 	/**
-	 * you'll want to call this when implementing an "advanced search filter".
-	 * note you'll probably also want to call
-	 * getContainerFilter(getSearchFieldText()) first to use as your starting
-	 * point filter.
-	 * 
-	 * @param filter
+	 * call this method to cause filters to be applied
 	 */
-	protected void applyFilter(final Filter filter)
+	protected void triggerFilter()
+	{
+		Filter filter = getContainerFilter(searchField.getValue());
+		if (advancedSearchButton.getValue())
+		{
+			filter = getAdvancedContainerFilter(filter);
+		}
+		applyFilter(filter);
+	}
+
+	private void applyFilter(final Filter filter)
 	{
 		/* Reset the filter for the contactContainer. */
 		container.removeAllContainerFilters();
@@ -435,7 +448,28 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 		return searchField.getValue();
 	}
 
+	/**
+	 * create a filter for the text supplied, the text is as entered in the text
+	 * search bar.
+	 * 
+	 * @param string
+	 * @return
+	 */
 	abstract protected Filter getContainerFilter(String string);
+
+	/**
+	 * to initiate advanced filtering call triggerFilter();
+	 * 
+	 * this method is only invoked when the advanced filter is visible. It is
+	 * called, allowing the advanced filter to be added to the simple filter.
+	 * 
+	 * @param string
+	 * @return
+	 */
+	protected Filter getAdvancedContainerFilter(Filter filter)
+	{
+		return filter;
+	}
 
 	@Override
 	/** Called when the currently selected row in the 

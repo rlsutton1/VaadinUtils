@@ -9,7 +9,6 @@ public class ColumnList
 {
 	List<SingularAttribute<? extends Object, ? extends Object>> columns = new ArrayList<SingularAttribute<? extends Object, ? extends Object>>();
 
-	@SafeVarargs
 	public ColumnList(SingularAttribute<? extends Object, ? extends Object>... columns)
 	{
 		for (SingularAttribute<? extends Object, ? extends Object> column : columns)

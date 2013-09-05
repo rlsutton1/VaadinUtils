@@ -1,6 +1,9 @@
 package au.com.vaadinutils.crud.columnGenerators;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import javax.persistence.metamodel.SingularAttribute;
 
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
@@ -20,6 +23,11 @@ public class DateColumnGenerator implements ColumnGenerator
 	{
 		sdf = new SimpleDateFormat(format);
 		this.propertyId = propertyId;
+	}
+
+	public DateColumnGenerator(String format, SingularAttribute<? extends Object, Date> field)
+	{
+		this(format,field.getName());
 	}
 
 	@Override
