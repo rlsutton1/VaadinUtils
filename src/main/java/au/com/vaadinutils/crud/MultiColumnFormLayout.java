@@ -1,6 +1,7 @@
 package au.com.vaadinutils.crud;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import javax.persistence.metamodel.SingularAttribute;
 
@@ -27,8 +28,13 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 {
 	private static Logger logger = Logger.getLogger(MultiColumnFormLayout.class);
 	private static final long serialVersionUID = 1L;
+	private static final int DEFAULT_LABEL_WIDTH = 120;
+	private static final int DEFAULT_FIELD_WIDTH = 100;
 	private final int columns;
 	private int colspan = 1;
+
+	private int labelWidths[];
+	private int fieldWidths[];
 
 	private ValidatingFieldGroup<E> fieldGroup;
 	private ArrayList<AbstractComponent> fieldList = new ArrayList<AbstractComponent>();
@@ -38,38 +44,62 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 
 	int x = 0;
 	int y = 0;
-	private int labelWidth;
 
-	public MultiColumnFormLayout(int columns, ValidatingFieldGroup<E> fieldGroup, int labelWidth)
+	public MultiColumnFormLayout(int columns, ValidatingFieldGroup<E> fieldGroup)
 	{
 		super.setDescription("MultiColumnFormLayout");
 		this.columns = columns * 2;
-		this.labelWidth = labelWidth;
-		
+
+		this.labelWidths = new int[columns];
+		this.fieldWidths = new int[columns];
+		for (int i = 0; i < columns; i++)
+		{
+			this.labelWidths[i] = DEFAULT_LABEL_WIDTH;
+			this.fieldWidths[i] = DEFAULT_FIELD_WIDTH;
+		}
+
 		grid = new GridLayout(columns * 2, 1);
 		grid.setDescription("Grid within MultiColumnLayout");
 		grid.setSizeFull();
 		grid.setSpacing(true);
-		
+
 		formHelper = new FormHelper<E>(grid, fieldGroup);
 		init();
 		this.fieldGroup = fieldGroup;
 		this.setSizeFull();
 		super.addComponent(grid);
 
-		VerticalLayout filler = new VerticalLayout();
-		filler.setDescription("MultiColumnFormLayout - vertical filler");
-		filler.setSizeFull();
-		super.addComponent(filler);
-		this.setExpandRatio(filler, 1.0f);
-		//grid.setSpacing(true);
-
 		for (int i = 1; i < columns * 2; i += 2)
 		{
-			//grid.setColumnExpandRatio(i, 1.0f / new Float(columns));
-			grid.setColumnExpandRatio(i, 1.0f );
+			grid.setColumnExpandRatio(i, 1.0f);
 		}
 
+	}
+
+	/**
+	 * Sets the width of the labels in the given column.
+	 * 
+	 * @param column
+	 *            - zero based column to set the width of
+	 * @param width
+	 *            - the width to set all labels to.
+	 */
+	public void setColumnLabelWidth(int column, int width)
+	{
+		this.labelWidths[column] = width;
+	}
+
+	/**
+	 * Sets the width of the labels in the given column.
+	 * 
+	 * @param column
+	 *            - zero based column to set the width of
+	 * @param width
+	 *            - the width to set all labels to.
+	 */
+	public void setColumnFieldWidth(int column, int width)
+	{
+		this.fieldWidths[column] = width;
 	}
 
 	private void init()
@@ -101,45 +131,53 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	{
 		// SplitField splitComponent = (SplitField) component;
 
-		int fieldWidth = colspan;
-		int captionWidth = 0;
-		if (splitComponent.getCaption()!= null && splitComponent.getCaption().length()>=0)
-		{
-			captionWidth = 1;
-			logger.debug("'"+splitComponent.getCaption()+"'");
-		}
-		else
-		{
-			logger.warn("No caption");
-		}
-		
-		
-		if (x + fieldWidth+captionWidth >= columns)
+		int fieldSpan = colspan;
+		int captionWidth = 1;
+		if (x + fieldSpan + captionWidth > columns)
 		{
 			x = 0;
 			y++;
 			grid.insertRow(y);
 
 		}
-		if (captionWidth==1)
-		{
-			grid.addComponent(splitComponent.getLabel(), x, y, x, y);
-			grid.setComponentAlignment(splitComponent.getLabel(), Alignment.MIDDLE_RIGHT);
-			splitComponent.getLabel().setWidth(""+this.labelWidth);
-			x++;
-		}
+		int labelWidth = this.labelWidths[x / 2];
+		Label caption;
+		if (splitComponent.getCaption() == null || splitComponent.getCaption().length() == 0)
+			caption = new Label("");
+		else
+			caption = splitComponent.getLabel();
+		caption.setWidth("" + labelWidth);
+		logger.warn("label: caption:" + caption + " width:" + labelWidth + " x:" + x + " y:" + y + " for col:" + x / 2);
+		grid.addComponent(caption, x, y, x, y);
+		grid.setComponentAlignment(caption, Alignment.MIDDLE_RIGHT);
+		x++;
 
-		logger.debug(splitComponent.getCaption() + " X:" + x + " Y:" + y + " X1:" + (x + fieldWidth - 1) + " Y1:"
-				+ y);
-		grid.addComponent(splitComponent, x , y, x + fieldWidth-1, y);
-		x += fieldWidth;
+		String fieldWidth = getFieldWidth(x, fieldSpan);
+		logger.warn("field:" + caption + " width: " + fieldWidth + " X:" + x + " Y:" + y + " X1:"
+				+ (x + fieldSpan - 1) + " Y1:" + y);
+		splitComponent.setWidth(fieldWidth);
+
+		grid.addComponent(splitComponent, x, y, x + fieldSpan - 1, y);
+		x += fieldSpan;
 
 		grid.setComponentAlignment(splitComponent, Alignment.MIDDLE_LEFT);
 
-		//splitComponent.setSizeFull();
-		splitComponent.setWidth("100%");
-
 		this.colspan = 1;
+	}
+
+	private String getFieldWidth(int x, int fieldSpan)
+	{
+		int column = x / 2;
+		int width = 0;
+
+		width = fieldWidths[column];
+
+		for (int i = 1; i < fieldSpan; i++)
+		{
+			width += labelWidths[column + i];
+			width += fieldWidths[column + i];
+		}
+		return "" + width;
 	}
 
 	/**
@@ -147,6 +185,8 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	 */
 	public void newLine()
 	{
+		x = 0;
+		y++;
 		grid.insertRow(grid.getRows());
 		grid.newLine();
 	}
@@ -178,9 +218,18 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		this.fieldList.add(field);
 		return field;
 	}
-	
-	/** 
+
+	public <M> TextField bindTextField(String fieldLabel, SingularAttribute<E, M> member)
+	{
+		TextField field = formHelper.bindTextField(this, fieldGroup, fieldLabel, member);
+
+		this.fieldList.add(field);
+		return field;
+	}
+
+	/**
 	 * Adds a text field to the form without binding it to the FieldGroup
+	 * 
 	 * @param caption
 	 * @return
 	 */
@@ -196,7 +245,6 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		return field;
 	}
 
-
 	public PasswordField bindPasswordField(String fieldLabel, String fieldName)
 	{
 		PasswordField field = formHelper.bindPasswordField(this, fieldGroup, fieldLabel, fieldName);
@@ -205,8 +253,9 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		return field;
 	}
 
-	/** 
+	/**
 	 * Adds a text field to the form without binding it to the FieldGroup
+	 * 
 	 * @param caption
 	 * @return
 	 */
@@ -218,6 +267,13 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		field.setNullRepresentation("");
 		field.setNullSettingAllowed(false);
 		this.addComponent(field);
+		this.fieldList.add(field);
+		return field;
+	}
+
+	public <M> TextArea bindTextAreaField(String fieldLabel, SingularAttribute<E, M> member, int rows)
+	{
+		TextArea field = formHelper.bindTextAreaField(this, fieldGroup, fieldLabel, member, rows);
 		this.fieldList.add(field);
 		return field;
 	}
@@ -265,9 +321,16 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		return field;
 	}
 
-	public CheckBox bindBooleanField(String fieldLabel, String fieldName)
+	public CheckBox bindBooleanField(String fieldLabel, SingularAttribute<E, Boolean> member)
 	{
-		CheckBox field = formHelper.bindBooleanField(this, fieldGroup, fieldLabel, fieldName);
+		CheckBox field = formHelper.bindBooleanField(this, fieldGroup, fieldLabel, member);
+		this.fieldList.add(field);
+		return field;
+	}
+
+	public CheckBox bindBooleanField(String fieldLabel, String member)
+	{
+		CheckBox field = formHelper.bindBooleanField(this, fieldGroup, fieldLabel, member);
 		this.fieldList.add(field);
 		return field;
 	}
@@ -299,14 +362,21 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		this.fieldList.add(field);
 		return field;
 	}
-	
 
-	public <L> ComboBox bindEntityField(String fieldLabel, SingularAttribute<E, String> fieldName, Class<L> listClazz, SingularAttribute<L, String> listFieldName)
+	public <L> ComboBox bindEntityField(String fieldLabel, SingularAttribute<E, String> fieldName, Class<L> listClazz,
+			SingularAttribute<L, String> listFieldName)
 	{
 		Preconditions.checkArgument(formHelper.isEntitymanagerSet(),
 				"You must provide the entity manager factory by calling setEntityManager first.");
 
 		ComboBox field = formHelper.bindEntityField(this, fieldGroup, fieldLabel, fieldName, listClazz, listFieldName);
+		this.fieldList.add(field);
+		return field;
+	}
+	
+	public ComboBox bindComboBox(String fieldLabel,Collection<?> options)
+	{
+		ComboBox field = formHelper.bindComboBox(this, fieldGroup, fieldLabel, options);
 		this.fieldList.add(field);
 		return field;
 	}
@@ -321,5 +391,6 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	{
 		return fieldGroup;
 	}
+
 
 }
