@@ -1,5 +1,7 @@
 package au.com.vaadinutils.crud.splitFields;
 
+import java.util.Collection;
+
 import com.vaadin.data.Container;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Label;
@@ -15,15 +17,18 @@ public class SplitComboBox extends ComboBox implements SplitField
 	public SplitComboBox(String label)
 	{
 		this.label = new Label(label);
-		
 	}
 
 	public SplitComboBox(String fieldLabel, Container createContainerFromEnumClass)
 	{
-
 		super(null, createContainerFromEnumClass);
 		this.label = new Label(fieldLabel);
-		
+	}
+
+	public SplitComboBox(String fieldLabel, Collection<?> options)
+	{
+		super(null, options);
+		this.label = new Label(fieldLabel);
 	}
 
 	@Override

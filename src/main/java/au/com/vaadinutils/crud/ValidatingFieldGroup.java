@@ -34,7 +34,17 @@ public class ValidatingFieldGroup<E> extends FieldGroup
 	protected void configureField(Field<?> field)
 	{
 		field.removeAllValidators();
+
+		// Vaadin applies the readonly status from the underlying entity
+		// which doesn't allow us to make a single field readonly
+		// hence we track it ourselves.
+		boolean readOnly = field.isReadOnly();
 		super.configureField(field);
+		
+		// If the field was originally readonly then force it back to readonly.
+		if (readOnly)
+			field.setReadOnly(true);
+		
 		// Add Bean validators if there are annotations
 		// Note that this requires a bean validation implementation to
 		// be available.

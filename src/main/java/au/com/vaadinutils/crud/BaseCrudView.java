@@ -10,8 +10,6 @@ import au.com.vaadinutils.listener.ClickListenerLogged;
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.data.Container.Filter;
-import com.vaadin.data.Container.PropertySetChangeEvent;
-import com.vaadin.data.Container.PropertySetChangeListener;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
@@ -161,7 +159,7 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 
 		/* Put a little margin around the fields in the right side editor */
 		Panel scroll = new Panel();
-		mainEditPanel.setMargin(true);
+		mainEditPanel.setDescription("BaseCrud:MainEditPanel");
 		mainEditPanel.setVisible(true);
 		mainEditPanel.setSizeFull();
 		scroll.setSizeFull();
@@ -419,7 +417,7 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 			public void textChange(final TextChangeEvent event)
 			{
 				Filter filter = getContainerFilter(event.getText());
-				if (advancedSearchButton.getValue())
+				if (advancedSearchLayout != null && advancedSearchButton.getValue())
 				{
 					filter = getAdvancedContainerFilter(filter);
 				}

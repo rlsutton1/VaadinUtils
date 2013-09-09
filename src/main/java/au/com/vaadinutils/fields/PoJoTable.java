@@ -13,9 +13,9 @@ import com.vaadin.ui.Table;
 /**
  * A simple class designed to display a PoJo in a table
  * 
- * By default each of the public gettters are displayed in order as a column.
+ * By default each of the public getters are displayed in order as a column.
  * 
- * You can pass in a set of visibile columns where the names correspond to the
+ * You can pass in a set of visible columns where the names correspond to the
  * getters name.
  * 
  * @author bsutton
@@ -27,6 +27,8 @@ public class PoJoTable<T> extends Table
 
 	Logger logger = Logger.getLogger(PoJoTable.class);
 
+	private Class<T> pojoClass;
+
 	private ArrayList<Column> columns;
 
 	private String[] visibleColumns;
@@ -36,17 +38,22 @@ public class PoJoTable<T> extends Table
 
 	}
 
-	public PoJoTable(String[] visibleColumns)
+	/**
+	 * @param clazz
+	 *            the class of the Pojo that is to be displayed.
+	 * @param visibleColumns
+	 *            the list of columns from the pojo (getters) that are to be
+	 *            displayed.
+	 */
+	public PoJoTable(Class<T> clazz, String[] visibleColumns)
 	{
+		this.pojoClass = clazz;
 		this.visibleColumns = visibleColumns;
+		initColumns();
 	}
 
 	public void addRow(T pojo)
 	{
-		if (columns == null)
-		{
-			initColumns(pojo);
-		}
 		Item item = this.getItem(pojo);
 		// If the same item is sent again we just update it.
 		if (item == null)
@@ -54,16 +61,23 @@ public class PoJoTable<T> extends Table
 
 		for (Column column : columns)
 		{
-			@SuppressWarnings("unchecked")
-			Property<Object> property = item.getItemProperty(column.name);
-			property.setValue(column.getValue(pojo));
+			try
+			{
+				@SuppressWarnings("unchecked")
+				Property<Object> property = item.getItemProperty(column.name);
+				property.setValue(column.getValue(pojo));
+			}
+			catch (RuntimeException e)
+			{
+				logger.error(e, e);
+				throw e;
+			}
 		}
 	}
 
-	private void initColumns(T pojo)
+	private void initColumns()
 	{
-		@SuppressWarnings("unchecked")
-		Class<T> objClass = (Class<T>) pojo.getClass();
+		Class<T> objClass = (Class<T>) this.pojoClass;
 		columns = new ArrayList<Column>();
 
 		// Get the public methods associated with this class.
@@ -81,6 +95,31 @@ public class PoJoTable<T> extends Table
 				}
 			}
 		}
+		if (columns.size() == 0)
+			throw new IllegalArgumentException("The PoJo class does not have any public getters.");
+
+		// check all of the visible columsn are available.
+		if (columns.size() != visibleColumns.length)
+		{
+			for (String visible : visibleColumns)
+			{
+				boolean found = false;
+				for (Column column : columns)
+				{
+					if (column.name.equals(visible))
+					{
+						found = true;
+						break;
+					}
+				}
+				if (found == false)
+				{
+					throw new IllegalArgumentException("The getter was not found for the required visible column "
+							+ visible + ".");
+				}
+			}
+		}
+
 	}
 
 	private boolean isVisible(Column column)

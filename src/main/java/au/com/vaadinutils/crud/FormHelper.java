@@ -2,10 +2,12 @@ package au.com.vaadinutils.crud;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import javax.persistence.metamodel.SingularAttribute;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
@@ -52,11 +54,10 @@ public class FormHelper<E> implements Serializable
 		this.form = form;
 		this.group = group;
 	}
-	
 
 	/**
-	 * Provides a factory which allows the FormHelper to get the current EntityManager
-	 * as and when it needs it.
+	 * Provides a factory which allows the FormHelper to get the current
+	 * EntityManager as and when it needs it.
 	 * 
 	 * @param factory
 	 */
@@ -65,6 +66,20 @@ public class FormHelper<E> implements Serializable
 		entityManagerFactory = factory;
 	}
 
+	public <M> TextField bindTextField(AbstractLayout form, ValidatingFieldGroup<E> group, String fieldLabel,
+			SingularAttribute<E, M> member)
+	{
+		TextField field = bindTextField(form, group, fieldLabel, member.getName());
+		this.fieldList.add(field);
+		return field;
+	}
+
+	public <M> TextField bindTextField(String fieldLabel, SingularAttribute<E, M> member)
+	{
+		TextField field = bindTextField(form, group, fieldLabel, member.getName());
+		this.fieldList.add(field);
+		return field;
+	}
 
 	public TextField bindTextField(String fieldLabel, String fieldName)
 	{
@@ -87,7 +102,6 @@ public class FormHelper<E> implements Serializable
 		return field;
 	}
 
-	
 	public PasswordField bindPasswordField(AbstractLayout form, FieldGroup group, String fieldLabel, String fieldName)
 	{
 		PasswordField field = new SplitPasswordField(fieldLabel);
@@ -98,6 +112,13 @@ public class FormHelper<E> implements Serializable
 		if (group != null)
 			group.bind(field, fieldName);
 		form.addComponent(field);
+		return field;
+	}
+
+	public <M> TextArea bindTextAreaField(AbstractLayout form, ValidatingFieldGroup<E> group, String fieldLabel, SingularAttribute<E, M> member, int rows)
+	{
+		TextArea field = bindTextAreaField(form, group, fieldLabel, member.getName(), rows);
+		this.fieldList.add(field);
 		return field;
 	}
 
@@ -129,6 +150,14 @@ public class FormHelper<E> implements Serializable
 		return field;
 	}
 
+	public <M> DateField bindDateField(String fieldLabel, SingularAttribute<E, M> member, String dateFormat,
+			Resolution resolution)
+	{
+		DateField field = bindDateField(form, group, fieldLabel, member.getName());
+		this.fieldList.add(field);
+		return field;
+	}
+
 	public DateField bindDateField(AbstractLayout form, ValidatingFieldGroup<E> group, String fieldLabel,
 			String fieldName, String dateFormat, Resolution resolution)
 	{
@@ -147,7 +176,7 @@ public class FormHelper<E> implements Serializable
 	public DateField bindDateField(AbstractLayout form, ValidatingFieldGroup<E> group, String fieldLabel,
 			String fieldName)
 	{
-		return bindDateField(form,group,fieldLabel,fieldName,"yyyy-MM-dd",Resolution.DAY);
+		return bindDateField(form, group, fieldLabel, fieldName, "yyyy-MM-dd", Resolution.DAY);
 	}
 
 	public Label bindLabel(String fieldLabel)
@@ -172,6 +201,15 @@ public class FormHelper<E> implements Serializable
 		return field;
 	}
 
+	public <M> ComboBox bindEnumField(String fieldLabel, SingularAttribute<E, M> member, Class<?> clazz)
+	{
+		ComboBox field = bindEnumField(form, group, fieldLabel, member.getName(), clazz);
+		this.fieldList.add(field);
+		return field;
+	}
+
+	
+	
 	public ComboBox bindEnumField(String fieldLabel, String fieldName, Class<?> clazz)
 	{
 		ComboBox field = bindEnumField(form, group, fieldLabel, fieldName, clazz);
@@ -194,6 +232,14 @@ public class FormHelper<E> implements Serializable
 		form.addComponent(field);
 		return field;
 	}
+	
+	public <M> CheckBox bindBooleanField(String fieldLabel, SingularAttribute<E, M> member)
+	{
+		CheckBox field = bindBooleanField(form, group, fieldLabel, member.getName());
+		this.fieldList.add(field);
+		return field;
+	}
+
 
 	public CheckBox bindBooleanField(String fieldLabel, String fieldName)
 	{
@@ -202,6 +248,14 @@ public class FormHelper<E> implements Serializable
 		return field;
 	}
 
+	public CheckBox bindBooleanField(AbstractLayout form, ValidatingFieldGroup<E> group, String fieldLabel,
+			SingularAttribute<E, Boolean> member)
+	{
+		CheckBox field = bindBooleanField(form, group, fieldLabel, member.getName());
+		this.fieldList.add(field);
+		return field;
+	
+	}
 	public CheckBox bindBooleanField(AbstractLayout form, ValidatingFieldGroup<E> group, String fieldLabel,
 			String fieldName)
 	{
@@ -215,27 +269,53 @@ public class FormHelper<E> implements Serializable
 		return field;
 
 	}
-
-	public ComboBox bindEntityField(String fieldLabel, String fieldName, String listFieldname, Class<E> listClazz)
+	
+	public <L> ComboBox bindComboBox(AbstractLayout form, ValidatingFieldGroup<E> fieldGroup, String fieldLabel, Collection<?> options)
 	{
-		ComboBox field = bindEntityField(form, group, fieldLabel, fieldName, listFieldname, listClazz);
+		ComboBox field = new SplitComboBox(fieldLabel, options);
+		field.setNewItemsAllowed(false);
+		field.setNullSelectionAllowed(false);
+		field.setTextInputAllowed(false);
+		field.setWidth("100%");
+		field.setImmediate(true);
+		form.addComponent(field);
+		return field;
+	}
+
+	public <M> ComboBox bindEntityField(String fieldLabel, SingularAttribute<E, M> member, Class<E> listClazz, SingularAttribute<E, M> listMember)
+	{
+		ComboBox field = bindEntityField(form, group, fieldLabel, member.getName(), listClazz, listMember.getName());
 		this.fieldList.add(field);
 		return field;
 	}
 
 
-	public <L> ComboBox bindEntityField(AbstractLayout form, ValidatingFieldGroup<E> fieldGroup, String fieldLabel,
-			String fieldName, String listFieldName, Class<L> listClazz)
+	public ComboBox bindEntityField(String fieldLabel, String fieldName, Class<E> listClazz, String listFieldname)
 	{
-		Preconditions
-				.checkNotNull(entityManagerFactory, "You must provide the entity manager factory by calling setEntityManager first.");
+		ComboBox field = bindEntityField(form, group, fieldLabel, fieldName, listClazz, listFieldname);
+		this.fieldList.add(field);
+		return field;
+	}
+
+	public <L> ComboBox bindEntityField(AbstractLayout form, ValidatingFieldGroup<E> fieldGroup, String fieldLabel,
+			SingularAttribute<E, String> fieldName, Class<L> listClazz, SingularAttribute<L, String> listFieldName)
+	{
+		return bindEntityField(form, fieldGroup, fieldLabel, fieldName.getName(), listClazz, listFieldName.getName());
+
+	}
+
+	public <L> ComboBox bindEntityField(AbstractLayout form, ValidatingFieldGroup<E> fieldGroup, String fieldLabel,
+			String fieldName, Class<L> listClazz, String listFieldName)
+	{
+		Preconditions.checkNotNull(entityManagerFactory,
+				"You must provide the entity manager factory by calling setEntityManager first.");
 		JPAContainer<?> container = JPAContainerFactory.make(listClazz, entityManagerFactory.getEntityManager());
 
 		ComboBox field = new SplitComboBox(fieldLabel);
 
 		field.setItemCaptionMode(ItemCaptionMode.PROPERTY);
-		Preconditions.checkState(container.getContainerPropertyIds().contains(listFieldName),
-				listFieldName+ " is not valid, valid listFieldNames are " + container.getContainerPropertyIds().toString());
+		Preconditions.checkState(container.getContainerPropertyIds().contains(listFieldName), listFieldName
+				+ " is not valid, valid listFieldNames are " + container.getContainerPropertyIds().toString());
 		field.setItemCaptionPropertyId(listFieldName);
 		field.setContainerDataSource(container);
 		SingleSelectConverter<L> converter = new SingleSelectConverter<L>(field);

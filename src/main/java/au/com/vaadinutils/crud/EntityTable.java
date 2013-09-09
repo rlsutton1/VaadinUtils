@@ -56,7 +56,6 @@ public class EntityTable<E> extends Table
 								+ this.getContainerPropertyIds().toString());
 			}
 		}
-		System.out.println(this.getContainerPropertyIds().toString());
 		this.setVisibleColumns(colsToShow.toArray());
 
 		for (HeadingToPropertyId column : visibleColumns)
