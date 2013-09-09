@@ -1,5 +1,6 @@
 package au.com.vaadinutils.crud;
 
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -63,7 +64,7 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		grid.setSizeFull();
 		grid.setSpacing(true);
 
-		formHelper = new FormHelper<E>(grid, fieldGroup);
+		formHelper = getFormHelper(grid, fieldGroup);
 		init();
 		this.fieldGroup = fieldGroup;
 		this.setSizeFull();
@@ -75,6 +76,12 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		}
 
 	}
+	
+	protected FormHelper<E> getFormHelper(GridLayout grid2, ValidatingFieldGroup<E> fieldGroup2)
+	{
+		return new FormHelper<E>(grid, fieldGroup);
+	}
+
 
 	/**
 	 * Sets the width of the labels in the given column.
@@ -292,6 +299,16 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		this.fieldList.add(field);
 		return field;
 	}
+	
+
+	public DateField bindDateField(String fieldLabel, SingularAttribute<E, Date> dateField, String dateFormat,
+			Resolution resolution)
+	{
+			DateField field = formHelper.bindDateField(this, fieldGroup, fieldLabel, dateField, dateFormat, resolution);
+			this.fieldList.add(field);
+			return field;
+	}
+
 
 	public DateField bindDateField(String fieldLabel, String fieldName, String dateFormat, Resolution resolution)
 	{
@@ -313,6 +330,15 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		this.fieldList.add(field);
 		return field;
 	}
+
+
+	public <M> ComboBox bindEnumField(String fieldLabel, SingularAttribute<E, M> member, Class<?> clazz)
+	{
+		ComboBox field = formHelper.bindEnumField(this, fieldGroup, fieldLabel, member, clazz);
+		this.fieldList.add(field);
+		return field;
+	}
+
 
 	public ComboBox bindEnumField(String fieldLabel, String fieldName, Class<?> clazz)
 	{
@@ -362,9 +388,10 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		this.fieldList.add(field);
 		return field;
 	}
-
-	public <L> ComboBox bindEntityField(String fieldLabel, SingularAttribute<E, String> fieldName, Class<L> listClazz,
-			SingularAttribute<L, String> listFieldName)
+	
+	
+	public <F, L, M> ComboBox bindEntityField(String fieldLabel, SingularAttribute<E, F> fieldName, Class<L> listClazz,
+			SingularAttribute<L, M> listFieldName)
 	{
 		Preconditions.checkArgument(formHelper.isEntitymanagerSet(),
 				"You must provide the entity manager factory by calling setEntityManager first.");
@@ -393,4 +420,8 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	}
 
 
+	protected FormHelper<E> getFormHelper()
+	{
+		return this.formHelper;
+	}
 }
