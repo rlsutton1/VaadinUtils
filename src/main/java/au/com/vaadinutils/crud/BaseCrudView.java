@@ -78,7 +78,7 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 		fieldGroup = new ValidatingFieldGroup<E>(container, entityClass);
 		fieldGroup.setBuffered(true);
 
-		entityTable = new EntityTable<E>(container, headings.getColumns());
+		entityTable = new EntityTable<E>(container, headings);
 		entityTable.setRowChangeListener(this);
 		entityTable.setSortEnabled(true);
 		

@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
+
 import com.google.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
@@ -19,14 +20,14 @@ public class EntityTable<E> extends Table
 	private static final long serialVersionUID = 1L;
 	private JPAContainer<E> contactContainer;
 	private RowChangeListener<E> rowChangeListener;
-	private List<HeadingToPropertyId> visibleColumns;
+	private HeadingPropertySet<E>visibleColumns;
 
 	Logger logger = Logger.getLogger(EntityTable.class);
 
-	public EntityTable(JPAContainer<E> contactContainer, List<HeadingToPropertyId> columns)
+	public EntityTable(JPAContainer<E> contactContainer, HeadingPropertySet<E> headingPropertySet)
 	{
 		this.contactContainer = contactContainer;
-		this.visibleColumns = columns;
+		this.visibleColumns = headingPropertySet;
 	}
 
 	public void setRowChangeListener(RowChangeListener<E> rowChangeListener)
@@ -40,7 +41,7 @@ public class EntityTable<E> extends Table
 		this.setContainerDataSource(contactContainer);
 
 		List<String> colsToShow = new LinkedList<String>();
-		for (HeadingToPropertyId column : visibleColumns)
+		for (HeadingToPropertyId<E> column : visibleColumns.getColumns())
 		{
 			colsToShow.add(column.getPropertyId());
 
@@ -58,7 +59,7 @@ public class EntityTable<E> extends Table
 		}
 		this.setVisibleColumns(colsToShow.toArray());
 
-		for (HeadingToPropertyId column : visibleColumns)
+		for (HeadingToPropertyId<E>column : visibleColumns.getColumns())
 		{
 			this.setColumnHeader(column.getPropertyId(), column.getHeader());
 		}
