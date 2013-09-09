@@ -118,6 +118,7 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 
 		basicSearchLayout = new HorizontalLayout();
 		basicSearchLayout.setSizeFull();
+		basicSearchLayout.setSpacing(true);
 		searchLayout.addComponent(basicSearchLayout);
 
 		leftLayout.addComponent(searchLayout);
