@@ -5,7 +5,7 @@ import javax.validation.ConstraintViolationException;
 import org.apache.log4j.Logger;
 import org.vaadin.dialogs.ConfirmDialog;
 
-import au.com.vaadinutils.listener.ClickListenerLogged;
+import au.com.vaadinutils.listener.ClickEventLogged;
 
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
@@ -158,7 +158,7 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 
 		/* Put a little margin around the fields in the right side editor */
 		Panel scroll = new Panel();
-		mainEditPanel.setDescription("BaseCrud:MainEditPanel");
+		//mainEditPanel.setDescription("BaseCrud:MainEditPanel");
 		mainEditPanel.setVisible(true);
 		mainEditPanel.setSizeFull();
 		scroll.setSizeFull();
@@ -241,7 +241,7 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 
 	private void initButtons()
 	{
-		newButton.addClickListener(new ClickListenerLogged()
+		newButton.addClickListener(new ClickEventLogged.ClickListener()
 		{
 			private static final long serialVersionUID = 1L;
 
