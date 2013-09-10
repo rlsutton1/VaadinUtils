@@ -48,7 +48,7 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 
 	public MultiColumnFormLayout(int columns, ValidatingFieldGroup<E> fieldGroup)
 	{
-		super.setDescription("MultiColumnFormLayout");
+		//super.setDescription("MultiColumnFormLayout");
 		this.columns = columns * 2;
 
 		this.labelWidths = new int[columns];
@@ -60,7 +60,7 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		}
 
 		grid = new GridLayout(columns * 2, 1);
-		grid.setDescription("Grid within MultiColumnLayout");
+		// grid.setDescription("Grid within MultiColumnLayout");
 		grid.setSizeFull();
 		grid.setSpacing(true);
 
@@ -124,7 +124,7 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		}
 		else
 		{
-			super.addComponent(component);
+			grid.addComponent(component);
 		}
 	}
 
