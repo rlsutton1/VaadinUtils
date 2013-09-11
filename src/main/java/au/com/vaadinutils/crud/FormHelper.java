@@ -150,7 +150,7 @@ public class FormHelper<E> implements Serializable
 		return field;
 	}
 
-	public <M> DateField bindDateField(String fieldLabel, SingularAttribute<E, M> member, String dateFormat,
+	public <M> DateField bindDateField(AbstractLayout form, ValidatingFieldGroup<E> group, String fieldLabel, SingularAttribute<E, M> member, String dateFormat,
 			Resolution resolution)
 	{
 		DateField field = bindDateField(form, group, fieldLabel, member.getName());
@@ -201,14 +201,12 @@ public class FormHelper<E> implements Serializable
 		return field;
 	}
 
-	public <M> ComboBox bindEnumField(String fieldLabel, SingularAttribute<E, M> member, Class<?> clazz)
+	public <M> ComboBox bindEnumField(AbstractLayout form, ValidatingFieldGroup<E> group, String fieldLabel, SingularAttribute<E, M> member, Class<?> clazz)
 	{
 		ComboBox field = bindEnumField(form, group, fieldLabel, member.getName(), clazz);
 		this.fieldList.add(field);
 		return field;
 	}
-
-	
 	
 	public ComboBox bindEnumField(String fieldLabel, String fieldName, Class<?> clazz)
 	{
@@ -297,10 +295,10 @@ public class FormHelper<E> implements Serializable
 		return field;
 	}
 
-	public <L> ComboBox bindEntityField(AbstractLayout form, ValidatingFieldGroup<E> fieldGroup, String fieldLabel,
-			SingularAttribute<E, String> fieldName, Class<L> listClazz, SingularAttribute<L, String> listFieldName)
+	public <F, L, M> ComboBox bindEntityField(AbstractLayout form, ValidatingFieldGroup<E> fieldGroup, String fieldLabel,
+			SingularAttribute<E, F> field, Class<L> listClazz, SingularAttribute<L, M> listFieldName)
 	{
-		return bindEntityField(form, fieldGroup, fieldLabel, fieldName.getName(), listClazz, listFieldName.getName());
+		return bindEntityField(form, fieldGroup, fieldLabel, field.getName(), listClazz, listFieldName.getName());
 
 	}
 

@@ -26,6 +26,13 @@ public class ValidatingFieldGroup<E> extends FieldGroup
 		this.entityClass = entityClass;
 		
 	}
+	
+	public ValidatingFieldGroup( Class<E> entityClass)
+	{
+		this.entityClass = entityClass;
+		
+	}
+
 
 	/*
 	 * Override configureField to add a bean validator to each field.
