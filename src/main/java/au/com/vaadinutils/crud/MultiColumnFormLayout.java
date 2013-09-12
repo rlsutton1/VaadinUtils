@@ -252,6 +252,15 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		return field;
 	}
 
+	public PasswordField bindPasswordField(String fieldLabel, SingularAttribute<E, String> fieldName)
+	{
+		PasswordField field = formHelper.bindPasswordField(this, fieldGroup, fieldLabel, fieldName);
+
+		this.fieldList.add(field);
+		return field;
+	}
+
+
 	public PasswordField bindPasswordField(String fieldLabel, String fieldName)
 	{
 		PasswordField field = formHelper.bindPasswordField(this, fieldGroup, fieldLabel, fieldName);
