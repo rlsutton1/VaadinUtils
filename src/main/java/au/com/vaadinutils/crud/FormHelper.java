@@ -102,8 +102,8 @@ public class FormHelper<E> implements Serializable
 		return field;
 	}
 
-	
-	public <M> PasswordField bindPasswordField(AbstractLayout form, FieldGroup group, String fieldLabel, SingularAttribute<E, M> member)
+	public <M> PasswordField bindPasswordField(AbstractLayout form, FieldGroup group, String fieldLabel,
+			SingularAttribute<E, M> member)
 	{
 		PasswordField field = bindPasswordField(form, group, fieldLabel, member.getName());
 		this.fieldList.add(field);
@@ -123,7 +123,8 @@ public class FormHelper<E> implements Serializable
 		return field;
 	}
 
-	public <M> TextArea bindTextAreaField(AbstractLayout form, ValidatingFieldGroup<E> group, String fieldLabel, SingularAttribute<E, M> member, int rows)
+	public <M> TextArea bindTextAreaField(AbstractLayout form, ValidatingFieldGroup<E> group, String fieldLabel,
+			SingularAttribute<E, M> member, int rows)
 	{
 		TextArea field = bindTextAreaField(form, group, fieldLabel, member.getName(), rows);
 		this.fieldList.add(field);
@@ -158,8 +159,8 @@ public class FormHelper<E> implements Serializable
 		return field;
 	}
 
-	public <M> DateField bindDateField(AbstractLayout form, ValidatingFieldGroup<E> group, String fieldLabel, SingularAttribute<E, M> member, String dateFormat,
-			Resolution resolution)
+	public <M> DateField bindDateField(AbstractLayout form, ValidatingFieldGroup<E> group, String fieldLabel,
+			SingularAttribute<E, M> member, String dateFormat, Resolution resolution)
 	{
 		DateField field = bindDateField(form, group, fieldLabel, member.getName());
 		this.fieldList.add(field);
@@ -209,13 +210,14 @@ public class FormHelper<E> implements Serializable
 		return field;
 	}
 
-	public <M> ComboBox bindEnumField(AbstractLayout form, ValidatingFieldGroup<E> group, String fieldLabel, SingularAttribute<E, M> member, Class<?> clazz)
+	public <M> ComboBox bindEnumField(AbstractLayout form, ValidatingFieldGroup<E> group, String fieldLabel,
+			SingularAttribute<E, M> member, Class<?> clazz)
 	{
 		ComboBox field = bindEnumField(form, group, fieldLabel, member.getName(), clazz);
 		this.fieldList.add(field);
 		return field;
 	}
-	
+
 	public ComboBox bindEnumField(String fieldLabel, String fieldName, Class<?> clazz)
 	{
 		ComboBox field = bindEnumField(form, group, fieldLabel, fieldName, clazz);
@@ -238,14 +240,13 @@ public class FormHelper<E> implements Serializable
 		form.addComponent(field);
 		return field;
 	}
-	
+
 	public <M> CheckBox bindBooleanField(String fieldLabel, SingularAttribute<E, M> member)
 	{
 		CheckBox field = bindBooleanField(form, group, fieldLabel, member.getName());
 		this.fieldList.add(field);
 		return field;
 	}
-
 
 	public CheckBox bindBooleanField(String fieldLabel, String fieldName)
 	{
@@ -260,8 +261,9 @@ public class FormHelper<E> implements Serializable
 		CheckBox field = bindBooleanField(form, group, fieldLabel, member.getName());
 		this.fieldList.add(field);
 		return field;
-	
+
 	}
+
 	public CheckBox bindBooleanField(AbstractLayout form, ValidatingFieldGroup<E> group, String fieldLabel,
 			String fieldName)
 	{
@@ -275,8 +277,9 @@ public class FormHelper<E> implements Serializable
 		return field;
 
 	}
-	
-	public <L> ComboBox bindComboBox(AbstractLayout form, ValidatingFieldGroup<E> fieldGroup, String fieldLabel, Collection<?> options)
+
+	public <L> ComboBox bindComboBox(AbstractLayout form, ValidatingFieldGroup<E> fieldGroup, String fieldLabel,
+			Collection<?> options)
 	{
 		ComboBox field = new SplitComboBox(fieldLabel, options);
 		field.setNewItemsAllowed(false);
@@ -288,13 +291,13 @@ public class FormHelper<E> implements Serializable
 		return field;
 	}
 
-	public <M> ComboBox bindEntityField(String fieldLabel, SingularAttribute<E, M> member, Class<E> listClazz, SingularAttribute<E, M> listMember)
+	public <M> ComboBox bindEntityField(String fieldLabel, SingularAttribute<E, M> member, Class<E> listClazz,
+			SingularAttribute<E, M> listMember)
 	{
 		ComboBox field = bindEntityField(form, group, fieldLabel, member.getName(), listClazz, listMember.getName());
 		this.fieldList.add(field);
 		return field;
 	}
-
 
 	public ComboBox bindEntityField(String fieldLabel, String fieldName, Class<E> listClazz, String listFieldname)
 	{
@@ -303,8 +306,25 @@ public class FormHelper<E> implements Serializable
 		return field;
 	}
 
-	public <F, L, M> ComboBox bindEntityField(AbstractLayout form, ValidatingFieldGroup<E> fieldGroup, String fieldLabel,
-			SingularAttribute<E, F> field, Class<L> listClazz, SingularAttribute<L, M> listFieldName)
+	/**
+	 * this method is for displaying a combobox which displayes all the values
+	 * for a many to one relationship and allows the user to select only one.
+	 * 
+	 * @param form
+	 * @param fieldGroup
+	 * @param fieldLabel
+	 * @param field
+	 * @param listClazz
+	 * @param listFieldName
+	 * 
+	 *            E is the entity F is the set from the entity that contains the
+	 *            foriegn entities L is the foriegn entity M is the field to
+	 *            display from the foriegn entity
+	 * 
+	 * @return
+	 */
+	public <F, L, M> ComboBox bindEntityField(AbstractLayout form, ValidatingFieldGroup<E> fieldGroup,
+			String fieldLabel, SingularAttribute<E, F> field, Class<L> listClazz, SingularAttribute<L, M> listFieldName)
 	{
 		return bindEntityField(form, fieldGroup, fieldLabel, field.getName(), listClazz, listFieldName.getName());
 

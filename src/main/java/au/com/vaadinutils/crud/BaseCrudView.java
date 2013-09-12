@@ -73,7 +73,8 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 	private CheckBox advancedSearchButton;
 	private EntityManagerFactory entityManagerFactory;
 
-	protected void init(Class<E> entityClass, JPAContainer<E> container, HeadingPropertySet<E> headings,EntityManagerFactory entityManagerFactory)
+	protected void init(Class<E> entityClass, JPAContainer<E> container, HeadingPropertySet<E> headings,
+			EntityManagerFactory entityManagerFactory)
 	{
 		this.entityManagerFactory = entityManagerFactory;
 		this.entityClass = entityClass;
@@ -84,8 +85,6 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 		entityTable = new EntityTable<E>(container, headings);
 		entityTable.setRowChangeListener(this);
 		entityTable.setSortEnabled(true);
-		
-	
 
 		initLayout();
 		entityTable.init();
@@ -162,7 +161,7 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 
 		/* Put a little margin around the fields in the right side editor */
 		Panel scroll = new Panel();
-		//mainEditPanel.setDescription("BaseCrud:MainEditPanel");
+		// mainEditPanel.setDescription("BaseCrud:MainEditPanel");
 		mainEditPanel.setVisible(true);
 		mainEditPanel.setSizeFull();
 		scroll.setSizeFull();
@@ -353,25 +352,27 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 		{
 			commit();
 
-			interceptSaveValues(BaseCrudView.this.currentEntity);
-
+			Long id = null;
 			if (inNew)
 			{
-				Long id = (Long) container.addEntity(BaseCrudView.this.currentEntity);
+				id = (Long) container.addEntity(BaseCrudView.this.currentEntity);
 				BaseCrudView.this.entityTable.select(id);
 				inNew = false;
-			
+				BaseCrudView.this.currentEntity=container.getItem(id).getEntity();
 
 			}
+			interceptSaveValues(BaseCrudView.this.currentEntity);
+
+			BaseCrudView.this.currentEntity = entityManagerFactory.getEntityManager().merge(BaseCrudView.this.currentEntity);
 			
-			entityManagerFactory.getEntityManager().flush();
+			
 
 			Notification.show("Changes Saved", "Any changes you have made have been saved.", Type.TRAY_NOTIFICATION);
 
 		}
 		catch (PersistenceException e)
 		{
-			Notification.show(e.getMessage(),Type.ERROR_MESSAGE);
+			Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
 		}
 		catch (ConstraintViolationException e)
 		{
@@ -454,9 +455,9 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 		container.removeAllContainerFilters();
 		container.addContainerFilter(filter);
 		container.discard();
-		
+
 		entityTable.select(entityTable.firstItemId());
-		
+
 	}
 
 	protected String getSearchFieldText()
