@@ -1,5 +1,6 @@
 package au.com.vaadinutils.crud;
 
+import javax.persistence.PersistenceException;
 import javax.validation.ConstraintViolationException;
 
 import org.apache.log4j.Logger;
@@ -70,9 +71,11 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 	private VerticalLayout searchLayout;
 	private HorizontalLayout basicSearchLayout;
 	private CheckBox advancedSearchButton;
+	private EntityManagerFactory entityManagerFactory;
 
-	protected void init(Class<E> entityClass, JPAContainer<E> container, HeadingPropertySet<E> headings)
+	protected void init(Class<E> entityClass, JPAContainer<E> container, HeadingPropertySet<E> headings,EntityManagerFactory entityManagerFactory)
 	{
+		this.entityManagerFactory = entityManagerFactory;
 		this.entityClass = entityClass;
 		this.container = container;
 		fieldGroup = new ValidatingFieldGroup<E>(container, entityClass);
@@ -357,13 +360,18 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 				Long id = (Long) container.addEntity(BaseCrudView.this.currentEntity);
 				BaseCrudView.this.entityTable.select(id);
 				inNew = false;
+			
 
 			}
-
-			// TODO: flush before announcing we've saved
+			
+			entityManagerFactory.getEntityManager().flush();
 
 			Notification.show("Changes Saved", "Any changes you have made have been saved.", Type.TRAY_NOTIFICATION);
 
+		}
+		catch (PersistenceException e)
+		{
+			Notification.show(e.getMessage(),Type.ERROR_MESSAGE);
 		}
 		catch (ConstraintViolationException e)
 		{
