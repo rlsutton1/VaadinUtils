@@ -214,9 +214,11 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 			public void clicked(ClickEvent event)
 			{
 				searchField.setValue("");
+				clearAdvancedFilters();
 				triggerFilter();
 
 			}
+
 		});
 		return clear;
 	}
@@ -526,6 +528,14 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 	protected Filter getAdvancedContainerFilter(Filter filter)
 	{
 		return filter;
+	}
+
+	/**
+	 * called when the advancedFilters layout should clear it's values
+	 */
+	protected void clearAdvancedFilters()
+	{
+
 	}
 
 	@Override

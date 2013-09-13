@@ -48,6 +48,7 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 
 	public MultiColumnFormLayout(int columns, ValidatingFieldGroup<E> fieldGroup)
 	{
+		this.fieldGroup = fieldGroup;
 		//super.setDescription("MultiColumnFormLayout");
 		this.columns = columns * 2;
 
@@ -66,7 +67,6 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 
 		formHelper = getFormHelper(grid, fieldGroup);
 		init();
-		this.fieldGroup = fieldGroup;
 		this.setSizeFull();
 		super.addComponent(grid);
 
@@ -154,13 +154,13 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		else
 			caption = splitComponent.getLabel();
 		caption.setWidth("" + labelWidth);
-		logger.warn("label: caption:" + caption + " width:" + labelWidth + " x:" + x + " y:" + y + " for col:" + x / 2);
+		logger.debug("label: caption:" + caption + " width:" + labelWidth + " x:" + x + " y:" + y + " for col:" + x / 2);
 		grid.addComponent(caption, x, y, x, y);
 		grid.setComponentAlignment(caption, Alignment.MIDDLE_RIGHT);
 		x++;
 
 		String fieldWidth = getFieldWidth(x, fieldSpan);
-		logger.warn("field:" + caption + " width: " + fieldWidth + " X:" + x + " Y:" + y + " X1:"
+		logger.debug("field:" + caption + " width: " + fieldWidth + " X:" + x + " Y:" + y + " X1:"
 				+ (x + fieldSpan - 1) + " Y1:" + y);
 		splitComponent.setWidth(fieldWidth);
 
@@ -429,7 +429,7 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	}
 
 
-	protected FormHelper<E> getFormHelper()
+	public FormHelper<E> getFormHelper()
 	{
 		return this.formHelper;
 	}
