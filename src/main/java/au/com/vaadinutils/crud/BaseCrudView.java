@@ -1,5 +1,7 @@
 package au.com.vaadinutils.crud;
 
+import java.util.Map;
+
 import javax.persistence.PersistenceException;
 import javax.validation.ConstraintViolationException;
 
@@ -69,7 +71,6 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 	private HorizontalLayout buttonLayout;
 	private AbstractLayout advancedSearchLayout;
 	private VerticalLayout searchLayout;
-	private HorizontalLayout basicSearchLayout;
 	private CheckBox advancedSearchButton;
 	private EntityManagerFactory entityManagerFactory;
 
@@ -115,19 +116,12 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 		// Start by defining the LHS which contains the table
 		splitPanel.addComponent(leftLayout);
 		searchLayout = new VerticalLayout();
-
-		basicSearchLayout = new HorizontalLayout();
-		basicSearchLayout.setSizeFull();
-		basicSearchLayout.setSpacing(true);
-		searchLayout.addComponent(basicSearchLayout);
-
+		searchLayout.setWidth("100%");
+		searchField.setWidth("100%");
 		leftLayout.addComponent(searchLayout);
-		buildAdvancedSearch();
-		basicSearchLayout.addComponent(searchField);
-		basicSearchLayout.setExpandRatio(searchField, 1.0f);
 
-		basicSearchLayout.addComponent(newButton);
-		basicSearchLayout.setSpacing(true);
+		buildSearchBar();
+
 		leftLayout.addComponent(entityTable);
 		leftLayout.setSizeFull();
 
@@ -137,15 +131,6 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 		 */
 		leftLayout.setExpandRatio(entityTable, 1);
 		entityTable.setSizeFull();
-
-		/*
-		 * In the bottomLeftLayout, searchField takes all the width there is
-		 * after adding addNewContactButton. The height of the layout is defined
-		 * by the tallest component.
-		 */
-		searchLayout.setWidth("100%");
-		searchField.setWidth("100%");
-		basicSearchLayout.setExpandRatio(searchField, 1);
 
 		// Now define the edit area
 		rightLayout = new VerticalLayout();
@@ -187,7 +172,56 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 		rightLayout.setVisible(false);
 	}
 
-	private void buildAdvancedSearch()
+	private void buildSearchBar()
+	{
+		HorizontalLayout basicSearchLayout = new HorizontalLayout();
+		basicSearchLayout.setSizeFull();
+		basicSearchLayout.setSpacing(true);
+		searchLayout.addComponent(basicSearchLayout);
+
+		AbstractLayout advancedSearch = buildAdvancedSearch();
+		if (advancedSearch != null)
+		{
+			basicSearchLayout.addComponent(advancedSearchButton);
+		}
+
+		basicSearchLayout.addComponent(searchField);
+		basicSearchLayout.setExpandRatio(searchField, 1.0f);
+
+		Button clear = createClearButton();
+		basicSearchLayout.addComponent(clear);
+
+		basicSearchLayout.addComponent(newButton);
+		basicSearchLayout.setSpacing(true);
+
+		/*
+		 * In the bottomLeftLayout, searchField takes all the width there is
+		 * after adding addNewContactButton. The height of the layout is defined
+		 * by the tallest component.
+		 */
+		basicSearchLayout.setExpandRatio(searchField, 1);
+
+	}
+
+	private Button createClearButton()
+	{
+		Button clear = new Button("Clear Filter");
+		clear.setImmediate(true);
+		clear.addClickListener(new ClickEventLogged.ClickListener()
+		{
+
+			@Override
+			public void clicked(ClickEvent event)
+			{
+				searchField.setValue("");
+				triggerFilter();
+
+			}
+		});
+		return clear;
+	}
+
+	private AbstractLayout buildAdvancedSearch()
 	{
 		advancedSearchLayout = getAdvancedSearchLayout();
 		if (advancedSearchLayout != null)
@@ -213,10 +247,10 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 				}
 			});
 
-			basicSearchLayout.addComponent(advancedSearchButton);
 			searchLayout.addComponent(advancedSearchLayout);
 			advancedSearchLayout.setVisible(false);
 		}
+		return advancedSearchLayout;
 	}
 
 	protected AbstractLayout getAdvancedSearchLayout()
@@ -250,34 +284,41 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 
 			public void clicked(ClickEvent event)
 			{
-				try
-				{
-					/*
-					 * Rows in the Container data model are called Item. Here we
-					 * add a new row in the beginning of the list.
-					 */
-					if (allowRowChange())
-					{
-						container.removeAllContainerFilters();
-						inNew = true;
-						EntityItem<E> entityItem = container.createEntityItem(entityClass.newInstance());
-						rowChanged(entityItem);
 
-						rightLayout.setVisible(true);
+				/*
+				 * Rows in the Container data model are called Item. Here we add
+				 * a new row in the beginning of the list.
+				 */
+
+				allowRowChange(new RowChangeCallback()
+				{
+					@Override
+					public void allowRowChange()
+					{
+						try
+						{
+							container.removeAllContainerFilters();
+							inNew = true;
+							EntityItem<E> entityItem = container.createEntityItem(entityClass.newInstance());
+							rowChanged(entityItem);
+
+							rightLayout.setVisible(true);
+						}
+						catch (ConstraintViolationException e)
+						{
+							FormHelper.showConstraintViolation(e);
+						}
+						catch (InstantiationException e)
+						{
+							throw new RuntimeException(e);
+						}
+						catch (IllegalAccessException e)
+						{
+							throw new RuntimeException(e);
+						}
 					}
-				}
-				catch (ConstraintViolationException e)
-				{
-					FormHelper.showConstraintViolation(e);
-				}
-				catch (InstantiationException e)
-				{
-					throw new RuntimeException(e);
-				}
-				catch (IllegalAccessException e)
-				{
-					throw new RuntimeException(e);
-				}
+				});
+
 			}
 
 		});
@@ -358,14 +399,13 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 				id = (Long) container.addEntity(BaseCrudView.this.currentEntity);
 				BaseCrudView.this.entityTable.select(id);
 				inNew = false;
-				BaseCrudView.this.currentEntity=container.getItem(id).getEntity();
+				BaseCrudView.this.currentEntity = container.getItem(id).getEntity();
 
 			}
 			interceptSaveValues(BaseCrudView.this.currentEntity);
 
-			BaseCrudView.this.currentEntity = entityManagerFactory.getEntityManager().merge(BaseCrudView.this.currentEntity);
-			
-			
+			BaseCrudView.this.currentEntity = entityManagerFactory.getEntityManager().merge(
+					BaseCrudView.this.currentEntity);
 
 			Notification.show("Changes Saved", "Any changes you have made have been saved.", Type.TRAY_NOTIFICATION);
 
@@ -449,7 +489,7 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 		applyFilter(filter);
 	}
 
-	private void applyFilter(final Filter filter)
+	public void applyFilter(final Filter filter)
 	{
 		/* Reset the filter for the contactContainer. */
 		container.removeAllContainerFilters();
@@ -493,7 +533,7 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 	 *  table part of this view has changed.
 	 *  We use this to update the editor's current item.
 	 */
-	public boolean allowRowChange()
+	public void allowRowChange(final RowChangeCallback callback)
 	{
 
 		if (fieldGroup.isModified() || inNew)
@@ -521,6 +561,8 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 										fieldGroup.discard();
 										inNew = false;
 
+										callback.allowRowChange();
+
 									}
 									else
 									{
@@ -531,8 +573,10 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 								}
 							});
 		}
-
-		return true;
+		else
+		{
+			callback.allowRowChange();
+		}
 
 	}
 

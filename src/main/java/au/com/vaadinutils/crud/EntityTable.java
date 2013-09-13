@@ -7,7 +7,6 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
-
 import com.google.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
@@ -20,7 +19,7 @@ public class EntityTable<E> extends Table
 	private static final long serialVersionUID = 1L;
 	private JPAContainer<E> contactContainer;
 	private RowChangeListener<E> rowChangeListener;
-	private HeadingPropertySet<E>visibleColumns;
+	private HeadingPropertySet<E> visibleColumns;
 
 	Logger logger = Logger.getLogger(EntityTable.class);
 
@@ -47,7 +46,7 @@ public class EntityTable<E> extends Table
 
 			if (column.isGenerated())
 			{
-				addGeneratedColumn(column.getPropertyId(),column.getColumnGenerator());
+				addGeneratedColumn(column.getPropertyId(), column.getColumnGenerator());
 			}
 			else
 			{
@@ -59,7 +58,7 @@ public class EntityTable<E> extends Table
 		}
 		this.setVisibleColumns(colsToShow.toArray());
 
-		for (HeadingToPropertyId<E>column : visibleColumns.getColumns())
+		for (HeadingToPropertyId<E> column : visibleColumns.getColumns())
 		{
 			this.setColumnHeader(column.getPropertyId(), column.getHeader());
 		}
@@ -88,8 +87,17 @@ public class EntityTable<E> extends Table
 		});
 	}
 
+	public void superChangeVariables(final Object source, final Map<String, Object> variables)
+	{
+
+	}
+
 	/**
-	 * Hooking this allows us to veto the user selecting a new row.
+	 * Hooking this allows us to veto the user selecting a new row. if there is
+	 * a rowChangeListener we will prevent the row change.
+	 * 
+	 * it's up to the listener to callback on superChangeVariables to perform
+	 * the row change if row change should be allowed.
 	 */
 	@Override
 	public void changeVariables(final Object source, final Map<String, Object> variables)
@@ -97,12 +105,22 @@ public class EntityTable<E> extends Table
 		if (variables.containsKey("selected"))
 		{
 
-			if (EntityTable.this.rowChangeListener != null && EntityTable.this.rowChangeListener.allowRowChange())
+			if (EntityTable.this.rowChangeListener != null)
+			{
+				EntityTable.this.rowChangeListener.allowRowChange(new RowChangeCallback()
+				{
+					@Override
+					public void allowRowChange()
+					{
+						EntityTable.super.changeVariables(source, variables);
+					}
+				});
+				markAsDirty();
+			}
+			else
 			{
 				EntityTable.super.changeVariables(source, variables);
 			}
-			else
-				markAsDirty();
 		}
 		else
 			super.changeVariables(source, variables);
@@ -171,7 +189,7 @@ public class EntityTable<E> extends Table
 		}
 		catch (Exception e)
 		{
-			logger.error("value: " + property.getValue() + " type: " + property.getType(),e);
+			logger.error("value: " + property.getValue() + " type: " + property.getType(), e);
 			ret = e.getMessage();
 		}
 		return ret;
