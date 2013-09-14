@@ -494,7 +494,7 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 	protected void triggerFilter()
 	{
 		Filter filter = getContainerFilter(searchField.getValue());
-		if (advancedSearchButton.getValue())
+		if (advancedSearchButton != null && advancedSearchButton.getValue())
 		{
 			filter = getAdvancedContainerFilter(filter);
 		}
