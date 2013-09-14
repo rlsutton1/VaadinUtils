@@ -237,6 +237,13 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 		newButton.setVisible(show);
 	}
 
+	protected void showSaveCancel(boolean show)
+	{
+
+		saveButton.setVisible(show);
+		cancelButton.setVisible(show);
+	}
+
 	protected void setSplitPosition(float pos)
 	{
 		splitPanel.setSplitPosition(pos);
@@ -434,6 +441,8 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 			}
 
 		});
+		
+		searchField.focus();
 	}
 
 	/**
