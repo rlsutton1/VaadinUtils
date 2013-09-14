@@ -14,10 +14,12 @@ import javax.validation.ConstraintViolationException;
 import au.com.vaadinutils.crud.splitFields.SplitCheckBox;
 import au.com.vaadinutils.crud.splitFields.SplitComboBox;
 import au.com.vaadinutils.crud.splitFields.SplitDateField;
+import au.com.vaadinutils.crud.splitFields.SplitEditorField;
 import au.com.vaadinutils.crud.splitFields.SplitLabel;
 import au.com.vaadinutils.crud.splitFields.SplitPasswordField;
 import au.com.vaadinutils.crud.splitFields.SplitTextArea;
 import au.com.vaadinutils.crud.splitFields.SplitTextField;
+import au.com.vaadinutils.fields.CKEditorEmailField;
 
 import com.google.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.JPAContainer;
@@ -35,8 +37,8 @@ import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.DateField;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.Notification.Type;
+import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 
@@ -102,6 +104,7 @@ public class FormHelper<E> implements Serializable
 		return field;
 	}
 
+	
 	public <M> PasswordField bindPasswordField(AbstractLayout form, FieldGroup group, String fieldLabel,
 			SingularAttribute<E, M> member)
 	{
@@ -340,8 +343,8 @@ public class FormHelper<E> implements Serializable
 		ComboBox field = new SplitComboBox(fieldLabel);
 
 		field.setItemCaptionMode(ItemCaptionMode.PROPERTY);
-		Preconditions.checkState(container.getContainerPropertyIds().contains(listFieldName), listFieldName
-				+ " is not valid, valid listFieldNames are " + container.getContainerPropertyIds().toString());
+//		Preconditions.checkState(container.getContainerPropertyIds().contains(listFieldName), listFieldName
+//				+ " is not valid, valid listFieldNames are " + container.getContainerPropertyIds().toString());
 		field.setItemCaptionPropertyId(listFieldName);
 		field.setContainerDataSource(container);
 		SingleSelectConverter<L> converter = new SingleSelectConverter<L>(field);
@@ -363,6 +366,41 @@ public class FormHelper<E> implements Serializable
 		form.addComponent(field);
 		return field;
 	}
+	
+	public <M> CKEditorEmailField bindEditorField(AbstractLayout form, ValidatingFieldGroup<E> group, 
+			SingularAttribute<E, M> member, boolean readonly)
+	{
+		CKEditorEmailField field = bindEditorField(form, group,  member.getName(), readonly);
+		this.fieldList.add(field);
+		return field;
+	}
+
+	public <M> CKEditorEmailField bindEditorField(String fieldLabel, SingularAttribute<E, M> member, boolean readonly)
+	{
+		CKEditorEmailField field = bindEditorField(form, group,  member.getName(), readonly);
+		this.fieldList.add(field);
+		return field;
+	}
+
+	public CKEditorEmailField bindEditorField( String fieldName, boolean readonly)
+	{
+		CKEditorEmailField field = bindEditorField(form, group,  fieldName,  readonly);
+		this.fieldList.add(field);
+		return field;
+	}
+
+	public CKEditorEmailField bindEditorField(AbstractLayout form, ValidatingFieldGroup<E> group, 
+			String fieldName, boolean readonly)
+	{
+		SplitEditorField field = new SplitEditorField(readonly);
+		field.setWidth("100%");
+		field.setImmediate(true);
+		if (group != null)
+			group.bind(field, fieldName);
+		form.addComponent(field);
+		return field;
+	}
+
 
 	static Container createContainerFromEnumClass(String fieldName, Class<?> clazz)
 	{
