@@ -9,9 +9,12 @@ public interface RowChangeListener<ENTITY>
 	/**
 	 * Called when a user attempts to change the current row.
 	 * Return false to stop the user selecting a new row.
+	 * @param variables 
+	 * @param source 
+	 * @param rowChangeCallback 
 	 * @return
 	 */
-	boolean allowRowChange();
+	void allowRowChange( RowChangeCallback rowChangeCallback);
 
 	/**
 	 * Called to inform the listener that a new row has been selected and it the
