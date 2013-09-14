@@ -11,6 +11,8 @@ import javax.persistence.metamodel.SingularAttribute;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
+import org.apache.log4j.Logger;
+
 import au.com.vaadinutils.crud.splitFields.SplitCheckBox;
 import au.com.vaadinutils.crud.splitFields.SplitComboBox;
 import au.com.vaadinutils.crud.splitFields.SplitDateField;
@@ -30,6 +32,7 @@ import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.shared.ui.datefield.Resolution;
 import com.vaadin.ui.AbstractComponent;
+import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.AbstractSelect.ItemCaptionMode;
 import com.vaadin.ui.CheckBox;
@@ -51,8 +54,11 @@ public class FormHelper<E> implements Serializable
 	private AbstractLayout form;
 	private ValidatingFieldGroup<E> group;
 
+	Logger logger = Logger.getLogger(FormHelper.class);
+
 	public FormHelper(AbstractLayout form, ValidatingFieldGroup<E> group)
 	{
+		Preconditions.checkNotNull(group, "ValidatingFieldGroup can not be null");
 		this.form = form;
 		this.group = group;
 	}
@@ -98,10 +104,20 @@ public class FormHelper<E> implements Serializable
 		field.setImmediate(true);
 		field.setNullRepresentation("");
 		field.setNullSettingAllowed(false);
-		if (group != null)
-			group.bind(field, fieldName);
+		doBinding(group, fieldName, field);
 		form.addComponent(field);
 		return field;
+	}
+
+	private void doBinding(FieldGroup group, String fieldName,  AbstractField field)
+	{
+		if (group != null)
+			group.bind(field, fieldName);
+		else
+			
+		{
+			logger.warn("field "+fieldName+" was not bound");
+		}
 	}
 
 	
@@ -120,8 +136,7 @@ public class FormHelper<E> implements Serializable
 		field.setImmediate(true);
 		field.setNullRepresentation("");
 		field.setNullSettingAllowed(false);
-		if (group != null)
-			group.bind(field, fieldName);
+		doBinding(group, fieldName, field);
 		form.addComponent(field);
 		return field;
 	}
@@ -149,8 +164,7 @@ public class FormHelper<E> implements Serializable
 		field.setWidth("100%");
 		field.setImmediate(true);
 		field.setNullRepresentation("");
-		if (group != null)
-			group.bind(field, fieldName);
+		doBinding(group, fieldName, field);
 		form.addComponent(field);
 		return field;
 	}
@@ -179,8 +193,7 @@ public class FormHelper<E> implements Serializable
 
 		field.setImmediate(true);
 		field.setWidth("100%");
-		if (group != null)
-			group.bind(field, fieldName);
+		doBinding(group, fieldName, field);
 		form.addComponent(field);
 		return field;
 	}
@@ -238,8 +251,8 @@ public class FormHelper<E> implements Serializable
 		field.setTextInputAllowed(false);
 		field.setWidth("100%");
 		field.setImmediate(true);
-		if (group != null)
-			group.bind(field, fieldName);
+		doBinding(group, fieldName, field);
+
 		form.addComponent(field);
 		return field;
 	}
@@ -274,8 +287,8 @@ public class FormHelper<E> implements Serializable
 		field.setWidth("100%");
 		field.setImmediate(true);
 
-		if (group != null)
-			group.bind(field, fieldName);
+		doBinding(group, fieldName, field);
+
 		form.addComponent(field);
 		return field;
 
@@ -343,8 +356,8 @@ public class FormHelper<E> implements Serializable
 		ComboBox field = new SplitComboBox(fieldLabel);
 
 		field.setItemCaptionMode(ItemCaptionMode.PROPERTY);
-//		Preconditions.checkState(container.getContainerPropertyIds().contains(listFieldName), listFieldName
-//				+ " is not valid, valid listFieldNames are " + container.getContainerPropertyIds().toString());
+		Preconditions.checkState(container.getContainerPropertyIds().contains(listFieldName), listFieldName
+				+ " is not valid, valid listFieldNames are " + container.getContainerPropertyIds().toString());
 		field.setItemCaptionPropertyId(listFieldName);
 		field.setContainerDataSource(container);
 		SingleSelectConverter<L> converter = new SingleSelectConverter<L>(field);
@@ -361,7 +374,8 @@ public class FormHelper<E> implements Serializable
 					+ " is not valid, valid listFieldNames are "
 					+ fieldGroup.getContainer().getContainerPropertyIds().toString());
 
-			fieldGroup.bind(field, fieldName);
+			doBinding(group, fieldName, field);
+
 		}
 		form.addComponent(field);
 		return field;
