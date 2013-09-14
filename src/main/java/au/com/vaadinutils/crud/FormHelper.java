@@ -35,6 +35,7 @@ import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.AbstractSelect.ItemCaptionMode;
+import com.vaadin.ui.AbstractTextField;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.DateField;
@@ -53,6 +54,8 @@ public class FormHelper<E> implements Serializable
 	ArrayList<AbstractComponent> fieldList = new ArrayList<AbstractComponent>();
 	private AbstractLayout form;
 	private ValidatingFieldGroup<E> group;
+	
+	Logger logger = Logger.getLogger(FormHelper.class);
 
 	Logger logger = Logger.getLogger(FormHelper.class);
 
@@ -107,6 +110,17 @@ public class FormHelper<E> implements Serializable
 		doBinding(group, fieldName, field);
 		form.addComponent(field);
 		return field;
+	}
+
+	private void doBinding(FieldGroup group, String fieldName,  AbstractField field)
+	{
+		if (group != null)
+			group.bind(field, fieldName);
+		else
+			
+		{
+			logger.warn("field "+fieldName+" was not bound");
+		}
 	}
 
 	private void doBinding(FieldGroup group, String fieldName,  AbstractField field)
