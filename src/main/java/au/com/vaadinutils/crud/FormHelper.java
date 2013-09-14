@@ -35,7 +35,6 @@ import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.AbstractSelect.ItemCaptionMode;
-import com.vaadin.ui.AbstractTextField;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.DateField;
@@ -55,8 +54,6 @@ public class FormHelper<E> implements Serializable
 	private AbstractLayout form;
 	private ValidatingFieldGroup<E> group;
 	
-	Logger logger = Logger.getLogger(FormHelper.class);
-
 	Logger logger = Logger.getLogger(FormHelper.class);
 
 	public FormHelper(AbstractLayout form, ValidatingFieldGroup<E> group)
@@ -112,18 +109,7 @@ public class FormHelper<E> implements Serializable
 		return field;
 	}
 
-	private void doBinding(FieldGroup group, String fieldName,  AbstractField field)
-	{
-		if (group != null)
-			group.bind(field, fieldName);
-		else
-			
-		{
-			logger.warn("field "+fieldName+" was not bound");
-		}
-	}
-
-	private void doBinding(FieldGroup group, String fieldName,  AbstractField field)
+	private void doBinding(FieldGroup group, String fieldName,  @SuppressWarnings("rawtypes") AbstractField field)
 	{
 		if (group != null)
 			group.bind(field, fieldName);
@@ -423,8 +409,7 @@ public class FormHelper<E> implements Serializable
 		SplitEditorField field = new SplitEditorField(readonly);
 		field.setWidth("100%");
 		field.setImmediate(true);
-		if (group != null)
-			group.bind(field, fieldName);
+		doBinding(group, fieldName, field);
 		form.addComponent(field);
 		return field;
 	}
