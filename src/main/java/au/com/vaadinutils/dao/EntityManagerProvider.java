@@ -9,6 +9,9 @@ public enum EntityManagerProvider implements EntityManagerFactory
 {
 	INSTANCE;
 	
+	private  ThreadLocal<EntityManager> entityManagerThreadLocal = new ThreadLocal<EntityManager>();
+
+	
 	
 	public EntityManager getEntityManager()
 	{
@@ -20,5 +23,4 @@ public enum EntityManagerProvider implements EntityManagerFactory
 		entityManagerThreadLocal.set(em);
 	}
 
-	private  ThreadLocal<EntityManager> entityManagerThreadLocal = new ThreadLocal<EntityManager>();
 }
