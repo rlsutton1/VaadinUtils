@@ -1,7 +1,5 @@
 package au.com.vaadinutils.crud;
 
-import java.util.Map;
-
 import javax.persistence.PersistenceException;
 import javax.validation.ConstraintViolationException;
 
@@ -42,8 +40,14 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 	private static final long serialVersionUID = 1L;
 
 	private boolean inNew = false;
+	/**
+	 * When we enter inNew mode we need to hide the delete button.
+	 * When we exit inNew mode thsi var is used to determine if we need 
+	 * to restore the delete button. i.e. if it wasn't visible before 'new'
+	 * we shouldn't make it visible now.
+	 */
 	private boolean restoreDelete;
-
+	
 	private TextField searchField = new TextField();
 	private Button newButton = new Button("New");
 	private Button deleteButton = new Button("Delete");
@@ -210,6 +214,7 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 		clear.setImmediate(true);
 		clear.addClickListener(new ClickEventLogged.ClickListener()
 		{
+			private static final long serialVersionUID = 1L;
 
 			@Override
 			public void clicked(ClickEvent event)
@@ -303,6 +308,7 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 				allowRowChange(new RowChangeCallback()
 				{
 
+	
 					@Override
 					public void allowRowChange()
 					{
@@ -387,7 +393,8 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 						showDelete(true);
 						restoreDelete = false;
 					}
-					BaseCrudView.this.entityTable.select(null);
+					// set the selection to the first item on the page.
+					BaseCrudView.this.entityTable.select(entityTable.getCurrentPageFirstItemId());
 				}
 
 				inNew = false;
