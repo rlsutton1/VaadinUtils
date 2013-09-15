@@ -17,15 +17,15 @@ public class EntityTable<E> extends Table
 {
 
 	private static final long serialVersionUID = 1L;
-	private JPAContainer<E> contactContainer;
+	private JPAContainer<E> entityContainer;
 	private RowChangeListener<E> rowChangeListener;
 	private HeadingPropertySet<E> visibleColumns;
 
 	Logger logger = Logger.getLogger(EntityTable.class);
 
-	public EntityTable(JPAContainer<E> contactContainer, HeadingPropertySet<E> headingPropertySet)
+	public EntityTable(JPAContainer<E> entityContainer, HeadingPropertySet<E> headingPropertySet)
 	{
-		this.contactContainer = contactContainer;
+		this.entityContainer = entityContainer;
 		this.visibleColumns = headingPropertySet;
 	}
 
@@ -37,7 +37,7 @@ public class EntityTable<E> extends Table
 	public void init()
 	{
 
-		this.setContainerDataSource(contactContainer);
+		this.setContainerDataSource(entityContainer);
 
 		List<String> colsToShow = new LinkedList<String>();
 		for (HeadingToPropertyId<E> column : visibleColumns.getColumns())
@@ -73,16 +73,19 @@ public class EntityTable<E> extends Table
 			@Override
 			public void valueChange(com.vaadin.data.Property.ValueChangeEvent event)
 			{
-				Long contactId = (Long) EntityTable.this.getValue();
-
-				if (contactId != null) // it can be null when a row is being
-										// deleted.
+				if (EntityTable.this.rowChangeListener != null)
 				{
-					EntityItem<E> contact = EntityTable.this.contactContainer.getItem(contactId); // .getEntity();
-					EntityTable.this.rowChangeListener.rowChanged(contact);
+					Long entityId = (Long) EntityTable.this.getValue();
+
+					if (entityId != null) // it can be null when a row is being
+											// deleted.
+					{
+						EntityItem<E> entity = EntityTable.this.entityContainer.getItem(entityId); // .getEntity();
+						EntityTable.this.rowChangeListener.rowChanged(entity);
+					}
+					else
+						EntityTable.this.rowChangeListener.rowChanged(null);
 				}
-				else
-					EntityTable.this.rowChangeListener.rowChanged(null);
 			}
 		});
 	}
@@ -128,10 +131,10 @@ public class EntityTable<E> extends Table
 
 	public E getCurrent()
 	{
-		Long contactId = (Long) this.getValue();
-		E contact = this.contactContainer.getItem(contactId).getEntity();
+		Long entityId = (Long) this.getValue();
+		E entity = this.entityContainer.getItem(entityId).getEntity();
 
-		return contact;
+		return entity;
 
 	}
 
