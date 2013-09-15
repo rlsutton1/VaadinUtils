@@ -42,6 +42,7 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 	private static final long serialVersionUID = 1L;
 
 	private boolean inNew = false;
+	private boolean restoreDelete;
 
 	private TextField searchField = new TextField();
 	private Button newButton = new Button("New");
@@ -301,6 +302,7 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 
 				allowRowChange(new RowChangeCallback()
 				{
+
 					@Override
 					public void allowRowChange()
 					{
@@ -308,6 +310,13 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 						{
 							container.removeAllContainerFilters();
 							inNew = true;
+							// Can't delete when you are adding a new record.
+							// Use cancel instead.
+							if (deleteButton.isVisible())
+							{
+								restoreDelete = true;
+								showDelete(false);
+							}
 							EntityItem<E> entityItem = container.createEntityItem(entityClass.newInstance());
 							rowChanged(entityItem);
 
@@ -329,7 +338,6 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 				});
 
 			}
-
 
 		});
 
@@ -374,6 +382,11 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 				fieldGroup.discard();
 				if (inNew)
 				{
+					if (restoreDelete)
+					{
+						showDelete(true);
+						restoreDelete = false;
+					}
 					BaseCrudView.this.entityTable.select(null);
 				}
 
@@ -406,7 +419,14 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 			Long id = null;
 			if (inNew)
 			{
+
 				id = (Long) container.addEntity(BaseCrudView.this.currentEntity);
+
+				if (restoreDelete)
+				{
+					showDelete(true);
+					restoreDelete = false;
+				}
 				BaseCrudView.this.entityTable.select(id);
 				inNew = false;
 				BaseCrudView.this.currentEntity = container.getItem(id).getEntity();
@@ -484,7 +504,7 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 			}
 
 		});
-		
+
 		searchField.focus();
 	}
 
@@ -579,6 +599,12 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 										 * Properties in our contact at once.
 										 */
 										fieldGroup.discard();
+										if (restoreDelete)
+										{
+											showDelete(true);
+											restoreDelete = false;
+										}
+
 										inNew = false;
 
 										callback.allowRowChange();
@@ -604,6 +630,8 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 	/** Called when the currently selected row in the 
 	 *  table part of this view has changed.
 	 *  We use this to update the editor's current item.
+	 *  
+	 *  @item the item that is now selected. This may be null if selection has been lost.
 	 */
 	public void rowChanged(EntityItem<E> item)
 	{
