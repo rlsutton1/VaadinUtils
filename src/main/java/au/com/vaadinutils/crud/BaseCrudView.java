@@ -316,6 +316,8 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 						{
 							container.removeAllContainerFilters();
 							inNew = true;
+							EntityItem<E> entityItem = container.createEntityItem(entityClass.newInstance());
+							rowChanged(entityItem);
 							// Can't delete when you are adding a new record.
 							// Use cancel instead.
 							if (deleteButton.isVisible())
@@ -323,8 +325,6 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 								restoreDelete = true;
 								showDelete(false);
 							}
-							EntityItem<E> entityItem = container.createEntityItem(entityClass.newInstance());
-							rowChanged(entityItem);
 
 							rightLayout.setVisible(true);
 						}
@@ -372,6 +372,14 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 										entityTable.removeItem(contactId);
 										BaseCrudView.this.currentEntity = null;
 										inNew = false;
+										// set the selection to the first item on the page.
+										// We need to set it to null first as if the first item was already selected
+										// then we won't get a row change which is need to update the rhs.
+										// CONSIDER: On the other hand I'm concerned that we might confuse people as they
+										// get to row changes events.
+										BaseCrudView.this.entityTable.select(null);
+										BaseCrudView.this.entityTable.select(entityTable.getCurrentPageFirstItemId());
+										
 									}
 								}
 							});
@@ -394,6 +402,11 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 						restoreDelete = false;
 					}
 					// set the selection to the first item on the page.
+					// We need to set it to null first as if the first item was already selected
+					// then we won't get a row change which is need to update the rhs.
+					// CONSIDER: On the other hand I'm concerned that we might confuse people as they
+					// get to row changes events.
+					BaseCrudView.this.entityTable.select(null);
 					BaseCrudView.this.entityTable.select(entityTable.getCurrentPageFirstItemId());
 				}
 
