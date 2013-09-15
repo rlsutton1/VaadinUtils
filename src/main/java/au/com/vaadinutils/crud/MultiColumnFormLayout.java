@@ -445,4 +445,9 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	{
 		return this.formHelper;
 	}
+	
+	public void setReadOnly(boolean readOnly)
+	{
+		this.fieldGroup.setReadOnly(readOnly);
+	}
 }
