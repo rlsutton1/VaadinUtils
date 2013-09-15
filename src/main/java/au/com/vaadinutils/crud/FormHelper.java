@@ -58,7 +58,9 @@ public class FormHelper<E> implements Serializable
 
 	public FormHelper(AbstractLayout form, ValidatingFieldGroup<E> group)
 	{
-		Preconditions.checkNotNull(group, "ValidatingFieldGroup can not be null");
+		//I'm actually using this without a field group.
+		// need to makes some modes so that we formally support non-group usage.
+		// Preconditions.checkNotNull(group, "ValidatingFieldGroup can not be null");
 		this.form = form;
 		this.group = group;
 	}
