@@ -33,7 +33,7 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
-public abstract class BaseCrudView<E> extends VerticalLayout implements RowChangeListener<E>, Selected<E>
+public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout implements RowChangeListener<E>, Selected<E>
 {
 
 	private static Logger logger = Logger.getLogger(BaseCrudView.class);
@@ -85,6 +85,15 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 		this.entityManagerFactory = entityManagerFactory;
 		this.entityClass = entityClass;
 		this.container = container;
+		try{
+		container.setBuffered(true);
+		}
+		catch (Exception e)
+		{
+			logger.error(" ******* when constructing a jpaContainer for use with the BaseCrudView use JPAContainerFactory.makeBatchable ****** ");
+			logger.error(e,e);
+			throw new RuntimeException(e);
+		}
 		fieldGroup = new ValidatingFieldGroup<E>(container, entityClass);
 		fieldGroup.setBuffered(true);
 
@@ -452,6 +461,9 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 				BaseCrudView.this.currentEntity = container.getItem(id).getEntity();
 
 			}
+			
+			BaseCrudView.this.currentEntity =container.getItem(currentEntity.getId()).getEntity();
+			
 			interceptSaveValues(BaseCrudView.this.currentEntity);
 
 			BaseCrudView.this.currentEntity = entityManagerFactory.getEntityManager().merge(
@@ -462,10 +474,12 @@ public abstract class BaseCrudView<E> extends VerticalLayout implements RowChang
 		}
 		catch (PersistenceException e)
 		{
+			logger.error(e,e);
 			Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
 		}
 		catch (ConstraintViolationException e)
 		{
+			logger.error(e,e);
 			FormHelper.showConstraintViolation(e);
 		}
 		return BaseCrudView.this.currentEntity;
