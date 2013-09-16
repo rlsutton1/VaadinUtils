@@ -77,7 +77,7 @@ public class PoJoTable<T> extends Table
 
 	private void initColumns()
 	{
-		Class<T> objClass = (Class<T>) this.pojoClass;
+		Class<T> objClass = this.pojoClass;
 		columns = new ArrayList<Column>();
 
 		// Get the public methods associated with this class.
