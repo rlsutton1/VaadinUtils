@@ -8,6 +8,7 @@ import org.vaadin.dialogs.ConfirmDialog;
 
 import au.com.vaadinutils.listener.ClickEventLogged;
 
+import com.google.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.data.Container.Filter;
@@ -39,7 +40,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	private static Logger logger = Logger.getLogger(BaseCrudView.class);
 	private static final long serialVersionUID = 1L;
 
-	private boolean inNew = false;
+	protected boolean inNew = false;
 	/**
 	 * When we enter inNew mode we need to hide the delete button.
 	 * When we exit inNew mode thsi var is used to determine if we need 
@@ -468,8 +469,12 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 			BaseCrudView.this.currentEntity = entityManagerFactory.getEntityManager().merge(
 					BaseCrudView.this.currentEntity);
+			
+			
 
 			Notification.show("Changes Saved", "Any changes you have made have been saved.", Type.TRAY_NOTIFICATION);
+			
+			container.discard();
 
 		}
 		catch (PersistenceException e)
@@ -735,6 +740,30 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	{
 		return currentEntity;
 
+	}
+	
+	/**
+	 * update the container and editor with any changes from the db.
+	 */
+	public void updateEditorFromDb()
+	{
+		Preconditions.checkState(!isDirty(),"The editor is dirty, save or cancel first.");
+		E tmp = currentEntity;
+		container.discard();
+		fieldGroup.discard();
+		
+		BaseCrudView.this.entityTable.select(null);
+		BaseCrudView.this.entityTable.select(tmp.getId());
+
+	}
+	
+	/**
+	 * check if the editor has changes
+	 * @return
+	 */
+	public boolean isDirty()
+	{
+		return fieldGroup.isModified() || inNew;
 	}
 
 }

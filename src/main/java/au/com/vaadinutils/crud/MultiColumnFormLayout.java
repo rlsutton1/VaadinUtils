@@ -126,6 +126,13 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		else
 		{
 			grid.addComponent(component);
+			x++;
+			if (x > columns)
+			{
+				x = 0;
+				y++;
+				grid.insertRow(y);
+			}
 		}
 	}
 
@@ -155,13 +162,13 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		else
 			caption = splitComponent.getLabel();
 		caption.setWidth("" + labelWidth);
-		logger.debug("label: caption:" + caption + " width:" + labelWidth + " x:" + x + " y:" + y + " for col:" + x / 2);
+		logger.debug("label: caption:" + caption.getValue() + " width:" + labelWidth + " x:" + x + " y:" + y + " for col:" + x / 2);
 		grid.addComponent(caption, x, y, x, y);
 		grid.setComponentAlignment(caption, Alignment.MIDDLE_RIGHT);
 		x++;
 
 		String fieldWidth = getFieldWidth(x, fieldSpan);
-		logger.debug("field:" + caption + " width: " + fieldWidth + " X:" + x + " Y:" + y + " X1:"
+		logger.debug("field:" + caption.getValue() + " width: " + fieldWidth + " X:" + x + " Y:" + y + " X1:"
 				+ (x + fieldSpan - 1) + " Y1:" + y);
 		splitComponent.setWidth(fieldWidth);
 
