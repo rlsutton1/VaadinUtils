@@ -1,5 +1,6 @@
 package au.com.vaadinutils.crud;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -59,5 +60,10 @@ public class HeadingPropertySet<E>
 	{
 		
 		return cols;
+	}
+	
+	public String toString()
+	{
+		return Arrays.toString(cols.toArray());
 	}
 }
