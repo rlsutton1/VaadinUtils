@@ -7,8 +7,9 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<vaadin.version>7.1.4</vaadin.version>
+		<vaadin.version>7.1.5</vaadin.version>
 		<vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
+		<jasperreports.version>5.2.0</jasperreports.version>
 	</properties>
 
 	<repositories>
@@ -26,7 +27,7 @@
 				<enabled>true</enabled>
 			</snapshots>
 		</repository>
-		
+
 		<repository>
 			<id>EclipseLink Repo</id>
 			<url>http://www.eclipse.org/downloads/download.php?r=1&amp;nf=1&amp;file=/rt/eclipselink/maven.repo</url>
@@ -81,6 +82,13 @@
 			<artifactId>vaadin-client-compiled</artifactId>
 			<version>${vaadin.version}</version>
 		</dependency>
+
+		<dependency>
+			<groupId>com.vaadin</groupId>
+			<artifactId>vaadin-push</artifactId>
+			<version>${vaadin.version}</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.vaadin.addon</groupId>
 			<artifactId>confirmdialog</artifactId>
@@ -111,13 +119,43 @@
 			<artifactId>validation-api</artifactId>
 			<version>1.1.0.Final</version>
 		</dependency>
-		
-			<dependency>
+
+		<dependency>
 			<groupId>org.vaadin.addons</groupId>
 			<artifactId>ckeditor-wrapper-for-vaadin</artifactId>
 			<version>7.8.6</version>
 		</dependency>
-		
+
+		<dependency>
+			<groupId>org.vaadin.addons</groupId>
+			<artifactId>wizards-for-vaadin</artifactId>
+			<version>1.0.0-beta1</version>
+		</dependency>
+
+
+
+
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-email</artifactId>
+			<version>1.3.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>net.sf.jasperreports</groupId>
+			<artifactId>jasperreports</artifactId>
+			<version>${jasperreports.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>3.0.1</version>
+			<scope>provided</scope>
+		</dependency>
+
+
+
 
 	</dependencies>
 
