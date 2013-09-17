@@ -6,6 +6,7 @@ import javax.validation.ConstraintViolationException;
 import org.apache.log4j.Logger;
 import org.vaadin.dialogs.ConfirmDialog;
 
+import au.com.vaadinutils.dao.EntityManagerFactory;
 import au.com.vaadinutils.listener.ClickEventLogged;
 
 import com.google.common.base.Preconditions;
