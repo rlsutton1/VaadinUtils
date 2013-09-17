@@ -21,6 +21,7 @@ import au.com.vaadinutils.crud.splitFields.SplitLabel;
 import au.com.vaadinutils.crud.splitFields.SplitPasswordField;
 import au.com.vaadinutils.crud.splitFields.SplitTextArea;
 import au.com.vaadinutils.crud.splitFields.SplitTextField;
+import au.com.vaadinutils.dao.EntityManagerFactory;
 import au.com.vaadinutils.fields.CKEditorEmailField;
 
 import com.google.common.base.Preconditions;
