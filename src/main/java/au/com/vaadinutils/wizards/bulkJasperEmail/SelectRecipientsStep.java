@@ -1,4 +1,4 @@
-package au.org.scoutmaster.views.wizards.bulkJasperEmail;
+package au.com.vaadinutils.wizards.bulkJasperEmail;
 
 
 import java.util.Collection;

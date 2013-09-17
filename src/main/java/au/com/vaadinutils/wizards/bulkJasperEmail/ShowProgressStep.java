@@ -1,4 +1,4 @@
-package au.org.scoutmaster.views.wizards.bulkJasperEmail;
+package au.com.vaadinutils.wizards.bulkJasperEmail;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,10 +13,10 @@ import au.com.vaadinutils.crud.CrudEntity;
 import au.com.vaadinutils.fields.PoJoTable;
 import au.com.vaadinutils.ui.UIUpdater;
 import au.com.vaadinutils.ui.WorkingDialog;
-import au.org.vaadinutil.util.MutableInteger;
-import au.org.vaadinutil.util.ProgressBarWorker;
-import au.org.vaadinutil.util.ProgressTaskListener;
-import au.org.vaadinutil.util.VUNotification;
+import au.com.vaadinutils.util.MutableInteger;
+import au.com.vaadinutils.util.ProgressBarWorker;
+import au.com.vaadinutils.util.ProgressTaskListener;
+import au.com.vaadinutils.util.VUNotification;
 
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.ui.Component;

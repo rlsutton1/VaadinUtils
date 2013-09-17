@@ -1,4 +1,4 @@
-package au.org.scoutmaster.views.wizards.bulkJasperEmail;
+package au.com.vaadinutils.wizards.bulkJasperEmail;
 
 
 public class RecipientException extends Exception

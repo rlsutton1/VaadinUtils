@@ -1,8 +1,8 @@
-package au.org.scoutmaster.views.wizards.bulkJasperEmail;
+package au.com.vaadinutils.wizards.bulkJasperEmail;
 
 import java.io.File;
 
-import au.org.scoutmaster.jasper.JasperSettings;
+import au.com.vaadinutils.jasper.JasperSettings;
 
 public class SMJasperSettings implements JasperSettings
 {

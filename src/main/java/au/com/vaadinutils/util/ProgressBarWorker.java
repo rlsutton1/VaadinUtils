@@ -1,4 +1,4 @@
-package au.org.vaadinutil.util;
+package au.com.vaadinutils.util;
 
 
 public class ProgressBarWorker<T> extends Thread

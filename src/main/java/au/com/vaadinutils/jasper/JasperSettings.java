@@ -1,4 +1,4 @@
-package au.org.scoutmaster.jasper;
+package au.com.vaadinutils.jasper;
 
 import java.io.File;
 

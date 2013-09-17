@@ -1,4 +1,4 @@
-package au.org.scoutmaster.jasper;
+package au.com.vaadinutils.jasper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -8,7 +8,7 @@ import javax.activation.DataSource;
 
 import org.apache.commons.mail.ByteArrayDataSource;
 
-import au.org.scoutmaster.jasper.JasperManager.Exporter;
+import au.com.vaadinutils.jasper.JasperManager.Exporter;
 
 public class RenderedReport
 {

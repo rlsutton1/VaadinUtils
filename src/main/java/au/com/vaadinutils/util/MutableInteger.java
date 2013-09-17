@@ -1,4 +1,4 @@
-package au.org.vaadinutil.util;
+package au.com.vaadinutils.util;
 
 /**
  * created Aug 13, 2004

@@ -1,4 +1,4 @@
-package au.org.scoutmaster.views.wizards.bulkJasperEmail;
+package au.com.vaadinutils.wizards.bulkJasperEmail;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -12,14 +12,14 @@ import org.apache.log4j.Logger;
 import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.dao.Transaction;
 import au.com.vaadinutils.impl.LocalEntityManagerFactory;
+import au.com.vaadinutils.jasper.JasperManager;
+import au.com.vaadinutils.jasper.RenderedReport;
+import au.com.vaadinutils.jasper.JasperManager.EmailBuilder;
+import au.com.vaadinutils.jasper.JasperManager.Exporter;
 import au.com.vaadinutils.listener.CancelListener;
-import au.org.scoutmaster.jasper.JasperManager;
-import au.org.scoutmaster.jasper.JasperManager.EmailBuilder;
-import au.org.scoutmaster.jasper.JasperManager.Exporter;
-import au.org.scoutmaster.jasper.RenderedReport;
-import au.org.vaadinutil.util.ProgressBarTask;
-import au.org.vaadinutil.util.ProgressTaskListener;
-import au.org.vaadinutil.util.VUNotification;
+import au.com.vaadinutils.util.ProgressBarTask;
+import au.com.vaadinutils.util.ProgressTaskListener;
+import au.com.vaadinutils.util.VUNotification;
 
 import com.vaadin.ui.Notification.Type;
 

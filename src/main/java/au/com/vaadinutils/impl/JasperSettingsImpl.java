@@ -2,7 +2,7 @@ package au.com.vaadinutils.impl;
 
 import java.io.File;
 
-import au.org.scoutmaster.jasper.JasperSettings;
+import au.com.vaadinutils.jasper.JasperSettings;
 
 /**
  * If you want to use the Jasper Wizard you need to implement this class.

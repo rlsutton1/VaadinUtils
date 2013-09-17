@@ -1,4 +1,4 @@
-package au.org.vaadinutils.filter;
+package au.com.vaadinutils.filters;
 
 import javax.persistence.EntityManager;
 

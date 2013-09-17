@@ -23,7 +23,7 @@ public class LocalEntityManagerFactory implements ServletContextListener
 	public void contextInitialized(ServletContextEvent event)
 	{
 		// TODO replace this exception with something like:
-		// emf = Persistence.createEntityManagerFactory("scoutmaster");
+		//emf = Persistence.createEntityManagerFactory("scoutmaster");
 		throw new IllegalStateException("You need to implement this method!");
 	}
 

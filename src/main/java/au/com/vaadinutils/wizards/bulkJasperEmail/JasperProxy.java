@@ -1,4 +1,4 @@
-package au.org.scoutmaster.views.wizards.bulkJasperEmail;
+package au.com.vaadinutils.wizards.bulkJasperEmail;
 
 import java.io.File;
 
@@ -6,7 +6,7 @@ import javax.persistence.EntityManager;
 
 import net.sf.jasperreports.engine.JRException;
 import au.com.vaadinutils.impl.JasperSettingsImpl;
-import au.org.scoutmaster.jasper.JasperManager;
+import au.com.vaadinutils.jasper.JasperManager;
 
 public class JasperProxy
 {

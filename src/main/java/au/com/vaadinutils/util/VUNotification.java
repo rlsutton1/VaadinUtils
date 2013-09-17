@@ -1,4 +1,4 @@
-package au.org.vaadinutil.util;
+package au.com.vaadinutils.util;
 
 import au.com.vaadinutils.ui.UIUpdater;
 
