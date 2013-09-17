@@ -5,6 +5,7 @@ import au.com.vaadinutils.listener.ClickEventLogged;
 import au.com.vaadinutils.listener.CompleteListener;
 import au.com.vaadinutils.listener.ProgressListener;
 
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.HorizontalLayout;
@@ -103,6 +104,7 @@ public class WorkingDialog extends Window implements ProgressListener<String>
 				}
 			});
 			content.addComponent(cancel);
+			content.setComponentAlignment(cancel, Alignment.BOTTOM_RIGHT);
 
 		}
 
