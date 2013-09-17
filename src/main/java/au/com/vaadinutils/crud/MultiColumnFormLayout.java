@@ -9,6 +9,7 @@ import javax.persistence.metamodel.SingularAttribute;
 import org.apache.log4j.Logger;
 
 import au.com.vaadinutils.crud.splitFields.SplitField;
+import au.com.vaadinutils.dao.EntityManagerFactory;
 import au.com.vaadinutils.fields.CKEditorEmailField;
 
 import com.google.gwt.thirdparty.guava.common.base.Preconditions;
