@@ -2,9 +2,14 @@ package au.com.vaadinutils.dao;
 
 import javax.persistence.EntityManager;
 
-import au.com.vaadinutils.crud.EntityManagerFactory;
 
-
+/**
+ * The class is a place holder to allow access to an 'non-injected' entity manager.
+ * 
+ * You should implement a servlet filter which calls setCurrentEntityManager 
+ * @author bsutton
+ *
+ */
 public enum EntityManagerProvider implements EntityManagerFactory
 {
 	INSTANCE;
