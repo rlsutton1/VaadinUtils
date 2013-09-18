@@ -5,6 +5,7 @@ import java.io.File;
 import javax.persistence.EntityManager;
 
 import net.sf.jasperreports.engine.JRException;
+import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.impl.JasperSettingsImpl;
 import au.com.vaadinutils.jasper.JasperManager;
 
@@ -17,7 +18,7 @@ public class JasperProxy
 
 	public JasperProxy(File jasperReport, String subject, String senderEmailAddress) throws JRException
 	{
-		EntityManager em = au.com.vaadinutils.impl.LocalEntityManagerFactory.createEntityManager();
+		EntityManager em = EntityManagerProvider.INSTANCE.createEntityManager();
 		this.manager = new JasperManager(em, jasperReport, new JasperSettingsImpl());
 		this.subject = subject;
 		this.senderEmailAddress = senderEmailAddress;

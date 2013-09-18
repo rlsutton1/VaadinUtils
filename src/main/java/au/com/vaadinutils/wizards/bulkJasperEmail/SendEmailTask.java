@@ -4,18 +4,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.EntityManager;
-
 import org.apache.commons.mail.EmailException;
 import org.apache.log4j.Logger;
 
 import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.dao.Transaction;
-import au.com.vaadinutils.impl.LocalEntityManagerFactory;
 import au.com.vaadinutils.jasper.JasperManager;
-import au.com.vaadinutils.jasper.RenderedReport;
 import au.com.vaadinutils.jasper.JasperManager.EmailBuilder;
 import au.com.vaadinutils.jasper.JasperManager.Exporter;
+import au.com.vaadinutils.jasper.RenderedReport;
 import au.com.vaadinutils.listener.CancelListener;
 import au.com.vaadinutils.util.ProgressBarTask;
 import au.com.vaadinutils.util.ProgressTaskListener;
@@ -58,9 +55,8 @@ public class SendEmailTask extends ProgressBarTask<JasperTransmission> implement
 			throws IOException
 	{
 
-		EntityManager em = LocalEntityManagerFactory.createEntityManager();
 		int sent = 0;
-		Transaction t = new Transaction(em);
+		Transaction t = new Transaction(EntityManagerProvider.INSTANCE.createEntityManager());
 		try 
 		{
 			for (JasperTransmission transmission : targets)
@@ -145,9 +141,6 @@ public class SendEmailTask extends ProgressBarTask<JasperTransmission> implement
 			if (t != null)
 				t.close();
 			super.taskComplete(sent);
-
-			// Reset the entity manager
-			EntityManagerProvider.INSTANCE.setCurrentEntityManager(null);
 		}
 	}
 

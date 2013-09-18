@@ -6,7 +6,7 @@ import javax.validation.ConstraintViolationException;
 import org.apache.log4j.Logger;
 import org.vaadin.dialogs.ConfirmDialog;
 
-import au.com.vaadinutils.dao.EntityManagerFactory;
+import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.listener.ClickEventLogged;
 
 import com.google.common.base.Preconditions;
@@ -35,7 +35,8 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
-public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout implements RowChangeListener<E>, Selected<E>
+public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout implements RowChangeListener<E>,
+		Selected<E>
 {
 
 	private static Logger logger = Logger.getLogger(BaseCrudView.class);
@@ -43,13 +44,13 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 	protected boolean inNew = false;
 	/**
-	 * When we enter inNew mode we need to hide the delete button.
-	 * When we exit inNew mode thsi var is used to determine if we need 
-	 * to restore the delete button. i.e. if it wasn't visible before 'new'
-	 * we shouldn't make it visible now.
+	 * When we enter inNew mode we need to hide the delete button. When we exit
+	 * inNew mode thsi var is used to determine if we need to restore the delete
+	 * button. i.e. if it wasn't visible before 'new' we shouldn't make it
+	 * visible now.
 	 */
 	private boolean restoreDelete;
-	
+
 	private TextField searchField = new TextField();
 	private Button newButton = new Button("New");
 	private Button deleteButton = new Button("Delete");
@@ -79,21 +80,19 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	private AbstractLayout advancedSearchLayout;
 	private VerticalLayout searchLayout;
 	private CheckBox advancedSearchButton;
-	private EntityManagerFactory entityManagerFactory;
 
-	protected void init(Class<E> entityClass, JPAContainer<E> container, HeadingPropertySet<E> headings,
-			EntityManagerFactory entityManagerFactory)
+	protected void init(Class<E> entityClass, JPAContainer<E> container, HeadingPropertySet<E> headings)
 	{
-		this.entityManagerFactory = entityManagerFactory;
 		this.entityClass = entityClass;
 		this.container = container;
-		try{
-		container.setBuffered(true);
+		try
+		{
+			container.setBuffered(true);
 		}
 		catch (Exception e)
 		{
 			logger.error(" ******* when constructing a jpaContainer for use with the BaseCrudView use JPAContainerFactory.makeBatchable ****** ");
-			logger.error(e,e);
+			logger.error(e, e);
 			throw new RuntimeException(e);
 		}
 		fieldGroup = new ValidatingFieldGroup<E>(container, entityClass);
@@ -319,7 +318,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				allowRowChange(new RowChangeCallback()
 				{
 
-	
 					@Override
 					public void allowRowChange()
 					{
@@ -383,14 +381,19 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 										entityTable.removeItem(contactId);
 										BaseCrudView.this.currentEntity = null;
 										inNew = false;
-										// set the selection to the first item on the page.
-										// We need to set it to null first as if the first item was already selected
-										// then we won't get a row change which is need to update the rhs.
-										// CONSIDER: On the other hand I'm concerned that we might confuse people as they
+										// set the selection to the first item
+										// on the page.
+										// We need to set it to null first as if
+										// the first item was already selected
+										// then we won't get a row change which
+										// is need to update the rhs.
+										// CONSIDER: On the other hand I'm
+										// concerned that we might confuse
+										// people as they
 										// get to row changes events.
 										BaseCrudView.this.entityTable.select(null);
 										BaseCrudView.this.entityTable.select(entityTable.getCurrentPageFirstItemId());
-										
+
 									}
 								}
 							});
@@ -413,9 +416,12 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 						restoreDelete = false;
 					}
 					// set the selection to the first item on the page.
-					// We need to set it to null first as if the first item was already selected
-					// then we won't get a row change which is need to update the rhs.
-					// CONSIDER: On the other hand I'm concerned that we might confuse people as they
+					// We need to set it to null first as if the first item was
+					// already selected
+					// then we won't get a row change which is need to update
+					// the rhs.
+					// CONSIDER: On the other hand I'm concerned that we might
+					// confuse people as they
 					// get to row changes events.
 					BaseCrudView.this.entityTable.select(null);
 					BaseCrudView.this.entityTable.select(entityTable.getCurrentPageFirstItemId());
@@ -463,29 +469,27 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				BaseCrudView.this.currentEntity = container.getItem(id).getEntity();
 
 			}
-			
-			BaseCrudView.this.currentEntity =container.getItem(currentEntity.getId()).getEntity();
-			
+
+			BaseCrudView.this.currentEntity = container.getItem(currentEntity.getId()).getEntity();
+
 			interceptSaveValues(BaseCrudView.this.currentEntity);
 
-			BaseCrudView.this.currentEntity = entityManagerFactory.getEntityManager().merge(
+			BaseCrudView.this.currentEntity = EntityManagerProvider.INSTANCE.getEntityManager().merge(
 					BaseCrudView.this.currentEntity);
-			
-			
 
 			Notification.show("Changes Saved", "Any changes you have made have been saved.", Type.TRAY_NOTIFICATION);
-			
+
 			container.discard();
 
 		}
 		catch (PersistenceException e)
 		{
-			logger.error(e,e);
+			logger.error(e, e);
 			Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
 		}
 		catch (ConstraintViolationException e)
 		{
-			logger.error(e,e);
+			logger.error(e, e);
 			FormHelper.showConstraintViolation(e);
 		}
 		return BaseCrudView.this.currentEntity;
@@ -742,24 +746,25 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		return currentEntity;
 
 	}
-	
+
 	/**
 	 * update the container and editor with any changes from the db.
 	 */
 	public void updateEditorFromDb()
 	{
-		Preconditions.checkState(!isDirty(),"The editor is dirty, save or cancel first.");
+		Preconditions.checkState(!isDirty(), "The editor is dirty, save or cancel first.");
 		E tmp = currentEntity;
 		container.discard();
 		fieldGroup.discard();
-		
+
 		BaseCrudView.this.entityTable.select(null);
 		BaseCrudView.this.entityTable.select(tmp.getId());
 
 	}
-	
+
 	/**
 	 * check if the editor has changes
+	 * 
 	 * @return
 	 */
 	public boolean isDirty()

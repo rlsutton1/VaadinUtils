@@ -1,4 +1,4 @@
-package au.com.vaadinutils.filters;
+package au.com.vaadinutils.servlet;
 
 import java.io.IOException;
 
@@ -16,7 +16,6 @@ import org.apache.log4j.Logger;
 
 import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.dao.Transaction;
-import au.com.vaadinutils.impl.LocalEntityManagerFactory;
 
 public class EntityManagerInjectorFilter implements Filter
 {
@@ -31,7 +30,7 @@ public class EntityManagerInjectorFilter implements Filter
 	public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
 			throws IOException, ServletException
 	{
-		EntityManager em = LocalEntityManagerFactory.createEntityManager();
+		EntityManager em = EntityManagerProvider.INSTANCE.createEntityManager();
 		
 		Transaction t = new Transaction(em);
 		try 

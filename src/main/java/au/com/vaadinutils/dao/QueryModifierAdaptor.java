@@ -1,4 +1,4 @@
-package au.com.vaadinutils.filters;
+package au.com.vaadinutils.dao;
 
 import java.util.List;
 

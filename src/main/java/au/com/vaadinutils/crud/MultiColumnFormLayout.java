@@ -9,10 +9,8 @@ import javax.persistence.metamodel.SingularAttribute;
 import org.apache.log4j.Logger;
 
 import au.com.vaadinutils.crud.splitFields.SplitField;
-import au.com.vaadinutils.dao.EntityManagerFactory;
 import au.com.vaadinutils.fields.CKEditorEmailField;
 
-import com.google.gwt.thirdparty.guava.common.base.Preconditions;
 import com.vaadin.shared.ui.datefield.Resolution;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.Alignment;
@@ -51,6 +49,7 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	public MultiColumnFormLayout(int columns, ValidatingFieldGroup<E> fieldGroup)
 	{
 		this.fieldGroup = fieldGroup;
+		this.fieldGroup.setBuffered(true);
 		//super.setDescription("MultiColumnFormLayout");
 		this.columns = columns * 2;
 
@@ -390,11 +389,6 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		return field;
 	}
 
-	public void setEntityManager(EntityManagerFactory factory)
-	{
-		FormHelper.setEntityManagerFactory(factory);
-	}
-
 	/**
 	 * 
 	 * @param fieldLabel
@@ -410,9 +404,6 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	 */
 	public <L> ComboBox bindEntityField(String fieldLabel, String fieldName, Class<L> listClazz, String listFieldName)
 	{
-		Preconditions.checkArgument(formHelper.isEntitymanagerSet(),
-				"You must provide the entity manager factory by calling setEntityManager first.");
-
 		ComboBox field = formHelper.bindEntityField(this, fieldGroup, fieldLabel, fieldName, listClazz, listFieldName);
 		this.fieldList.add(field);
 		return field;
@@ -422,9 +413,6 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	public <F, L, M> ComboBox bindEntityField(String fieldLabel, SingularAttribute<E, F> fieldName, Class<L> listClazz,
 			SingularAttribute<L, M> listFieldName)
 	{
-		Preconditions.checkArgument(formHelper.isEntitymanagerSet(),
-				"You must provide the entity manager factory by calling setEntityManager first.");
-
 		ComboBox field = formHelper.bindEntityField(this, fieldGroup, fieldLabel, fieldName, listClazz, listFieldName);
 		this.fieldList.add(field);
 		return field;

@@ -21,7 +21,7 @@ import au.com.vaadinutils.crud.splitFields.SplitLabel;
 import au.com.vaadinutils.crud.splitFields.SplitPasswordField;
 import au.com.vaadinutils.crud.splitFields.SplitTextArea;
 import au.com.vaadinutils.crud.splitFields.SplitTextField;
-import au.com.vaadinutils.dao.EntityManagerFactory;
+import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.fields.CKEditorEmailField;
 
 import com.google.common.base.Preconditions;
@@ -49,7 +49,6 @@ import com.vaadin.ui.TextField;
 public class FormHelper<E> implements Serializable
 {
 	private static final long serialVersionUID = 1L;
-	static EntityManagerFactory entityManagerFactory;
 
 	ArrayList<AbstractComponent> fieldList = new ArrayList<AbstractComponent>();
 	private AbstractLayout form;
@@ -64,17 +63,6 @@ public class FormHelper<E> implements Serializable
 		// Preconditions.checkNotNull(group, "ValidatingFieldGroup can not be null");
 		this.form = form;
 		this.group = group;
-	}
-
-	/**
-	 * Provides a factory which allows the FormHelper to get the current
-	 * EntityManager as and when it needs it.
-	 * 
-	 * @param factory
-	 */
-	static public void setEntityManagerFactory(EntityManagerFactory factory)
-	{
-		entityManagerFactory = factory;
 	}
 
 	public <M> TextField bindTextField(AbstractLayout form, ValidatingFieldGroup<E> group, String fieldLabel,
@@ -352,9 +340,7 @@ public class FormHelper<E> implements Serializable
 	public <L> ComboBox bindEntityField(AbstractLayout form, ValidatingFieldGroup<E> fieldGroup, String fieldLabel,
 			String fieldName, Class<L> listClazz, String listFieldName)
 	{
-		Preconditions.checkNotNull(entityManagerFactory,
-				"You must provide the entity manager factory by calling setEntityManager first.");
-		JPAContainer<?> container = JPAContainerFactory.make(listClazz, entityManagerFactory.getEntityManager());
+		JPAContainer<?> container = JPAContainerFactory.make(listClazz, EntityManagerProvider.INSTANCE.getEntityManager());
 
 		ComboBox field = new SplitComboBox(fieldLabel);
 
@@ -460,11 +446,6 @@ public class FormHelper<E> implements Serializable
 			sb.append("Error: " + violation.getPropertyPath() + " : " + violation.getMessage() + "\n");
 		}
 		Notification.show(sb.toString(), Type.ERROR_MESSAGE);
-	}
-
-	public boolean isEntitymanagerSet()
-	{
-		return entityManagerFactory != null;
 	}
 
 	protected AbstractLayout getForm()
