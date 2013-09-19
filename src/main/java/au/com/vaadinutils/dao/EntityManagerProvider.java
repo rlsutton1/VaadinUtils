@@ -18,11 +18,13 @@ import javax.persistence.EntityManager;
  * 
  * e.g.
  * 
- * 		Transaction t = new Transaction(em);
+ * 		EntityManager em = EntityManagerProvider.createEntityManager();
+		Transaction t = null;
+		Transaction t = new Transaction(em);
 		try 
 		{
 			// Create and set the entity manager
-			EntityManagerProvider.INSTANCE.setCurrentEntityManager(em);
+			EntityManagerProvider.setCurrentEntityManager(em);
 
 			// Handle the request
 			filterChain.doFilter(servletRequest, servletResponse);
@@ -34,7 +36,7 @@ import javax.persistence.EntityManager;
 			if (t!= null)
 				t.close();
 			// Reset the entity manager
-			EntityManagerProvider.INSTANCE.setCurrentEntityManager(null);
+			EntityManagerProvider.setCurrentEntityManager(null);
 		}
 	}
 
@@ -54,14 +56,14 @@ public enum EntityManagerProvider
 	private javax.persistence.EntityManagerFactory emf;
 
 	
-	public EntityManager getEntityManager()
+	public static EntityManager getEntityManager()
 	{
-		return entityManagerThreadLocal.get();
+		return INSTANCE.entityManagerThreadLocal.get();
 	}
 
-	public void setCurrentEntityManager(EntityManager em)
+	public static void setCurrentEntityManager(EntityManager em)
 	{
-		entityManagerThreadLocal.set(em);
+		INSTANCE.entityManagerThreadLocal.set(em);
 	}
 
 	
@@ -73,9 +75,9 @@ public enum EntityManagerProvider
 	 * 
 	 * @param emf
 	 */
-	public void setEntityManagerFactory(javax.persistence.EntityManagerFactory emf)
+	public static void setEntityManagerFactory(javax.persistence.EntityManagerFactory emf)
 	{
-		this.emf = emf;
+		INSTANCE.emf = emf;
 	}
 
 	/**
@@ -86,14 +88,14 @@ public enum EntityManagerProvider
 	 * You will also need 
 	 * @return
 	 */
-	public EntityManager createEntityManager()
+	public static EntityManager createEntityManager()
 	{
-		if (this.emf == null)
+		if (INSTANCE.emf == null)
 		{
 			throw new IllegalStateException("Context is not initialized yet.");
 		}
 
-		return this.emf.createEntityManager();
+		return INSTANCE.emf.createEntityManager();
 	}
 
 

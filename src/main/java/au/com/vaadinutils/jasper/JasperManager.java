@@ -111,7 +111,7 @@ public class JasperManager
 		}
 		finally
 		{
-			if (t != null)
+			
 				t.close();
 		}
 	}
@@ -165,8 +165,13 @@ public class JasperManager
 				exporter = new JRPdfExporter();
 				exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasper_print);
 				exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, out);
-
+				break;
 			}
+			default:
+			{
+				throw new RuntimeException("Unsupported export option "+exportMethod);
+				}
+			
 		}
 
 		for (Entry<JRExporterParameter, Object> param : exporter.getParameters().entrySet())

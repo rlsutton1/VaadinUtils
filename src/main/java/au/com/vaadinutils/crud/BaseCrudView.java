@@ -474,7 +474,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 			interceptSaveValues(BaseCrudView.this.currentEntity);
 
-			BaseCrudView.this.currentEntity = EntityManagerProvider.INSTANCE.getEntityManager().merge(
+			BaseCrudView.this.currentEntity = EntityManagerProvider.getEntityManager().merge(
 					BaseCrudView.this.currentEntity);
 
 			Notification.show("Changes Saved", "Any changes you have made have been saved.", Type.TRAY_NOTIFICATION);

@@ -25,7 +25,7 @@ public abstract class VUEntityManagerContextListener implements ServletContextLi
 	{
 		
 		emf = getEntityManagerFactory();
-		EntityManagerProvider.INSTANCE.setEntityManagerFactory(emf);
+		EntityManagerProvider.setEntityManagerFactory(emf);
 	}
 
 

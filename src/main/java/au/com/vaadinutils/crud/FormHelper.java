@@ -340,7 +340,7 @@ public class FormHelper<E> implements Serializable
 	public <L> ComboBox bindEntityField(AbstractLayout form, ValidatingFieldGroup<E> fieldGroup, String fieldLabel,
 			String fieldName, Class<L> listClazz, String listFieldName)
 	{
-		JPAContainer<?> container = JPAContainerFactory.make(listClazz, EntityManagerProvider.INSTANCE.getEntityManager());
+		JPAContainer<?> container = JPAContainerFactory.make(listClazz, EntityManagerProvider.getEntityManager());
 
 		ComboBox field = new SplitComboBox(fieldLabel);
 

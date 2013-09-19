@@ -30,13 +30,13 @@ public class EntityManagerInjectorFilter implements Filter
 	public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
 			throws IOException, ServletException
 	{
-		EntityManager em = EntityManagerProvider.INSTANCE.createEntityManager();
+		EntityManager em = EntityManagerProvider.createEntityManager();
 		
 		Transaction t = new Transaction(em);
 		try 
 		{
 			// Create and set the entity manager
-			EntityManagerProvider.INSTANCE.setCurrentEntityManager(em);
+			EntityManagerProvider.setCurrentEntityManager(em);
 
 			// Handle the request
 			filterChain.doFilter(servletRequest, servletResponse);
@@ -69,10 +69,10 @@ public class EntityManagerInjectorFilter implements Filter
 		}
 		finally
 		{
-			if (t!= null)
+			
 				t.close();
 			// Reset the entity manager
-			EntityManagerProvider.INSTANCE.setCurrentEntityManager(null);
+			EntityManagerProvider.setCurrentEntityManager(null);
 		}
 	}
 
