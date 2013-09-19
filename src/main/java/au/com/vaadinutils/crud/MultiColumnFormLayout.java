@@ -49,7 +49,6 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	public MultiColumnFormLayout(int columns, ValidatingFieldGroup<E> fieldGroup)
 	{
 		this.fieldGroup = fieldGroup;
-		this.fieldGroup.setBuffered(true);
 		//super.setDescription("MultiColumnFormLayout");
 		this.columns = columns * 2;
 
