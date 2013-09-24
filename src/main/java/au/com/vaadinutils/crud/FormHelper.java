@@ -404,7 +404,7 @@ public class FormHelper<E> implements Serializable
 	}
 
 
-	static Container createContainerFromEnumClass(String fieldName, Class<?> clazz)
+	public static Container createContainerFromEnumClass(String fieldName, Class<?> clazz)
 	{
 		LinkedHashMap<Enum<?>, String> enumMap = new LinkedHashMap<Enum<?>, String>();
 		for (Object enumConstant : clazz.getEnumConstants())
