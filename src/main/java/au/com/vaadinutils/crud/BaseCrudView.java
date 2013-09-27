@@ -13,6 +13,7 @@ import com.google.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.data.Container.Filter;
+import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
@@ -88,6 +89,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		try
 		{
 			container.setBuffered(true);
+			container.setFireContainerItemSetChangeEvents(true);
+
 		}
 		catch (Exception e)
 		{
@@ -382,7 +385,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 								{
 									if (dialog.isConfirmed())
 									{
+										
 										Object contactId = entityTable.getValue();
+										Object previousItemId = entityTable.prevItemId(contactId);
 										entityTable.removeItem(contactId);
 										BaseCrudView.this.currentEntity = null;
 										inNew = false;
@@ -397,7 +402,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 										// people as they
 										// get to row changes events.
 										BaseCrudView.this.entityTable.select(null);
-										BaseCrudView.this.entityTable.select(entityTable.getCurrentPageFirstItemId());
+										BaseCrudView.this.entityTable.select(previousItemId);
 										container.commit();
 									}
 								}
@@ -458,30 +463,35 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		{
 			commit();
 
+			interceptSaveValues(BaseCrudView.this.currentEntity);
+
+			BaseCrudView.this.currentEntity = EntityManagerProvider.getEntityManager().merge(
+					BaseCrudView.this.currentEntity);
+			
+			// you might not like the commit/begin approach, but it works!
+			EntityManagerProvider.getEntityManager().getTransaction().commit();
+			EntityManagerProvider.getEntityManager().getTransaction().begin();
+			
+			Long id = currentEntity.getId();
 			if (inNew)
 			{
-
-				Object id = container.addEntity(BaseCrudView.this.currentEntity);
-
+				container.refresh();
+				entityTable.select(id);
+				inNew = false;
 				if (restoreDelete)
 				{
 					showDelete(true);
 					restoreDelete = false;
 				}
-				BaseCrudView.this.entityTable.select(id);
-				inNew = false;
-				BaseCrudView.this.currentEntity = container.getItem(id).getEntity();
-
-			}
-			else
+			}else
 			{
-				BaseCrudView.this.currentEntity = container.getItem(currentEntity.getId()).getEntity();
+				container.refreshItem(id);
+				
+				// select null and reselect the item to guarantee that the field group flushes to the db.
+				entityTable.select(null);
+				entityTable.select(id);
 			}
-			interceptSaveValues(BaseCrudView.this.currentEntity);
-
-			BaseCrudView.this.currentEntity = EntityManagerProvider.getEntityManager().merge(
-					BaseCrudView.this.currentEntity);
-
+			
 			Notification.show("Changes Saved", "Any changes you have made have been saved.", Type.TRAY_NOTIFICATION);
 
 		}
