@@ -17,6 +17,7 @@ public class SplitComboBox extends ComboBox implements SplitField
 	public SplitComboBox(String label)
 	{
 		this.label = new Label(label);
+		setCaption(label);
 	}
 
 	public SplitComboBox(String fieldLabel, Container createContainerFromEnumClass)
@@ -48,5 +49,12 @@ public class SplitComboBox extends ComboBox implements SplitField
 	public String getCaption()
 	{
 		return label.getValue();
+	}
+	
+	@Override
+	public void hideLabel()
+	{
+		setCaption(null);
+		
 	}
 }

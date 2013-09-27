@@ -13,7 +13,7 @@ import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.data.Property;
 import com.vaadin.ui.Table;
 
-public class EntityTable<E> extends Table
+public class EntityTable<E> extends Table implements EntityList<E>
 {
 
 	private static final long serialVersionUID = 1L;
@@ -75,7 +75,7 @@ public class EntityTable<E> extends Table
 			{
 				if (EntityTable.this.rowChangeListener != null)
 				{
-					Long entityId = (Long) EntityTable.this.getValue();
+					 Object entityId =  EntityTable.this.getValue();
 
 					if (entityId != null) // it can be null when a row is being
 											// deleted.
@@ -197,5 +197,7 @@ public class EntityTable<E> extends Table
 		}
 		return ret;
 	}
+
+	
 
 }

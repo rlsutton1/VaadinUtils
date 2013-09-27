@@ -13,7 +13,7 @@ public class SplitLabel extends Label implements SplitField
 	public SplitLabel(String label)
 	{
 		super(label);
-
+	
 	}
 
 	@Override
@@ -21,5 +21,9 @@ public class SplitLabel extends Label implements SplitField
 	{
 		return this;
 	}
-
+	@Override
+	public void hideLabel()
+	{
+		
+	}
 }

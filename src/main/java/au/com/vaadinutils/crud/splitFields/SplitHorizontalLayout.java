@@ -35,4 +35,10 @@ public class SplitHorizontalLayout extends HorizontalLayout implements SplitFiel
 	{
 		return label.getValue();
 	}
+	@Override
+	public void hideLabel()
+	{
+		setCaption(null);
+		
+	}
 }

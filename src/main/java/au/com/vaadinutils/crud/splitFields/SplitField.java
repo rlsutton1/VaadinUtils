@@ -10,4 +10,6 @@ public interface SplitField extends Component
 
 	String getCaption();
 
+	void hideLabel();
+
 }

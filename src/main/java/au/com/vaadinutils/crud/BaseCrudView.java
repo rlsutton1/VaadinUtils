@@ -72,7 +72,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	private JPAContainer<E> container;
 
 	/* User interface components are stored in session. */
-	private EntityTable<E> entityTable;
+	private EntityList<E> entityTable;
 	private VerticalLayout rightLayout;
 	private AbstractLayout editor;
 	private HorizontalSplitPanel splitPanel;
@@ -98,7 +98,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		fieldGroup = new ValidatingFieldGroup<E>(container, entityClass);
 		fieldGroup.setBuffered(true);
 
-		entityTable = new EntityTable<E>(container, headings);
+		entityTable = getTable(container, headings);
 		entityTable.setRowChangeListener(this);
 		entityTable.setSortEnabled(true);
 
@@ -109,6 +109,11 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		this.setVisible(true);
 		entityTable.select(entityTable.firstItemId());
 
+	}
+
+	protected EntityList<E> getTable(JPAContainer<E> container, HeadingPropertySet<E> headings)
+	{
+		return new EntityTable<E>(container, headings);
 	}
 
 	/*
@@ -393,7 +398,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 										// get to row changes events.
 										BaseCrudView.this.entityTable.select(null);
 										BaseCrudView.this.entityTable.select(entityTable.getCurrentPageFirstItemId());
-
+										container.commit();
 									}
 								}
 							});
@@ -453,11 +458,10 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		{
 			commit();
 
-			Long id = null;
 			if (inNew)
 			{
 
-				id = (Long) container.addEntity(BaseCrudView.this.currentEntity);
+				Object id = container.addEntity(BaseCrudView.this.currentEntity);
 
 				if (restoreDelete)
 				{
@@ -469,17 +473,16 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				BaseCrudView.this.currentEntity = container.getItem(id).getEntity();
 
 			}
-
-			BaseCrudView.this.currentEntity = container.getItem(currentEntity.getId()).getEntity();
-
+			else
+			{
+				BaseCrudView.this.currentEntity = container.getItem(currentEntity.getId()).getEntity();
+			}
 			interceptSaveValues(BaseCrudView.this.currentEntity);
 
 			BaseCrudView.this.currentEntity = EntityManagerProvider.getEntityManager().merge(
 					BaseCrudView.this.currentEntity);
 
 			Notification.show("Changes Saved", "Any changes you have made have been saved.", Type.TRAY_NOTIFICATION);
-
-			container.discard();
 
 		}
 		catch (PersistenceException e)
