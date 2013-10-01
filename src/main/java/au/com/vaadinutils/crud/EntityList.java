@@ -16,6 +16,8 @@ public interface EntityList<E> extends Component
 	public void select(Object firstItemId);
 
 	public Object getValue();
+	
+	public E getCurrent();
 
 
 	public boolean removeItem(Object contactId);

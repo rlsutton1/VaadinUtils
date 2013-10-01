@@ -75,7 +75,7 @@ public class EntityTable<E> extends Table implements EntityList<E>
 			{
 				if (EntityTable.this.rowChangeListener != null)
 				{
-					 Object entityId =  EntityTable.this.getValue();
+					Object entityId = EntityTable.this.getValue();
 
 					if (entityId != null) // it can be null when a row is being
 											// deleted.
@@ -131,8 +131,12 @@ public class EntityTable<E> extends Table implements EntityList<E>
 
 	public E getCurrent()
 	{
-		Long entityId = (Long) this.getValue();
-		E entity = this.entityContainer.getItem(entityId).getEntity();
+		Object entityId = this.getValue();
+		E entity = null;
+		if (entityId != null)
+		{
+			entity = this.entityContainer.getItem(entityId).getEntity();
+		}
 
 		return entity;
 
@@ -197,8 +201,5 @@ public class EntityTable<E> extends Table implements EntityList<E>
 		}
 		return ret;
 	}
-
-	
-	
 
 }
