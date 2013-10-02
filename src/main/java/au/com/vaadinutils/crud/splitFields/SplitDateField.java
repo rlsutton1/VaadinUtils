@@ -15,6 +15,7 @@ public class SplitDateField extends DateField implements SplitField
 	public SplitDateField(String label)
 	{
 		this.label = new Label(label);
+		setCaption(label);
 
 	}
 
@@ -35,5 +36,11 @@ public class SplitDateField extends DateField implements SplitField
 	public String getCaption()
 	{
 		return label.getValue();
+	}
+	@Override
+	public void hideLabel()
+	{
+		setCaption(null);
+		
 	}
 }

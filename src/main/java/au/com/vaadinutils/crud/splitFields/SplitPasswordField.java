@@ -11,6 +11,7 @@ public class SplitPasswordField extends PasswordField implements SplitField
 	public SplitPasswordField(String label)
 	{
 		this.label = new Label(label);
+		setCaption(label);
 
 	}
 
@@ -32,5 +33,10 @@ public class SplitPasswordField extends PasswordField implements SplitField
 	{
 		return label.getValue();
 	}
-
+	@Override
+	public void hideLabel()
+	{
+		setCaption(null);
+		
+	}
 }

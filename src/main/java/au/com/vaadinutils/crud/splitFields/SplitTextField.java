@@ -14,6 +14,7 @@ public class SplitTextField extends TextField implements SplitField
 	public SplitTextField(String label)
 	{
 		this.label = new Label(label);
+		setCaption(label);
 
 	}
 
@@ -34,6 +35,13 @@ public class SplitTextField extends TextField implements SplitField
 	public String getCaption()
 	{
 		return label.getValue();
+	}
+
+	@Override
+	public void hideLabel()
+	{
+		setCaption(null);
+		
 	}
 
 }

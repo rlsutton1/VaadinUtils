@@ -33,5 +33,11 @@ public class SplitEditorField extends CKEditorEmailField implements SplitField
 	{
 		return null;
 	}
+	@Override
+	public void hideLabel()
+	{
+		setCaption(null);
+		
+	}
 
 }
