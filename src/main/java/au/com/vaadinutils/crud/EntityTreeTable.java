@@ -57,10 +57,10 @@ public class EntityTreeTable<E> extends Tree implements EntityList<E>
 		}
 	//	this.setVisibleColumns(colsToShow.toArray());
 
-		for (HeadingToPropertyId<E> column : visibleColumns.getColumns())
-		{
+//		for (HeadingToPropertyId<E> column : visibleColumns.getColumns())
+//		{
 //			this.setColumnHeader(column.getPropertyId(), column.getHeader());
-		}
+//		}
 
 		this.setSelectable(true);
 		this.setImmediate(true);
