@@ -56,7 +56,7 @@ public class SendEmailTask extends ProgressBarTask<JasperTransmission> implement
 	{
 
 		int sent = 0;
-		Transaction t = new Transaction(EntityManagerProvider.INSTANCE.createEntityManager());
+		Transaction t = new Transaction(EntityManagerProvider.createEntityManager());
 		try 
 		{
 			for (JasperTransmission transmission : targets)
