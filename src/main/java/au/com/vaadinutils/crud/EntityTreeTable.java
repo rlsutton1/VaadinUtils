@@ -3,7 +3,6 @@ package au.com.vaadinutils.crud;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -11,9 +10,7 @@ import com.google.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.data.Property;
-import com.vaadin.ui.Table;
 import com.vaadin.ui.Tree;
-import com.vaadin.ui.TreeTable;
 
 public class EntityTreeTable<E> extends Tree implements EntityList<E>
 {
