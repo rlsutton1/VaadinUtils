@@ -12,8 +12,10 @@ import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.data.Property;
 import com.vaadin.ui.Table;
+import com.vaadin.ui.Tree;
+import com.vaadin.ui.TreeTable;
 
-public class EntityTable<E> extends Table implements EntityList<E>
+public class EntityTreeTable<E> extends Tree implements EntityList<E>
 {
 
 	private static final long serialVersionUID = 1L;
@@ -21,9 +23,9 @@ public class EntityTable<E> extends Table implements EntityList<E>
 	private RowChangeListener<E> rowChangeListener;
 	private HeadingPropertySet<E> visibleColumns;
 
-	Logger logger = Logger.getLogger(EntityTable.class);
+	Logger logger = Logger.getLogger(EntityTreeTable.class);
 
-	public EntityTable(JPAContainer<E> entityContainer, HeadingPropertySet<E> headingPropertySet)
+	public EntityTreeTable(JPAContainer<E> entityContainer, HeadingPropertySet<E> headingPropertySet)
 	{
 		this.entityContainer = entityContainer;
 		this.visibleColumns = headingPropertySet;
@@ -46,7 +48,7 @@ public class EntityTable<E> extends Table implements EntityList<E>
 
 			if (column.isGenerated())
 			{
-				addGeneratedColumn(column.getPropertyId(), column.getColumnGenerator());
+	//			addGeneratedColumn(column.getPropertyId(), column.getColumnGenerator());
 			}
 			else
 			{
@@ -56,11 +58,11 @@ public class EntityTable<E> extends Table implements EntityList<E>
 								+ this.getContainerPropertyIds().toString());
 			}
 		}
-		this.setVisibleColumns(colsToShow.toArray());
+	//	this.setVisibleColumns(colsToShow.toArray());
 
 		for (HeadingToPropertyId<E> column : visibleColumns.getColumns())
 		{
-			this.setColumnHeader(column.getPropertyId(), column.getHeader());
+//			this.setColumnHeader(column.getPropertyId(), column.getHeader());
 		}
 
 		this.setSelectable(true);
@@ -73,18 +75,18 @@ public class EntityTable<E> extends Table implements EntityList<E>
 			@Override
 			public void valueChange(com.vaadin.data.Property.ValueChangeEvent event)
 			{
-				if (EntityTable.this.rowChangeListener != null)
+				if (EntityTreeTable.this.rowChangeListener != null)
 				{
-					Object entityId = EntityTable.this.getValue();
+					 Object entityId =  EntityTreeTable.this.getValue();
 
 					if (entityId != null) // it can be null when a row is being
 											// deleted.
 					{
-						EntityItem<E> entity = EntityTable.this.entityContainer.getItem(entityId); // .getEntity();
-						EntityTable.this.rowChangeListener.rowChanged(entity);
+						EntityItem<E> entity = EntityTreeTable.this.entityContainer.getItem(entityId); // .getEntity();
+						EntityTreeTable.this.rowChangeListener.rowChanged(entity);
 					}
 					else
-						EntityTable.this.rowChangeListener.rowChanged(null);
+						EntityTreeTable.this.rowChangeListener.rowChanged(null);
 				}
 			}
 		});
@@ -108,21 +110,21 @@ public class EntityTable<E> extends Table implements EntityList<E>
 		if (variables.containsKey("selected"))
 		{
 
-			if (EntityTable.this.rowChangeListener != null)
+			if (EntityTreeTable.this.rowChangeListener != null)
 			{
-				EntityTable.this.rowChangeListener.allowRowChange(new RowChangeCallback()
+				EntityTreeTable.this.rowChangeListener.allowRowChange(new RowChangeCallback()
 				{
 					@Override
 					public void allowRowChange()
 					{
-						EntityTable.super.changeVariables(source, variables);
+						EntityTreeTable.super.changeVariables(source, variables);
 					}
 				});
 				markAsDirty();
 			}
 			else
 			{
-				EntityTable.super.changeVariables(source, variables);
+				EntityTreeTable.super.changeVariables(source, variables);
 			}
 		}
 		else
@@ -131,15 +133,39 @@ public class EntityTable<E> extends Table implements EntityList<E>
 
 	public E getCurrent()
 	{
-		Object entityId = this.getValue();
-		E entity = null;
-		if (entityId != null)
-		{
-			entity = this.entityContainer.getItem(entityId).getEntity();
-		}
+		Long entityId = (Long) this.getValue();
+		E entity = this.entityContainer.getItem(entityId).getEntity();
 
 		return entity;
 
+	}
+
+	@Override
+	public void setSortEnabled(boolean b)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Object firstItemId()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Object getCurrentPageFirstItemId()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Object prevItemId(Object contactId)
+	{
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/**
@@ -173,33 +199,35 @@ public class EntityTable<E> extends Table implements EntityList<E>
 	 * au.org.scoutmaster.views.ContactTable.init(ContactTable.java:46)
 	 * 
 	 */
-	@Override
-	protected String formatPropertyValue(Object rowId, Object colId, Property<?> property)
-	{
-		if (property.getType() == Set.class)
-		{
-			return null;
-		}
-		try
-		{
-			property.getValue();
+//	@Override
+//	protected String formatPropertyValue(Object rowId, Object colId, Property<?> property)
+//	{
+//		if (property.getType() == Set.class)
+//		{
+//			return null;
+//		}
+//		try
+//		{
+//			property.getValue();
+//
+//		}
+//		catch (Exception e)
+//		{
+//			return null;
+//		}
+//		String ret = null;
+//		try
+//		{
+//			ret = super.formatPropertyValue(rowId, colId, property);
+//		}
+//		catch (Exception e)
+//		{
+//			logger.error("value: " + property.getValue() + " type: " + property.getType(), e);
+//			ret = e.getMessage();
+//		}
+//		return ret;
+//	}
 
-		}
-		catch (Exception e)
-		{
-			return null;
-		}
-		String ret = null;
-		try
-		{
-			ret = super.formatPropertyValue(rowId, colId, property);
-		}
-		catch (Exception e)
-		{
-			logger.error("value: " + property.getValue() + " type: " + property.getType(), e);
-			ret = e.getMessage();
-		}
-		return ret;
-	}
+	
 
 }

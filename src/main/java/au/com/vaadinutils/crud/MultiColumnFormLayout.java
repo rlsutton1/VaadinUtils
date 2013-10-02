@@ -145,6 +145,7 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	{
 		// SplitField splitComponent = (SplitField) component;
 
+		splitComponent.hideLabel();
 		int fieldSpan = colspan;
 		int captionWidth = 1;
 		if (x + fieldSpan + captionWidth > columns)
