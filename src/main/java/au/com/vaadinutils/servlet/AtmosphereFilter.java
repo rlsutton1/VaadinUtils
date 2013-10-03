@@ -43,11 +43,11 @@ public class AtmosphereFilter extends AtmosphereInterceptorAdapter
 	{
 		// do pre-request stuff
 
-		EntityManager em = EntityManagerProvider.INSTANCE.createEntityManager();
+		EntityManager em = EntityManagerProvider.createEntityManager();
 		t = new Transaction(em);
 
 		// Create and set the entity manager
-		EntityManagerProvider.INSTANCE.setCurrentEntityManager(em);
+		EntityManagerProvider.setCurrentEntityManager(em);
 
 		return super.inspect(r);
 	}
@@ -62,7 +62,7 @@ public class AtmosphereFilter extends AtmosphereInterceptorAdapter
 		catch (Throwable e)
 		{
 			// Reset the entity manager
-			EntityManagerProvider.INSTANCE.setCurrentEntityManager(null);
+			EntityManagerProvider.setCurrentEntityManager(null);
 			throw new RuntimeException(e);
 		}
 

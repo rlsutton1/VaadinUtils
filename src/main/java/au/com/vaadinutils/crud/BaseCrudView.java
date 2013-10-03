@@ -481,7 +481,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			if (newEntity != null)
 			{
 				if (selected && entityTable.getCurrent() != null)
-				container.removeItem(entityTable.getCurrent());
+				if (selected && entityTable.getCurrent() != null)
+					container.removeItem(entityTable.getCurrent());
 			}
 		}
 
