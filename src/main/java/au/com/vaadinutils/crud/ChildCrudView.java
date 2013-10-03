@@ -36,6 +36,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 		super(CrudDisplayMode.VERTICAL);
 		this.parentKey = parentKey;
 		this.childKey = childKey;
+		setMargin(true);
 
 	}
 
