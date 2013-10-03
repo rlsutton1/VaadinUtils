@@ -54,7 +54,7 @@ public class FormHelper<E> implements Serializable
 	private AbstractLayout form;
 	private ValidatingFieldGroup<E> group;
 	
-	Logger logger = Logger.getLogger(FormHelper.class);
+	static Logger logger = Logger.getLogger(FormHelper.class);
 
 	public FormHelper(AbstractLayout form, ValidatingFieldGroup<E> group)
 	{

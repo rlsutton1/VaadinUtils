@@ -31,9 +31,9 @@ public class EntityManagerInjectorFilter implements Filter
 			throws IOException, ServletException
 	{
 		EntityManager em = EntityManagerProvider.createEntityManager();
-		
+
 		Transaction t = new Transaction(em);
-		try 
+		try
 		{
 			// Create and set the entity manager
 			EntityManagerProvider.setCurrentEntityManager(em);
@@ -43,34 +43,35 @@ public class EntityManagerInjectorFilter implements Filter
 
 			t.commit();
 		}
-		catch (ConstraintViolationException  e)
+		catch (ConstraintViolationException e)
 		{
+
 			if (e.getCause() instanceof ConstraintViolationException)
 			{
-				e = (ConstraintViolationException) e.getCause();
-			}
+				ConstraintViolationException e2 = (ConstraintViolationException) e.getCause();
 
-			if (e != null)
-			{
-				for (ConstraintViolation<?> violation : e.getConstraintViolations())
+				if (e2 != null)
 				{
-					StringBuilder sb = new StringBuilder();
-					sb.append("Constraint Violation: \n");
-					sb.append("Entity:" + violation.getRootBean());
-					sb.append("Error: " + violation.getMessage() + "\n");
-					sb.append(" on property: " + violation.getPropertyPath() + "\n");
-					sb.append("Constraint:" + violation.getMessageTemplate());
-					
-					logger.error(sb.toString());
-				}
+					for (ConstraintViolation<?> violation : e.getConstraintViolations())
+					{
+						StringBuilder sb = new StringBuilder();
+						sb.append("Constraint Violation: \n");
+						sb.append("Entity:" + violation.getRootBean());
+						sb.append("Error: " + violation.getMessage() + "\n");
+						sb.append(" on property: " + violation.getPropertyPath() + "\n");
+						sb.append("Constraint:" + violation.getMessageTemplate());
 
+						logger.error(sb.toString());
+					}
+
+				}
 			}
 			throw e;
 		}
 		finally
 		{
-			
-				t.close();
+
+			t.close();
 			// Reset the entity manager
 			EntityManagerProvider.setCurrentEntityManager(null);
 		}

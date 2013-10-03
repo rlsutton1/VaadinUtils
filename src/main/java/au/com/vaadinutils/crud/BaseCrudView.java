@@ -1,5 +1,8 @@
 package au.com.vaadinutils.crud;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.persistence.PersistenceException;
 import javax.validation.ConstraintViolationException;
 
@@ -26,7 +29,6 @@ import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.HorizontalSplitPanel;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
@@ -51,7 +53,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 */
 	protected boolean restoreDelete;
 
-	private TextField searchField = new TextField();
+	protected TextField searchField = new TextField();
 	private Button newButton = new Button("New");
 	private Button deleteButton = new Button("Delete");
 	private Button saveButton = new Button("Save");
@@ -75,12 +77,23 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	protected EntityList<E> entityTable;
 	private VerticalLayout rightLayout;
 	private Component editor;
-	private HorizontalSplitPanel splitPanel;
+	protected CrudPanelPair splitPanel;
 	private HorizontalLayout buttonLayout;
 	private AbstractLayout advancedSearchLayout;
 	private VerticalLayout searchLayout;
 	private CheckBox advancedSearchButton;
-	private CommitListener<E> commitListener;
+	private Set<ChildCrudListener<E>> childCrudListeners = new HashSet<ChildCrudListener<E>>();
+	private CrudDisplayMode displayMode = CrudDisplayMode.HORIZONTAL;
+
+	protected BaseCrudView()
+	{
+
+	}
+
+	BaseCrudView(CrudDisplayMode mode)
+	{
+		this.displayMode = mode;
+	}
 
 	protected void init(Class<E> entityClass, JPAContainer<E> container, HeadingPropertySet<E> headings)
 	{
@@ -130,15 +143,15 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	{
 		this.setSizeFull();
 
-		splitPanel = new HorizontalSplitPanel();
-		this.addComponent(splitPanel);
-		this.setExpandRatio(splitPanel, 1);
+		splitPanel = displayMode.getContainer();
+		this.addComponent(splitPanel.getPanel());
+		this.setExpandRatio(splitPanel.getPanel(), 1);
 
 		// Layout for the table
 		VerticalLayout leftLayout = new VerticalLayout();
 
 		// Start by defining the LHS which contains the table
-		splitPanel.addComponent(leftLayout);
+		splitPanel.setFirstComponent(leftLayout);
 		searchLayout = new VerticalLayout();
 		searchLayout.setWidth("100%");
 		searchField.setWidth("100%");
@@ -158,7 +171,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 		// Now define the edit area
 		rightLayout = new VerticalLayout();
-		splitPanel.addComponent(rightLayout);
+		splitPanel.setSecondComponent(rightLayout);
 
 		buttonLayout = new HorizontalLayout();
 		buttonLayout.setWidth("100%");
@@ -347,25 +360,10 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 									if (dialog.isConfirmed())
 									{
 
-										Object contactId = entityTable.getValue();
-										Object previousItemId = entityTable.prevItemId(contactId);
-										entityTable.removeItem(contactId);
-										newEntity = null;
-										// set the selection to the first item
-										// on the page.
-										// We need to set it to null first as if
-										// the first item was already selected
-										// then we won't get a row change which
-										// is need to update the rhs.
-										// CONSIDER: On the other hand I'm
-										// concerned that we might confuse
-										// people as they
-										// get to row changes events.
-										BaseCrudView.this.entityTable.select(null);
-										BaseCrudView.this.entityTable.select(previousItemId);
-										container.commit();
+										delete();
 									}
 								}
+
 							});
 				}
 			}
@@ -398,6 +396,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				}
 
 				newEntity = null;
+				splitPanel.showFirstComponet();
 				Notification.show("Changes discarded.", "Any changes you have made to this contact been discarded.",
 						Type.TRAY_NOTIFICATION);
 			}
@@ -415,6 +414,27 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 		});
 
+	}
+
+	protected void delete()
+	{
+		Object contactId = entityTable.getValue();
+		Object previousItemId = entityTable.prevItemId(contactId);
+		entityTable.removeItem(contactId);
+		newEntity = null;
+		// set the selection to the first item
+		// on the page.
+		// We need to set it to null first as if
+		// the first item was already selected
+		// then we won't get a row change which
+		// is need to update the rhs.
+		// CONSIDER: On the other hand I'm
+		// concerned that we might confuse
+		// people as they
+		// get to row changes events.
+		BaseCrudView.this.entityTable.select(null);
+		BaseCrudView.this.entityTable.select(previousItemId);
+		container.commit();
 	}
 
 	protected void save()
@@ -459,10 +479,12 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 					restoreDelete = false;
 				}
 			}
-			if (commitListener != null)
+			for (ChildCrudListener<E> commitListener : childCrudListeners)
 			{
-				commitListener.committed();
+
+				commitListener.committed(entityTable.getCurrent());
 			}
+			splitPanel.showFirstComponet();
 			Notification.show("Changes Saved", "Any changes you have made have been saved.", Type.TRAY_NOTIFICATION);
 
 		}
@@ -480,9 +502,11 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		{
 			if (newEntity != null)
 			{
+
 				if (selected && entityTable.getCurrent() != null)
-				if (selected && entityTable.getCurrent() != null)
+				{
 					container.removeItem(entityTable.getCurrent());
+				}
 			}
 		}
 
@@ -561,7 +585,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	public void applyFilter(final Filter filter)
 	{
 		/* Reset the filter for the contactContainer. */
-		container.removeAllContainerFilters();
+		resetFilters();
 		container.addContainerFilter(filter);
 		container.discard();
 
@@ -613,7 +637,13 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	public void allowRowChange(final RowChangeCallback callback)
 	{
 
-		if (fieldGroup.isModified() || newEntity != null)
+		boolean dirty = false;
+		for (ChildCrudListener<E> commitListener : childCrudListeners)
+		{
+			dirty |= commitListener.isDirty();
+		}
+
+		if (fieldGroup.isModified() || newEntity != null || dirty)
 		{
 			ConfirmDialog
 					.show(UI.getCurrent(),
@@ -673,8 +703,12 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	public void rowChanged(EntityItem<E> item)
 	{
 
+		
+		splitPanel.showSecondComponet();
 		fieldGroup.setItemDataSource(item);
-		if (commitListener != null)
+
+		// notifiy ChildCrudView's taht we've changed row.
+		for (ChildCrudListener<E> commitListener : childCrudListeners)
 		{
 			commitListener.selectedRowChanged(item);
 		}
@@ -757,16 +791,22 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		return fieldGroup.isModified() || newEntity != null;
 	}
 
-	public void setCommitListener(CommitListener<E> listener)
+	/**
+	 * a ChildCrudView adds it's self here so it will be notified when the
+	 * parent saves
+	 * 
+	 * @param listener
+	 */
+	public void addCommitListener(ChildCrudListener<E> listener)
 	{
-		commitListener = listener;
+		childCrudListeners.add(listener);
 	}
 
 	protected void newClicked()
 	{
 		/*
-		 * Rows in the Container data model are called Item. Here we add
-		 * a new row in the beginning of the list.
+		 * Rows in the Container data model are called Item. Here we add a new
+		 * row in the beginning of the list.
 		 */
 
 		allowRowChange(new RowChangeCallback()
@@ -777,7 +817,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			{
 				try
 				{
-					container.removeAllContainerFilters();
+
+					resetFilters();
 
 					newEntity = container.createEntityItem(entityClass.newInstance());
 					rowChanged(newEntity);
@@ -806,6 +847,16 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 					throw new RuntimeException(e);
 				}
 			}
+
 		});
+	}
+
+	/**
+	 * for child cruds, they overload this an so ensure that the minimum
+	 * necessary filters are always applied.
+	 */
+	protected void resetFilters()
+	{
+		container.removeAllContainerFilters();
 	}
 }
