@@ -797,7 +797,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 * 
 	 * @param listener
 	 */
-	public void addCommitListener(ChildCrudListener<E> listener)
+	public void addChildCrudListener(ChildCrudListener<E> listener)
 	{
 		childCrudListeners.add(listener);
 	}
