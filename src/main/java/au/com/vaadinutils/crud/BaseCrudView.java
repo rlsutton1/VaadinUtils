@@ -90,7 +90,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			container.setFireContainerItemSetChangeEvents(true);
 			container.setAutoCommit(true);
 
-
 		}
 		catch (Exception e)
 		{
@@ -460,7 +459,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 	public void save()
 	{
-//		Object id = null;
+		boolean selected = false;
 		try
 		{
 			commit();
@@ -469,17 +468,16 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			{
 				interceptSaveValues(newEntity.getEntity());
 
-				Object id =  container.addEntity(newEntity.getEntity());
+				Object id = container.addEntity(newEntity.getEntity());
 				EntityItem<E> item = container.getItem(id);
-				//container.commit();
-				
-				
+				// container.commit();
 
 				fieldGroup.setItemDataSource(item);
 				entityTable.select(item.getItemId());
+				selected = true;
 				// If we leave the save button active, clicking it again
 				// duplicates the record
-	//			rightLayout.setVisible(false);
+				// rightLayout.setVisible(false);
 			}
 			else
 			{
@@ -518,7 +516,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		{
 			if (newEntity != null)
 			{
-				container.removeItem(entityTable.getCurrent());
+				if (selected && entityTable.getCurrent() != null)
+					container.removeItem(entityTable.getCurrent());
 			}
 		}
 
