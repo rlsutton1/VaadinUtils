@@ -12,7 +12,6 @@ import com.google.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.data.Container.Filter;
-import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
@@ -25,6 +24,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.CheckBox;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.HorizontalSplitPanel;
 import com.vaadin.ui.Label;
@@ -49,7 +49,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 * button. i.e. if it wasn't visible before 'new' we shouldn't make it
 	 * visible now.
 	 */
-	private boolean restoreDelete;
+	protected boolean restoreDelete;
 
 	private TextField searchField = new TextField();
 	private Button newButton = new Button("New");
@@ -69,17 +69,18 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 * just a dummy in-memory list, but there are many more practical
 	 * implementations.
 	 */
-	private JPAContainer<E> container;
+	protected JPAContainer<E> container;
 
 	/* User interface components are stored in session. */
-	private EntityList<E> entityTable;
+	protected EntityList<E> entityTable;
 	private VerticalLayout rightLayout;
-	private AbstractLayout editor;
+	private Component editor;
 	private HorizontalSplitPanel splitPanel;
 	private HorizontalLayout buttonLayout;
 	private AbstractLayout advancedSearchLayout;
 	private VerticalLayout searchLayout;
 	private CheckBox advancedSearchButton;
+	private CommitListener<E> commitListener;
 
 	protected void init(Class<E> entityClass, JPAContainer<E> container, HeadingPropertySet<E> headings)
 	{
@@ -90,7 +91,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			container.setBuffered(true);
 			container.setFireContainerItemSetChangeEvents(true);
 			container.setAutoCommit(true);
-
 
 		}
 		catch (Exception e)
@@ -124,7 +124,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 * build the button layout aned editor panel
 	 */
 
-	protected abstract AbstractLayout buildEditor(ValidatingFieldGroup<E> fieldGroup2);
+	protected abstract Component buildEditor(ValidatingFieldGroup<E> fieldGroup2);
 
 	private void initLayout()
 	{
@@ -319,49 +319,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			public void clicked(ClickEvent event)
 			{
 
-				/*
-				 * Rows in the Container data model are called Item. Here we add
-				 * a new row in the beginning of the list.
-				 */
-
-				allowRowChange(new RowChangeCallback()
-				{
-
-					@Override
-					public void allowRowChange()
-					{
-						try
-						{
-							container.removeAllContainerFilters();
-
-							newEntity = container.createEntityItem(entityClass.newInstance());
-							rowChanged(newEntity);
-							// Can't delete when you are adding a new record.
-							// Use cancel instead.
-							if (deleteButton.isVisible())
-							{
-								restoreDelete = true;
-								showDelete(false);
-							}
-
-							rightLayout.setVisible(true);
-						}
-						catch (ConstraintViolationException e)
-						{
-							FormHelper.showConstraintViolation(e);
-						}
-						catch (InstantiationException e)
-						{
-							logger.error(e, e);
-							throw new RuntimeException(e);
-						}
-						catch (IllegalAccessException e)
-						{
-							logger.error(e, e);
-							throw new RuntimeException(e);
-						}
-					}
-				});
+				newClicked();
 
 			}
 
@@ -459,9 +417,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 	}
 
-	public void save()
+	protected void save()
 	{
-//		Object id = null;
+		boolean selected = false;
 		try
 		{
 			commit();
@@ -470,17 +428,16 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			{
 				interceptSaveValues(newEntity.getEntity());
 
-				Object id =  container.addEntity(newEntity.getEntity());
+				Object id = container.addEntity(newEntity.getEntity());
 				EntityItem<E> item = container.getItem(id);
-				//container.commit();
-				
-				
+				// container.commit();
 
 				fieldGroup.setItemDataSource(item);
 				entityTable.select(item.getItemId());
+				selected = true;
 				// If we leave the save button active, clicking it again
 				// duplicates the record
-	//			rightLayout.setVisible(false);
+				// rightLayout.setVisible(false);
 			}
 			else
 			{
@@ -489,6 +446,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				{
 					interceptSaveValues(current);
 					container.commit();
+
 				}
 			}
 
@@ -501,7 +459,10 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 					restoreDelete = false;
 				}
 			}
-
+			if (commitListener != null)
+			{
+				commitListener.committed();
+			}
 			Notification.show("Changes Saved", "Any changes you have made have been saved.", Type.TRAY_NOTIFICATION);
 
 		}
@@ -519,6 +480,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		{
 			if (newEntity != null)
 			{
+				if (selected && entityTable.getCurrent() != null)
 				container.removeItem(entityTable.getCurrent());
 			}
 		}
@@ -710,23 +672,12 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	public void rowChanged(EntityItem<E> item)
 	{
 
-		// The contact is null if the row is de-selected
-		if (item != null)
+		fieldGroup.setItemDataSource(item);
+		if (commitListener != null)
 		{
-
-			fieldGroup.setItemDataSource(item);
-
-			// removed as this doesn't make any sense particularly since the
-			// property id is hard coded to'name'.
-			// Preconditions.checkState(fieldGroup.getItemDataSource().getItemPropertyIds().contains("name"),
-			// "valid listFieldNames are " +
-			// fieldGroup.getItemDataSource().getItemPropertyIds().toString());
-
+			commitListener.selectedRowChanged(item);
 		}
-		else
-		{
-			fieldGroup.setItemDataSource(null);
-		}
+
 		rightLayout.setVisible(item != null || newEntity != null);
 
 	}
@@ -805,4 +756,55 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		return fieldGroup.isModified() || newEntity != null;
 	}
 
+	public void setCommitListener(CommitListener<E> listener)
+	{
+		commitListener = listener;
+	}
+
+	protected void newClicked()
+	{
+		/*
+		 * Rows in the Container data model are called Item. Here we add
+		 * a new row in the beginning of the list.
+		 */
+
+		allowRowChange(new RowChangeCallback()
+		{
+
+			@Override
+			public void allowRowChange()
+			{
+				try
+				{
+					container.removeAllContainerFilters();
+
+					newEntity = container.createEntityItem(entityClass.newInstance());
+					rowChanged(newEntity);
+					// Can't delete when you are adding a new record.
+					// Use cancel instead.
+					if (deleteButton.isVisible())
+					{
+						restoreDelete = true;
+						showDelete(false);
+					}
+
+					rightLayout.setVisible(true);
+				}
+				catch (ConstraintViolationException e)
+				{
+					FormHelper.showConstraintViolation(e);
+				}
+				catch (InstantiationException e)
+				{
+					logger.error(e, e);
+					throw new RuntimeException(e);
+				}
+				catch (IllegalAccessException e)
+				{
+					logger.error(e, e);
+					throw new RuntimeException(e);
+				}
+			}
+		});
+	}
 }
