@@ -6,6 +6,7 @@ import javax.validation.ConstraintViolationException;
 
 import org.apache.log4j.Logger;
 
+import com.google.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.EntityItemProperty;
 import com.vaadin.addon.jpacontainer.JPAContainer;
@@ -14,29 +15,50 @@ import com.vaadin.data.util.filter.Compare;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 
+/**
+ * child crud does not support nesting.
+ * 
+ * @author rsutton
+ * 
+ * @param <P>
+ * @param <E>
+ */
 public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> extends BaseCrudView<E> implements
 		ChildCrudListener<P>
 {
 
 	private static final long serialVersionUID = -7756584349283089830L;
 	Logger logger = Logger.getLogger(ChildCrudView.class);
-	private SingularAttribute<P, Long> parentKey;
-	private SingularAttribute<E, Long> childKey;
+	private String parentKey;
+	private String childKey;
 	private Object parentId;
 	private Filter parentFilter;
 	private boolean dirty = false;
 
 	/**
 	 * 
-	 * @param parentKey - this will usually be the primary key of the parent table
-	 * @param childKey - this will be the foreign key in the child table
+	 * @param parentKey
+	 *            - this will usually be the primary key of the parent table
+	 * @param childKey
+	 *            - this will be the foreign key in the child table
 	 */
-	public ChildCrudView(SingularAttribute<P, Long> parentKey, SingularAttribute<E, Long> childKey)
+	public ChildCrudView(Class<P> parentType, Class<E> childType, SingularAttribute<P, ? extends Object> parentKey,
+			SingularAttribute<E, ? extends Object> childKey)
 	{
 		super(CrudDisplayMode.VERTICAL);
-		this.parentKey = parentKey;
+		this.parentKey = parentKey.getName();
+		this.childKey = childKey.getName();
+	//	setMargin(true);
+
+	}
+
+	public ChildCrudView(Class<P> parentType, Class<E> childType, SingularAttribute<P, ? extends Object> parentKey,
+			String childKey)
+	{
+		super(CrudDisplayMode.VERTICAL);
+		this.parentKey = parentKey.getName();
 		this.childKey = childKey;
-		setMargin(true);
+	//	setMargin(true);
 
 	}
 
@@ -62,10 +84,10 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 		for (Object id : container.getItemIds())
 		{
 			EntityItem<E> item = container.getItem(id);
-			EntityItemProperty reference = item.getItemProperty(childKey.getName());
+			EntityItemProperty reference = item.getItemProperty(childKey);
 			if (reference.getValue() == null)
 			{
-				item.getItemProperty(childKey.getName()).setValue(newParentId.getId());
+				item.getItemProperty(childKey).setValue(newParentId.getId());
 			}
 		}
 		container.commit();
@@ -84,11 +106,10 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 		Object previousItemId = entityTable.prevItemId(contactId);
 		entityTable.removeItem(contactId);
 		newEntity = null;
-		
-		
+
 		entityTable.select(null);
 		entityTable.select(previousItemId);
-		
+
 		dirty = true;
 
 	}
@@ -175,15 +196,16 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	public void selectedRowChanged(EntityItem<P> item)
 	{
 
-		parentFilter = new Compare.Equal(childKey.getName(), -1);
+		parentFilter = new Compare.Equal(childKey, -1);
 		if (item != null)
 
 		{
-			EntityItemProperty key = item.getItemProperty(parentKey.getName());
+			EntityItemProperty key = item.getItemProperty(parentKey);
+			Preconditions.checkNotNull(key, "parentKey " + parentKey + " doesn't exist in properties");
 			parentId = key.getValue();
 			if (parentId != null)
 			{
-				parentFilter = new Compare.Equal(childKey.getName(), parentId);
+				parentFilter = new Compare.Equal(childKey, parentId);
 			}
 
 		}
@@ -199,7 +221,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	@Override
 	protected void resetFilters()
 	{
-		
+
 		container.removeAllContainerFilters();
 		container.addContainerFilter(parentFilter);
 	}

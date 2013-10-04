@@ -82,7 +82,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	private AbstractLayout advancedSearchLayout;
 	private VerticalLayout searchLayout;
 	private CheckBox advancedSearchButton;
-	private Set<ChildCrudListener<E>> childCrudListeners = new HashSet<ChildCrudListener<E>>();
+	protected Set<ChildCrudListener<E>> childCrudListeners = new HashSet<ChildCrudListener<E>>();
 	private CrudDisplayMode displayMode = CrudDisplayMode.HORIZONTAL;
 
 	protected BaseCrudView()

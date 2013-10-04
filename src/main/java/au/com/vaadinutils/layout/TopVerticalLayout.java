@@ -35,4 +35,9 @@ public class TopVerticalLayout extends CustomComponent
 	{
 		contents.removeComponent(component);
 	}
+	
+	public void setMargin(boolean b)
+	{
+		container.setMargin(b);
+	}
 }

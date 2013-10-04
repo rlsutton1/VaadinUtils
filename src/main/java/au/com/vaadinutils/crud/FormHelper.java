@@ -298,8 +298,8 @@ public class FormHelper<E> implements Serializable
 		return field;
 	}
 
-	public <M> ComboBox bindEntityField(String fieldLabel, SingularAttribute<E, M> member, Class<E> listClazz,
-			SingularAttribute<E, M> listMember)
+	public <M,F> ComboBox bindEntityField(String fieldLabel, SingularAttribute<E, M> member, Class<F> listClazz,
+			SingularAttribute<F, ? extends Object> listMember)
 	{
 		ComboBox field = bindEntityField(form, group, fieldLabel, member.getName(), listClazz, listMember.getName());
 		this.fieldList.add(field);
