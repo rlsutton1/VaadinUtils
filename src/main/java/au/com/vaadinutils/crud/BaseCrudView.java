@@ -17,6 +17,7 @@ import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
+import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
@@ -383,6 +384,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 						showDelete(true);
 						restoreDelete = false;
 					}
+					newEntity = null;
+
 					// set the selection to the first item on the page.
 					// We need to set it to null first as if the first item was
 					// already selected
@@ -395,7 +398,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 					BaseCrudView.this.entityTable.select(entityTable.getCurrentPageFirstItemId());
 				}
 
-				newEntity = null;
 				splitPanel.showFirstComponet();
 				Notification.show("Changes discarded.", "Any changes you have made to this contact been discarded.",
 						Type.TRAY_NOTIFICATION);
@@ -497,6 +499,23 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		{
 			logger.error(e, e);
 			FormHelper.showConstraintViolation(e);
+		}
+		catch (InvalidValueException e)
+		{
+			logger.error(e, e);
+			Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
+		}
+		catch (CommitException e)
+		{
+			if (e.getCause() instanceof InvalidValueException)
+			{
+				Notification.show("Please fix the form errors and then try again.", Type.ERROR_MESSAGE);
+			}
+			else
+			{
+			logger.error(e, e);
+			Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
+			}
 		}
 		finally
 		{
@@ -717,28 +736,41 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 	}
 
-	protected void commit()
+	protected void commit() throws CommitException
 	{
-		try
-		{
-			if (!fieldGroup.isValid())
-			{
-				Notification.show("Validation Errors", "Please fix any field errors and try again.",
-						Type.WARNING_MESSAGE);
-			}
-			else
-			{
-				fieldGroup.commit();
+		formValidate();
+		fieldGroup.commit();
 
-			}
-		}
-		catch (CommitException e)
-		{
-			Notification.show("Error saving changes.",
-					"Any error occured attempting to save your changes: " + e.getMessage(), Type.ERROR_MESSAGE);
-			logger.error(e, e);
-		}
+//		try
+//		{
+//			if (!fieldGroup.isValid() || !valid())
+//			{
+//				Notification.show("Validation Errors", "Please fix any field errors and try again.",
+//						Type.WARNING_MESSAGE);
+//			}
+//			else
+//			{
+//				fieldGroup.commit();
+//
+//			}
+//		}
+//		catch (CommitException e)
+//		{
+//			Notification.show("Error saving changes.",
+//					"Any error occured attempting to save your changes: " + e.getMessage(), Type.ERROR_MESSAGE);
+//			logger.error(e, e);
+//		}
 
+	}
+
+	
+
+	/**
+	 * Overload this method to provide cross-field (form level) validation.
+	 * @return
+	 */
+	protected void formValidate() throws InvalidValueException
+	{
 	}
 
 	VerticalLayout getEmptyPanel()
@@ -858,5 +890,10 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	protected void resetFilters()
 	{
 		container.removeAllContainerFilters();
+	}
+	
+	protected boolean isNew()
+	{
+		return this.newEntity != null;
 	}
 }

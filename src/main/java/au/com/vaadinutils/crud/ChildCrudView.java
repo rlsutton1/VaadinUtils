@@ -11,6 +11,8 @@ import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.EntityItemProperty;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.data.Container.Filter;
+import com.vaadin.data.Validator.InvalidValueException;
+import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.data.util.filter.Compare;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
@@ -175,6 +177,25 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 			logger.error(e, e);
 			FormHelper.showConstraintViolation(e);
 		}
+		catch (InvalidValueException e)
+		{
+			logger.error(e, e);
+			Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
+		}
+		catch (CommitException e)
+		{
+			if (e.getCause() instanceof InvalidValueException)
+			{
+				Notification.show("Please fix the form errors and then try again.", Type.ERROR_MESSAGE);
+			}
+			else
+			{
+			logger.error(e, e);
+			Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
+			}
+		}
+
+		
 		finally
 		{
 			if (newEntity != null)
