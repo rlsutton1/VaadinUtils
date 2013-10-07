@@ -115,7 +115,7 @@ public class FormHelper<E> implements Serializable
 	public <M> PasswordField bindPasswordField(AbstractLayout form, FieldGroup group, String fieldLabel,
 			SingularAttribute<E, M> member)
 	{
-		PasswordField field = bindPasswordField(form, group, fieldLabel, member.getName());
+		PasswordField field = bindPasswordField(form, group, fieldLabel, (member != null ? member.getName() : null));
 		this.fieldList.add(field);
 		return field;
 	}
