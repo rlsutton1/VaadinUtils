@@ -393,9 +393,19 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 					// the rhs.
 					// CONSIDER: On the other hand I'm concerned that we might
 					// confuse people as they
-					// get to row changes events.
+					// get two row changes events.
 					BaseCrudView.this.entityTable.select(null);
 					BaseCrudView.this.entityTable.select(entityTable.getCurrentPageFirstItemId());
+				}
+				else
+				{
+					// Force the row to be reselected so that derived 
+					// classes get a rowChange when we cancel.
+					// CONSIDER: is there a better way of doing this?
+					// Could we not just fire an 'onCancel' event or similar?
+					Long id = entityTable.getCurrent().getId();
+					BaseCrudView.this.entityTable.select(null);
+					BaseCrudView.this.entityTable.select(id);
 				}
 
 				splitPanel.showFirstComponet();
@@ -452,14 +462,10 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 				Object id = container.addEntity(newEntity.getEntity());
 				EntityItem<E> item = container.getItem(id);
-				// container.commit();
 
 				fieldGroup.setItemDataSource(item);
 				entityTable.select(item.getItemId());
 				selected = true;
-				// If we leave the save button active, clicking it again
-				// duplicates the record
-				// rightLayout.setVisible(false);
 			}
 			else
 			{
