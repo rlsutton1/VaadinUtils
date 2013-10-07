@@ -294,14 +294,17 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	 * @param caption
 	 * @return
 	 */
-	public PasswordField addPasswordField(String caption)
+	public PasswordField addPasswordField(String fieldLabel)
 	{
-		PasswordField field = new PasswordField(caption);
-		field.setWidth("100%");
-		field.setImmediate(true);
-		field.setNullRepresentation("");
-		field.setNullSettingAllowed(false);
-		this.addComponent(field);
+		//PasswordField field = new PasswordField(caption);
+		
+		PasswordField field = formHelper.bindPasswordField(this, (ValidatingFieldGroup)null, fieldLabel, (SingularAttribute<E, String>)null);
+
+//		field.setWidth("100%");
+//		field.setImmediate(true);
+//		field.setNullRepresentation("");
+//		field.setNullSettingAllowed(false);
+//		this.addComponent(field);
 		this.fieldList.add(field);
 		return field;
 	}
