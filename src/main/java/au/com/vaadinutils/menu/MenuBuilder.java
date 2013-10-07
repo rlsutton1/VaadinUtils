@@ -1,5 +1,6 @@
 package au.com.vaadinutils.menu;
 
+import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,8 +12,9 @@ import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.UI;
 
-public class MenuBuilder
+public class MenuBuilder implements Serializable
 {
+	private static final long serialVersionUID = 1L;
 	private ArrayList<ViewMap> viewMap;
 	private Navigator navigator;
 
