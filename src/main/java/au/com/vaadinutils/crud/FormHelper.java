@@ -238,6 +238,7 @@ public class FormHelper<E> implements Serializable
 	{
 		ComboBox field = new SplitComboBox(fieldLabel, createContainerFromEnumClass(fieldName, clazz));
 		field.setItemCaptionPropertyId(fieldName);
+		//field.setCaption(fieldLabel);
 		field.setNewItemsAllowed(false);
 		field.setNullSelectionAllowed(false);
 		field.setTextInputAllowed(false);

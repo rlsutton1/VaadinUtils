@@ -147,6 +147,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		splitPanel = displayMode.getContainer();
 		this.addComponent(splitPanel.getPanel());
 		this.setExpandRatio(splitPanel.getPanel(), 1);
+		this.setSizeFull();
 
 		// Layout for the table
 		VerticalLayout leftLayout = new VerticalLayout();
@@ -156,6 +157,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		searchLayout = new VerticalLayout();
 		searchLayout.setWidth("100%");
 		searchField.setWidth("100%");
+		searchLayout.setHeight("24");
 		leftLayout.addComponent(searchLayout);
 
 		buildSearchBar();
@@ -187,6 +189,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		// mainEditPanel.setDescription("BaseCrud:MainEditPanel");
 		mainEditPanel.setVisible(true);
 		mainEditPanel.setSizeFull();
+		mainEditPanel.setId("MailEditPanel");
 		scroll.setSizeFull();
 		scroll.setContent(mainEditPanel);
 

@@ -7,7 +7,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<vaadin.version>7.1.5</vaadin.version>
+		<vaadin.version>7.1.6</vaadin.version>
 		<vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
 		<jasperreports.version>5.2.0</jasperreports.version>
 	</properties>
@@ -101,6 +101,14 @@
 			<artifactId>jpacontainer</artifactId>
 			<version>3.1.0</version>
 		</dependency>
+
+
+		<dependency>
+			<groupId>org.vaadin.addons</groupId>
+			<artifactId>aceeditor</artifactId>
+			<version>0.8.8</version>
+		</dependency>
+
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
