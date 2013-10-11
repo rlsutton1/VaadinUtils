@@ -21,6 +21,7 @@ import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.AbstractTextField.TextChangeEventMode;
 import com.vaadin.ui.Alignment;
@@ -157,7 +158,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		searchLayout = new VerticalLayout();
 		searchLayout.setWidth("100%");
 		searchField.setWidth("100%");
-		searchLayout.setHeight("24");
+
+		// expandratio and use of setSizeFull are incompatible
+		// searchLayout.setSizeFull();
 		leftLayout.addComponent(searchLayout);
 
 		buildSearchBar();
@@ -285,8 +288,10 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				public void valueChange(ValueChangeEvent arg0)
 				{
 					advancedSearchLayout.setVisible(advancedSearchButton.getValue());
-
-					triggerFilter();
+					if (!advancedSearchButton.getValue())
+					{
+						triggerFilter();
+					}
 
 				}
 			});
@@ -402,7 +407,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				}
 				else
 				{
-					// Force the row to be reselected so that derived 
+					// Force the row to be reselected so that derived
 					// classes get a rowChange when we cancel.
 					// CONSIDER: is there a better way of doing this?
 					// Could we not just fire an 'onCancel' event or similar?
@@ -522,8 +527,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			}
 			else
 			{
-			logger.error(e, e);
-			Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
+				logger.error(e, e);
+				Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
 			}
 		}
 		finally
@@ -731,7 +736,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	public void rowChanged(EntityItem<E> item)
 	{
 
-		
 		splitPanel.showSecondComponet();
 		fieldGroup.setItemDataSource(item);
 
@@ -739,6 +743,29 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		for (ChildCrudListener<E> commitListener : childCrudListeners)
 		{
 			commitListener.selectedRowChanged(item);
+		}
+
+		if (item != null || newEntity != null)
+		{
+			splitPanel.setSecondComponent(rightLayout);
+		}
+		else
+		{
+			String message = "Click New to create a new record.";
+			if (entityTable.firstItemId() != null)
+			{
+				message = "Click New to create a new record or click an existing "
+						+ "record to view and or edit the records details.";
+			}
+			VerticalLayout pane = new VerticalLayout();
+			pane.setSizeFull();
+			Label label = new Label(message);
+			label.setWidth("300");
+			label.setContentMode(ContentMode.HTML);
+
+			pane.addComponent(label);
+			pane.setComponentAlignment(label, Alignment.MIDDLE_CENTER);
+			splitPanel.setSecondComponent(pane);
 		}
 
 		rightLayout.setVisible(item != null || newEntity != null);
@@ -750,32 +777,33 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		formValidate();
 		fieldGroup.commit();
 
-//		try
-//		{
-//			if (!fieldGroup.isValid() || !valid())
-//			{
-//				Notification.show("Validation Errors", "Please fix any field errors and try again.",
-//						Type.WARNING_MESSAGE);
-//			}
-//			else
-//			{
-//				fieldGroup.commit();
-//
-//			}
-//		}
-//		catch (CommitException e)
-//		{
-//			Notification.show("Error saving changes.",
-//					"Any error occured attempting to save your changes: " + e.getMessage(), Type.ERROR_MESSAGE);
-//			logger.error(e, e);
-//		}
+		// try
+		// {
+		// if (!fieldGroup.isValid() || !valid())
+		// {
+		// Notification.show("Validation Errors",
+		// "Please fix any field errors and try again.",
+		// Type.WARNING_MESSAGE);
+		// }
+		// else
+		// {
+		// fieldGroup.commit();
+		//
+		// }
+		// }
+		// catch (CommitException e)
+		// {
+		// Notification.show("Error saving changes.",
+		// "Any error occured attempting to save your changes: " +
+		// e.getMessage(), Type.ERROR_MESSAGE);
+		// logger.error(e, e);
+		// }
 
 	}
 
-	
-
 	/**
 	 * Overload this method to provide cross-field (form level) validation.
+	 * 
 	 * @return
 	 */
 	protected void formValidate() throws InvalidValueException
@@ -900,7 +928,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	{
 		container.removeAllContainerFilters();
 	}
-	
+
 	protected boolean isNew()
 	{
 		return this.newEntity != null;

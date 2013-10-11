@@ -32,10 +32,10 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	private static final long serialVersionUID = -7756584349283089830L;
 	Logger logger = Logger.getLogger(ChildCrudView.class);
 	private String parentKey;
-	private String childKey;
+	protected String childKey;
 	private Object parentId;
 	private Filter parentFilter;
-	private boolean dirty = false;
+	protected boolean dirty = false;
 
 	/**
 	 * 

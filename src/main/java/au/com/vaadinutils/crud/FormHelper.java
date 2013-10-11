@@ -236,9 +236,18 @@ public class FormHelper<E> implements Serializable
 	public ComboBox bindEnumField(AbstractLayout form, ValidatingFieldGroup<E> group, String fieldLabel,
 			String fieldName, Class<?> clazz)
 	{
-		ComboBox field = new SplitComboBox(fieldLabel, createContainerFromEnumClass(fieldName, clazz));
+		return bindEnumField(new SplitComboBox(fieldLabel), form,
+				group, fieldLabel, fieldName, clazz);
+	}
+
+	public ComboBox bindEnumField(ComboBox comboBox, AbstractLayout form, ValidatingFieldGroup<E> group,
+			String fieldLabel, String fieldName, Class<?> clazz)
+	{
+		ComboBox field = comboBox;
+		field.setCaption(fieldLabel);
+		field.setContainerDataSource(createContainerFromEnumClass(fieldName, clazz));
 		field.setItemCaptionPropertyId(fieldName);
-		//field.setCaption(fieldLabel);
+		// field.setCaption(fieldLabel);
 		field.setNewItemsAllowed(false);
 		field.setNullSelectionAllowed(false);
 		field.setTextInputAllowed(false);
@@ -483,4 +492,5 @@ public class FormHelper<E> implements Serializable
 		form.addComponent(field);
 		return field;
 	}
+
 }
