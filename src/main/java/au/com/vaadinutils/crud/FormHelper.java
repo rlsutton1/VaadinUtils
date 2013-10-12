@@ -23,6 +23,7 @@ import au.com.vaadinutils.crud.splitFields.SplitTextArea;
 import au.com.vaadinutils.crud.splitFields.SplitTextField;
 import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.fields.CKEditorEmailField;
+import au.com.vaadinutils.fields.DataBoundButton;
 
 import com.google.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.JPAContainer;
@@ -33,12 +34,12 @@ import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.shared.ui.datefield.Resolution;
 import com.vaadin.ui.AbstractComponent;
-import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.AbstractSelect.ItemCaptionMode;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.DateField;
+import com.vaadin.ui.Field;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
@@ -53,14 +54,15 @@ public class FormHelper<E> implements Serializable
 	ArrayList<AbstractComponent> fieldList = new ArrayList<AbstractComponent>();
 	private AbstractLayout form;
 	private ValidatingFieldGroup<E> group;
-	
+
 	static Logger logger = Logger.getLogger(FormHelper.class);
 
 	public FormHelper(AbstractLayout form, ValidatingFieldGroup<E> group)
 	{
-		//I'm actually using this without a field group.
+		// I'm actually using this without a field group.
 		// need to makes some modes so that we formally support non-group usage.
-		// Preconditions.checkNotNull(group, "ValidatingFieldGroup can not be null");
+		// Preconditions.checkNotNull(group,
+		// "ValidatingFieldGroup can not be null");
 		this.form = form;
 		this.group = group;
 	}
@@ -100,18 +102,17 @@ public class FormHelper<E> implements Serializable
 		return field;
 	}
 
-	private void doBinding(FieldGroup group, String fieldName,  @SuppressWarnings("rawtypes") AbstractField field)
+	private void doBinding(FieldGroup group, String fieldName, @SuppressWarnings("rawtypes") Field field)
 	{
 		if (group != null)
 			group.bind(field, fieldName);
 		else
-			
+
 		{
-			logger.warn("field "+fieldName+" was not bound");
+			logger.warn("field " + fieldName + " was not bound");
 		}
 	}
 
-	
 	public <M> PasswordField bindPasswordField(AbstractLayout form, FieldGroup group, String fieldLabel,
 			SingularAttribute<E, M> member)
 	{
@@ -235,8 +236,18 @@ public class FormHelper<E> implements Serializable
 	public ComboBox bindEnumField(AbstractLayout form, ValidatingFieldGroup<E> group, String fieldLabel,
 			String fieldName, Class<?> clazz)
 	{
-		ComboBox field = new SplitComboBox(fieldLabel, createContainerFromEnumClass(fieldName, clazz));
+		return bindEnumField(new SplitComboBox(fieldLabel), form,
+				group, fieldLabel, fieldName, clazz);
+	}
+
+	public ComboBox bindEnumField(ComboBox comboBox, AbstractLayout form, ValidatingFieldGroup<E> group,
+			String fieldLabel, String fieldName, Class<?> clazz)
+	{
+		ComboBox field = comboBox;
+		field.setCaption(fieldLabel);
+		field.setContainerDataSource(createContainerFromEnumClass(fieldName, clazz));
 		field.setItemCaptionPropertyId(fieldName);
+		// field.setCaption(fieldLabel);
 		field.setNewItemsAllowed(false);
 		field.setNullSelectionAllowed(false);
 		field.setTextInputAllowed(false);
@@ -298,7 +309,7 @@ public class FormHelper<E> implements Serializable
 		return field;
 	}
 
-	public <M,F> ComboBox bindEntityField(String fieldLabel, SingularAttribute<E, M> member, Class<F> listClazz,
+	public <M, F> ComboBox bindEntityField(String fieldLabel, SingularAttribute<E, M> member, Class<F> listClazz,
 			SingularAttribute<F, ? extends Object> listMember)
 	{
 		ComboBox field = bindEntityField(form, group, fieldLabel, member.getName(), listClazz, listMember.getName());
@@ -306,7 +317,7 @@ public class FormHelper<E> implements Serializable
 		return field;
 	}
 
-	public<M> ComboBox bindEntityField(String fieldLabel, String fieldName, Class<M> listClazz, String listFieldname)
+	public <M> ComboBox bindEntityField(String fieldLabel, String fieldName, Class<M> listClazz, String listFieldname)
 	{
 		ComboBox field = bindEntityField(form, group, fieldLabel, fieldName, listClazz, listFieldname);
 		this.fieldList.add(field);
@@ -369,31 +380,31 @@ public class FormHelper<E> implements Serializable
 		form.addComponent(field);
 		return field;
 	}
-	
-	public <M> CKEditorEmailField bindEditorField(AbstractLayout form, ValidatingFieldGroup<E> group, 
+
+	public <M> CKEditorEmailField bindEditorField(AbstractLayout form, ValidatingFieldGroup<E> group,
 			SingularAttribute<E, M> member, boolean readonly)
 	{
-		CKEditorEmailField field = bindEditorField(form, group,  member.getName(), readonly);
+		CKEditorEmailField field = bindEditorField(form, group, member.getName(), readonly);
 		this.fieldList.add(field);
 		return field;
 	}
 
 	public <M> CKEditorEmailField bindEditorField(String fieldLabel, SingularAttribute<E, M> member, boolean readonly)
 	{
-		CKEditorEmailField field = bindEditorField(form, group,  member.getName(), readonly);
+		CKEditorEmailField field = bindEditorField(form, group, member.getName(), readonly);
 		this.fieldList.add(field);
 		return field;
 	}
 
-	public CKEditorEmailField bindEditorField( String fieldName, boolean readonly)
+	public CKEditorEmailField bindEditorField(String fieldName, boolean readonly)
 	{
-		CKEditorEmailField field = bindEditorField(form, group,  fieldName,  readonly);
+		CKEditorEmailField field = bindEditorField(form, group, fieldName, readonly);
 		this.fieldList.add(field);
 		return field;
 	}
 
-	public CKEditorEmailField bindEditorField(AbstractLayout form, ValidatingFieldGroup<E> group, 
-			String fieldName, boolean readonly)
+	public CKEditorEmailField bindEditorField(AbstractLayout form, ValidatingFieldGroup<E> group, String fieldName,
+			boolean readonly)
 	{
 		SplitEditorField field = new SplitEditorField(readonly);
 		field.setWidth("100%");
@@ -402,7 +413,6 @@ public class FormHelper<E> implements Serializable
 		form.addComponent(field);
 		return field;
 	}
-
 
 	public static Container createContainerFromEnumClass(String fieldName, Class<?> clazz)
 	{
@@ -456,6 +466,31 @@ public class FormHelper<E> implements Serializable
 	protected ValidatingFieldGroup<E> getFieldGroup()
 	{
 		return this.group;
+	}
+
+	public <M> DataBoundButton<M> bindButtonField(String fieldLabel, SingularAttribute<E, M> enterScript, Class<M> type)
+	{
+		return bindButtonField(fieldLabel, enterScript.getName(), type);
+
+	}
+
+	public <M> DataBoundButton<M> bindButtonField(String fieldLabel, String fieldName, Class<M> type)
+	{
+		DataBoundButton<M> field = bindButtonField(form, group, fieldLabel, fieldName, type);
+		this.fieldList.add(field);
+		return field;
+	}
+
+	public <M> DataBoundButton<M> bindButtonField(AbstractLayout form, ValidatingFieldGroup<E> group,
+			String fieldLabel, String fieldName, Class<M> type)
+	{
+		DataBoundButton<M> field = new DataBoundButton<M>(fieldLabel, type);
+
+		field.setImmediate(true);
+
+		doBinding(group, fieldName, field);
+		form.addComponent(field);
+		return field;
 	}
 
 }

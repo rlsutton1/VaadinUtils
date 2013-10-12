@@ -2,6 +2,8 @@ package au.com.vaadinutils.dao;
 
 import javax.persistence.EntityManager;
 
+import com.google.common.base.Preconditions;
+
 /**
  * The class is a place holder to allow access to an 'non-injected' entity
  * manager.
@@ -65,11 +67,18 @@ public enum EntityManagerProvider
 		INSTANCE.emf = emf;
 	}
 
+	public static EntityManager setThreadLocalEntityManager()
+	{
+		EntityManager em = createEntityManager();
+		setCurrentEntityManager(em);
+		return (em);
+	}
+	
 	/**
 	 * If you have a worker thread then it won't have access to a thread local
 	 * entity manager (as they are injected by the servlet request filters
 	 * mentioned above. For worker threads you need to call this method to get
-	 * an entity manager. You will also need
+	 * an entity manager. You will also need to call close when done
 	 * 
 	 * @return
 	 */
@@ -91,6 +100,12 @@ public enum EntityManagerProvider
 	public static <T> T merge(T entity)
 	{
 		return getEntityManager().merge(entity);
+	}
+
+	public static <T>void remove(T entity)
+	{
+		getEntityManager().remove(entity);
+		
 	}
 
 }

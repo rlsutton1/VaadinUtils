@@ -22,7 +22,7 @@ public class SplitComboBox extends ComboBox implements SplitField
 
 	public SplitComboBox(String fieldLabel, Container createContainerFromEnumClass)
 	{
-		super(null, createContainerFromEnumClass);
+		super(fieldLabel, createContainerFromEnumClass);
 		this.label = new Label(fieldLabel);
 	}
 
