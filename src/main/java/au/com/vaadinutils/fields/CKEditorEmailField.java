@@ -31,6 +31,7 @@ public class CKEditorEmailField extends CKEditorTextField
 	public CKEditorEmailField(boolean readonly)
 	{
 		super(getConfig(readonly));
+		setSizeFull();
 
 	}
 
