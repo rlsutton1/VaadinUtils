@@ -44,8 +44,8 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	 * @param childKey
 	 *            - this will be the foreign key in the child table
 	 */
-	public ChildCrudView(Class<P> parentType, Class<E> childType, SingularAttribute<P, ? extends Object> parentKey,
-			SingularAttribute<E, ? extends Object> childKey)
+	public ChildCrudView(Class<P> parentType, Class<E> childType, SingularAttribute<? extends CrudEntity, ? extends Object> parentKey,
+			SingularAttribute<? extends CrudEntity, ? extends Object> childKey)
 	{
 		super(CrudDisplayMode.VERTICAL);
 		this.parentKey = parentKey.getName();
@@ -54,7 +54,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 
 	}
 
-	public ChildCrudView(Class<P> parentType, Class<E> childType, SingularAttribute<P, ? extends Object> parentKey,
+	public ChildCrudView(Class<P> parentType, Class<E> childType, SingularAttribute<? extends CrudEntity, ? extends Object> parentKey,
 			String childKey)
 	{
 		super(CrudDisplayMode.VERTICAL);
