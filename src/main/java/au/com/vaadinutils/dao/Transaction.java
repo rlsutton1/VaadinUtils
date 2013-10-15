@@ -26,7 +26,8 @@ public class Transaction
 
 	public void commit()
 	{
-		transaction.commit();
+		if (transaction.isActive())
+			transaction.commit();
 
 	}
 
