@@ -98,12 +98,12 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	}
 
 	/**
-	 * Sets the width of the labels in the given column.
+	 * Sets the width of the fields in the given column.
 	 * 
 	 * @param column
 	 *            - zero based column to set the width of
 	 * @param width
-	 *            - the width to set all labels to.
+	 *            - the width to set all fields to.
 	 */
 	public void setColumnFieldWidth(int column, int width)
 	{
