@@ -1,4 +1,3 @@
-
 package au.com.vaadinutils.servlet;
 
 import javax.persistence.EntityManagerFactory;
@@ -23,26 +22,25 @@ public abstract class VUEntityManagerContextListener implements ServletContextLi
 	@Override
 	public void contextInitialized(ServletContextEvent event)
 	{
-		
+
 		emf = getEntityManagerFactory();
 		EntityManagerProvider.setEntityManagerFactory(emf);
 	}
 
-
 	@Override
 	public void contextDestroyed(ServletContextEvent event)
 	{
-		emf.close();
+		if (emf != null)
+			emf.close();
 	}
 
 	/**
 	 * Implement this method to provide a factory. e.g.
 	 * 
-	 *  return Persistence.createEntityManagerFactory("scoutmaster");
-
+	 * return Persistence.createEntityManagerFactory("scoutmaster");
+	 * 
 	 * @return an EntityManagerFactory
 	 */
 	abstract protected EntityManagerFactory getEntityManagerFactory();
-
 
 }
