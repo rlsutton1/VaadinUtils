@@ -1,13 +1,12 @@
 package au.com.vaadinutils.crud;
 
-import java.util.Date;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.apache.log4j.Logger;
-import org.joda.time.DateTime;
 
 import au.com.vaadinutils.crud.splitFields.SplitField;
 import au.com.vaadinutils.fields.CKEditorEmailField;
@@ -98,12 +97,12 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	}
 
 	/**
-	 * Sets the width of the labels in the given column.
+	 * Sets the width of the fields in the given column.
 	 * 
 	 * @param column
 	 *            - zero based column to set the width of
 	 * @param width
-	 *            - the width to set all labels to.
+	 *            - the width to set all fields to.
 	 */
 	public void setColumnFieldWidth(int column, int width)
 	{
