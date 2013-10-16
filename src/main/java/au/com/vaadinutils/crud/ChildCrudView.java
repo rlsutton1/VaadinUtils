@@ -11,7 +11,6 @@ import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.EntityItemProperty;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.data.Container.Filter;
-import com.vaadin.data.Property.ReadOnlyException;
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.data.util.filter.Compare;
