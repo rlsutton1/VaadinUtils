@@ -2,8 +2,6 @@ package au.com.vaadinutils.dao;
 
 import javax.persistence.EntityManager;
 
-import com.google.common.base.Preconditions;
-
 /**
  * The class is a place holder to allow access to an 'non-injected' entity
  * manager.
@@ -105,6 +103,12 @@ public enum EntityManagerProvider
 	public static <T>void remove(T entity)
 	{
 		getEntityManager().remove(entity);
+		
+	}
+
+	public static <T> void persist(T record)
+	{
+		getEntityManager().persist(record);
 		
 	}
 

@@ -357,7 +357,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				if (contactId != null)
 				{
 					E contact = container.getItem(contactId).getEntity();
-					ConfirmDialog.show(UI.getCurrent(), "Delete Contact",
+					ConfirmDialog.show(UI.getCurrent(), "Confirm Delete",
 							"Are you sure you want to delete " + contact.toString(), "Delete", "Cancel",
 							new ConfirmDialog.Listener()
 							{

@@ -351,9 +351,16 @@ public class FormHelper<E> implements Serializable
 	public <L> ComboBox bindEntityField(AbstractLayout form, ValidatingFieldGroup<E> fieldGroup, String fieldLabel,
 			String fieldName, Class<L> listClazz, String listFieldName)
 	{
+		return bindEntityField(new SplitComboBox(fieldLabel),form,fieldGroup,fieldLabel,fieldName,listClazz,listFieldName);
+	}
+	
+	public <L> ComboBox bindEntityField(ComboBox field,AbstractLayout form, ValidatingFieldGroup<E> fieldGroup, String fieldLabel,
+			String fieldName, Class<L> listClazz, String listFieldName)
+	{
+		
 		JPAContainer<?> container = JPAContainerFactory.make(listClazz, EntityManagerProvider.getEntityManager());
 
-		ComboBox field = new SplitComboBox(fieldLabel);
+		field.setCaption(fieldLabel);
 
 		field.setItemCaptionMode(ItemCaptionMode.PROPERTY);
 		Preconditions.checkState(container.getContainerPropertyIds().contains(listFieldName), listFieldName
@@ -493,4 +500,5 @@ public class FormHelper<E> implements Serializable
 		return field;
 	}
 
+	
 }

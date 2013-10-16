@@ -11,6 +11,7 @@ import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.EntityItemProperty;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.data.Container.Filter;
+import com.vaadin.data.Property.ReadOnlyException;
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.data.util.filter.Compare;
@@ -33,9 +34,10 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	Logger logger = Logger.getLogger(ChildCrudView.class);
 	private String parentKey;
 	protected String childKey;
-	private Object parentId;
+	private Long parentId;
 	private Filter parentFilter;
 	protected boolean dirty = false;
+	final private Class<P> parentType;
 
 	/**
 	 * 
@@ -50,7 +52,9 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 		super(CrudDisplayMode.VERTICAL);
 		this.parentKey = parentKey.getName();
 		this.childKey = childKey.getName();
-	//	setMargin(true);
+		this.parentType = parentType;
+
+		// setMargin(true);
 
 	}
 
@@ -60,7 +64,8 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 		super(CrudDisplayMode.VERTICAL);
 		this.parentKey = parentKey.getName();
 		this.childKey = childKey;
-	//	setMargin(true);
+		this.parentType = parentType;
+		// setMargin(true);
 
 	}
 
@@ -89,7 +94,15 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 			EntityItemProperty reference = item.getItemProperty(childKey);
 			if (reference.getValue() == null)
 			{
-				item.getItemProperty(childKey).setValue(newParentId.getId());
+				try
+				{
+					item.getItemProperty(childKey).setValue(translateParentId(newParentId.getId()));
+				}
+				catch (Exception e)
+				{
+					logger.error(e,e);
+				}
+				
 			}
 		}
 		container.commit();
@@ -190,12 +203,11 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 			}
 			else
 			{
-			logger.error(e, e);
-			Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
+				logger.error(e, e);
+				Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
 			}
 		}
 
-		
 		finally
 		{
 			if (newEntity != null)
@@ -216,27 +228,52 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	@Override
 	public void selectedRowChanged(EntityItem<P> item)
 	{
-
-		parentFilter = new Compare.Equal(childKey, -1);
-		if (item != null)
-
+		try
 		{
-			EntityItemProperty key = item.getItemProperty(parentKey);
-			Preconditions.checkNotNull(key, "parentKey " + parentKey + " doesn't exist in properties");
-			parentId = key.getValue();
-			if (parentId != null)
+			parentFilter = new Compare.Equal(childKey, translateParentId(-1l));
+			if (item != null)
+
 			{
-				parentFilter = new Compare.Equal(childKey, parentId);
+				EntityItemProperty key = item.getItemProperty(parentKey);
+				Preconditions.checkNotNull(key, "parentKey " + parentKey + " doesn't exist in properties");
+				parentId = (Long) key.getValue();
+				if (parentId != null)
+				{
+
+					parentFilter = new Compare.Equal(childKey, translateParentId(parentId));
+
+				}
+
 			}
-
+			fieldGroup.discard();
+			container.discard();
+			dirty = false;
+			resetFilters();
+			entityTable.select(entityTable.firstItemId());
+			searchField.setValue("");
 		}
-		fieldGroup.discard();
-		container.discard();
-		dirty = false;
-		resetFilters();
-		entityTable.select(entityTable.firstItemId());
-		searchField.setValue("");
+		catch (Exception e)
+		{
+			logger.error(e, e);
+		}
 
+	}
+
+	/**
+	 * the id (Long) of the parent will need to be translated into an entity for
+	 * the filtering. an implementing class must implement this method and
+	 * return an instance of the Parent class (P) with it's id set (parentId2)
+	 * 
+	 * @param parentId2
+	 * @return
+	 * @throws IllegalAccessException
+	 * @throws InstantiationException
+	 */
+	protected P translateParentId(Long parentId2) throws InstantiationException, IllegalAccessException
+	{
+		P tmp = parentType.newInstance();
+		tmp.setId(parentId2);
+		return tmp;
 	}
 
 	@Override
