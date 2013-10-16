@@ -4,4 +4,6 @@ public interface CrudEntity
 {
 
 	public Long getId();
+	
+	public void setId(Long id);
 }

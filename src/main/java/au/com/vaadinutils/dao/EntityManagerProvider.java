@@ -109,4 +109,10 @@ public enum EntityManagerProvider
 		
 	}
 
+	public static <T> void persist(T record)
+	{
+		getEntityManager().persist(record);
+		
+	}
+
 }
