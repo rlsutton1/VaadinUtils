@@ -62,7 +62,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	private Button cancelButton = new Button("Cancel");
 	private Class<E> entityClass;
 
-	public ValidatingFieldGroup<E> fieldGroup;
+	protected ValidatingFieldGroup<E> fieldGroup;
 
 	private VerticalLayout mainEditPanel = new VerticalLayout();
 
@@ -86,6 +86,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	private CheckBox advancedSearchButton;
 	protected Set<ChildCrudListener<E>> childCrudListeners = new HashSet<ChildCrudListener<E>>();
 	private CrudDisplayMode displayMode = CrudDisplayMode.HORIZONTAL;
+	private HorizontalLayout deleteLayout;
 
 	protected BaseCrudView()
 	{
@@ -189,15 +190,14 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 		/* Put a little margin around the fields in the right side editor */
 		Panel scroll = new Panel();
-		// mainEditPanel.setDescription("BaseCrud:MainEditPanel");
+		mainEditPanel.setDescription("BaseCrud:MainEditPanel");
 		mainEditPanel.setVisible(true);
 		mainEditPanel.setSizeFull();
 		mainEditPanel.setId("MailEditPanel");
 		scroll.setSizeFull();
 		scroll.setContent(mainEditPanel);
 
-		// Delete button
-		HorizontalLayout deleteLayout = new HorizontalLayout();
+		deleteLayout = new HorizontalLayout();
 		deleteLayout.setWidth("100%");
 		deleteLayout.addComponent(deleteButton);
 		deleteLayout.setComponentAlignment(deleteButton, Alignment.MIDDLE_RIGHT);
@@ -310,19 +310,18 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 	protected void showDelete(boolean show)
 	{
-
+		deleteLayout.setVisible(show);
 		deleteButton.setVisible(show);
 	}
 
 	protected void showNew(boolean show)
 	{
-
 		newButton.setVisible(show);
 	}
 
 	protected void showSaveCancel(boolean show)
 	{
-
+		buttonLayout.setVisible(show);
 		saveButton.setVisible(show);
 		cancelButton.setVisible(show);
 	}
@@ -638,7 +637,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 * @param string
 	 * @return
 	 */
-	abstract protected Filter getContainerFilter(String string);
+	abstract protected Filter getContainerFilter(String filterString);
 
 	/**
 	 * to initiate advanced filtering call triggerFilter();
@@ -921,7 +920,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	}
 
 	/**
-	 * for child cruds, they overload this an so ensure that the minimum
+	 * for child cruds, they overload this to ensure that the minimum
 	 * necessary filters are always applied.
 	 */
 	protected void resetFilters()

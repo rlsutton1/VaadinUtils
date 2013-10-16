@@ -1,12 +1,13 @@
 package au.com.vaadinutils.crud;
 
-import java.sql.Date;
+import java.util.Date;
 import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.apache.log4j.Logger;
+import org.joda.time.DateTime;
 
 import au.com.vaadinutils.crud.splitFields.SplitField;
 import au.com.vaadinutils.fields.CKEditorEmailField;
@@ -97,12 +98,12 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	}
 
 	/**
-	 * Sets the width of the labels in the given column.
+	 * Sets the width of the fields in the given column.
 	 * 
 	 * @param column
 	 *            - zero based column to set the width of
 	 * @param width
-	 *            - the width to set all labels to.
+	 *            - the width to set all fields to.
 	 */
 	public void setColumnFieldWidth(int column, int width)
 	{
@@ -237,7 +238,6 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	public <M> TextField bindTextField(String fieldLabel, SingularAttribute<E, M> member)
 	{
 		TextField field = formHelper.bindTextField(this, fieldGroup, fieldLabel, member);
-
 		this.fieldList.add(field);
 		return field;
 	}
@@ -246,7 +246,6 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	public CKEditorEmailField bindEditorField(SingularAttribute<E, String> member, boolean readonly)
 	{
 		CKEditorEmailField field = formHelper.bindEditorField(this, fieldGroup,  member, readonly);
-
 		this.fieldList.add(field);
 		return field;
 		
@@ -298,13 +297,7 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	{
 		//PasswordField field = new PasswordField(caption);
 		
-		PasswordField field = formHelper.bindPasswordField(this, (ValidatingFieldGroup)null, fieldLabel, (SingularAttribute<E, String>)null);
-
-//		field.setWidth("100%");
-//		field.setImmediate(true);
-//		field.setNullRepresentation("");
-//		field.setNullSettingAllowed(false);
-//		this.addComponent(field);
+		PasswordField field = formHelper.bindPasswordField(this, (ValidatingFieldGroup<?>)null, fieldLabel, (SingularAttribute<E, String>)null);
 		this.fieldList.add(field);
 		return field;
 	}
@@ -332,13 +325,15 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	}
 	
 
-	public DateField bindDateField(String fieldLabel, SingularAttribute<E, Date> dateField, String dateFormat,
+	public DateField bindDateField(String fieldLabel, SingularAttribute<E, ? extends Date> dateField, String dateFormat,
 			Resolution resolution)
 	{
 			DateField field = formHelper.bindDateField(this, fieldGroup, fieldLabel, dateField, dateFormat, resolution);
 			this.fieldList.add(field);
 			return field;
 	}
+	
+
 
 
 	public DateField bindDateField(String fieldLabel, String fieldName, String dateFormat, Resolution resolution)
@@ -449,4 +444,24 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	{
 		this.fieldGroup.setReadOnly(readOnly);
 	}
+	
+	/**
+	 * Sets the expand ratio on the row that is currently last.
+	 * @param ratio
+	 */
+	public void setExpandRatio(float ratio)
+	{
+		this.grid.setRowExpandRatio(this.grid.getRows() - 1, ratio);
+	}
+	
+	/**
+	 * Sets the given columns expand ratio.
+	 * @param columnIndex
+	 * @param ratio
+	 */
+	public void setColumnExpandRatio(int columnIndex, float ratio)
+	{
+		this.grid.setColumnExpandRatio(columnIndex, ratio);
+	}
+
 }

@@ -34,7 +34,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	Logger logger = Logger.getLogger(ChildCrudView.class);
 	private String parentKey;
 	protected String childKey;
-	private Long parentId;
+	private Object parentId;
 	private Filter parentFilter;
 	protected boolean dirty = false;
 	final private Class<P> parentType;
@@ -46,8 +46,8 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	 * @param childKey
 	 *            - this will be the foreign key in the child table
 	 */
-	public ChildCrudView(Class<P> parentType, Class<E> childType, SingularAttribute<P, ? extends Object> parentKey,
-			SingularAttribute<E, ? extends Object> childKey)
+	public ChildCrudView(Class<P> parentType, Class<E> childType, SingularAttribute<? extends CrudEntity, ? extends Object> parentKey,
+			SingularAttribute<? extends CrudEntity, ? extends Object> childKey)
 	{
 		super(CrudDisplayMode.VERTICAL);
 		this.parentKey = parentKey.getName();
@@ -58,7 +58,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 
 	}
 
-	public ChildCrudView(Class<P> parentType, Class<E> childType, SingularAttribute<P, ? extends Object> parentKey,
+	public ChildCrudView(Class<P> parentType, Class<E> childType, SingularAttribute<? extends CrudEntity, ? extends Object> parentKey,
 			String childKey)
 	{
 		super(CrudDisplayMode.VERTICAL);
@@ -269,10 +269,10 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	 * @throws IllegalAccessException
 	 * @throws InstantiationException
 	 */
-	protected P translateParentId(Long parentId2) throws InstantiationException, IllegalAccessException
+	protected P translateParentId(Object parentId2) throws InstantiationException, IllegalAccessException
 	{
 		P tmp = parentType.newInstance();
-		tmp.setId(parentId2);
+		tmp.setId((Long) parentId2);
 		return tmp;
 	}
 

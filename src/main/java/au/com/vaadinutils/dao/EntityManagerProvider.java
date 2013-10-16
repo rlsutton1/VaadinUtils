@@ -2,6 +2,7 @@ package au.com.vaadinutils.dao;
 
 import javax.persistence.EntityManager;
 
+
 /**
  * The class is a place holder to allow access to an 'non-injected' entity
  * manager.
@@ -87,7 +88,9 @@ public enum EntityManagerProvider
 			throw new IllegalStateException("Context is not initialized yet.");
 		}
 
-		return INSTANCE.emf.createEntityManager();
+		EntityManager entityManager = INSTANCE.emf.createEntityManager();
+		
+		return entityManager;
 	}
 
 	/**

@@ -171,7 +171,7 @@ public class FormHelper<E> implements Serializable
 	public <M> DateField bindDateField(AbstractLayout form, ValidatingFieldGroup<E> group, String fieldLabel,
 			SingularAttribute<E, M> member, String dateFormat, Resolution resolution)
 	{
-		DateField field = bindDateField(form, group, fieldLabel, member.getName());
+		DateField field = bindDateField(form, group, fieldLabel, member.getName(), dateFormat, resolution);
 		this.fieldList.add(field);
 		return field;
 	}
