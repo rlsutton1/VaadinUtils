@@ -1,13 +1,12 @@
 package au.com.vaadinutils.crud;
 
-import java.util.Date;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.apache.log4j.Logger;
-import org.joda.time.DateTime;
 
 import au.com.vaadinutils.crud.splitFields.SplitField;
 import au.com.vaadinutils.fields.CKEditorEmailField;
