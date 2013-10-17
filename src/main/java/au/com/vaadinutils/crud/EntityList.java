@@ -20,9 +20,9 @@ public interface EntityList<E> extends Component
 	public E getCurrent();
 
 
-	public boolean removeItem(Object contactId);
+	public boolean removeItem(Object entityId);
 
 	public Object getCurrentPageFirstItemId();
 
-	public Object prevItemId(Object contactId);
+	public Object prevItemId(Object entityId);
 }

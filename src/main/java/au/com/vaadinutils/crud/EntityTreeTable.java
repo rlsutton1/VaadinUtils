@@ -159,7 +159,7 @@ public class EntityTreeTable<E> extends Tree implements EntityList<E>
 	}
 
 	@Override
-	public Object prevItemId(Object contactId)
+	public Object prevItemId(Object entityId)
 	{
 		// TODO Auto-generated method stub
 		return null;

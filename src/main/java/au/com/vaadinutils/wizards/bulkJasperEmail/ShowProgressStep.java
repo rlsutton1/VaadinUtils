@@ -96,8 +96,7 @@ public class ShowProgressStep<C extends CrudEntity> implements WizardStep, Progr
 		{
 			Recipient recipient = this.wizardView.getRecipient((Long) recipientId);
 
-			// Find if the contact has a mobile.
-			// Check the primary field first.
+			// Find if the recipient has ane email address
 			String email = recipient.getEmailAddress();
 			if (email != null && email.length() > 0)
 			{
@@ -114,7 +113,7 @@ public class ShowProgressStep<C extends CrudEntity> implements WizardStep, Progr
 
 		if (transmissions.size() == 0)
 		{
-			Notification.show("None of the selected contacts have an Email address", Type.ERROR_MESSAGE);
+			Notification.show("None of the selected recipients have an Email address", Type.ERROR_MESSAGE);
 		}
 		else
 		{

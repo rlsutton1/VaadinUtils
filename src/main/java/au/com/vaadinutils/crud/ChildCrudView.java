@@ -117,9 +117,9 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	@Override
 	protected void delete()
 	{
-		Object contactId = entityTable.getValue();
-		Object previousItemId = entityTable.prevItemId(contactId);
-		entityTable.removeItem(contactId);
+		Object entityId = entityTable.getValue();
+		Object previousItemId = entityTable.prevItemId(entityId);
+		entityTable.removeItem(entityId);
 		newEntity = null;
 
 		entityTable.select(null);

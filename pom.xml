@@ -120,7 +120,7 @@
 			<artifactId>javax.persistence</artifactId>
 			<version>2.1.0</version>
 		</dependency>
-		
+
 		<!-- Bean Validation API and RI -->
 		<dependency>
 			<groupId>javax.validation</groupId>
@@ -167,7 +167,11 @@
 			<artifactId>joda-time</artifactId>
 			<version>2.3</version>
 		</dependency>
-
+		<dependency>
+			<groupId>net.sf.opencsv</groupId>
+			<artifactId>opencsv</artifactId>
+			<version>2.3</version>
+		</dependency>
 
 
 
