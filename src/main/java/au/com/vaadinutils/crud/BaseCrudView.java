@@ -15,6 +15,7 @@ import com.google.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.data.Container.Filter;
+import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.Validator.InvalidValueException;
@@ -29,7 +30,9 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.CheckBox;
+import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
@@ -38,6 +41,7 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.themes.Reindeer;
 
 public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout implements RowChangeListener<E>,
 		Selected<E>
@@ -57,10 +61,10 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 	protected TextField searchField = new TextField();
 	private Button newButton = new Button("New");
-	private Button deleteButton = new Button("Delete");
+	protected Button applyButton = new Button("Apply");
 	private Button saveButton = new Button("Save");
 	private Button cancelButton = new Button("Cancel");
-	private Class<E> entityClass;
+	protected Class<E> entityClass;
 
 	protected ValidatingFieldGroup<E> fieldGroup;
 
@@ -77,7 +81,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 	/* User interface components are stored in session. */
 	protected EntityList<E> entityTable;
-	private VerticalLayout rightLayout;
+	protected VerticalLayout rightLayout;
 	private Component editor;
 	protected CrudPanelPair splitPanel;
 	private HorizontalLayout buttonLayout;
@@ -86,7 +90,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	private CheckBox advancedSearchButton;
 	protected Set<ChildCrudListener<E>> childCrudListeners = new HashSet<ChildCrudListener<E>>();
 	private CrudDisplayMode displayMode = CrudDisplayMode.HORIZONTAL;
-	private HorizontalLayout deleteLayout;
+	protected HorizontalLayout deleteLayout;
+	private ComboBox actionCombo;
 
 	protected BaseCrudView()
 	{
@@ -152,7 +157,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		this.setExpandRatio(splitPanel.getPanel(), 1);
 		this.setSizeFull();
 
-		// Layout for the table
+		// Layout for the tablesaveOnRowChange
 		VerticalLayout leftLayout = new VerticalLayout();
 
 		// Start by defining the LHS which contains the table
@@ -181,13 +186,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		rightLayout = new VerticalLayout();
 		splitPanel.setSecondComponent(rightLayout);
 
-		buttonLayout = new HorizontalLayout();
-		buttonLayout.setWidth("100%");
-		buttonLayout.addComponent(cancelButton);
-		buttonLayout.addComponent(saveButton);
-		buttonLayout.setComponentAlignment(saveButton, Alignment.MIDDLE_RIGHT);
-		buttonLayout.setComponentAlignment(cancelButton, Alignment.MIDDLE_LEFT);
-		buttonLayout.setHeight("40");
 
 		/* Put a little margin around the fields in the right side editor */
 		Panel scroll = new Panel();
@@ -200,11 +198,33 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 		deleteLayout = new HorizontalLayout();
 		deleteLayout.setWidth("100%");
-		deleteLayout.addComponent(deleteButton);
-		deleteLayout.setComponentAlignment(deleteButton, Alignment.MIDDLE_RIGHT);
-		deleteLayout.setHeight("30");
+		//deleteLayout.setMargin(true);
+		
+		FormLayout comboWrapper = new FormLayout();
+		comboWrapper.setMargin(false);
+		comboWrapper.setSpacing(false);
+		comboWrapper.setHeight("40");
+		
+		 actionCombo = new ComboBox("Action");
+		actionCombo.setWidth("120");
+		comboWrapper.addComponent(actionCombo);
+		
+		Item item = actionCombo.addItem("Delete");
+		actionCombo.setNullSelectionAllowed(false);
+		
+		
+		actionCombo.setValue("Delete");
+		comboWrapper.setComponentAlignment(actionCombo, Alignment.MIDDLE_RIGHT);
+		deleteLayout.addComponent(comboWrapper);
+		deleteLayout.addComponent(applyButton);
+		deleteLayout.setComponentAlignment(applyButton, Alignment.MIDDLE_LEFT);
+		
+		deleteLayout.addComponent(newButton);
+		deleteLayout.setComponentAlignment(newButton, Alignment.MIDDLE_RIGHT);
 
-		rightLayout.addComponent(deleteLayout);
+		deleteLayout.setHeight("40");
+
+		leftLayout.addComponent(deleteLayout);
 		rightLayout.addComponent(scroll);
 		rightLayout.setExpandRatio(scroll, 1.0f);
 		rightLayout.setSizeFull();
@@ -212,9 +232,22 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 		editor = buildEditor(fieldGroup);
 		mainEditPanel.addComponent(editor);
-		rightLayout.addComponent(buttonLayout);
+
+		addSaveAndCancelButtons();
 
 		rightLayout.setVisible(false);
+	}
+
+	protected void addSaveAndCancelButtons()
+	{
+		buttonLayout = new HorizontalLayout();
+		buttonLayout.setWidth("100%");
+		buttonLayout.addComponent(cancelButton);
+		buttonLayout.addComponent(saveButton);
+		buttonLayout.setComponentAlignment(saveButton, Alignment.MIDDLE_RIGHT);
+		buttonLayout.setComponentAlignment(cancelButton, Alignment.MIDDLE_LEFT);
+		buttonLayout.setHeight("40");
+		rightLayout.addComponent(buttonLayout);
 	}
 
 	private void buildSearchBar()
@@ -230,13 +263,16 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			basicSearchLayout.addComponent(advancedSearchButton);
 		}
 
+		
+		
 		basicSearchLayout.addComponent(searchField);
 		basicSearchLayout.setExpandRatio(searchField, 1.0f);
 
 		Button clear = createClearButton();
 		basicSearchLayout.addComponent(clear);
+		basicSearchLayout.setComponentAlignment(clear, Alignment.MIDDLE_CENTER);
 
-		basicSearchLayout.addComponent(newButton);
+		
 		basicSearchLayout.setSpacing(true);
 
 		/*
@@ -250,7 +286,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 	private Button createClearButton()
 	{
-		Button clear = new Button("Clear Filter");
+		
+		Button clear = new Button("X");
+		clear.setStyleName(Reindeer.BUTTON_SMALL);
 		clear.setImmediate(true);
 		clear.addClickListener(new ClickEventLogged.ClickListener()
 		{
@@ -312,7 +350,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	protected void showDelete(boolean show)
 	{
 		deleteLayout.setVisible(show);
-		deleteButton.setVisible(show);
+		applyButton.setVisible(show);
+		actionCombo.setVisible(show);
 	}
 
 	protected void showNew(boolean show)
@@ -347,7 +386,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 		});
 
-		deleteButton.addClickListener(new ClickListener()
+		applyButton.addClickListener(new ClickListener()
 		{
 			private static final long serialVersionUID = 1L;
 
@@ -923,7 +962,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 					rowChanged(newEntity);
 					// Can't delete when you are adding a new record.
 					// Use cancel instead.
-					if (deleteButton.isVisible())
+					if (applyButton.isVisible())
 					{
 						restoreDelete = true;
 						showDelete(false);

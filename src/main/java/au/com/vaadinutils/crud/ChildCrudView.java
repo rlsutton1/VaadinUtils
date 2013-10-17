@@ -45,7 +45,8 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	 * @param childKey
 	 *            - this will be the foreign key in the child table
 	 */
-	public ChildCrudView(Class<P> parentType, Class<E> childType, SingularAttribute<? extends CrudEntity, ? extends Object> parentKey,
+	public ChildCrudView(Class<P> parentType, Class<E> childType,
+			SingularAttribute<? extends CrudEntity, ? extends Object> parentKey,
 			SingularAttribute<? extends CrudEntity, ? extends Object> childKey)
 	{
 		super(CrudDisplayMode.VERTICAL);
@@ -57,8 +58,8 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 
 	}
 
-	public ChildCrudView(Class<P> parentType, Class<E> childType, SingularAttribute<? extends CrudEntity, ? extends Object> parentKey,
-			String childKey)
+	public ChildCrudView(Class<P> parentType, Class<E> childType,
+			SingularAttribute<? extends CrudEntity, ? extends Object> parentKey, String childKey)
 	{
 		super(CrudDisplayMode.VERTICAL);
 		this.parentKey = parentKey.getName();
@@ -87,6 +88,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	@Override
 	public void committed(P newParentId)
 	{
+		saveEditsToTemp();
 		for (Object id : container.getItemIds())
 		{
 			EntityItem<E> item = container.getItem(id);
@@ -99,9 +101,9 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 				}
 				catch (Exception e)
 				{
-					logger.error(e,e);
+					logger.error(e, e);
 				}
-				
+
 			}
 		}
 		container.commit();
@@ -128,12 +130,65 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 
 	}
 
+	protected void newClicked()
+	{
+		/*
+		 * Rows in the Container data model are called Item. Here we add a new
+		 * row in the beginning of the list.
+		 */
+
+		try
+		{
+			saveEditsToTemp();
+			resetFilters();
+
+			newEntity = container.createEntityItem(entityClass.newInstance());
+			rowChanged(newEntity);
+			// Can't delete when you are adding a new record.
+			// Use cancel instead.
+			if (applyButton.isVisible())
+			{
+				restoreDelete = true;
+				showDelete(false);
+				deleteLayout.setVisible(true);
+			}
+
+			rightLayout.setVisible(true);
+		}
+		catch (ConstraintViolationException e)
+		{
+			FormHelper.showConstraintViolation(e);
+		}
+		catch (InstantiationException e)
+		{
+			logger.error(e, e);
+			throw new RuntimeException(e);
+		}
+		catch (IllegalAccessException e)
+		{
+			logger.error(e, e);
+			throw new RuntimeException(e);
+		}
+	}
+
 	/**
-	 * slightly modified save behaviour so that the records are not committed to
-	 * the database.
+	 * for child crud, dont have save and cancel buttons
+	 */
+	protected void addSaveAndCancelButtons()
+	{
+
+	}
+
+	/**
+	 * for child crud, save is implied when the row changes
 	 */
 	@Override
 	protected void save()
+	{
+
+	}
+
+	protected void saveEditsToTemp()
 	{
 		try
 		{
@@ -176,7 +231,9 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 				}
 			}
 			splitPanel.showFirstComponet();
-			Notification.show("Changes Saved", "Any changes you have made have been saved.", Type.TRAY_NOTIFICATION);
+			// Notification.show("Changes Saved",
+			// "Any changes you have made have been saved.",
+			// Type.TRAY_NOTIFICATION);
 
 		}
 		catch (PersistenceException e)
@@ -229,6 +286,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	{
 		try
 		{
+			saveEditsToTemp();
 			parentFilter = new Compare.Equal(childKey, translateParentId(-1l));
 			if (item != null)
 

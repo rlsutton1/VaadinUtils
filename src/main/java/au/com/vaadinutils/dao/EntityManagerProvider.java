@@ -55,7 +55,7 @@ public enum EntityManagerProvider
 
 	/**
 	 * Call this method to initialise the EntityManagerProvider so that it can
-	 * hand out EntityManagers to worker threads.
+	 * hand out EntityManagers to worker threads. Dont forget to close the entitymanager
 	 * 
 	 * This should normally be called from a servlet Context Listener.
 	 * 
