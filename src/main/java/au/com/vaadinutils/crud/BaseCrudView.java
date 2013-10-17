@@ -196,6 +196,24 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		scroll.setSizeFull();
 		scroll.setContent(mainEditPanel);
 
+		buildDeleteLayout();
+
+		leftLayout.addComponent(deleteLayout);
+		rightLayout.addComponent(scroll);
+		rightLayout.setExpandRatio(scroll, 1.0f);
+		rightLayout.setSizeFull();
+		rightLayout.setId("rightLayout");
+
+		editor = buildEditor(fieldGroup);
+		mainEditPanel.addComponent(editor);
+
+		addSaveAndCancelButtons();
+
+		rightLayout.setVisible(false);
+	}
+
+	private void buildDeleteLayout()
+	{
 		deleteLayout = new HorizontalLayout();
 		deleteLayout.setWidth("100%");
 		//deleteLayout.setMargin(true);
@@ -223,19 +241,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		deleteLayout.setComponentAlignment(newButton, Alignment.MIDDLE_RIGHT);
 
 		deleteLayout.setHeight("40");
-
-		leftLayout.addComponent(deleteLayout);
-		rightLayout.addComponent(scroll);
-		rightLayout.setExpandRatio(scroll, 1.0f);
-		rightLayout.setSizeFull();
-		rightLayout.setId("rightLayout");
-
-		editor = buildEditor(fieldGroup);
-		mainEditPanel.addComponent(editor);
-
-		addSaveAndCancelButtons();
-
-		rightLayout.setVisible(false);
 	}
 
 	protected void addSaveAndCancelButtons()
