@@ -357,8 +357,10 @@ public class FormHelper<E> implements Serializable
 	public <L> ComboBox bindEntityField(ComboBox field,AbstractLayout form, ValidatingFieldGroup<E> fieldGroup, String fieldLabel,
 			String fieldName, Class<L> listClazz, String listFieldName)
 	{
-		
 		JPAContainer<?> container = JPAContainerFactory.make(listClazz, EntityManagerProvider.getEntityManager());
+		
+		if (container.getSortableContainerPropertyIds().contains(listFieldName))
+			container.sort(new String[] {listFieldName},new boolean[] {true});
 
 		field.setCaption(fieldLabel);
 
@@ -376,13 +378,11 @@ public class FormHelper<E> implements Serializable
 		field.setImmediate(true);
 		if (fieldGroup != null)
 		{
-
 			Preconditions.checkState(fieldGroup.getContainer().getContainerPropertyIds().contains(fieldName), fieldName
 					+ " is not valid, valid listFieldNames are "
 					+ fieldGroup.getContainer().getContainerPropertyIds().toString());
 
 			doBinding(group, fieldName, field);
-
 		}
 		form.addComponent(field);
 		return field;
