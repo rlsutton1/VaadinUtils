@@ -171,7 +171,6 @@ public class PreviewCSV
 		IndexedContainer container = new IndexedContainer();
 
 		String[] columnHeaders = null;
-		String[] record;
 
 		// Import no more than 100 records as this is only a sample
 		int count = 0;
