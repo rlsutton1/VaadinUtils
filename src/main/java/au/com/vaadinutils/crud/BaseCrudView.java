@@ -233,13 +233,20 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		/**
 		 * Add the set of actions in.
 		 */
+		CrudAction<E> defaultAction = null;
 		for (CrudAction<E> action : getCrudActions())
 		{
+			if (action.isDefault())
+			{
+				Preconditions.checkState(defaultAction == null, "Only one action may be marked as default: " + (defaultAction != null ? defaultAction.toString() : "" ) + " was already the default when " + action.toString() + " was found to also be default.");
+				defaultAction = action;
+			}
 			actionCombo.addItem(action);
+			
 		}
 
 		// Make delete the default action
-		actionCombo.setValue("Delete");
+		actionCombo.setValue(defaultAction);
 		actionArea.addComponent(applyButton);
 
 		// tweak the alignments.

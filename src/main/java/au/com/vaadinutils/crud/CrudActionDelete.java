@@ -6,7 +6,8 @@ import com.vaadin.ui.UI;
 
 public class CrudActionDelete<E extends CrudEntity> implements CrudAction< CrudEntity>
 {
-
+	private boolean isDefault = true;
+	
 	@Override
 	public void exec(final BaseCrudView<CrudEntity> crud,CrudEntity entity)
 	{
@@ -36,6 +37,13 @@ public class CrudActionDelete<E extends CrudEntity> implements CrudAction< CrudE
 		return "Delete";
 	}
 
+	public boolean isDefault()
+	{
+		return isDefault;
+	}
 	
-
+	public void setIsDefault(boolean isDefault)
+	{
+		this.isDefault = isDefault;
+	}
 }

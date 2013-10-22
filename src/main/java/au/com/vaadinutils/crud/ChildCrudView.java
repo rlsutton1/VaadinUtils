@@ -158,7 +158,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 			{
 				restoreDelete = true;
 				showDelete(false);
-				deleteLayout.setVisible(true);
+				actionLayout.setVisible(true);
 			}
 
 			rightLayout.setVisible(true);
