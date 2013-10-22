@@ -188,6 +188,9 @@ public class PreviewCSV
 				addRow(container, rowArray, columnHeaders);
 				count++;
 			}
+			
+			if (count > 100)
+				break;
 		}
 
 		return container;
