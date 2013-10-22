@@ -382,13 +382,24 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		return null;
 	}
 
-	protected void showDelete(boolean show)
+	/**
+	 * Call this method during buildEditor to suppress 
+	 * the action combo and Apply button.
+	 * They are displayed by default.
+	 * @param show
+	 */
+	protected void showActions(boolean show)
 	{
 		actionLayout.setVisible(show);
 		applyButton.setVisible(show);
 		actionCombo.setVisible(show);
 	}
 
+	/**
+	 * Call this method during buildEditor to suppress
+	 * the display of the 'New' button.
+	 * The 'New' button will be displayed by default.
+	 */
 	protected void showNew(boolean show)
 	{
 		newButton.setVisible(show);
@@ -451,7 +462,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				{
 					if (restoreDelete)
 					{
-						showDelete(true);
+						showActions(true);
 						restoreDelete = false;
 					}
 					newEntity = null;
@@ -559,7 +570,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				newEntity = null;
 				if (restoreDelete)
 				{
-					showDelete(true);
+					showActions(true);
 					restoreDelete = false;
 				}
 			}
@@ -774,7 +785,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 										fieldGroup.discard();
 										if (restoreDelete)
 										{
-											showDelete(true);
+											showActions(true);
 											restoreDelete = false;
 										}
 
@@ -991,7 +1002,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 					if (applyButton.isVisible())
 					{
 						restoreDelete = true;
-						showDelete(false);
+						showActions(false);
 					}
 
 					rightLayout.setVisible(true);
