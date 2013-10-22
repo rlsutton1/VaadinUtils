@@ -17,7 +17,6 @@ import com.google.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.data.Container.Filter;
-import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.Validator.InvalidValueException;
@@ -606,9 +605,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 * 
 	 * NOTE: modify item properties, accessing the entity is unreliable
 	 * 
-	 * @param entity
+	 * @param item
 	 */
-	protected void interceptSaveValues(EntityItem<E> entity)
+	protected void interceptSaveValues(EntityItem<E> entityItem)
 	{
 	}
 
