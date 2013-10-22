@@ -1,5 +1,6 @@
 package au.com.vaadinutils.crud;
 
+import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.ui.Component;
 
 public interface EntityList<E> extends Component 
@@ -17,7 +18,7 @@ public interface EntityList<E> extends Component
 
 	public Object getValue();
 	
-	public E getCurrent();
+	public EntityItem<E> getCurrent();
 
 
 	public boolean removeItem(Object entityId);

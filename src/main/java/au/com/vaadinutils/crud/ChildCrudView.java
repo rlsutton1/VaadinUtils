@@ -86,7 +86,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public void committed(P newParentId)
+	public void committed(EntityItem<P> newParentId)
 	{
 		saveEditsToTemp();
 		for (Object id : container.getItemIds())
@@ -97,7 +97,8 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 			{
 				try
 				{
-					item.getItemProperty(childKey).setValue(translateParentId(newParentId.getId()));
+					item.getItemProperty(childKey).setValue(translateParentId(newParentId.getEntity().getId()));
+
 				}
 				catch (Exception e)
 				{
@@ -105,9 +106,16 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 				}
 
 			}
+			extendedChildCommitProcessing(newParentId, item);
 		}
 		container.commit();
 		dirty = false;
+
+	}
+
+	protected void extendedChildCommitProcessing(EntityItem<P> newParentId, EntityItem<E> item)
+	{
+		// TODO Auto-generated method stub
 
 	}
 
@@ -199,7 +207,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 
 			if (newEntity != null)
 			{
-				interceptSaveValues(newEntity.getEntity());
+				interceptSaveValues(newEntity);
 
 				Object id = container.addEntity(newEntity.getEntity());
 				EntityItem<E> item = container.getItem(id);
@@ -213,7 +221,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 			}
 			else
 			{
-				E current = entityTable.getCurrent();
+				EntityItem<E> current = entityTable.getCurrent();
 				if (current != null)
 				{
 					interceptSaveValues(current);

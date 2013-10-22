@@ -128,10 +128,10 @@ public class EntityTreeTable<E> extends Tree implements EntityList<E>
 			super.changeVariables(source, variables);
 	}
 
-	public E getCurrent()
+	public EntityItem<E> getCurrent()
 	{
 		Long entityId = (Long) this.getValue();
-		E entity = this.entityContainer.getItem(entityId).getEntity();
+		EntityItem<E> entity = this.entityContainer.getItem(entityId);
 
 		return entity;
 

@@ -114,5 +114,11 @@ public enum EntityManagerProvider
 		getEntityManager().persist(record);
 		
 	}
+	
+	public static <T> void refresh(T record)
+	{
+		getEntityManager().refresh(record);
+		
+	}
 
 }

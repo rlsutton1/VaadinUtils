@@ -129,13 +129,13 @@ public class EntityTable<E> extends Table implements EntityList<E>
 			super.changeVariables(source, variables);
 	}
 
-	public E getCurrent()
+	public EntityItem<E> getCurrent()
 	{
 		Object entityId = this.getValue();
-		E entity = null;
+		EntityItem<E> entity = null;
 		if (entityId != null)
 		{
-			entity = this.entityContainer.getItem(entityId).getEntity();
+			entity = this.entityContainer.getItem(entityId);
 		}
 
 		return entity;

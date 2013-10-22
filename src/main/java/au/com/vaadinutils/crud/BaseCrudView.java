@@ -1,6 +1,8 @@
 package au.com.vaadinutils.crud;
 
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.PersistenceException;
@@ -186,10 +188,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		rightLayout = new VerticalLayout();
 		splitPanel.setSecondComponent(rightLayout);
 
-
 		/* Put a little margin around the fields in the right side editor */
 		Panel scroll = new Panel();
-		//mainEditPanel.setDescription("BaseCrud:MainEditPanel");
+		// mainEditPanel.setDescription("BaseCrud:MainEditPanel");
 		mainEditPanel.setVisible(true);
 		mainEditPanel.setSizeFull();
 		mainEditPanel.setId("MailEditPanel");
@@ -216,31 +217,49 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	{
 		deleteLayout = new HorizontalLayout();
 		deleteLayout.setWidth("100%");
-		//deleteLayout.setMargin(true);
-		
+		// deleteLayout.setMargin(true);
+
 		FormLayout comboWrapper = new FormLayout();
 		comboWrapper.setMargin(false);
 		comboWrapper.setSpacing(false);
 		comboWrapper.setHeight("40");
-		
-		 actionCombo = new ComboBox("Action");
+
+		actionCombo = new ComboBox("Action");
 		actionCombo.setWidth("120");
 		comboWrapper.addComponent(actionCombo);
-		
-		Item item = actionCombo.addItem("Delete");
+
+		for (CrudAction<E> action : getCrudActions())
+		{
+			actionCombo.addItem(action);
+		}
+
 		actionCombo.setNullSelectionAllowed(false);
-		
-		
+
 		actionCombo.setValue("Delete");
 		comboWrapper.setComponentAlignment(actionCombo, Alignment.MIDDLE_RIGHT);
 		deleteLayout.addComponent(comboWrapper);
 		deleteLayout.addComponent(applyButton);
 		deleteLayout.setComponentAlignment(applyButton, Alignment.MIDDLE_LEFT);
-		
+
 		deleteLayout.addComponent(newButton);
 		deleteLayout.setComponentAlignment(newButton, Alignment.MIDDLE_RIGHT);
 
 		deleteLayout.setHeight("40");
+	}
+
+	/**
+	 * overload this method to add customer actions, in your overloaded version
+	 * you should call super.getCrudActions() to get a list with the
+	 * DeleteAction pre-populated
+	 */
+	protected List<CrudAction<E>> getCrudActions()
+	{
+		List<CrudAction<E>> actions = new LinkedList<CrudAction<E>>();
+		@SuppressWarnings("unchecked")
+		CrudAction<E> crudAction = ((CrudAction<E>) new CrudActionDelete<E>());
+		actions.add(crudAction);
+
+		return actions;
 	}
 
 	protected void addSaveAndCancelButtons()
@@ -268,8 +287,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			basicSearchLayout.addComponent(advancedSearchButton);
 		}
 
-		
-		
 		basicSearchLayout.addComponent(searchField);
 		basicSearchLayout.setExpandRatio(searchField, 1.0f);
 
@@ -277,7 +294,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		basicSearchLayout.addComponent(clear);
 		basicSearchLayout.setComponentAlignment(clear, Alignment.MIDDLE_CENTER);
 
-		
 		basicSearchLayout.setSpacing(true);
 
 		/*
@@ -291,7 +307,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 	private Button createClearButton()
 	{
-		
+
 		Button clear = new Button("X");
 		clear.setStyleName(Reindeer.BUTTON_SMALL);
 		clear.setImmediate(true);
@@ -401,23 +417,11 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				if (entityId != null)
 				{
 					E entity = container.getItem(entityId).getEntity();
-					ConfirmDialog.show(UI.getCurrent(), "Confirm Delete",
-							"Are you sure you want to delete " + entity.getName(), "Delete", "Cancel",
-							new ConfirmDialog.Listener()
-							{
-								private static final long serialVersionUID = 1L;
 
-								@Override
-								public void onClose(ConfirmDialog dialog)
-								{
-									if (dialog.isConfirmed())
-									{
-
-										delete();
-									}
-								}
-
-							});
+					@SuppressWarnings("unchecked")
+					CrudAction<E> action = (CrudAction<E>) actionCombo.getValue();
+					action.exec(BaseCrudView.this, entity);
+					// actionCombo.select(actionCombo.getNullSelectionItemId());
 				}
 			}
 		});
@@ -456,7 +460,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 					// classes get a rowChange when we cancel.
 					// CONSIDER: is there a better way of doing this?
 					// Could we not just fire an 'onCancel' event or similar?
-					Long id = entityTable.getCurrent().getId();
+					Long id = entityTable.getCurrent().getEntity().getId();
 					BaseCrudView.this.entityTable.select(null);
 					BaseCrudView.this.entityTable.select(id);
 
@@ -516,7 +520,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 			if (newEntity != null)
 			{
-				interceptSaveValues(newEntity.getEntity());
+				interceptSaveValues(newEntity);
 
 				Object id = container.addEntity(newEntity.getEntity());
 				EntityItem<E> item = container.getItem(id);
@@ -527,7 +531,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			}
 			else
 			{
-				E current = entityTable.getCurrent();
+				EntityItem<E> current = entityTable.getCurrent();
 				if (current != null)
 				{
 					interceptSaveValues(current);
@@ -549,6 +553,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			{
 
 				commitListener.committed(entityTable.getCurrent());
+				container.commit();
 			}
 			splitPanel.showFirstComponet();
 			Notification.show("Changes Saved", "Any changes you have made have been saved.", Type.TRAY_NOTIFICATION);
@@ -597,11 +602,13 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 	/**
 	 * opportunity for implementing classes to modify or add data to the entity
-	 * being saved
+	 * being saved.
 	 * 
-	 * @param currentEntity2
+	 * NOTE: modify item properties, accessing the entity is unreliable
+	 * 
+	 * @param entity
 	 */
-	protected void interceptSaveValues(E entity)
+	protected void interceptSaveValues(EntityItem<E> entity)
 	{
 	}
 
@@ -904,7 +911,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			entity = newEntity.getEntity();
 		if (entity == null)
 		{
-			entity = entityTable.getCurrent();
+			entity = entityTable.getCurrent().getEntity();
 		}
 		return entity;
 
@@ -917,7 +924,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	{
 		Preconditions.checkState(!isDirty(), "The editor is dirty, save or cancel first.");
 
-		E entity = entityTable.getCurrent();
+		E entity = entityTable.getCurrent().getEntity();
 		container.refresh();
 		entityTable.select(null);
 		entityTable.select(entity.getId());

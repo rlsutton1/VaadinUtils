@@ -10,7 +10,7 @@ public interface ChildCrudListener<E>
 	 * that they too should save. The parent entity is provied so that the child
 	 * crud can retrieve the parent key (for new records)
 	 */
-	public void committed(E parent);
+	public void committed(EntityItem<E> parent);
 
 	/**
 	 * called by the parent when the parent changes row, allowing the child to
