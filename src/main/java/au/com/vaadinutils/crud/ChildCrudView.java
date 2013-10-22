@@ -364,4 +364,9 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 		return ret;
 
 	}
+
+	public Object getParentId()
+	{
+		return parentId;
+	}
 }
