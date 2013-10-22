@@ -23,6 +23,7 @@ import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
+import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.AbstractTextField.TextChangeEventMode;
@@ -33,7 +34,6 @@ import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
@@ -91,7 +91,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	private CheckBox advancedSearchButton;
 	protected Set<ChildCrudListener<E>> childCrudListeners = new HashSet<ChildCrudListener<E>>();
 	private CrudDisplayMode displayMode = CrudDisplayMode.HORIZONTAL;
-	protected HorizontalLayout deleteLayout;
+	protected HorizontalLayout actionLayout;
 	private ComboBox actionCombo;
 
 	protected BaseCrudView()
@@ -196,54 +196,61 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		scroll.setSizeFull();
 		scroll.setContent(mainEditPanel);
 
-		buildDeleteLayout();
+		buildActionLayout();
 
-		leftLayout.addComponent(deleteLayout);
+		leftLayout.addComponent(actionLayout);
 		rightLayout.addComponent(scroll);
 		rightLayout.setExpandRatio(scroll, 1.0f);
 		rightLayout.setSizeFull();
 		rightLayout.setId("rightLayout");
 
+		addSaveAndCancelButtons();
+
 		editor = buildEditor(fieldGroup);
 		mainEditPanel.addComponent(editor);
-
-		addSaveAndCancelButtons();
 
 		rightLayout.setVisible(false);
 	}
 
-	private void buildDeleteLayout()
+	private void buildActionLayout()
 	{
-		deleteLayout = new HorizontalLayout();
-		deleteLayout.setWidth("100%");
-		// deleteLayout.setMargin(true);
+		actionLayout = new HorizontalLayout();
+		actionLayout.setWidth("100%");
+		actionLayout.setMargin(new MarginInfo(false, true, false, true));
+		
+		HorizontalLayout actionArea = new HorizontalLayout();
+		actionArea.setSpacing(true);
+		Label applyLabel = new Label(" Action");
+		actionArea.addComponent(applyLabel);
+		actionArea.setComponentAlignment(applyLabel, Alignment.MIDDLE_LEFT);
 
-		FormLayout comboWrapper = new FormLayout();
-		comboWrapper.setMargin(false);
-		comboWrapper.setSpacing(false);
-		comboWrapper.setHeight("40");
+		actionCombo = new ComboBox(null);
+		actionCombo.setWidth("160");
+		actionCombo.setNullSelectionAllowed(false);
 
-		actionCombo = new ComboBox("Action");
-		actionCombo.setWidth("120");
-		comboWrapper.addComponent(actionCombo);
-
+		actionArea.addComponent(actionCombo);
+		
+		/**
+		 * Add the set of actions in.
+		 */
 		for (CrudAction<E> action : getCrudActions())
 		{
 			actionCombo.addItem(action);
 		}
 
-		actionCombo.setNullSelectionAllowed(false);
-
+		// Make delete the default action
 		actionCombo.setValue("Delete");
-		comboWrapper.setComponentAlignment(actionCombo, Alignment.MIDDLE_RIGHT);
-		deleteLayout.addComponent(comboWrapper);
-		deleteLayout.addComponent(applyButton);
-		deleteLayout.setComponentAlignment(applyButton, Alignment.MIDDLE_LEFT);
+		actionArea.addComponent(applyButton);
 
-		deleteLayout.addComponent(newButton);
-		deleteLayout.setComponentAlignment(newButton, Alignment.MIDDLE_RIGHT);
+		// tweak the alignments.
+		actionArea.setComponentAlignment(actionCombo, Alignment.MIDDLE_RIGHT);
+		actionLayout.addComponent(actionArea);
+		actionLayout.setComponentAlignment(actionArea, Alignment.MIDDLE_LEFT);
 
-		deleteLayout.setHeight("40");
+		actionLayout.addComponent(newButton);
+		actionLayout.setComponentAlignment(newButton, Alignment.MIDDLE_RIGHT);
+
+		actionLayout.setHeight("35");
 	}
 
 	/**
@@ -264,12 +271,13 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	protected void addSaveAndCancelButtons()
 	{
 		buttonLayout = new HorizontalLayout();
+		buttonLayout.setMargin(new MarginInfo(false, true, false, true));
 		buttonLayout.setWidth("100%");
 		buttonLayout.addComponent(cancelButton);
 		buttonLayout.addComponent(saveButton);
 		buttonLayout.setComponentAlignment(saveButton, Alignment.MIDDLE_RIGHT);
 		buttonLayout.setComponentAlignment(cancelButton, Alignment.MIDDLE_LEFT);
-		buttonLayout.setHeight("40");
+		buttonLayout.setHeight("35");
 		rightLayout.addComponent(buttonLayout);
 	}
 
@@ -369,7 +377,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 	protected void showDelete(boolean show)
 	{
-		deleteLayout.setVisible(show);
+		actionLayout.setVisible(show);
 		applyButton.setVisible(show);
 		actionCombo.setVisible(show);
 	}
