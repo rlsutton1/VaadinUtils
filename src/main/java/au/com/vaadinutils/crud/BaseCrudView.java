@@ -395,6 +395,19 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		actionCombo.setVisible(show);
 	}
 
+
+	/**
+	 * Used when creating a 'new' record to disable
+	 * actions such as 'new' and delete until the record is saved. 
+	 * @param show
+	 */
+	private void enableActions(boolean enabled)
+	{
+		applyButton.setEnabled(enabled);
+		actionCombo.setEnabled(enabled);
+		newButton.setEnabled(enabled);
+	}
+
 	/**
 	 * Call this method during buildEditor to suppress
 	 * the display of the 'New' button.
@@ -462,7 +475,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				{
 					if (restoreDelete)
 					{
-						showActions(true);
+						enableActions(true);
 						restoreDelete = false;
 					}
 					newEntity = null;
@@ -570,7 +583,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				newEntity = null;
 				if (restoreDelete)
 				{
-					showActions(true);
+					enableActions(true);
 					restoreDelete = false;
 				}
 			}
@@ -785,7 +798,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 										fieldGroup.discard();
 										if (restoreDelete)
 										{
-											showActions(true);
+											enableActions(true);
 											restoreDelete = false;
 										}
 
@@ -1002,7 +1015,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 					if (applyButton.isVisible())
 					{
 						restoreDelete = true;
-						showActions(false);
+						enableActions(false);
 					}
 
 					rightLayout.setVisible(true);
