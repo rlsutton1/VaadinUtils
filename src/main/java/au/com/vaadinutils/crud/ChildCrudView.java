@@ -157,8 +157,8 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 			if (applyButton.isVisible())
 			{
 				restoreDelete = true;
-				showDelete(false);
-				deleteLayout.setVisible(true);
+				showActions(false);
+				actionLayout.setVisible(true);
 			}
 
 			rightLayout.setVisible(true);
@@ -234,7 +234,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 				newEntity = null;
 				if (restoreDelete)
 				{
-					showDelete(true);
+					showActions(true);
 					restoreDelete = false;
 				}
 			}
@@ -363,5 +363,10 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 
 		return ret;
 
+	}
+
+	public Object getParentId()
+	{
+		return parentId;
 	}
 }

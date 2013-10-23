@@ -17,13 +17,13 @@ import com.google.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.data.Container.Filter;
-import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
+import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.AbstractTextField.TextChangeEventMode;
@@ -34,7 +34,6 @@ import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
@@ -92,7 +91,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	private CheckBox advancedSearchButton;
 	protected Set<ChildCrudListener<E>> childCrudListeners = new HashSet<ChildCrudListener<E>>();
 	private CrudDisplayMode displayMode = CrudDisplayMode.HORIZONTAL;
-	protected HorizontalLayout deleteLayout;
+	protected HorizontalLayout actionLayout;
 	private ComboBox actionCombo;
 
 	protected BaseCrudView()
@@ -197,54 +196,68 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		scroll.setSizeFull();
 		scroll.setContent(mainEditPanel);
 
-		buildDeleteLayout();
+		buildActionLayout();
 
-		leftLayout.addComponent(deleteLayout);
+		leftLayout.addComponent(actionLayout);
 		rightLayout.addComponent(scroll);
 		rightLayout.setExpandRatio(scroll, 1.0f);
 		rightLayout.setSizeFull();
 		rightLayout.setId("rightLayout");
 
+		addSaveAndCancelButtons();
+
 		editor = buildEditor(fieldGroup);
 		mainEditPanel.addComponent(editor);
-
-		addSaveAndCancelButtons();
 
 		rightLayout.setVisible(false);
 	}
 
-	private void buildDeleteLayout()
+	private void buildActionLayout()
 	{
-		deleteLayout = new HorizontalLayout();
-		deleteLayout.setWidth("100%");
-		// deleteLayout.setMargin(true);
+		actionLayout = new HorizontalLayout();
+		actionLayout.setWidth("100%");
+		actionLayout.setMargin(new MarginInfo(false, true, false, true));
+		
+		HorizontalLayout actionArea = new HorizontalLayout();
+		actionArea.setSpacing(true);
+		Label applyLabel = new Label(" Action");
+		actionArea.addComponent(applyLabel);
+		actionArea.setComponentAlignment(applyLabel, Alignment.MIDDLE_LEFT);
 
-		FormLayout comboWrapper = new FormLayout();
-		comboWrapper.setMargin(false);
-		comboWrapper.setSpacing(false);
-		comboWrapper.setHeight("40");
-
-		actionCombo = new ComboBox("Action");
-		actionCombo.setWidth("120");
-		comboWrapper.addComponent(actionCombo);
-
-		for (CrudAction<E> action : getCrudActions())
-		{
-			actionCombo.addItem(action);
-		}
-
+		actionCombo = new ComboBox(null);
+		actionCombo.setWidth("160");
 		actionCombo.setNullSelectionAllowed(false);
 
-		actionCombo.setValue("Delete");
-		comboWrapper.setComponentAlignment(actionCombo, Alignment.MIDDLE_RIGHT);
-		deleteLayout.addComponent(comboWrapper);
-		deleteLayout.addComponent(applyButton);
-		deleteLayout.setComponentAlignment(applyButton, Alignment.MIDDLE_LEFT);
+		actionArea.addComponent(actionCombo);
+		
+		/**
+		 * Add the set of actions in.
+		 */
+		CrudAction<E> defaultAction = null;
+		for (CrudAction<E> action : getCrudActions())
+		{
+			if (action.isDefault())
+			{
+				Preconditions.checkState(defaultAction == null, "Only one action may be marked as default: " + (defaultAction != null ? defaultAction.toString() : "" ) + " was already the default when " + action.toString() + " was found to also be default.");
+				defaultAction = action;
+			}
+			actionCombo.addItem(action);
+			
+		}
 
-		deleteLayout.addComponent(newButton);
-		deleteLayout.setComponentAlignment(newButton, Alignment.MIDDLE_RIGHT);
+		// Make delete the default action
+		actionCombo.setValue(defaultAction);
+		actionArea.addComponent(applyButton);
 
-		deleteLayout.setHeight("40");
+		// tweak the alignments.
+		actionArea.setComponentAlignment(actionCombo, Alignment.MIDDLE_RIGHT);
+		actionLayout.addComponent(actionArea);
+		actionLayout.setComponentAlignment(actionArea, Alignment.MIDDLE_LEFT);
+
+		actionLayout.addComponent(newButton);
+		actionLayout.setComponentAlignment(newButton, Alignment.MIDDLE_RIGHT);
+
+		actionLayout.setHeight("35");
 	}
 
 	/**
@@ -265,12 +278,13 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	protected void addSaveAndCancelButtons()
 	{
 		buttonLayout = new HorizontalLayout();
+		buttonLayout.setMargin(new MarginInfo(false, true, false, true));
 		buttonLayout.setWidth("100%");
 		buttonLayout.addComponent(cancelButton);
 		buttonLayout.addComponent(saveButton);
 		buttonLayout.setComponentAlignment(saveButton, Alignment.MIDDLE_RIGHT);
 		buttonLayout.setComponentAlignment(cancelButton, Alignment.MIDDLE_LEFT);
-		buttonLayout.setHeight("40");
+		buttonLayout.setHeight("35");
 		rightLayout.addComponent(buttonLayout);
 	}
 
@@ -368,13 +382,24 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		return null;
 	}
 
-	protected void showDelete(boolean show)
+	/**
+	 * Call this method during buildEditor to suppress 
+	 * the action combo and Apply button.
+	 * They are displayed by default.
+	 * @param show
+	 */
+	protected void showActions(boolean show)
 	{
-		deleteLayout.setVisible(show);
+		actionLayout.setVisible(show);
 		applyButton.setVisible(show);
 		actionCombo.setVisible(show);
 	}
 
+	/**
+	 * Call this method during buildEditor to suppress
+	 * the display of the 'New' button.
+	 * The 'New' button will be displayed by default.
+	 */
 	protected void showNew(boolean show)
 	{
 		newButton.setVisible(show);
@@ -437,7 +462,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				{
 					if (restoreDelete)
 					{
-						showDelete(true);
+						showActions(true);
 						restoreDelete = false;
 					}
 					newEntity = null;
@@ -545,7 +570,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				newEntity = null;
 				if (restoreDelete)
 				{
-					showDelete(true);
+					showActions(true);
 					restoreDelete = false;
 				}
 			}
@@ -606,9 +631,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 * 
 	 * NOTE: modify item properties, accessing the entity is unreliable
 	 * 
-	 * @param entity
+	 * @param item
 	 */
-	protected void interceptSaveValues(EntityItem<E> entity)
+	protected void interceptSaveValues(EntityItem<E> entityItem)
 	{
 	}
 
@@ -760,7 +785,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 										fieldGroup.discard();
 										if (restoreDelete)
 										{
-											showDelete(true);
+											showActions(true);
 											restoreDelete = false;
 										}
 
@@ -977,7 +1002,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 					if (applyButton.isVisible())
 					{
 						restoreDelete = true;
-						showDelete(false);
+						showActions(false);
 					}
 
 					rightLayout.setVisible(true);
