@@ -272,16 +272,16 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 			}
 		}
 
-		finally
-		{
-			if (newEntity != null)
-			{
-				if (entityTable.getCurrent() != null)
-				{
-					container.removeItem(entityTable.getCurrent());
-				}
-			}
-		}
+//		finally
+//		{
+//			if (newEntity != null)
+//			{
+//				if (entityTable.getCurrent() != null)
+//				{
+//					container.removeItem(entityTable.getCurrent());
+//				}
+//			}
+//		}
 
 	}
 
