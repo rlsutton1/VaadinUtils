@@ -202,8 +202,11 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 		{
 			// if a row is saved in the childCrud, then it is dirty for the
 			// purposes of the parent crud
-			dirty = true;
-			commit();
+			if (fieldGroup.isModified())
+			{
+				dirty = true;
+				commit();
+			}
 
 			if (newEntity != null)
 			{
