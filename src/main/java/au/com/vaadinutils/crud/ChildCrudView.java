@@ -129,7 +129,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	 * of the parent crud
 	 */
 	@Override
-	protected void delete()
+	public void delete()
 	{
 		Object entityId = entityTable.getValue();
 		Object previousItemId = entityTable.prevItemId(entityId);
