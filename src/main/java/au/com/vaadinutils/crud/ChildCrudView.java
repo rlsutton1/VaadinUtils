@@ -209,8 +209,8 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 			// purposes of the parent crud
 			if (fieldGroup.isModified())
 			{
-			dirty = true;
-			commit();
+				dirty = true;
+				commit();
 			}
 
 			if (newEntity != null)
