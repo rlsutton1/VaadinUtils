@@ -169,6 +169,13 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 		// expandratio and use of setSizeFull are incompatible
 		// searchLayout.setSizeFull();
+
+		Component title = getTitle();
+		if (title != null)
+		{
+			leftLayout.addComponent(getTitle());
+		}
+
 		leftLayout.addComponent(searchLayout);
 
 		buildSearchBar();
@@ -212,12 +219,29 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		rightLayout.setVisible(false);
 	}
 
+	protected String getTitleText()
+	{
+		return "Override getTitleText() to set a title.";
+	}
+
+	protected Component getTitle()
+	{
+		HorizontalLayout holder = new HorizontalLayout();
+
+		Label titleLabel = new Label(getTitleText());
+
+		titleLabel.setStyleName(Reindeer.LABEL_H1);
+		holder.addComponent(titleLabel);
+		holder.setComponentAlignment(titleLabel, Alignment.MIDDLE_RIGHT);
+		return holder;
+	}
+
 	private void buildActionLayout()
 	{
 		actionLayout = new HorizontalLayout();
 		actionLayout.setWidth("100%");
 		actionLayout.setMargin(new MarginInfo(false, true, false, true));
-		
+
 		HorizontalLayout actionArea = new HorizontalLayout();
 		actionArea.setSpacing(true);
 		Label applyLabel = new Label(" Action");
@@ -229,7 +253,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		actionCombo.setNullSelectionAllowed(false);
 
 		actionArea.addComponent(actionCombo);
-		
+
 		/**
 		 * Add the set of actions in.
 		 */
@@ -238,11 +262,13 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		{
 			if (action.isDefault())
 			{
-				Preconditions.checkState(defaultAction == null, "Only one action may be marked as default: " + (defaultAction != null ? defaultAction.toString() : "" ) + " was already the default when " + action.toString() + " was found to also be default.");
+				Preconditions.checkState(defaultAction == null, "Only one action may be marked as default: "
+						+ (defaultAction != null ? defaultAction.toString() : "") + " was already the default when "
+						+ action.toString() + " was found to also be default.");
 				defaultAction = action;
 			}
 			actionCombo.addItem(action);
-			
+
 		}
 
 		// Make delete the default action
@@ -383,9 +409,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	}
 
 	/**
-	 * Call this method during buildEditor to suppress 
-	 * the action combo and Apply button.
-	 * They are displayed by default.
+	 * Call this method during buildEditor to suppress the action combo and
+	 * Apply button. They are displayed by default.
+	 * 
 	 * @param show
 	 */
 	protected void showActions(boolean show)
@@ -393,6 +419,18 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		actionLayout.setVisible(show);
 		applyButton.setVisible(show);
 		actionCombo.setVisible(show);
+	}
+
+	/**
+	 * Used when creating a 'new' record to disable
+	 * actions such as 'new' and delete until the record is saved. 
+	 * @param show
+	 */
+	private void enableActions(boolean enabled)
+	{
+		applyButton.setEnabled(enabled);
+		actionCombo.setEnabled(enabled);
+		newButton.setEnabled(enabled);
 	}
 
 	/**
@@ -462,7 +500,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				{
 					if (restoreDelete)
 					{
-						showActions(true);
+						enableActions(true);
 						restoreDelete = false;
 					}
 					newEntity = null;
@@ -553,6 +591,13 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				fieldGroup.setItemDataSource(item);
 				entityTable.select(item.getItemId());
 				selected = true;
+
+				newEntity = null;
+				if (restoreDelete)
+				{
+					enableActions(true);
+					restoreDelete = false;
+				}
 			}
 			else
 			{
@@ -560,26 +605,21 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				if (current != null)
 				{
 					interceptSaveValues(current);
-					container.commit();
-
 				}
 			}
 
-			if (newEntity != null)
-			{
-				newEntity = null;
-				if (restoreDelete)
-				{
-					showActions(true);
-					restoreDelete = false;
-				}
-			}
 			for (ChildCrudListener<E> commitListener : childCrudListeners)
 			{
-
 				commitListener.committed(entityTable.getCurrent());
-				container.commit();
 			}
+			
+			EntityItem<E> current = entityTable.getCurrent();
+			if (current != null)
+			{
+				postSaveAction(current);
+			}
+			
+			container.commit();
 			splitPanel.showFirstComponet();
 			Notification.show("Changes Saved", "Any changes you have made have been saved.", Type.TRAY_NOTIFICATION);
 
@@ -622,6 +662,12 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				}
 			}
 		}
+
+	}
+
+	protected void postSaveAction(EntityItem<E> entityItem)
+	{
+		// TODO Auto-generated method stub
 
 	}
 
@@ -785,7 +831,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 										fieldGroup.discard();
 										if (restoreDelete)
 										{
-											showActions(true);
+											enableActions(true);
 											restoreDelete = false;
 										}
 
@@ -1002,7 +1048,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 					if (applyButton.isVisible())
 					{
 						restoreDelete = true;
-						showActions(false);
+						enableActions(false);
 					}
 
 					rightLayout.setVisible(true);
@@ -1039,4 +1085,5 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	{
 		return this.newEntity != null;
 	}
+
 }

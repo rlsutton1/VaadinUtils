@@ -14,8 +14,13 @@ import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.data.util.filter.Compare;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
+import com.vaadin.ui.themes.Reindeer;
 
 /**
  * child crud does not support nesting.
@@ -202,8 +207,11 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 		{
 			// if a row is saved in the childCrud, then it is dirty for the
 			// purposes of the parent crud
+			if (fieldGroup.isModified())
+			{
 			dirty = true;
 			commit();
+			}
 
 			if (newEntity != null)
 			{
@@ -368,5 +376,11 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	public Object getParentId()
 	{
 		return parentId;
+	}
+	
+	protected Component getTitle()
+	{
+		// no title in child cruds
+		return null;
 	}
 }
