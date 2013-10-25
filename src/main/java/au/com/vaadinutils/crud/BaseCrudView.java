@@ -553,7 +553,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 	}
 
-	protected void delete()
+	public void delete()
 	{
 		Object entityId = entityTable.getValue();
 		Object previousItemId = entityTable.prevItemId(entityId);

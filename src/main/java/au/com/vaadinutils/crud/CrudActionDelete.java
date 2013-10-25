@@ -4,7 +4,7 @@ import org.vaadin.dialogs.ConfirmDialog;
 
 import com.vaadin.ui.UI;
 
-public class CrudActionDelete<E extends CrudEntity> implements CrudAction< CrudEntity>
+public class CrudActionDelete<E > implements CrudAction< CrudEntity>
 {
 	private boolean isDefault = true;
 	
