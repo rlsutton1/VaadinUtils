@@ -30,7 +30,6 @@ import com.vaadin.ui.AbstractTextField.TextChangeEventMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
@@ -271,7 +270,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 		}
 
-		// Make delete the default action
+		// Select the default action
 		actionCombo.setValue(defaultAction);
 		actionArea.addComponent(applyButton);
 
@@ -422,8 +421,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	}
 
 	/**
-	 * Used when creating a 'new' record to disable
-	 * actions such as 'new' and delete until the record is saved. 
+	 * Used when creating a 'new' record to disable actions such as 'new' and
+	 * delete until the record is saved.
+	 * 
 	 * @param show
 	 */
 	private void enableActions(boolean enabled)
@@ -434,9 +434,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	}
 
 	/**
-	 * Call this method during buildEditor to suppress
-	 * the display of the 'New' button.
-	 * The 'New' button will be displayed by default.
+	 * Call this method during buildEditor to suppress the display of the 'New'
+	 * button. The 'New' button will be displayed by default.
 	 */
 	protected void showNew(boolean show)
 	{
@@ -470,11 +469,12 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 		});
 
-		applyButton.addClickListener(new ClickListener()
+		applyButton.addClickListener(new ClickEventLogged.ClickListener()
 		{
 			private static final long serialVersionUID = 1L;
 
-			public void buttonClick(ClickEvent event)
+			@Override
+			public void clicked(ClickEvent event)
 			{
 				Object entityId = entityTable.getValue();
 				if (entityId != null)
@@ -483,17 +483,20 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 					@SuppressWarnings("unchecked")
 					CrudAction<E> action = (CrudAction<E>) actionCombo.getValue();
-					action.exec(BaseCrudView.this, entity);
+					if (interceptAction(action, entity))
+						action.exec(BaseCrudView.this, entity);
+
 					// actionCombo.select(actionCombo.getNullSelectionItemId());
 				}
 			}
 		});
 
-		cancelButton.addClickListener(new ClickListener()
+		cancelButton.addClickListener(new ClickEventLogged.ClickListener()
 		{
 			private static final long serialVersionUID = 1L;
 
-			public void buttonClick(ClickEvent event)
+			@Override
+			public void clicked(ClickEvent event)
 			{
 				fieldGroup.discard();
 				if (newEntity != null)
@@ -539,11 +542,12 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			}
 		});
 
-		saveButton.addClickListener(new ClickListener()
+		saveButton.addClickListener(new ClickEventLogged.ClickListener()
 		{
 			private static final long serialVersionUID = 1L;
 
-			public void buttonClick(ClickEvent event)
+			@Override
+			public void clicked(ClickEvent event)
 			{
 				save();
 
@@ -551,6 +555,24 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 		});
 
+	}
+
+	/**
+	 * Override this method to intercept activation of an action.
+	 * 
+	 * Return true if you are happy for the action to proceed otherwise return
+	 * false if you want to suppress the action.
+	 * 
+	 * When suppressing the action you should display a notification as to why
+	 * you suppressed it.
+	 * 
+	 * @param action
+	 * @param entity
+	 * @return
+	 */
+	protected boolean interceptAction(CrudAction<E> action, E entity)
+	{
+		return true;
 	}
 
 	public void delete()
@@ -567,8 +589,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		// is need to update the rhs.
 		// CONSIDER: On the other hand I'm
 		// concerned that we might confuse
-		// people as they
-		// get to row changes events.
+		// developers as they
+		// get two row changes events.
 		BaseCrudView.this.entityTable.select(null);
 		BaseCrudView.this.entityTable.select(previousItemId);
 		container.commit();
@@ -612,13 +634,13 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			{
 				commitListener.committed(entityTable.getCurrent());
 			}
-			
+
 			EntityItem<E> current = entityTable.getCurrent();
 			if (current != null)
 			{
 				postSaveAction(current);
 			}
-			
+
 			container.commit();
 			splitPanel.showFirstComponet();
 			Notification.show("Changes Saved", "Any changes you have made have been saved.", Type.TRAY_NOTIFICATION);
