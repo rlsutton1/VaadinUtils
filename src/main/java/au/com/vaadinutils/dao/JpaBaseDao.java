@@ -6,8 +6,13 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Subquery;
+import javax.persistence.metamodel.EntityType;
 import javax.persistence.metamodel.SingularAttribute;
 
 import com.google.common.base.Preconditions;
@@ -160,6 +165,28 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 	public JPAContainer<E> createVaadinContainer()
 	{
 		return JPAContainerFactory.makeBatchable(entityClass, EntityManagerProvider.getEntityManager());
+
+	}
+	
+	public <V> int deleteAllByAttribute(SingularAttribute<E, V> vKey, V value)
+	{
+
+		EntityManager em = EntityManagerProvider.getEntityManager();
+		CriteriaBuilder builder = em.getCriteriaBuilder();
+
+		CriteriaDelete<E> criteria = builder.createCriteriaDelete(entityClass);
+	
+		Root<E> root = criteria.from(entityClass);
+		
+		
+		criteria.where(builder.equal(root.get(vKey), value));
+		
+		em.getClass();
+		int result = em.createQuery(criteria).executeUpdate();
+		
+		
+
+		return result;
 
 	}
 

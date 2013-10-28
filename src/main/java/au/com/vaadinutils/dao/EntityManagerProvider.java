@@ -2,7 +2,6 @@ package au.com.vaadinutils.dao;
 
 import javax.persistence.EntityManager;
 
-
 /**
  * The class is a place holder to allow access to an 'non-injected' entity
  * manager.
@@ -55,7 +54,8 @@ public enum EntityManagerProvider
 
 	/**
 	 * Call this method to initialise the EntityManagerProvider so that it can
-	 * hand out EntityManagers to worker threads. Dont forget to close the entitymanager
+	 * hand out EntityManagers to worker threads. Dont forget to close the
+	 * entitymanager
 	 * 
 	 * This should normally be called from a servlet Context Listener.
 	 * 
@@ -66,13 +66,27 @@ public enum EntityManagerProvider
 		INSTANCE.emf = emf;
 	}
 
-	public static EntityManager setThreadLocalEntityManager()
+	public static void setThreadLocalEntityManager(EntityWorker worker) throws Exception
 	{
 		EntityManager em = createEntityManager();
-		setCurrentEntityManager(em);
-		return (em);
+		try
+		{
+
+			setCurrentEntityManager(em);
+			em.getTransaction().begin();
+
+			worker.exec();
+			
+			em.getTransaction().commit();
+		}
+		finally
+		{
+			setCurrentEntityManager(null);
+			em.close();
+		}
+
 	}
-	
+
 	/**
 	 * If you have a worker thread then it won't have access to a thread local
 	 * entity manager (as they are injected by the servlet request filters
@@ -89,7 +103,7 @@ public enum EntityManagerProvider
 		}
 
 		EntityManager entityManager = INSTANCE.emf.createEntityManager();
-		
+
 		return entityManager;
 	}
 
@@ -103,22 +117,22 @@ public enum EntityManagerProvider
 		return getEntityManager().merge(entity);
 	}
 
-	public static <T>void remove(T entity)
+	public static <T> void remove(T entity)
 	{
 		getEntityManager().remove(entity);
-		
+
 	}
 
 	public static <T> void persist(T record)
 	{
 		getEntityManager().persist(record);
-		
+
 	}
-	
+
 	public static <T> void refresh(T record)
 	{
 		getEntityManager().refresh(record);
-		
+
 	}
 
 }
