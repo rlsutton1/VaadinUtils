@@ -17,12 +17,11 @@
 package au.com.vaadinutils.dao;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
 
 import com.vaadin.addon.jpacontainer.BatchableEntityProvider;
 import com.vaadin.addon.jpacontainer.CachingEntityProvider;
 import com.vaadin.addon.jpacontainer.provider.BatchUpdatePerformedEvent;
-import com.vaadin.addon.jpacontainer.provider.CachingBatchableLocalEntityProvider;
+import com.vaadin.addon.jpacontainer.provider.BatchableLocalEntityProvider;
 import com.vaadin.addon.jpacontainer.provider.CachingMutableLocalEntityProvider;
 
 /**

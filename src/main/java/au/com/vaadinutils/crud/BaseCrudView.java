@@ -1034,27 +1034,6 @@ container.refreshItem(entity.getItemId());
 		formValidate();
 		fieldGroup.commit();
 
-		// try
-		// {
-		// if (!fieldGroup.isValid() || !valid())
-		// {
-		// Notification.show("Validation Errors",
-		// "Please fix any field errors and try again.",
-		// Type.WARNING_MESSAGE);
-		// }
-		// else
-		// {
-		// fieldGroup.commit();
-		//
-		// }
-		// }
-		// catch (CommitException e)
-		// {
-		// Notification.show("Error saving changes.",
-		// "Any error occured attempting to save your changes: " +
-		// e.getMessage(), Type.ERROR_MESSAGE);
-		// logger.error(e, e);
-		// }
 
 	}
 
@@ -1189,6 +1168,12 @@ container.refreshItem(entity.getItemId());
 	protected boolean isNew()
 	{
 		return this.newEntity != null;
+	}
+
+	public JPAContainer<E> getContainer()
+	{
+		return container;
+		
 	}
 
 }
