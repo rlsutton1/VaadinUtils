@@ -16,8 +16,10 @@ import javax.persistence.metamodel.EntityType;
 import javax.persistence.metamodel.SingularAttribute;
 
 import com.google.common.base.Preconditions;
+import com.vaadin.addon.jpacontainer.EntityProvider;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.JPAContainerFactory;
+import com.vaadin.addon.jpacontainer.provider.CachingBatchableLocalEntityProvider;
 
 public class JpaBaseDao<E, K> implements Dao<E, K>
 {
@@ -164,10 +166,13 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 	public JPAContainer<E> createVaadinContainer()
 	{
-		return JPAContainerFactory.makeBatchable(entityClass, EntityManagerProvider.getEntityManager());
+
+		JPAContainer<E> container = new JPAContainer<E>(entityClass);
+		container.setEntityProvider(new BatchingPerRequestEntityProvider<E>(entityClass));
+		return container;
 
 	}
-	
+
 	public <V> int deleteAllByAttribute(SingularAttribute<E, V> vKey, V value)
 	{
 
@@ -175,16 +180,13 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		CriteriaBuilder builder = em.getCriteriaBuilder();
 
 		CriteriaDelete<E> criteria = builder.createCriteriaDelete(entityClass);
-	
+
 		Root<E> root = criteria.from(entityClass);
-		
-		
+
 		criteria.where(builder.equal(root.get(vKey), value));
-		
+
 		em.getClass();
 		int result = em.createQuery(criteria).executeUpdate();
-		
-		
 
 		return result;
 

@@ -594,6 +594,16 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		BaseCrudView.this.entityTable.select(null);
 		BaseCrudView.this.entityTable.select(previousItemId);
 		container.commit();
+		
+		postDelete( entityId);
+	}
+
+	/** hook for implements that need to do some additional cleanup after a delete
+	 * 
+	 */
+	protected void postDelete(Object entityId)
+	{
+		
 	}
 
 	protected void save()
