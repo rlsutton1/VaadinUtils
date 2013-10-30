@@ -167,10 +167,15 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 	public JPAContainer<E> createVaadinContainer()
 	{
 
+//		
 		JPAContainer<E> container = new JPAContainer<E>(entityClass);
 		container.setEntityProvider(new BatchingPerRequestEntityProvider<E>(entityClass));
 		return container;
 
+	}
+	private void oldCreateVaadinContainer()
+	{
+		 JPAContainerFactory.makeBatchable(entityClass, EntityManagerProvider.getEntityManager());
 	}
 
 	public <V> int deleteAllByAttribute(SingularAttribute<E, V> vKey, V value)

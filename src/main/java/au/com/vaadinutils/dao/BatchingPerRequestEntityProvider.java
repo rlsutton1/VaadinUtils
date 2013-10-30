@@ -17,10 +17,12 @@
 package au.com.vaadinutils.dao;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 
 import com.vaadin.addon.jpacontainer.BatchableEntityProvider;
 import com.vaadin.addon.jpacontainer.CachingEntityProvider;
 import com.vaadin.addon.jpacontainer.provider.BatchUpdatePerformedEvent;
+import com.vaadin.addon.jpacontainer.provider.CachingBatchableLocalEntityProvider;
 import com.vaadin.addon.jpacontainer.provider.CachingMutableLocalEntityProvider;
 
 /**
@@ -40,6 +42,7 @@ public class BatchingPerRequestEntityProvider<T> extends CachingMutableLocalEnti
 
 	private static final long serialVersionUID = 9174163487778140520L;
 
+	EntityManager em = EntityManagerProvider.getEntityManager();
 	/**
 	 * Creates a new <code>CachingBatchableLocalEntityProvider</code>. The
 	 * entity manager must be set using
@@ -51,24 +54,20 @@ public class BatchingPerRequestEntityProvider<T> extends CachingMutableLocalEnti
 	public BatchingPerRequestEntityProvider(Class<T> entityClass)
 	{
 		super(entityClass);
+		setCacheEnabled(true);
 	}
 
-	/**
-	 * Creates a new <code>CachingBatchableLocalEntityProvider</code>.
-	 * 
-	 * @param entityClass
-	 *            the entity class (must not be null).
-	 * @param entityManager
-	 *            the entity manager to use (must not be null).
-	 */
-	public BatchingPerRequestEntityProvider(Class<T> entityClass, EntityManager entityManager)
-	{
-		super(entityClass, entityManager);
-	}
 
+	static private ThreadLocal<Integer> updating = new ThreadLocal<Integer>();
+	
 	public void batchUpdate(final BatchUpdateCallback<T> callback) throws UnsupportedOperationException
 	{
 		assert callback != null : "callback must not be null";
+		if (updating.get()== null)
+		{
+			updating.set(1);
+			getEntityManager().getTransaction().commit();
+		}
 		setFireEntityProviderChangeEvents(false);
 		try
 		{
@@ -78,15 +77,33 @@ public class BatchingPerRequestEntityProvider<T> extends CachingMutableLocalEnti
 				public void run()
 				{
 					callback.batchUpdate(BatchingPerRequestEntityProvider.this);
+					
 				}
 			});
 		}
 		finally
 		{
+			int count = updating.get()-1;
+			updating.set(count);
+			if (count == 0)
+			{
+				getEntityManager().getTransaction().begin();
+				updating.set(null);
+			}
 			setFireEntityProviderChangeEvents(true);
 		}
 		fireEntityProviderChangeEvent(new BatchUpdatePerformedEvent<T>(this));
 	}
+
+//	protected EntityManager doGetEntityManager() throws IllegalStateException
+//	{
+//		return em;
+//	}
+//
+//	public EntityManager getEntityManager()
+//	{
+//		return em;
+//	}
 
 	protected EntityManager doGetEntityManager() throws IllegalStateException
 	{
@@ -97,5 +114,31 @@ public class BatchingPerRequestEntityProvider<T> extends CachingMutableLocalEnti
 	{
 		return EntityManagerProvider.getEntityManager();
 	}
+	
+//	  protected void runInTransaction(Runnable operation) {
+//	        assert operation != null : "operation must not be null";
+//	        if (isTransactionsHandledByProvider()) {
+//	            EntityTransaction et = getEntityManager().getTransaction();
+//	            if (et.isActive()) {
+//	                // The transaction has been started outside of this method
+//	                // and should also be committed/rolled back outside of
+//	                // this method
+//	                operation.run();
+//	            } else {
+//	                try {
+//	                    et.begin();
+//	                    operation.run();
+//	                    et.commit();
+//	                } finally {
+//	                    if (et.isActive()) {
+//	                        et.rollback();
+//	                    }
+//	                }
+//	            }
+//	        } else {
+//	            operation.run();
+//	        }
+//	    }
+
 
 }
