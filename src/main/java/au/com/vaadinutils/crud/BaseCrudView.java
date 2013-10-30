@@ -213,6 +213,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		addSaveAndCancelButtons();
 
 		editor = buildEditor(fieldGroup);
+		Preconditions.checkNotNull(editor, "Your editor implementation returned null!, you better create an editor. "
+				+ entityClass);
 		mainEditPanel.addComponent(editor);
 
 		rightLayout.setVisible(false);
@@ -235,6 +237,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		return holder;
 	}
 
+	@SuppressWarnings("null")
 	private void buildActionLayout()
 	{
 		actionLayout = new HorizontalLayout();
@@ -594,16 +597,18 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		BaseCrudView.this.entityTable.select(null);
 		BaseCrudView.this.entityTable.select(previousItemId);
 		container.commit();
-		
-		postDelete( entityId);
+
+		postDelete(entityId);
 	}
 
-	/** hook for implements that need to do some additional cleanup after a delete
+	/**
+	 * hook for implements that need to do some additional cleanup after a
+	 * delete
 	 * 
 	 */
 	protected void postDelete(Object entityId)
 	{
-		
+
 	}
 
 	protected void save()
