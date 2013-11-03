@@ -23,11 +23,8 @@ public class InputDialog extends Window implements InputFormDialogRecipient
 
 		field.setCaption(question);
 		form.addComponent(field);
-		
 	
-	
-		InputFormDialog delagate = new InputFormDialog(parent, title, field,  form, this);
-
+		new InputFormDialog(parent, title, field,  form, this);
 	}
 
 
