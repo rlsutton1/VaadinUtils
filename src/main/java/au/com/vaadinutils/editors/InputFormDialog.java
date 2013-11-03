@@ -1,7 +1,6 @@
 package au.com.vaadinutils.editors;
 
 import java.util.Iterator;
-import java.util.List;
 
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.event.ShortcutAction.KeyCode;
