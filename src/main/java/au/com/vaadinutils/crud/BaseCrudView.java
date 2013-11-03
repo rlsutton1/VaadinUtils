@@ -1,9 +1,11 @@
 package au.com.vaadinutils.crud;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.persistence.PersistenceException;
 import javax.validation.ConstraintViolationException;
@@ -16,7 +18,10 @@ import au.com.vaadinutils.listener.ClickEventLogged;
 import com.google.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
+import com.vaadin.addon.jpacontainer.JPAContainer.ProviderChangedEvent;
 import com.vaadin.data.Container.Filter;
+import com.vaadin.data.Container.ItemSetChangeEvent;
+import com.vaadin.data.Container.ItemSetChangeListener;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.Validator.InvalidValueException;
@@ -111,7 +116,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		{
 			container.setBuffered(true);
 			container.setFireContainerItemSetChangeEvents(true);
-			container.setAutoCommit(true);
+			// container.setAutoCommit(true);
 
 		}
 		catch (Exception e)
@@ -213,6 +218,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		addSaveAndCancelButtons();
 
 		editor = buildEditor(fieldGroup);
+		Preconditions.checkNotNull(editor, "Your editor implementation returned null!, you better create an editor. "
+				+ entityClass.getSimpleName());
 		mainEditPanel.addComponent(editor);
 
 		rightLayout.setVisible(false);
@@ -235,6 +242,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		return holder;
 	}
 
+	@SuppressWarnings("null")
 	private void buildActionLayout()
 	{
 		actionLayout = new HorizontalLayout();
@@ -403,7 +411,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 	protected AbstractLayout getAdvancedSearchLayout()
 	{
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -479,13 +486,13 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				Object entityId = entityTable.getValue();
 				if (entityId != null)
 				{
-					E entity = container.getItem(entityId).getEntity();
+					EntityItem<E> entity = container.getItem(entityId);
 
 					@SuppressWarnings("unchecked")
 					CrudAction<E> action = (CrudAction<E>) actionCombo.getValue();
 					if (interceptAction(action, entity))
 						action.exec(BaseCrudView.this, entity);
-
+container.refreshItem(entity.getItemId());
 					// actionCombo.select(actionCombo.getNullSelectionItemId());
 				}
 			}
@@ -570,7 +577,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 * @param entity
 	 * @return
 	 */
-	protected boolean interceptAction(CrudAction<E> action, E entity)
+	protected boolean interceptAction(CrudAction<E> action, EntityItem<E> entity)
 	{
 		return true;
 	}
@@ -594,6 +601,18 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		BaseCrudView.this.entityTable.select(null);
 		BaseCrudView.this.entityTable.select(previousItemId);
 		container.commit();
+
+		postDelete(entityId);
+	}
+
+	/**
+	 * hook for implements that need to do some additional cleanup after a
+	 * delete
+	 * 
+	 */
+	protected void postDelete(Object entityId)
+	{
+
 	}
 
 	protected void save()
@@ -611,7 +630,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				EntityItem<E> item = container.getItem(id);
 
 				fieldGroup.setItemDataSource(item);
-				entityTable.select(item.getItemId());
 				selected = true;
 
 				newEntity = null;
@@ -630,18 +648,21 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				}
 			}
 
+			// commit the row to the database, and retrieve the possibly new entity
+			E newEntity = commitContainerAndGetDataBaseId();
+
 			for (ChildCrudListener<E> commitListener : childCrudListeners)
 			{
-				commitListener.committed(entityTable.getCurrent());
+				commitListener.committed(newEntity);
 			}
 
-			EntityItem<E> current = entityTable.getCurrent();
-			if (current != null)
-			{
-				postSaveAction(current);
-			}
+			postSaveAction(newEntity);
 
-			container.commit();
+			// select has been moved to here because when it happens earlier,
+			// child cruds are caused to discard their data before saving it for
+			// a new record
+			entityTable.select(newEntity.getId());
+
 			splitPanel.showFirstComponet();
 			Notification.show("Changes Saved", "Any changes you have made have been saved.", Type.TRAY_NOTIFICATION);
 
@@ -687,9 +708,71 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 	}
 
-	protected void postSaveAction(EntityItem<E> entityItem)
+	/**
+	 * commits the container and retrieves the new recordid
+	 * 
+	 * we have to hook the ItemSetChangeListener to be able to get the database
+	 * id of a new record.
+	 */
+	private E commitContainerAndGetDataBaseId()
 	{
-		// TODO Auto-generated method stub
+		// don't really need an AtomicReference, just using it as a mutable
+		// final variable to be used in the callback
+		final AtomicReference<E> newId = new AtomicReference<E>();
+
+		// call back to collect the id of the new record when the container
+		// fires the ItemSetChangeEvent
+		ItemSetChangeListener tmp = new ItemSetChangeListener()
+		{
+
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 9132090066374531277L;
+
+			@Override
+			public void containerItemSetChange(ItemSetChangeEvent event)
+			{
+				if (event instanceof ProviderChangedEvent)
+				{
+					@SuppressWarnings("rawtypes")
+					ProviderChangedEvent pce = (ProviderChangedEvent) event;
+					@SuppressWarnings("unchecked")
+					Collection<E> affectedEntities = pce.getChangeEvent().getAffectedEntities();
+
+					if (affectedEntities.size() > 0)
+					{
+						@SuppressWarnings("unchecked")
+						E id = (E) affectedEntities.toArray()[0];
+						newId.set(id);
+						System.out.println("Found id");
+					}
+				}
+			}
+		};
+
+		try
+		{
+			// add the listener
+			container.addItemSetChangeListener(tmp);
+			// call commit
+			container.commit();
+		}
+		finally
+		{
+			// detach the listener
+			container.removeItemSetChangeListener(tmp);
+		}
+
+		// return the entity
+		return newId.get();
+	}
+
+	/**
+	 * called after a record has been committed to the database
+	 */
+	protected void postSaveAction(E entityItem)
+	{
 
 	}
 
@@ -951,27 +1034,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		formValidate();
 		fieldGroup.commit();
 
-		// try
-		// {
-		// if (!fieldGroup.isValid() || !valid())
-		// {
-		// Notification.show("Validation Errors",
-		// "Please fix any field errors and try again.",
-		// Type.WARNING_MESSAGE);
-		// }
-		// else
-		// {
-		// fieldGroup.commit();
-		//
-		// }
-		// }
-		// catch (CommitException e)
-		// {
-		// Notification.show("Error saving changes.",
-		// "Any error occured attempting to save your changes: " +
-		// e.getMessage(), Type.ERROR_MESSAGE);
-		// logger.error(e, e);
-		// }
 
 	}
 
@@ -1106,6 +1168,12 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	protected boolean isNew()
 	{
 		return this.newEntity != null;
+	}
+
+	public JPAContainer<E> getContainer()
+	{
+		return container;
+		
 	}
 
 }

@@ -1,5 +1,7 @@
 package au.com.vaadinutils.crud;
 
+import com.vaadin.addon.jpacontainer.EntityItem;
+
 public interface CrudAction<E extends CrudEntity>
 {
 	public String toString();
@@ -10,5 +12,5 @@ public interface CrudAction<E extends CrudEntity>
 	 */
 	public boolean isDefault();
 	
-	void exec(BaseCrudView<E> crud, E entity);
+	void exec(BaseCrudView<E> crud, EntityItem<E> entity);
 }

@@ -2,6 +2,7 @@ package au.com.vaadinutils.crud;
 
 import org.vaadin.dialogs.ConfirmDialog;
 
+import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.ui.UI;
 
 public class CrudActionDelete<E > implements CrudAction< CrudEntity>
@@ -9,10 +10,10 @@ public class CrudActionDelete<E > implements CrudAction< CrudEntity>
 	private boolean isDefault = true;
 	
 	@Override
-	public void exec(final BaseCrudView<CrudEntity> crud,CrudEntity entity)
+	public void exec(final BaseCrudView<CrudEntity> crud,EntityItem<CrudEntity> entity)
 	{
 		ConfirmDialog.show(UI.getCurrent(), "Confirm Delete",
-				"Are you sure you want to delete " + entity.getName()+"?", "Delete", "Cancel",
+				"Are you sure you want to delete " + entity.getEntity().getName()+"?", "Delete", "Cancel",
 				new ConfirmDialog.Listener()
 				{
 					private static final long serialVersionUID = 1L;

@@ -135,7 +135,13 @@ public class EntityTable<E> extends Table implements EntityList<E>
 		EntityItem<E> entity = null;
 		if (entityId != null)
 		{
+			try{
 			entity = this.entityContainer.getItem(entityId);
+			}
+			catch (Exception e)
+			{
+				logger.warn(e);
+			}
 		}
 
 		return entity;

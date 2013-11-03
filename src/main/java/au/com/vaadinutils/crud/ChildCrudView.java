@@ -87,7 +87,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public void committed(EntityItem<P> newParentId)
+	public void committed(P newParentId)
 	{
 		saveEditsToTemp();
 		for (Object id : container.getItemIds())
@@ -98,7 +98,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 			{
 				try
 				{
-					item.getItemProperty(childKey).setValue(translateParentId(newParentId.getEntity().getId()));
+					item.getItemProperty(childKey).setValue(translateParentId(newParentId.getId()));
 
 				}
 				catch (Exception e)
@@ -110,11 +110,12 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 			extendedChildCommitProcessing(newParentId, item);
 		}
 		container.commit();
+		container.refresh();
 		dirty = false;
 
 	}
 
-	protected void extendedChildCommitProcessing(EntityItem<P> newParentId, EntityItem<E> item)
+	protected void extendedChildCommitProcessing(P newParentId, EntityItem<E> item)
 	{
 		// TODO Auto-generated method stub
 
@@ -305,7 +306,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 			{
 				EntityItemProperty key = item.getItemProperty(parentKey);
 				Preconditions.checkNotNull(key, "parentKey " + parentKey + " doesn't exist in properties");
-				parentId = (Long) key.getValue();
+				parentId = key.getValue();
 				if (parentId != null)
 				{
 

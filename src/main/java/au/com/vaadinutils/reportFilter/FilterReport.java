@@ -64,7 +64,7 @@ public abstract class FilterReport extends ReportView
 				try
 				{
 
-					generateReport(OutputFormat.PDF);
+					generateReport(OutputFormat.HTML);
 				}
 				catch (UnsupportedEncodingException e)
 				{
@@ -78,6 +78,38 @@ public abstract class FilterReport extends ReportView
 		});
 
 		layout.addComponent(startButton);
+		
+		
+		Button pdfButton = new Button("Print Quality");
+		startButton.addClickListener(new ClickEventLogged.ClickListener()
+		{
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = -1313098616695130664L;
+
+			@Override
+			public void clicked(ClickEvent event)
+			{
+				try
+				{
+
+					generateReport(OutputFormat.PDF);
+				}
+				catch (UnsupportedEncodingException e)
+				{
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+			}
+
+			
+		});
+
+		layout.addComponent(pdfButton);
+		
+		
 		
 		Button csvButton = new Button("Export CSV");
 		csvButton.addClickListener(new ClickEventLogged.ClickListener()
