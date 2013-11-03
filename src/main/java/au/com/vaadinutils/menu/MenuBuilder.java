@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.google.common.base.Preconditions;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.View;
 import com.vaadin.ui.MenuBar;
@@ -30,7 +31,7 @@ public class MenuBuilder implements Serializable
 		for (final ViewMap viewmap : this.viewMap)
 		{
 			// We don't add a menu item from the default view.
-			if (!viewmap.getViewName().equals("")) 
+			if (!viewmap.getViewName().equals(""))
 			{
 				Menu menu = getMenuAnnotation(viewmap.getView());
 				if (menu != null)
@@ -48,14 +49,19 @@ public class MenuBuilder implements Serializable
 					// Append the menu item name to the end of the path
 					path += "." + menu.display();
 
-					String[] pathElements = path.split("\\.");
-					
+					final String[] pathElements = path.split("\\.");
+
 					if (pathElements.length == 2)
-						getMenuItem(menubar, viewmap.getViewName(), menu.display(), pathElements[1], false);
+					{
+						createLeafItem(menubar, menu.display(), viewmap);
+					}
 					else
 					{
-						MenuItem parentMenuItem = getMenuItem(menubar,  viewmap.getViewName(), pathElements[1], pathElements[1], true);
-						resursiveAdd(parentMenuItem, viewmap.getViewName(), menu.display(),
+						MenuItem parentMenuItem = getParentMenuItem(menubar, pathElements[1]);// ,
+																								// pathElements[1],
+																								// pathElements[1],
+																								// true);
+						resursiveAdd(parentMenuItem, viewmap, menu.display(),
 								Arrays.copyOfRange(pathElements, 2, pathElements.length));
 					}
 				}
@@ -63,6 +69,19 @@ public class MenuBuilder implements Serializable
 		}
 		return menubar;
 
+	}
+
+	private void createLeafItem(MenuBar menubar, final String displayName, final ViewMap viewmap)
+	{
+		menubar.addItem(displayName, new MenuBar.Command()
+		{
+			private static final long serialVersionUID = 1L;
+
+			public void menuSelected(MenuItem selectedItem)
+			{
+				UI.getCurrent().getNavigator().navigateTo(viewmap.getViewName());
+			}
+		});
 	}
 
 	/**
@@ -74,10 +93,10 @@ public class MenuBuilder implements Serializable
 	 * @param menuItem
 	 * 
 	 * @param menubar
-	 * @param menuName
+	 * @param displayName
 	 * @param pathElements
 	 */
-	private void resursiveAdd(MenuItem menuItem, final String viewName, String menuName, String[] pathElements)
+	private void resursiveAdd(MenuItem menuItem, final ViewMap viewmap, String displayName, String[] pathElements)
 	{
 		if (pathElements.length > 0)
 		{
@@ -86,63 +105,95 @@ public class MenuBuilder implements Serializable
 				// Time to insert the actual menu item
 
 				// First see if the item is already on the menubar
-				menuItem.addItem(menuName, new MenuBar.Command()
-				{
-					private static final long serialVersionUID = 1L;
-
-					public void menuSelected(MenuItem selectedItem)
-					{
-						navigator.navigateTo(viewName);
-					}
-				});
+				createLeafItem(menuItem, displayName, viewmap);
 			}
 			else
 			{
 				// We need to navigate down further
 				String currentPath = pathElements[0];
-				MenuItem currentItem = getMenuItem(menuItem, currentPath, currentPath);
+				MenuItem currentItem = getMenuItem(menuItem, currentPath); // ,
+																			// currentPath);
 
-				resursiveAdd(currentItem, viewName, menuName, Arrays.copyOfRange(pathElements, 1, pathElements.length));
+				Preconditions.checkNotNull(currentItem);
+
+				resursiveAdd(currentItem, viewmap, displayName, Arrays.copyOfRange(pathElements, 1, pathElements.length));
 
 			}
 		}
 
 	}
 
-	private MenuItem getMenuItem(MenuItem parentItem, final String menuName, String currentPath)
+	private void createLeafItem(MenuItem menuItem, String displayName, final ViewMap viewmap)
 	{
-		MenuItem currentItem = findMenuItem(parentItem.getChildren(), currentPath);
-		if (currentItem != null)
+		menuItem.addItem(displayName, new MenuBar.Command()
 		{
-			currentItem = parentItem.addItem(menuName, new MenuBar.Command()
+			private static final long serialVersionUID = 1L;
+
+			public void menuSelected(MenuItem selectedItem)
 			{
-				private static final long serialVersionUID = 1L;
+				navigator.navigateTo(viewmap.getViewName());
+			}
+		});
+	}
 
-				public void menuSelected(MenuItem selectedItem)
-				{
-					UI.getCurrent().getNavigator().navigateTo(menuName);
-				}
-			});
+	/**
+	 * Searches for a menu item. If it doesn't exist it will be created.
+	 * 
+	 * @param parentItem
+	 * @param displayName
+	 * @param currentPath
+	 * @return
+	 */
+	private MenuItem getMenuItem(MenuItem parentItem, final String displayName) // ,
+																				// String
+																				// currentPath)
+	{
+		MenuItem currentItem = findMenuItem(parentItem.getChildren(), displayName);
 
+		if (currentItem == null)
+		{
+			currentItem = parentItem.addItem(displayName, null);
 		}
+		// if (currentItem != null)
+		// {
+		// currentItem = parentItem.addItem(menuName, new MenuBar.Command()
+		// {
+		// private static final long serialVersionUID = 1L;
+		//
+		// public void menuSelected(MenuItem selectedItem)
+		// {
+		// UI.getCurrent().getNavigator().navigateTo(menuName);
+		// }
+		// });
+		//
+		// }
 		return currentItem;
 	}
 
-	private MenuItem getMenuItem(MenuBar parentItem, final String viewName, final String displayName, String currentPath, final boolean parent)
+	/**
+	 * Searches for a parement menu item. If it doesn't exist it will be
+	 * created.
+	 * 
+	 * @param parentItem
+	 * @param menuName
+	 * @param currentPath
+	 * @return
+	 */
+	private MenuItem getParentMenuItem(MenuBar parentItem, final String displayName) // ,
+																				// String
+																				// currentPath)
 	{
-		MenuItem currentItem = findMenuItem(parentItem.getItems(), currentPath);
+		MenuItem currentItem = findMenuItem(parentItem.getItems(), displayName);
 		if (currentItem == null)
 		{
-			currentItem = parentItem.addItem(displayName, new MenuBar.Command()
-			{
-				private static final long serialVersionUID = 1L;
-
-				public void menuSelected(MenuItem selectedItem)
-				{
-					if (!parent)
-						UI.getCurrent().getNavigator().navigateTo(viewName);
-				}
-			});
+			currentItem = parentItem.addItem(displayName, null);
+			/*
+			 * , new MenuBar.Command() { private static final long
+			 * serialVersionUID = 1L;
+			 * 
+			 * public void menuSelected(MenuItem selectedItem) { if (!parent)
+			 * UI.getCurrent().getNavigator().navigateTo(viewName); } });
+			 */
 
 		}
 		return currentItem;
@@ -151,12 +202,16 @@ public class MenuBuilder implements Serializable
 	private MenuItem findMenuItem(List<MenuItem> list, String currentPath)
 	{
 		MenuItem currentItem = null;
-		for (MenuItem menuItem : list)
+
+		if (list != null)
 		{
-			if (menuItem.getText().equals(currentPath))
+			for (MenuItem menuItem : list)
 			{
-				currentItem = menuItem;
-				break;
+				if (menuItem.getText().equals(currentPath))
+				{
+					currentItem = menuItem;
+					break;
+				}
 			}
 		}
 		return currentItem;
