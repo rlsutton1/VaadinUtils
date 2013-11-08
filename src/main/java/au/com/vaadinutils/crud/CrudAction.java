@@ -1,8 +1,10 @@
 package au.com.vaadinutils.crud;
 
+import java.io.Serializable;
+
 import com.vaadin.addon.jpacontainer.EntityItem;
 
-public interface CrudAction<E extends CrudEntity>
+public interface CrudAction<E extends CrudEntity> extends Serializable
 {
 	public String toString();
 	
