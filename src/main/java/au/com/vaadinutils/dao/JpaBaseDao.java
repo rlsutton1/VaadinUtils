@@ -5,21 +5,16 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.persistence.Table;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import javax.persistence.criteria.Subquery;
-import javax.persistence.metamodel.EntityType;
 import javax.persistence.metamodel.SingularAttribute;
 
 import com.google.common.base.Preconditions;
-import com.vaadin.addon.jpacontainer.EntityProvider;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.JPAContainerFactory;
-import com.vaadin.addon.jpacontainer.provider.CachingBatchableLocalEntityProvider;
 
 public class JpaBaseDao<E, K> implements Dao<E, K>
 {
@@ -166,13 +161,12 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 	public JPAContainer<E> createVaadinContainer()
 	{
-
-//		
 		JPAContainer<E> container = new JPAContainer<E>(entityClass);
 		container.setEntityProvider(new BatchingPerRequestEntityProvider<E>(entityClass));
 		return container;
 
 	}
+	@SuppressWarnings("unused")
 	private void oldCreateVaadinContainer()
 	{
 		 JPAContainerFactory.makeBatchable(entityClass, EntityManagerProvider.getEntityManager());
@@ -196,5 +190,33 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		return result;
 
 	}
+	
+	/**
+	 * @return the number of entities in the table.
+	 */
+	public long getCount()
+	{
+		String entityName = entityClass.getSimpleName();
+		Table annotation = entityClass.getAnnotation(Table.class);
+		String tableName;
+		if (annotation != null)
+			tableName = annotation.name();
+		else
+			tableName = entityName;
+
+		String qry = "select count(" + entityName + ") from " + tableName + " " + entityName;
+		Query query = entityManager.createQuery(qry);
+		Number countResult=(Number) query.getSingleResult();
+		return countResult.longValue();
+
+	}
+	
+	public void flush()
+	{
+		this.entityManager.flush();
+
+	}
+
+
 
 }

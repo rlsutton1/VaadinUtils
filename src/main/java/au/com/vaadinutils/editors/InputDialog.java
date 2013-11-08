@@ -23,7 +23,6 @@ public class InputDialog extends Window implements InputFormDialogRecipient
 
 		field.setCaption(question);
 		form.addComponent(field);
-		
 		new InputFormDialog(parent, title, field,  form, this);
 	}
 
