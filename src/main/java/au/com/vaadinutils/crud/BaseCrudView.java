@@ -250,7 +250,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 		HorizontalLayout actionArea = new HorizontalLayout();
 		actionArea.setSpacing(true);
-		Label applyLabel = new Label(" Action");
+		Label applyLabel = new Label("Action");
 		actionArea.addComponent(applyLabel);
 		actionArea.setComponentAlignment(applyLabel, Alignment.MIDDLE_LEFT);
 
@@ -288,6 +288,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 		actionLayout.addComponent(newButton);
 		actionLayout.setComponentAlignment(newButton, Alignment.MIDDLE_RIGHT);
+
+
 
 		actionLayout.setHeight("35");
 	}
