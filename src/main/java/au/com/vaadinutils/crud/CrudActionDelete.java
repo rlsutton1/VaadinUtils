@@ -7,6 +7,7 @@ import com.vaadin.ui.UI;
 
 public class CrudActionDelete<E > implements CrudAction< CrudEntity>
 {
+	private static final long serialVersionUID = 1L;
 	private boolean isDefault = true;
 	
 	@Override
