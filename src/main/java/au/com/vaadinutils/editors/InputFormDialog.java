@@ -21,6 +21,9 @@ import com.vaadin.ui.Window;
 public class InputFormDialog extends Window
 {
 
+	private HorizontalLayout buttons;
+	private Button cancelButton;
+
 	public InputFormDialog(final UI parent, String title, Field<?> primaryFocusField, final FormLayout form,
 			final InputFormDialogRecipient recipient)
 	{
@@ -34,17 +37,20 @@ public class InputFormDialog extends Window
 		layout.setSizeUndefined();
 		layout.addComponent(form);
 
-		HorizontalLayout buttons = new HorizontalLayout();
+		buttons = new HorizontalLayout();
 		buttons.setSpacing(true);
 
-		buttons.addComponent(new Button("Cancel", new Button.ClickListener()
+		cancelButton = new Button("Cancel", new Button.ClickListener()
 		{
 			public void buttonClick(ClickEvent event)
 			{
-				recipient.onCancel();
-				close();
+				if (recipient.onCancel())
+				{
+					close();
+				}
 			}
-		}));
+		});
+		buttons.addComponent(cancelButton);
 
 		Button ok = new Button("Ok", new Button.ClickListener()
 		{
@@ -58,8 +64,10 @@ public class InputFormDialog extends Window
 						Field<?> field = (Field<?>) itr.next();
 						field.validate();
 					}
-					recipient.onOK();
-					close();
+					if (recipient.onOK())
+					{
+						close();
+					}
 				}
 				catch (InvalidValueException e)
 				{
@@ -79,5 +87,10 @@ public class InputFormDialog extends Window
 		parent.addWindow(this);
 
 		primaryFocusField.focus();
+	}
+
+	public void okOnly()
+	{
+		buttons.removeComponent(cancelButton);
 	}
 }

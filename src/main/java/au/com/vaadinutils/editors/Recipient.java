@@ -2,7 +2,16 @@ package au.com.vaadinutils.editors;
 
 public interface Recipient
 {
-	public void onOK(String input);
+	/** 
+	 * 
+	 * @param input
+	 * @return true if the dialog should be closed
+	 */
+	public boolean onOK(String input);
 
-	public void onCancel();
+	/**
+	 * 
+	 * @return true if the dialog should be closed
+	 */
+	public boolean onCancel();
 }

@@ -23,7 +23,6 @@ public class InputDialog extends Window implements InputFormDialogRecipient
 
 		field.setCaption(question);
 		form.addComponent(field);
-	
 		new InputFormDialog(parent, title, field,  form, this);
 	}
 
@@ -42,17 +41,17 @@ public class InputDialog extends Window implements InputFormDialogRecipient
 
 
 	@Override
-	public void onOK()
+	public boolean onOK()
 	{
-		recipient.onOK(field.getValue());
+		return recipient.onOK(field.getValue());
 		
 	}
 
 
 	@Override
-	public void onCancel()
+	public boolean onCancel()
 	{
-		recipient.onCancel();
+		return recipient.onCancel();
 		
 	}
 }

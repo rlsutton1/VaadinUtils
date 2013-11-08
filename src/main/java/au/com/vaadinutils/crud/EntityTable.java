@@ -27,6 +27,7 @@ public class EntityTable<E> extends Table implements EntityList<E>
 	{
 		this.entityContainer = entityContainer;
 		this.visibleColumns = headingPropertySet;
+		
 	}
 
 	public void setRowChangeListener(RowChangeListener<E> rowChangeListener)
