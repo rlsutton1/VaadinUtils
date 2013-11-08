@@ -26,4 +26,6 @@ public interface EntityList<E> extends Component
 	public Object getCurrentPageFirstItemId();
 
 	public Object prevItemId(Object entityId);
+
+	public void setColumnCollapsingAllowed(boolean b);
 }

@@ -2,7 +2,7 @@ package au.com.vaadinutils.editors;
 
 public interface InputFormDialogRecipient
 {
-	public void onOK();
+	public boolean onOK();
 
-	public void onCancel();
+	public boolean onCancel();
 }

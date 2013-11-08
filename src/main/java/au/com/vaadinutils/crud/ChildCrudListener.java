@@ -9,8 +9,9 @@ public interface ChildCrudListener<E>
 	 * this method is invoked when the parent saves, signalling the children
 	 * that they too should save. The parent entity is provied so that the child
 	 * crud can retrieve the parent key (for new records)
+	 * @throws Exception 
 	 */
-	public void committed(E newEntity);
+	public void committed(E newEntity) throws Exception;
 
 	/**
 	 * called by the parent when the parent changes row, allowing the child to
@@ -26,5 +27,7 @@ public interface ChildCrudListener<E>
 	 * @return
 	 */
 	public boolean isDirty();
+
+	public void validateFieldz();
 
 }

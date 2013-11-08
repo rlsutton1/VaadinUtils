@@ -131,6 +131,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		entityTable = getTable(container, headings);
 		entityTable.setRowChangeListener(this);
 		entityTable.setSortEnabled(true);
+		entityTable.setColumnCollapsingAllowed(true);
 
 		initLayout();
 		entityTable.init();
@@ -433,7 +434,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 * 
 	 * @param show
 	 */
-	private void enableActions(boolean enabled)
+	void enableActions(boolean enabled)
 	{
 		applyButton.setEnabled(enabled);
 		actionCombo.setEnabled(enabled);
@@ -620,7 +621,7 @@ container.refreshItem(entity.getItemId());
 		boolean selected = false;
 		try
 		{
-			commit();
+			commitFieldGroup();
 
 			if (newEntity != null)
 			{
@@ -667,22 +668,7 @@ container.refreshItem(entity.getItemId());
 			Notification.show("Changes Saved", "Any changes you have made have been saved.", Type.TRAY_NOTIFICATION);
 
 		}
-		catch (PersistenceException e)
-		{
-			logger.error(e, e);
-			Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
-		}
-		catch (ConstraintViolationException e)
-		{
-			logger.error(e, e);
-			FormHelper.showConstraintViolation(e);
-		}
-		catch (InvalidValueException e)
-		{
-			logger.error(e, e);
-			Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
-		}
-		catch (CommitException e)
+		catch (Exception e)
 		{
 			if (e.getCause() instanceof InvalidValueException)
 			{
@@ -1029,10 +1015,14 @@ container.refreshItem(entity.getItemId());
 		splitPanel.setSecondComponent(pane);
 	}
 
-	protected void commit() throws CommitException
+	protected void commitFieldGroup() throws CommitException
 	{
 		formValidate();
 		fieldGroup.commit();
+		for (ChildCrudListener<E> child:childCrudListeners)
+		{
+			child.validateFieldz();
+		}
 
 
 	}

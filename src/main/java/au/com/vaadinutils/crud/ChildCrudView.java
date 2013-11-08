@@ -5,6 +5,7 @@ import javax.persistence.metamodel.SingularAttribute;
 import javax.validation.ConstraintViolationException;
 
 import org.apache.log4j.Logger;
+import org.vaadin.dialogs.ConfirmDialog;
 
 import com.google.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.EntityItem;
@@ -16,6 +17,7 @@ import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.data.util.filter.Compare;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.Notification.Type;
 
 /**
@@ -84,10 +86,12 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	/**
 	 * this method is invoked when the parent saves, signaling the children that
 	 * they too should save.
+	 * 
+	 * @throws Exception
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public void committed(P newParentId)
+	public void committed(P newParentId) throws Exception
 	{
 		saveEditsToTemp();
 		for (Object id : container.getItemIds())
@@ -115,7 +119,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 
 	}
 
-	protected void extendedChildCommitProcessing(P newParentId, EntityItem<E> item)
+	protected void extendedChildCommitProcessing(P newParentId, EntityItem<E> item) throws Exception
 	{
 		// TODO Auto-generated method stub
 
@@ -140,45 +144,129 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 
 	}
 
+	public void validateFieldz()
+	{
+		try
+		{
+			if (!fieldGroup.isValid())
+			{
+
+				throw new InvalidValueException("Fields are invalid");
+
+			}
+		}
+		catch (InvalidValueException e)
+		{
+			throw e;
+		}
+	}
+
+	
+	public void allowRowChange(final RowChangeCallback callback)
+	{
+		try
+		{
+			if (!fieldGroup.isValid())
+			{
+
+				throw new InvalidValueException("Fields are invalid");
+
+			}
+		}
+		catch (InvalidValueException e)
+		{
+			ConfirmDialog
+			.show(UI.getCurrent(),
+					"Field Erros",
+					e.getMessage()+". Continuing will result in those changes being discarded. ",
+					"Continue", "Cancel", new ConfirmDialog.Listener()
+					{
+						private static final long serialVersionUID = 1L;
+
+						public void onClose(ConfirmDialog dialog)
+						{
+							if (dialog.isConfirmed())
+							{
+								/*
+								 * When an entity is selected from the
+								 * list, we want to show that in our
+								 * editor on the right. This is nicely
+								 * done by the FieldGroup that binds all
+								 * the fields to the corresponding
+								 * Properties in our entity at once.
+								 */
+								fieldGroup.discard();
+								if (restoreDelete)
+								{
+									enableActions(true);
+									restoreDelete = false;
+								}
+
+								newEntity = null;
+
+								callback.allowRowChange();
+
+							}
+							else
+							{
+								// User did not confirm so don't allow
+								// the change.
+
+							}
+						}
+					});
+			return;
+		}
+		callback.allowRowChange();
+
+	}
+
 	protected void newClicked()
 	{
 		/*
 		 * Rows in the Container data model are called Item. Here we add a new
 		 * row in the beginning of the list.
 		 */
-
-		try
+		allowRowChange(new RowChangeCallback()
 		{
-			saveEditsToTemp();
-			resetFilters();
 
-			newEntity = container.createEntityItem(entityClass.newInstance());
-			rowChanged(newEntity);
-			// Can't delete when you are adding a new record.
-			// Use cancel instead.
-			if (applyButton.isVisible())
+			@Override
+			public void allowRowChange()
 			{
-				restoreDelete = true;
-				showActions(false);
-				actionLayout.setVisible(true);
-			}
+				try
+				{
+					saveEditsToTemp();
+					resetFilters();
 
-			rightLayout.setVisible(true);
-		}
-		catch (ConstraintViolationException e)
-		{
-			FormHelper.showConstraintViolation(e);
-		}
-		catch (InstantiationException e)
-		{
-			logger.error(e, e);
-			throw new RuntimeException(e);
-		}
-		catch (IllegalAccessException e)
-		{
-			logger.error(e, e);
-			throw new RuntimeException(e);
-		}
+					newEntity = container.createEntityItem(entityClass.newInstance());
+					rowChanged(newEntity);
+					// Can't delete when you are adding a new record.
+					// Use cancel instead.
+					if (applyButton.isVisible())
+					{
+						restoreDelete = true;
+						showActions(false);
+						actionLayout.setVisible(true);
+					}
+
+					rightLayout.setVisible(true);
+				}
+				catch (ConstraintViolationException e)
+				{
+					FormHelper.showConstraintViolation(e);
+				}
+				catch (InstantiationException e)
+				{
+					logger.error(e, e);
+					throw new RuntimeException(e);
+				}
+				catch (IllegalAccessException e)
+				{
+					logger.error(e, e);
+					throw new RuntimeException(e);
+				}
+			}
+		});
 	}
 
 	/**
@@ -207,7 +295,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 			if (fieldGroup.isModified())
 			{
 				dirty = true;
-				commit();
+				commitFieldGroup();
 			}
 
 			if (newEntity != null)
@@ -277,16 +365,16 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 			}
 		}
 
-//		finally
-//		{
-//			if (newEntity != null)
-//			{
-//				if (entityTable.getCurrent() != null)
-//				{
-//					container.removeItem(entityTable.getCurrent());
-//				}
-//			}
-//		}
+		// finally
+		// {
+		// if (newEntity != null)
+		// {
+		// if (entityTable.getCurrent() != null)
+		// {
+		// container.removeItem(entityTable.getCurrent());
+		// }
+		// }
+		// }
 
 	}
 
@@ -374,7 +462,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	{
 		return parentId;
 	}
-	
+
 	protected Component getTitle()
 	{
 		// no title in child cruds

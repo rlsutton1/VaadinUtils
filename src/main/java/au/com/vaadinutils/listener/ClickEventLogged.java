@@ -2,6 +2,10 @@ package au.com.vaadinutils.listener;
 
 import org.apache.log4j.Logger;
 
+import com.vaadin.ui.Notification.Type;
+
+import com.vaadin.ui.Notification;
+
 public class ClickEventLogged
 {
 	static public abstract class ClickListener implements com.vaadin.ui.Button.ClickListener
@@ -22,7 +26,7 @@ public class ClickEventLogged
 			catch (Throwable e)
 			{
 				logger.error(e, e);
-				throw new RuntimeException(e);
+				Notification.show(e.getMessage(),Type.ERROR_MESSAGE);
 			}
 
 		}
