@@ -1057,10 +1057,14 @@ container.refreshItem(entity.getItemId());
 			entity = newEntity.getEntity();
 		if (entity == null)
 		{
-			entity = entityTable.getCurrent().getEntity();
+			EntityItem<E> entityItem = entityTable.getCurrent();
+			if (entityItem != null)
+			{
+				entity = entityItem.getEntity();
+			}
 		}
-		return entity;
 
+		return entity;
 	}
 
 	/**
