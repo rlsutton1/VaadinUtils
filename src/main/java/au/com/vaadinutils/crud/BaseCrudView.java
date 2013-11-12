@@ -290,6 +290,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		actionLayout.addComponent(newButton);
 		actionLayout.setComponentAlignment(newButton, Alignment.MIDDLE_RIGHT);
 
+
+
 		actionLayout.setHeight("35");
 	}
 
