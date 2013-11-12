@@ -678,7 +678,7 @@ container.refreshItem(entity.getItemId());
 			else
 			{
 				logger.error(e, e);
-				Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
+				Notification.show(e.getClass().getSimpleName()+ " " +e.getMessage(), Type.ERROR_MESSAGE);
 			}
 		}
 		finally
