@@ -2,9 +2,8 @@ package au.com.vaadinutils.listener;
 
 import org.apache.log4j.Logger;
 
-import com.vaadin.ui.Notification.Type;
-
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.Notification.Type;
 
 public class ClickEventLogged
 {

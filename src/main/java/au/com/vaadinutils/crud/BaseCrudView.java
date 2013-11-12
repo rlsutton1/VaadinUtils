@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
-import javax.persistence.PersistenceException;
 import javax.validation.ConstraintViolationException;
 
 import org.apache.log4j.Logger;
