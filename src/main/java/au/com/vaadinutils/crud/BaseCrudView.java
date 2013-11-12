@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javax.persistence.PersistenceException;
 import javax.validation.ConstraintViolationException;
 
 import org.apache.log4j.Logger;
@@ -250,7 +251,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 		HorizontalLayout actionArea = new HorizontalLayout();
 		actionArea.setSpacing(true);
-		Label applyLabel = new Label(" Action");
+		Label applyLabel = new Label("Action");
 		actionArea.addComponent(applyLabel);
 		actionArea.setComponentAlignment(applyLabel, Alignment.MIDDLE_LEFT);
 
