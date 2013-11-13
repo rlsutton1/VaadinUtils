@@ -229,6 +229,9 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 
 	}
 
+	/**
+	 * used to prevent cascading saves when new is clicked
+	 */
 	boolean inNew = false;
 
 	@Override
@@ -333,6 +336,9 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 
 	}
 
+	/**
+	 * used to prevent cascading save calls
+	 */
 	boolean saving = false;
 
 	protected void saveEditsToTemp()
@@ -424,6 +430,9 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 
 	}
 
+	/**
+	 * used to prevent cascading rowChange events
+	 */
 	boolean preventRowChangeCascade = false;
 
 	/**

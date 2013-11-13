@@ -303,8 +303,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	protected List<CrudAction<E>> getCrudActions()
 	{
 		List<CrudAction<E>> actions = new LinkedList<CrudAction<E>>();
-		@SuppressWarnings("unchecked")
-		CrudAction<E> crudAction = ((CrudAction<E>) new CrudActionDelete<E>());
+		CrudAction<E> crudAction =  new CrudActionDelete<E>();
 		actions.add(crudAction);
 
 		return actions;
