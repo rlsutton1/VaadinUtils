@@ -119,9 +119,11 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	protected void extendedChildCommitProcessing(P newParentId, EntityItem<E> item) throws Exception
 	{
-		// TODO Auto-generated method stub
 
 	}
 
@@ -161,12 +163,21 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 		}
 	}
 
-	
+	@Override
+	protected void enableActions(boolean enabled)
+	{
+		applyButton.setEnabled(enabled);
+		actionCombo.setEnabled(enabled);
+
+		// for child new is always enabled
+		newButton.setEnabled(true);
+	}
+
 	public void allowRowChange(final RowChangeCallback callback)
 	{
 		try
 		{
-			if (!fieldGroup.isValid())
+			if (isDirty() && !fieldGroup.isValid())
 			{
 
 				throw new InvalidValueException("Fields are invalid");
@@ -175,11 +186,9 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 		}
 		catch (InvalidValueException e)
 		{
-			ConfirmDialog
-			.show(UI.getCurrent(),
-					"Field Erros",
-					e.getMessage()+". Continuing will result in those changes being discarded. ",
-					"Continue", "Cancel", new ConfirmDialog.Listener()
+			ConfirmDialog.show(UI.getCurrent(), "Field Errors", e.getMessage()
+					+ ". Continuing will result in those changes being discarded. ", "Continue", "Cancel",
+					new ConfirmDialog.Listener()
 					{
 						private static final long serialVersionUID = 1L;
 
@@ -188,11 +197,10 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 							if (dialog.isConfirmed())
 							{
 								/*
-								 * When an entity is selected from the
-								 * list, we want to show that in our
-								 * editor on the right. This is nicely
-								 * done by the FieldGroup that binds all
-								 * the fields to the corresponding
+								 * When an entity is selected from the list, we
+								 * want to show that in our editor on the right.
+								 * This is nicely done by the FieldGroup that
+								 * binds all the fields to the corresponding
 								 * Properties in our entity at once.
 								 */
 								fieldGroup.discard();
@@ -221,8 +229,39 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 
 	}
 
+	boolean inNew = false;
+
+	@Override
+	public void rowChanged(EntityItem<E> item)
+	{
+		if (preventRowChangeCascade == false && !inNew)
+		{
+			try
+			{
+				preventRowChangeCascade = true;
+				saveEditsToTemp();
+				// fieldGroup.discard();
+				// container.discard();
+				// dirty = false;
+				super.rowChanged(item);
+				enableActions(true);
+			}
+			finally
+			{
+				preventRowChangeCascade = false;
+			}
+		}
+		else
+		{
+
+			super.rowChanged(item);
+		}
+
+	}
+
 	protected void newClicked()
 	{
+
 		/*
 		 * Rows in the Container data model are called Item. Here we add a new
 		 * row in the beginning of the list.
@@ -235,17 +274,20 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 			{
 				try
 				{
+					inNew = true;
 					saveEditsToTemp();
 					resetFilters();
 
 					newEntity = container.createEntityItem(entityClass.newInstance());
-					rowChanged(newEntity);
+
+					// if we call the overriden version we loop indefinately
+					ChildCrudView.super.rowChanged(newEntity);
 					// Can't delete when you are adding a new record.
 					// Use cancel instead.
 					if (applyButton.isVisible())
 					{
 						restoreDelete = true;
-						showActions(false);
+						enableActions(false);
 						actionLayout.setVisible(true);
 					}
 
@@ -265,8 +307,13 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 					logger.error(e, e);
 					throw new RuntimeException(e);
 				}
+				finally
+				{
+					inNew = false;
+				}
 			}
 		});
+
 	}
 
 	/**
@@ -286,97 +333,98 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 
 	}
 
+	boolean saving = false;
+
 	protected void saveEditsToTemp()
 	{
-		try
-		{
-			// if a row is saved in the childCrud, then it is dirty for the
-			// purposes of the parent crud
-			if (fieldGroup.isModified())
+		if (saving == false)
+			try
 			{
-				dirty = true;
-				commitFieldGroup();
-			}
-
-			if (newEntity != null)
-			{
-				interceptSaveValues(newEntity);
-
-				Object id = container.addEntity(newEntity.getEntity());
-				EntityItem<E> item = container.getItem(id);
-				// container.commit();
-
-				fieldGroup.setItemDataSource(item);
-				entityTable.select(item.getItemId());
-				// If we leave the save button active, clicking it again
-				// duplicates the record
-				// rightLayout.setVisible(false);
-			}
-			else
-			{
-				EntityItem<E> current = entityTable.getCurrent();
-				if (current != null)
+				saving = true;
+				// if a row is saved in the childCrud, then it is dirty for the
+				// purposes of the parent crud
+				if (fieldGroup.isModified())
 				{
-					interceptSaveValues(current);
-					// container.commit();
-				}
-			}
+					dirty = true;
+					commitFieldGroup();
 
-			if (newEntity != null)
-			{
-				newEntity = null;
-				if (restoreDelete)
-				{
-					showActions(true);
-					restoreDelete = false;
-				}
-			}
-			splitPanel.showFirstComponet();
-			// Notification.show("Changes Saved",
-			// "Any changes you have made have been saved.",
-			// Type.TRAY_NOTIFICATION);
+					if (newEntity != null)
+					{
+						interceptSaveValues(newEntity);
 
-		}
-		catch (PersistenceException e)
-		{
-			logger.error(e, e);
-			Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
-		}
-		catch (ConstraintViolationException e)
-		{
-			logger.error(e, e);
-			FormHelper.showConstraintViolation(e);
-		}
-		catch (InvalidValueException e)
-		{
-			logger.error(e, e);
-			Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
-		}
-		catch (CommitException e)
-		{
-			if (e.getCause() instanceof InvalidValueException)
-			{
-				Notification.show("Please fix the form errors and then try again.", Type.ERROR_MESSAGE);
+						Object id = container.addEntity(newEntity.getEntity());
+						EntityItem<E> item = container.getItem(id);
+						// container.commit();
+
+						fieldGroup.setItemDataSource(item);
+						entityTable.select(item.getItemId());
+						// If we leave the save button active, clicking it again
+						// duplicates the record
+						// rightLayout.setVisible(false);
+					}
+					else
+					{
+						EntityItem<E> current = entityTable.getCurrent();
+						if (current != null)
+						{
+							interceptSaveValues(current);
+							// container.commit();
+						}
+					}
+				}
+				// Notification.show("Changes Saved",
+				// "Any changes you have made have been saved.",
+				// Type.TRAY_NOTIFICATION);
+
 			}
-			else
+			catch (PersistenceException e)
 			{
 				logger.error(e, e);
 				Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
 			}
-		}
+			catch (ConstraintViolationException e)
+			{
+				logger.error(e, e);
+				FormHelper.showConstraintViolation(e);
+			}
+			catch (InvalidValueException e)
+			{
+				logger.error(e, e);
+				Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
+			}
+			catch (CommitException e)
+			{
+				if (e.getCause() instanceof InvalidValueException)
+				{
+					Notification.show("Please fix the form errors and then try again.", Type.ERROR_MESSAGE);
+				}
+				else
+				{
+					logger.error(e, e);
+					Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
+				}
+			}
 
-		// finally
-		// {
-		// if (newEntity != null)
-		// {
-		// if (entityTable.getCurrent() != null)
-		// {
-		// container.removeItem(entityTable.getCurrent());
-		// }
+			finally
+			{
+				if (newEntity != null)
+				{
+					newEntity = null;
+					if (restoreDelete)
+					{
+						enableActions(true);
+						restoreDelete = false;
+					}
+				}
+				splitPanel.showFirstComponet();
+				saving = false;
+			}
 		// }
 		// }
 
 	}
+
+	boolean preventRowChangeCascade = false;
 
 	/**
 	 * this method is called when the parent crud changes row, so we set filters

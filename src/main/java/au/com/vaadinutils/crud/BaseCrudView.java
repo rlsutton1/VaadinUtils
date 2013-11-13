@@ -65,7 +65,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	protected boolean restoreDelete;
 
 	protected TextField searchField = new TextField();
-	private Button newButton = new Button("New");
+	protected Button newButton = new Button("New");
 	protected Button applyButton = new Button("Apply");
 	private Button saveButton = new Button("Save");
 	private Button cancelButton = new Button("Cancel");
@@ -96,7 +96,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	protected Set<ChildCrudListener<E>> childCrudListeners = new HashSet<ChildCrudListener<E>>();
 	private CrudDisplayMode displayMode = CrudDisplayMode.HORIZONTAL;
 	protected HorizontalLayout actionLayout;
-	private ComboBox actionCombo;
+	protected ComboBox actionCombo;
 
 	protected BaseCrudView()
 	{
@@ -416,18 +416,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		return null;
 	}
 
-	/**
-	 * Call this method during buildEditor to suppress the action combo and
-	 * Apply button. They are displayed by default.
-	 * 
-	 * @param show
-	 */
-	protected void showActions(boolean show)
-	{
-		actionLayout.setVisible(show);
-		applyButton.setVisible(show);
-		actionCombo.setVisible(show);
-	}
 
 	/**
 	 * Used when creating a 'new' record to disable actions such as 'new' and
@@ -435,7 +423,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 * 
 	 * @param show
 	 */
-	void enableActions(boolean enabled)
+	protected void enableActions(boolean enabled)
 	{
 		applyButton.setEnabled(enabled);
 		actionCombo.setEnabled(enabled);
@@ -1057,10 +1045,13 @@ container.refreshItem(entity.getItemId());
 			entity = newEntity.getEntity();
 		if (entity == null)
 		{
-			entity = entityTable.getCurrent().getEntity();
+			EntityItem<E> entityItem = entityTable.getCurrent();
+			if (entityItem != null)
+			{
+				entity = entityItem.getEntity();
+			}
 		}
 		return entity;
-
 	}
 
 	/**
