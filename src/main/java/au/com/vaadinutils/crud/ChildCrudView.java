@@ -331,7 +331,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	 * for child crud, save is implied when the row changes
 	 */
 	@Override
-	protected void save()
+	public void save()
 	{
 
 	}

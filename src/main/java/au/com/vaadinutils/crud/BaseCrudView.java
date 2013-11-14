@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
-import javax.persistence.PersistenceException;
+import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
 import org.apache.log4j.Logger;
@@ -243,6 +243,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		return holder;
 	}
 
+	@SuppressWarnings("null")
 	private void buildActionLayout()
 	{
 		actionLayout = new HorizontalLayout();
@@ -604,7 +605,7 @@ container.refreshItem(entity.getItemId());
 
 	}
 
-	protected void save()
+	public void save()
 	{
 		boolean selected = false;
 		try
@@ -662,6 +663,17 @@ container.refreshItem(entity.getItemId());
 			{
 				Notification.show("Please fix the form errors and then try again.", Type.ERROR_MESSAGE);
 			}
+			else
+				if (e.getCause() instanceof ConstraintViolationException)
+				{	
+					ConstraintViolationException violation = (ConstraintViolationException) e.getCause();
+					String violations = "";
+					for (ConstraintViolation<?> cause:violation.getConstraintViolations())
+					{
+						violations += cause.getPropertyPath()+" " +cause.getMessage()+"\n";
+					}
+					Notification.show(violations, Type.ERROR_MESSAGE);
+				}
 			else
 			{
 				logger.error(e, e);
