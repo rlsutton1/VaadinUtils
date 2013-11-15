@@ -291,8 +291,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		actionLayout.addComponent(newButton);
 		actionLayout.setComponentAlignment(newButton, Alignment.MIDDLE_RIGHT);
 
-
-
 		actionLayout.setHeight("35");
 	}
 
@@ -304,7 +302,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	protected List<CrudAction<E>> getCrudActions()
 	{
 		List<CrudAction<E>> actions = new LinkedList<CrudAction<E>>();
-		CrudAction<E> crudAction =  new CrudActionDelete<E>();
+		CrudAction<E> crudAction = new CrudActionDelete<E>();
 		actions.add(crudAction);
 
 		return actions;
@@ -416,7 +414,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		return null;
 	}
 
-
 	/**
 	 * Used when creating a 'new' record to disable actions such as 'new' and
 	 * delete until the record is saved.
@@ -482,7 +479,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 					CrudAction<E> action = (CrudAction<E>) actionCombo.getValue();
 					if (interceptAction(action, entity))
 						action.exec(BaseCrudView.this, entity);
-container.refreshItem(entity.getItemId());
+					container.refreshItem(entity.getItemId());
 					// actionCombo.select(actionCombo.getNullSelectionItemId());
 				}
 			}
@@ -638,7 +635,8 @@ container.refreshItem(entity.getItemId());
 				}
 			}
 
-			// commit the row to the database, and retrieve the possibly new entity
+			// commit the row to the database, and retrieve the possibly new
+			// entity
 			E newEntity = commitContainerAndGetDataBaseId();
 
 			for (ChildCrudListener<E> commitListener : childCrudListeners)
@@ -663,21 +661,20 @@ container.refreshItem(entity.getItemId());
 			{
 				Notification.show("Please fix the form errors and then try again.", Type.ERROR_MESSAGE);
 			}
-			else
-				if (e.getCause() instanceof ConstraintViolationException)
-				{	
-					ConstraintViolationException violation = (ConstraintViolationException) e.getCause();
-					String violations = "";
-					for (ConstraintViolation<?> cause:violation.getConstraintViolations())
-					{
-						violations += cause.getPropertyPath()+" " +cause.getMessage()+"\n";
-					}
-					Notification.show(violations, Type.ERROR_MESSAGE);
+			else if (e.getCause() instanceof ConstraintViolationException)
+			{
+				ConstraintViolationException violation = (ConstraintViolationException) e.getCause();
+				String violations = "";
+				for (ConstraintViolation<?> cause : violation.getConstraintViolations())
+				{
+					violations += cause.getPropertyPath() + " " + cause.getMessage() + "\n";
 				}
+				Notification.show(violations, Type.ERROR_MESSAGE);
+			}
 			else
 			{
 				logger.error(e, e);
-				Notification.show(e.getClass().getSimpleName()+ " " +e.getMessage(), Type.ERROR_MESSAGE);
+				Notification.show(e.getClass().getSimpleName() + " " + e.getMessage(), Type.ERROR_MESSAGE);
 			}
 		}
 		finally
@@ -1019,11 +1016,10 @@ container.refreshItem(entity.getItemId());
 	{
 		formValidate();
 		fieldGroup.commit();
-		for (ChildCrudListener<E> child:childCrudListeners)
+		for (ChildCrudListener<E> child : childCrudListeners)
 		{
 			child.validateFieldz();
 		}
-
 
 	}
 
@@ -1149,6 +1145,7 @@ container.refreshItem(entity.getItemId());
 		});
 	}
 
+
 	/**
 	 * for child cruds, they overload this to ensure that the minimum necessary
 	 * filters are always applied.
@@ -1166,7 +1163,7 @@ container.refreshItem(entity.getItemId());
 	public JPAContainer<E> getContainer()
 	{
 		return container;
-		
+
 	}
 
 }

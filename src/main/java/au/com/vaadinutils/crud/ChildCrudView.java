@@ -349,7 +349,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 				saving = true;
 				// if a row is saved in the childCrud, then it is dirty for the
 				// purposes of the parent crud
-				if (fieldGroup.isModified())
+				if (fieldGroup.isModified() || areNonFieldGroupFieldsDirty())
 				{
 					dirty = true;
 					commitFieldGroup();
@@ -428,6 +428,24 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 		// }
 		// }
 
+	}
+
+	/**
+	 * 
+	 * 
+	 * When adding fields to a layout that need to be committed, but are not
+	 * part of the field group, override this method to let the crud know that a
+	 * commit should be performed.
+	 * 
+	 * This is required because committing on a child crud is not explicit -no
+	 * save button is available, the need to save is determined based on if the
+	 * fields are dirty.
+	 * 
+	 * @return
+	 */
+	protected boolean areNonFieldGroupFieldsDirty()
+	{
+		return false;
 	}
 
 	/**
