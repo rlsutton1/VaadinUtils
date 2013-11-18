@@ -888,6 +888,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	public void allowRowChange(final RowChangeCallback callback)
 	{
 
+		
 		boolean dirty = false;
 		for (ChildCrudListener<E> commitListener : childCrudListeners)
 		{
@@ -939,7 +940,14 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		}
 		else
 		{
+			try{
 			callback.allowRowChange();
+			}catch (Exception e)
+			{
+				logger.error(e,e);
+				Notification.show(e.getClass().getSimpleName()+" "+e.getMessage(),Type.ERROR_MESSAGE);
+				
+			}
 		}
 
 	}
@@ -1130,14 +1138,10 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				{
 					FormHelper.showConstraintViolation(e);
 				}
-				catch (InstantiationException e)
+				catch (Exception e)
 				{
 					logger.error(e, e);
-					throw new RuntimeException(e);
-				}
-				catch (IllegalAccessException e)
-				{
-					logger.error(e, e);
+					Notification.show(e.getClass().getSimpleName()+ " "+e.getMessage(),Type.ERROR_MESSAGE);
 					throw new RuntimeException(e);
 				}
 			}

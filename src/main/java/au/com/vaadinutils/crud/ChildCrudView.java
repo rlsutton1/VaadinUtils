@@ -502,7 +502,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	 * @throws IllegalAccessException
 	 * @throws InstantiationException
 	 */
-	protected P translateParentId(Object parentId2) throws InstantiationException, IllegalAccessException
+	protected Object translateParentId(Object parentId2) throws InstantiationException, IllegalAccessException
 	{
 		P tmp = parentType.newInstance();
 		tmp.setId((Long) parentId2);
