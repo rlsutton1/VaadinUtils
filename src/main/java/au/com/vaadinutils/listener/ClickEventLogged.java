@@ -1,10 +1,13 @@
 package au.com.vaadinutils.listener;
 
+import javax.validation.ConstraintViolationException;
+
 import org.apache.log4j.Logger;
 
-import com.vaadin.ui.Notification.Type;
+import au.com.vaadinutils.crud.FormHelper;
 
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.Notification.Type;
 
 public class ClickEventLogged
 {
@@ -25,8 +28,12 @@ public class ClickEventLogged
 			}
 			catch (Throwable e)
 			{
+				if (e instanceof ConstraintViolationException)
+				{
+					FormHelper.showConstraintViolation((ConstraintViolationException) e);
+				}
 				logger.error(e, e);
-				Notification.show(e.getMessage(),Type.ERROR_MESSAGE);
+				Notification.show(e.getClass().getSimpleName()+" "+e.getMessage(),Type.ERROR_MESSAGE);
 			}
 
 		}
