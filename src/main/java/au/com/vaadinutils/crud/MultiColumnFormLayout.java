@@ -381,6 +381,7 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	}
 
 	/**
+	 * Deprecated - Use bindEntityFieldBuilder instead
 	 * 
 	 * @param fieldLabel
 	 * @param fieldName
@@ -425,7 +426,6 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		this.fieldList.add(field);
 		return field;
 	}
-
 
 	public ArrayList<AbstractComponent> getFieldList()
 	{
