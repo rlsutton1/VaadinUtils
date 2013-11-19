@@ -28,7 +28,7 @@ public class SplitComboBox extends ComboBox implements SplitField
 
 	public SplitComboBox(String fieldLabel, Collection<?> options)
 	{
-		super(null, options);
+		super(fieldLabel, options);
 		this.label = new Label(fieldLabel);
 	}
 

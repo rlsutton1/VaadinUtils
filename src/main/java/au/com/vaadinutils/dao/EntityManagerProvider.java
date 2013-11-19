@@ -2,6 +2,8 @@ package au.com.vaadinutils.dao;
 
 import javax.persistence.EntityManager;
 
+
+
 /**
  * The class is a place holder to allow access to an 'non-injected' entity
  * manager.
@@ -133,6 +135,12 @@ public enum EntityManagerProvider
 	{
 		getEntityManager().refresh(record);
 
+	}
+
+	public static<T> void detach(T record)
+	{
+		getEntityManager().detach(record);
+		
 	}
 
 }

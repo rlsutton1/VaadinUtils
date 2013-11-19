@@ -618,7 +618,8 @@ public class FormHelper<E> implements Serializable
 		for (ConstraintViolation<?> violation : e.getConstraintViolations())
 		{
 			sb.append("Error: " + violation.getPropertyPath() + " : " + violation.getMessage() + "\n");
-		}
+			
+		}logger.error(sb.toString());
 		Notification.show(sb.toString(), Type.ERROR_MESSAGE);
 	}
 
