@@ -112,15 +112,14 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 	@Override
 	public List<E> findAll()
 	{
-		EntityManager em = EntityManagerProvider.getEntityManager();
-		CriteriaBuilder builder = em.getCriteriaBuilder();
+		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 
 		CriteriaQuery<E> criteria = builder.createQuery(entityClass);
 
 		Root<E> root = criteria.from(entityClass);
 		criteria.select(root);
 
-		List<E> results = em.createQuery(criteria).getResultList();
+		List<E> results = entityManager.createQuery(criteria).getResultList();
 
 		return results;
 
@@ -141,8 +140,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 	public <V, SK> List<E> findAllByAttribute(SingularAttribute<E, V> vKey, V value, SingularAttribute<E, SK> order)
 	{
 
-		EntityManager em = EntityManagerProvider.getEntityManager();
-		CriteriaBuilder builder = em.getCriteriaBuilder();
+		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 
 		CriteriaQuery<E> criteria = builder.createQuery(entityClass);
 
@@ -153,7 +151,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		{
 			criteria.orderBy(builder.asc(root.get(order)));
 		}
-		List<E> results = em.createQuery(criteria).getResultList();
+		List<E> results = entityManager.createQuery(criteria).getResultList();
 
 		return results;
 
@@ -169,14 +167,13 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 	@SuppressWarnings("unused")
 	private void oldCreateVaadinContainer()
 	{
-		 JPAContainerFactory.makeBatchable(entityClass, EntityManagerProvider.getEntityManager());
+		 JPAContainerFactory.makeBatchable(entityClass, entityManager);
 	}
 
 	public <V> int deleteAllByAttribute(SingularAttribute<E, V> vKey, V value)
 	{
 
-		EntityManager em = EntityManagerProvider.getEntityManager();
-		CriteriaBuilder builder = em.getCriteriaBuilder();
+		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 
 		CriteriaDelete<E> criteria = builder.createCriteriaDelete(entityClass);
 
@@ -184,8 +181,8 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 		criteria.where(builder.equal(root.get(vKey), value));
 
-		em.getClass();
-		int result = em.createQuery(criteria).executeUpdate();
+		entityManager.getClass();
+		int result = entityManager.createQuery(criteria).executeUpdate();
 
 		return result;
 
