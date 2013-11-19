@@ -578,6 +578,19 @@ public class FormHelper<E> implements Serializable
 		return field;
 	}
 
+//	public <L> EntityAutoCompleteField bindAutoCompleteField(AutoCompleteParent<E> parent, 
+//			String fieldLabel, ListAttribute<E, L> entityField, Class<L> listClazz)
+//	{
+//		// hack
+//		ContactDao dao = new DaoFactory().getContactDao();
+//		container = dao.createVaadinContainer();
+//		
+//		//EntityAutoCompleteField<CrudEntity, JpaBaseDao<E,Long>> field = new EntityAutoCompleteField<CrudEntity, JpaBaseDao<E,Long>>(container, dao, fieldLabel, parent);
+//		EntityAutoCompleteField field = new EntityAutoCompleteField<CrudEntity, JpaBaseDao(container, dao, fieldLabel, parent);
+//		return field;
+//				
+//	}
+
 	public static Container createContainerFromEnumClass(String fieldName, Class<?> clazz)
 	{
 		LinkedHashMap<Enum<?>, String> enumMap = new LinkedHashMap<Enum<?>, String>();
