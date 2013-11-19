@@ -442,16 +442,16 @@ public class FormHelper<E> implements Serializable
 			if (builderForm == null)
 			{
 				builderForm = form;
-			}
+	}
 			Preconditions.checkNotNull(builderForm, "Form may not be null");
-
+	
 			if (component == null)
-			{
+	{
 				component = new SplitComboBox(label);
 			}
 			component.setCaption(label);
 			component.setItemCaptionMode(ItemCaptionMode.PROPERTY);
-
+		
 			if (container == null)
 			{
 				Preconditions.checkNotNull(listClazz, "listClazz may not be null");
@@ -460,7 +460,7 @@ public class FormHelper<E> implements Serializable
 			}
 
 			Preconditions.checkState(container.getContainerPropertyIds().contains(listField), listField
-					+ " is not valid, valid listFieldNames are " + container.getContainerPropertyIds().toString());
+				+ " is not valid, valid listFieldNames are " + container.getContainerPropertyIds().toString());
 
 			if (container.getSortableContainerPropertyIds().contains(listField))
 				container.sort(new String[] { listField }, new boolean[] { true });
@@ -475,9 +475,9 @@ public class FormHelper<E> implements Serializable
 			component.setWidth("100%");
 			component.setImmediate(true);
 			if (group != null)
-			{
+		{
 				Preconditions.checkState(group.getContainer().getContainerPropertyIds().contains(field), field
-						+ " is not valid, valid listFieldNames are "
+					+ " is not valid, valid listFieldNames are "
 						+ group.getContainer().getContainerPropertyIds().toString());
 
 				doBinding(group, field, component);
@@ -577,6 +577,19 @@ public class FormHelper<E> implements Serializable
 		form.addComponent(field);
 		return field;
 	}
+	
+//	public <L> EntityAutoCompleteField bindAutoCompleteField(AutoCompleteParent<E> parent, 
+//			String fieldLabel, ListAttribute<E, L> entityField, Class<L> listClazz)
+//	{
+//		// hack
+//		ContactDao dao = new DaoFactory().getContactDao();
+//		container = dao.createVaadinContainer();
+//		
+//		//EntityAutoCompleteField<CrudEntity, JpaBaseDao<E,Long>> field = new EntityAutoCompleteField<CrudEntity, JpaBaseDao<E,Long>>(container, dao, fieldLabel, parent);
+//		EntityAutoCompleteField field = new EntityAutoCompleteField<CrudEntity, JpaBaseDao(container, dao, fieldLabel, parent);
+//		return field;
+//				
+//	}
 
 //	public <L> EntityAutoCompleteField bindAutoCompleteField(AutoCompleteParent<E> parent, 
 //			String fieldLabel, ListAttribute<E, L> entityField, Class<L> listClazz)
@@ -671,4 +684,5 @@ public class FormHelper<E> implements Serializable
 		return field;
 	}
 
+	
 }

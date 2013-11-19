@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
+import javax.persistence.metamodel.ListAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.apache.log4j.Logger;
 
 import au.com.vaadinutils.crud.splitFields.SplitField;
 import au.com.vaadinutils.fields.CKEditorEmailField;
+import au.com.vaadinutils.fields.EntityAutoCompleteField;
 
 import com.vaadin.shared.ui.datefield.Resolution;
 import com.vaadin.ui.AbstractComponent;
@@ -379,7 +381,7 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	}
 
 	/**
-	 * Deprecated - Use bindEntityFieldBuilder instead
+	 * Deprecated - Use BindEntityFieldBuilder instead
 	 * 
 	 * @param fieldLabel
 	 * @param fieldName
@@ -400,9 +402,8 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		return field;
 	}
 
-
 	/**
-	 * Deprecated - Use bindEntityFieldBuilder instead
+	 * Deprecated - Use BindEntityFieldBuilder instead
 	 * 
 	 * @param fieldLabel
 	 * @param fieldName
