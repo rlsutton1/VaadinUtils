@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
-import javax.persistence.PersistenceException;
+import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
 import org.apache.log4j.Logger;
@@ -65,7 +65,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	protected boolean restoreDelete;
 
 	protected TextField searchField = new TextField();
-	private Button newButton = new Button("New");
+	protected Button newButton = new Button("New");
 	protected Button applyButton = new Button("Apply");
 	private Button saveButton = new Button("Save");
 	private Button cancelButton = new Button("Cancel");
@@ -96,7 +96,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	protected Set<ChildCrudListener<E>> childCrudListeners = new HashSet<ChildCrudListener<E>>();
 	private CrudDisplayMode displayMode = CrudDisplayMode.HORIZONTAL;
 	protected HorizontalLayout actionLayout;
-	private ComboBox actionCombo;
+	protected ComboBox actionCombo;
 
 	protected BaseCrudView()
 	{
@@ -243,6 +243,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		return holder;
 	}
 
+	@SuppressWarnings("null")
 	private void buildActionLayout()
 	{
 		actionLayout = new HorizontalLayout();
@@ -290,8 +291,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		actionLayout.addComponent(newButton);
 		actionLayout.setComponentAlignment(newButton, Alignment.MIDDLE_RIGHT);
 
-
-
 		actionLayout.setHeight("35");
 	}
 
@@ -303,8 +302,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	protected List<CrudAction<E>> getCrudActions()
 	{
 		List<CrudAction<E>> actions = new LinkedList<CrudAction<E>>();
-		@SuppressWarnings("unchecked")
-		CrudAction<E> crudAction = ((CrudAction<E>) new CrudActionDelete<E>());
+		CrudAction<E> crudAction = new CrudActionDelete<E>();
 		actions.add(crudAction);
 
 		return actions;
@@ -417,25 +415,12 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	}
 
 	/**
-	 * Call this method during buildEditor to suppress the action combo and
-	 * Apply button. They are displayed by default.
-	 * 
-	 * @param show
-	 */
-	protected void showActions(boolean show)
-	{
-		actionLayout.setVisible(show);
-		applyButton.setVisible(show);
-		actionCombo.setVisible(show);
-	}
-
-	/**
 	 * Used when creating a 'new' record to disable actions such as 'new' and
 	 * delete until the record is saved.
 	 * 
 	 * @param show
 	 */
-	void enableActions(boolean enabled)
+	protected void enableActions(boolean enabled)
 	{
 		applyButton.setEnabled(enabled);
 		actionCombo.setEnabled(enabled);
@@ -494,7 +479,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 					CrudAction<E> action = (CrudAction<E>) actionCombo.getValue();
 					if (interceptAction(action, entity))
 						action.exec(BaseCrudView.this, entity);
-container.refreshItem(entity.getItemId());
+					container.refreshItem(entity.getItemId());
 					// actionCombo.select(actionCombo.getNullSelectionItemId());
 				}
 			}
@@ -617,7 +602,7 @@ container.refreshItem(entity.getItemId());
 
 	}
 
-	protected void save()
+	public void save()
 	{
 		boolean selected = false;
 		try
@@ -650,7 +635,8 @@ container.refreshItem(entity.getItemId());
 				}
 			}
 
-			// commit the row to the database, and retrieve the possibly new entity
+			// commit the row to the database, and retrieve the possibly new
+			// entity
 			E newEntity = commitContainerAndGetDataBaseId();
 
 			for (ChildCrudListener<E> commitListener : childCrudListeners)
@@ -675,10 +661,20 @@ container.refreshItem(entity.getItemId());
 			{
 				Notification.show("Please fix the form errors and then try again.", Type.ERROR_MESSAGE);
 			}
+			else if (e.getCause() instanceof ConstraintViolationException)
+			{
+				ConstraintViolationException violation = (ConstraintViolationException) e.getCause();
+				String violations = "";
+				for (ConstraintViolation<?> cause : violation.getConstraintViolations())
+				{
+					violations += cause.getPropertyPath() + " " + cause.getMessage() + "\n";
+				}
+				Notification.show(violations, Type.ERROR_MESSAGE);
+			}
 			else
 			{
 				logger.error(e, e);
-				Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
+				Notification.show(e.getClass().getSimpleName() + " " + e.getMessage(), Type.ERROR_MESSAGE);
 			}
 		}
 		finally
@@ -892,6 +888,7 @@ container.refreshItem(entity.getItemId());
 	public void allowRowChange(final RowChangeCallback callback)
 	{
 
+		
 		boolean dirty = false;
 		for (ChildCrudListener<E> commitListener : childCrudListeners)
 		{
@@ -943,7 +940,14 @@ container.refreshItem(entity.getItemId());
 		}
 		else
 		{
+			try{
 			callback.allowRowChange();
+			}catch (Exception e)
+			{
+				logger.error(e,e);
+				Notification.show(e.getClass().getSimpleName()+" "+e.getMessage(),Type.ERROR_MESSAGE);
+				
+			}
 		}
 
 	}
@@ -1020,11 +1024,10 @@ container.refreshItem(entity.getItemId());
 	{
 		formValidate();
 		fieldGroup.commit();
-		for (ChildCrudListener<E> child:childCrudListeners)
+		for (ChildCrudListener<E> child : childCrudListeners)
 		{
 			child.validateFieldz();
 		}
-
 
 	}
 
@@ -1057,10 +1060,13 @@ container.refreshItem(entity.getItemId());
 			entity = newEntity.getEntity();
 		if (entity == null)
 		{
-			entity = entityTable.getCurrent().getEntity();
+			EntityItem<E> entityItem = entityTable.getCurrent();
+			if (entityItem != null)
+			{
+				entity = entityItem.getEntity();
+			}
 		}
 		return entity;
-
 	}
 
 	/**
@@ -1132,20 +1138,17 @@ container.refreshItem(entity.getItemId());
 				{
 					FormHelper.showConstraintViolation(e);
 				}
-				catch (InstantiationException e)
+				catch (Exception e)
 				{
 					logger.error(e, e);
-					throw new RuntimeException(e);
-				}
-				catch (IllegalAccessException e)
-				{
-					logger.error(e, e);
+					Notification.show(e.getClass().getSimpleName()+ " "+e.getMessage(),Type.ERROR_MESSAGE);
 					throw new RuntimeException(e);
 				}
 			}
 
 		});
 	}
+
 
 	/**
 	 * for child cruds, they overload this to ensure that the minimum necessary
@@ -1164,7 +1167,7 @@ container.refreshItem(entity.getItemId());
 	public JPAContainer<E> getContainer()
 	{
 		return container;
-		
+
 	}
 
 }

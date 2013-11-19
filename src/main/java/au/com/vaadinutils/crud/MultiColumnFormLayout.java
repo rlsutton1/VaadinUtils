@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
+import javax.persistence.metamodel.ListAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.apache.log4j.Logger;
 
 import au.com.vaadinutils.crud.splitFields.SplitField;
 import au.com.vaadinutils.fields.CKEditorEmailField;
+import au.com.vaadinutils.fields.EntityAutoCompleteField;
 
 import com.vaadin.shared.ui.datefield.Resolution;
 import com.vaadin.ui.AbstractComponent;
@@ -49,7 +51,7 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	public MultiColumnFormLayout(int columns, ValidatingFieldGroup<E> fieldGroup)
 	{
 		this.fieldGroup = fieldGroup;
-		//super.setDescription("MultiColumnFormLayout");
+		// super.setDescription("MultiColumnFormLayout");
 		this.columns = columns * 2;
 
 		this.labelWidths = new int[columns];
@@ -76,12 +78,11 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		}
 
 	}
-	
+
 	protected FormHelper<E> getFormHelper(GridLayout grid2, ValidatingFieldGroup<E> fieldGroup2)
 	{
 		return new FormHelper<E>(grid, fieldGroup);
 	}
-
 
 	/**
 	 * Sets the width of the labels in the given column.
@@ -162,7 +163,8 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		else
 			caption = splitComponent.getLabel();
 		caption.setWidth("" + labelWidth);
-		logger.debug("label: caption:" + caption.getValue() + " width:" + labelWidth + " x:" + x + " y:" + y + " for col:" + x / 2);
+		logger.debug("label: caption:" + caption.getValue() + " width:" + labelWidth + " x:" + x + " y:" + y
+				+ " for col:" + x / 2);
 		grid.addComponent(caption, x, y, x, y);
 		grid.setComponentAlignment(caption, Alignment.MIDDLE_RIGHT);
 		x++;
@@ -240,16 +242,14 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		this.fieldList.add(field);
 		return field;
 	}
-	
 
 	public CKEditorEmailField bindEditorField(SingularAttribute<E, String> member, boolean readonly)
 	{
-		CKEditorEmailField field = formHelper.bindEditorField(this, fieldGroup,  member, readonly);
+		CKEditorEmailField field = formHelper.bindEditorField(this, fieldGroup, member, readonly);
 		this.fieldList.add(field);
 		return field;
-		
-	}
 
+	}
 
 	/**
 	 * Adds a text field to the form without binding it to the FieldGroup
@@ -277,7 +277,6 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		return field;
 	}
 
-
 	public PasswordField bindPasswordField(String fieldLabel, String fieldName)
 	{
 		PasswordField field = formHelper.bindPasswordField(this, fieldGroup, fieldLabel, fieldName);
@@ -294,9 +293,10 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	 */
 	public PasswordField addPasswordField(String fieldLabel)
 	{
-		//PasswordField field = new PasswordField(caption);
-		
-		PasswordField field = formHelper.bindPasswordField(this, (ValidatingFieldGroup<?>)null, fieldLabel, (SingularAttribute<E, String>)null);
+		// PasswordField field = new PasswordField(caption);
+
+		PasswordField field = formHelper.bindPasswordField(this, (ValidatingFieldGroup<?>) null, fieldLabel,
+				(SingularAttribute<E, String>) null);
 		this.fieldList.add(field);
 		return field;
 	}
@@ -322,18 +322,14 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		this.fieldList.add(field);
 		return field;
 	}
-	
 
-	public DateField bindDateField(String fieldLabel, SingularAttribute<E, ? extends Date> dateField, String dateFormat,
-			Resolution resolution)
+	public DateField bindDateField(String fieldLabel, SingularAttribute<E, ? extends Date> dateField,
+			String dateFormat, Resolution resolution)
 	{
-			DateField field = formHelper.bindDateField(this, fieldGroup, fieldLabel, dateField, dateFormat, resolution);
-			this.fieldList.add(field);
-			return field;
+		DateField field = formHelper.bindDateField(this, fieldGroup, fieldLabel, dateField, dateFormat, resolution);
+		this.fieldList.add(field);
+		return field;
 	}
-	
-
-
 
 	public DateField bindDateField(String fieldLabel, String fieldName, String dateFormat, Resolution resolution)
 	{
@@ -356,14 +352,12 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		return field;
 	}
 
-
 	public <M> ComboBox bindEnumField(String fieldLabel, SingularAttribute<E, M> member, Class<?> clazz)
 	{
 		ComboBox field = formHelper.bindEnumField(this, fieldGroup, fieldLabel, member, clazz);
 		this.fieldList.add(field);
 		return field;
 	}
-
 
 	public ComboBox bindEnumField(String fieldLabel, String fieldName, Class<?> clazz)
 	{
@@ -399,23 +393,33 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	 *            foreign entity
 	 * @return
 	 */
+	@Deprecated
 	public <L> ComboBox bindEntityField(String fieldLabel, String fieldName, Class<L> listClazz, String listFieldName)
 	{
 		ComboBox field = formHelper.bindEntityField(this, fieldGroup, fieldLabel, fieldName, listClazz, listFieldName);
 		this.fieldList.add(field);
 		return field;
 	}
-	
-	
-	public <F, L, M> ComboBox bindEntityField(String fieldLabel, SingularAttribute<E, F> fieldName, Class<L> listClazz,
-			SingularAttribute<L, M> listFieldName)
+
+	/**
+	 * Deprecated - Use bindEntityFieldBuilder instead
+	 * 
+	 * @param fieldLabel
+	 * @param fieldName
+	 * @param listClazz
+	 * @param listFieldName
+	 * @return
+	 */
+	@Deprecated
+	public <L> ComboBox bindEntityField(String fieldLabel, SingularAttribute<E, L> fieldName, Class<L> listClazz,
+			SingularAttribute<L, ?> listFieldName)
 	{
 		ComboBox field = formHelper.bindEntityField(this, fieldGroup, fieldLabel, fieldName, listClazz, listFieldName);
 		this.fieldList.add(field);
 		return field;
 	}
-	
-	public ComboBox bindComboBox(String fieldLabel,Collection<?> options)
+
+	public ComboBox bindComboBox(String fieldLabel, Collection<?> options)
 	{
 		ComboBox field = formHelper.bindComboBox(this, fieldGroup, fieldLabel, options);
 		this.fieldList.add(field);
@@ -433,28 +437,29 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		return fieldGroup;
 	}
 
-
 	public FormHelper<E> getFormHelper()
 	{
 		return this.formHelper;
 	}
-	
+
 	public void setReadOnly(boolean readOnly)
 	{
 		this.fieldGroup.setReadOnly(readOnly);
 	}
-	
+
 	/**
 	 * Sets the expand ratio on the row that is currently last.
+	 * 
 	 * @param ratio
 	 */
 	public void setExpandRatio(float ratio)
 	{
 		this.grid.setRowExpandRatio(this.grid.getRows() - 1, ratio);
 	}
-	
+
 	/**
 	 * Sets the given columns expand ratio.
+	 * 
 	 * @param columnIndex
 	 * @param ratio
 	 */

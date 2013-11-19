@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
@@ -27,7 +28,7 @@ public class EntityTable<E> extends Table implements EntityList<E>
 	{
 		this.entityContainer = entityContainer;
 		this.visibleColumns = headingPropertySet;
-		
+
 	}
 
 	public void setRowChangeListener(RowChangeListener<E> rowChangeListener)
@@ -134,14 +135,34 @@ public class EntityTable<E> extends Table implements EntityList<E>
 	{
 		Object entityId = this.getValue();
 		EntityItem<E> entity = null;
-		if (entityId != null)
+		if ((entityId instanceof UUID))
 		{
-			try{
-			entity = this.entityContainer.getItem(entityId);
+			logger.warn("UUID here, this may be ok and even common when in a child crud.");
+		}
+
+		if (entityId != null)// && !(entityId instanceof UUID))
+		{
+			try
+			{
+				if ((entityId instanceof UUID))
+				{
+					if (entityContainer.getItemIds().contains(entityId))
+					{
+						entity = this.entityContainer.getItem(entityId);
+					}else
+					{
+						Exception e =new Exception("Trying to look up a non existent UUID");
+						logger.error(e,e);
+					}
+				}
+				else
+				{
+					entity = this.entityContainer.getItem(entityId);
+				}
 			}
 			catch (Exception e)
 			{
-				logger.warn(e);
+				logger.warn(e, e);
 			}
 		}
 

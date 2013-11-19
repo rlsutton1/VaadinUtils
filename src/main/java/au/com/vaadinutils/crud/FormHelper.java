@@ -236,8 +236,7 @@ public class FormHelper<E> implements Serializable
 	public ComboBox bindEnumField(AbstractLayout form, ValidatingFieldGroup<E> group, String fieldLabel,
 			String fieldName, Class<?> clazz)
 	{
-		return bindEnumField(new SplitComboBox(fieldLabel), form,
-				group, fieldLabel, fieldName, clazz);
+		return bindEnumField(new SplitComboBox(fieldLabel), form, group, fieldLabel, fieldName, clazz);
 	}
 
 	public ComboBox bindEnumField(ComboBox comboBox, AbstractLayout form, ValidatingFieldGroup<E> group,
@@ -309,22 +308,26 @@ public class FormHelper<E> implements Serializable
 		return field;
 	}
 
-	public <M, F> ComboBox bindEntityField(String fieldLabel, SingularAttribute<E, M> member, Class<F> listClazz,
-			SingularAttribute<F, ? extends Object> listMember)
+	@Deprecated
+	public <L> ComboBox bindEntityField(String fieldLabel, SingularAttribute<E, L> fieldName, Class<L> listClazz,
+			SingularAttribute<L, ?> listFieldName)
 	{
-		ComboBox field = bindEntityField(form, group, fieldLabel, member.getName(), listClazz, listMember.getName());
-		this.fieldList.add(field);
-		return field;
+		return new EntityFieldBuilder<L>().setLabel(fieldLabel).setField(fieldName).setListClass(listClazz)
+				.setListFieldName(listFieldName).build();
+
 	}
 
-	public <M> ComboBox bindEntityField(String fieldLabel, String fieldName, Class<M> listClazz, String listFieldname)
+	@Deprecated
+	public <L> ComboBox bindEntityField(String fieldLabel, String fieldName, Class<L> listClazz, String listFieldName)
 	{
-		ComboBox field = bindEntityField(form, group, fieldLabel, fieldName, listClazz, listFieldname);
-		this.fieldList.add(field);
-		return field;
+		return new EntityFieldBuilder<L>().setLabel(fieldLabel).setField(fieldName).setListClass(listClazz)
+				.setListFieldName(listFieldName).build();
+
 	}
 
 	/**
+	 * Deprecated - use EntityFieldBuilder instead
+	 * 
 	 * this method is for displaying a combobox which displayes all the values
 	 * for a many to one relationship and allows the user to select only one.
 	 * 
@@ -341,51 +344,205 @@ public class FormHelper<E> implements Serializable
 	 * 
 	 * @return
 	 */
-	public <F, L, M> ComboBox bindEntityField(AbstractLayout form, ValidatingFieldGroup<E> fieldGroup,
-			String fieldLabel, SingularAttribute<E, F> field, Class<L> listClazz, SingularAttribute<L, M> listFieldName)
+
+	/**
+	 * Deprecated - use EntityFieldBuilder instead
+	 * 
+	 * @param form
+	 * @param fieldGroup
+	 * @param fieldLabel
+	 * @param field
+	 * @param listClazz
+	 * @param listFieldName
+	 * @return
+	 */
+	@Deprecated
+	public <L> ComboBox bindEntityField(AbstractLayout form, ValidatingFieldGroup<E> fieldGroup, String fieldLabel,
+			SingularAttribute<E, L> field, Class<L> listClazz, SingularAttribute<L, ?> listFieldName)
 	{
-		return bindEntityField(form, fieldGroup, fieldLabel, field.getName(), listClazz, listFieldName.getName());
+		return new EntityFieldBuilder<L>().setForm(form).setLabel(fieldLabel).setField(field)
+				.setListFieldName(listFieldName).build();
 
 	}
 
+	/**
+	 * Deprecated - use EntityFieldBuilder instead
+	 * 
+	 * @param form
+	 * @param fieldGroup
+	 * @param fieldLabel
+	 * @param fieldName
+	 * @param listClazz
+	 * @param listFieldName
+	 * @return
+	 */
+	@Deprecated
 	public <L> ComboBox bindEntityField(AbstractLayout form, ValidatingFieldGroup<E> fieldGroup, String fieldLabel,
 			String fieldName, Class<L> listClazz, String listFieldName)
 	{
-		return bindEntityField(new SplitComboBox(fieldLabel),form,fieldGroup,fieldLabel,fieldName,listClazz,listFieldName);
+		return new EntityFieldBuilder<L>().setForm(form).setLabel(fieldLabel).setField(fieldName)
+				.setListClass(listClazz).setListFieldName(listFieldName).build();
+
 	}
-	
-	public <L> ComboBox bindEntityField(ComboBox field,AbstractLayout form, ValidatingFieldGroup<E> fieldGroup, String fieldLabel,
-			String fieldName, Class<L> listClazz, String listFieldName)
+
+	/**
+	 * Deprecated - use EntityFieldBuilder instead
+	 * 
+	 * @param field
+	 * @param form
+	 * @param fieldGroup
+	 * @param fieldLabel
+	 * @param fieldName
+	 * @param listClazz
+	 * @param listFieldName
+	 * @return
+	 */
+	@Deprecated
+	public <L> ComboBox bindEntityField(ComboBox field, AbstractLayout form, ValidatingFieldGroup<E> fieldGroup,
+			String fieldLabel, String fieldName, Class<L> listClazz, String listFieldName)
 	{
-		JPAContainer<?> container = JPAContainerFactory.make(listClazz, EntityManagerProvider.getEntityManager());
-		
-		if (container.getSortableContainerPropertyIds().contains(listFieldName))
-			container.sort(new String[] {listFieldName},new boolean[] {true});
+		return new EntityFieldBuilder<L>().setComponent(field).setForm(form).setLabel(fieldLabel).setField(fieldName)
+				.setListClass(listClazz).setListFieldName(listFieldName).build();
 
-		field.setCaption(fieldLabel);
+	}
 
-		field.setItemCaptionMode(ItemCaptionMode.PROPERTY);
-		Preconditions.checkState(container.getContainerPropertyIds().contains(listFieldName), listFieldName
-				+ " is not valid, valid listFieldNames are " + container.getContainerPropertyIds().toString());
-		field.setItemCaptionPropertyId(listFieldName);
-		field.setContainerDataSource(container);
-		SingleSelectConverter<L> converter = new SingleSelectConverter<L>(field);
-		field.setConverter(converter);
-		field.setNewItemsAllowed(false);
-		field.setNullSelectionAllowed(false);
-		field.setTextInputAllowed(false);
-		field.setWidth("100%");
-		field.setImmediate(true);
-		if (fieldGroup != null)
+	/**
+	 *  use this syntax to instance the builder:<br>
+	 *  	formHelper.new EntityFieldBuilder<{name of list class}>();
+	 *  <br><br>
+	 *  	for example<br><br>
+	 *  	
+	 *  	FormHelper<Tblroutestep> helper = new FormHelper<Tblroutestep>(...);<br><br>
+	 *   	ComboBox field = helper.new EntityFieldBuilder<Tblroutingscript>()<br>
+	 *   	.setLabel("Action")<br>
+	 *   	.setField(Tblroutestep_.script)<br>
+	 *   	.setListFieldName(Tblroutingscript_.name)<br>
+	 *   	.build();<br>
+	 * @author rsutton
+	 * 
+	 * @param <L> the type of the list class
+	 */
+	public class EntityFieldBuilder<L>
+	{
+
+		private ComboBox component = null;
+		private String label = null;
+		private JPAContainer<L> container = null;
+		private Class<L> listClazz;
+		private String listField;
+		// private ValidatingFieldGroup<E> fieldGroup;
+		private String field;
+		private AbstractLayout builderForm;
+
+		public ComboBox build()
 		{
-			Preconditions.checkState(fieldGroup.getContainer().getContainerPropertyIds().contains(fieldName), fieldName
-					+ " is not valid, valid listFieldNames are "
-					+ fieldGroup.getContainer().getContainerPropertyIds().toString());
+			Preconditions.checkNotNull(label, "Label may not be null");
+			Preconditions.checkNotNull(listField, "ListField may not be null");
+			Preconditions.checkNotNull(field, "Field may not be null");
+			if (builderForm == null)
+			{
+				builderForm = form;
+	}
+			Preconditions.checkNotNull(builderForm, "Form may not be null");
+	
+			if (component == null)
+	{
+				component = new SplitComboBox(label);
+			}
+			component.setCaption(label);
+			component.setItemCaptionMode(ItemCaptionMode.PROPERTY);
+		
+			if (container == null)
+			{
+				Preconditions.checkNotNull(listClazz, "listClazz may not be null");
+				container = JPAContainerFactory.make(listClazz, EntityManagerProvider.getEntityManager());
 
-			doBinding(group, fieldName, field);
+			}
+
+			Preconditions.checkState(container.getContainerPropertyIds().contains(listField), listField
+				+ " is not valid, valid listFieldNames are " + container.getContainerPropertyIds().toString());
+
+			if (container.getSortableContainerPropertyIds().contains(listField))
+				container.sort(new String[] { listField }, new boolean[] { true });
+
+			component.setItemCaptionPropertyId(listField);
+			component.setContainerDataSource(container);
+			SingleSelectConverter<L> converter = new SingleSelectConverter<L>(component);
+			component.setConverter(converter);
+			component.setNewItemsAllowed(false);
+			component.setNullSelectionAllowed(false);
+			component.setTextInputAllowed(false);
+			component.setWidth("100%");
+			component.setImmediate(true);
+			if (group != null)
+		{
+				Preconditions.checkState(group.getContainer().getContainerPropertyIds().contains(field), field
+					+ " is not valid, valid listFieldNames are "
+						+ group.getContainer().getContainerPropertyIds().toString());
+
+				doBinding(group, field, component);
+			}
+			builderForm.addComponent(component);
+			return component;
 		}
-		form.addComponent(field);
-		return field;
+
+		public EntityFieldBuilder<L> setContainer(JPAContainer<L> container)
+		{
+			this.container = container;
+			return this;
+		}
+
+		public EntityFieldBuilder<L> setForm(AbstractLayout form)
+		{
+			this.builderForm = form;
+			return this;
+		}
+
+		public EntityFieldBuilder<L> setLabel(String label)
+		{
+			this.label = label;
+			return this;
+		}
+
+		public EntityFieldBuilder<L> setComponent(ComboBox component)
+		{
+			this.component = component;
+			return this;
+		}
+
+		public EntityFieldBuilder<L> setField(SingularAttribute<E, L> field)
+		{
+			this.field = field.getName();
+			listClazz = field.getJavaType();
+			return this;
+		}
+
+		public EntityFieldBuilder<L> setListFieldName(SingularAttribute<L, ?> listField)
+		{
+			this.listField = listField.getName();
+			return this;
+		}
+
+		public EntityFieldBuilder<L> setField(String field)
+		{
+			this.field = field;
+			return this;
+		}
+
+		public EntityFieldBuilder<L> setListFieldName(String listField)
+		{
+			this.listField = listField;
+			return this;
+		}
+
+		public EntityFieldBuilder<L> setListClass(Class<L> listClazz)
+		{
+			Preconditions.checkState(this.listClazz == null,
+					"If you set the field as a singularAttribute, the listClass is set automatically.");
+			this.listClazz = listClazz;
+			return this;
+		}
+
 	}
 
 	public <M> CKEditorEmailField bindEditorField(AbstractLayout form, ValidatingFieldGroup<E> group,
@@ -420,6 +577,19 @@ public class FormHelper<E> implements Serializable
 		form.addComponent(field);
 		return field;
 	}
+	
+//	public <L> EntityAutoCompleteField bindAutoCompleteField(AutoCompleteParent<E> parent, 
+//			String fieldLabel, ListAttribute<E, L> entityField, Class<L> listClazz)
+//	{
+//		// hack
+//		ContactDao dao = new DaoFactory().getContactDao();
+//		container = dao.createVaadinContainer();
+//		
+//		//EntityAutoCompleteField<CrudEntity, JpaBaseDao<E,Long>> field = new EntityAutoCompleteField<CrudEntity, JpaBaseDao<E,Long>>(container, dao, fieldLabel, parent);
+//		EntityAutoCompleteField field = new EntityAutoCompleteField<CrudEntity, JpaBaseDao(container, dao, fieldLabel, parent);
+//		return field;
+//				
+//	}
 
 	public static Container createContainerFromEnumClass(String fieldName, Class<?> clazz)
 	{
