@@ -381,7 +381,7 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	}
 
 	/**
-	 * Deprecated - Use BindEntityFieldBuilder instead
+	 * Deprecated - Use EntityFieldBuilder instead
 	 * 
 	 * @param fieldLabel
 	 * @param fieldName
@@ -403,7 +403,7 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	}
 
 	/**
-	 * Deprecated - Use BindEntityFieldBuilder instead
+	 * Deprecated - Use EntityFieldBuilder instead
 	 * 
 	 * @param fieldLabel
 	 * @param fieldName
