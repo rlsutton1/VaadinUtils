@@ -13,6 +13,7 @@ import javax.validation.ConstraintViolationException;
 import org.apache.log4j.Logger;
 import org.vaadin.dialogs.ConfirmDialog;
 
+import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.listener.ClickEventLogged;
 
 import com.google.common.base.Preconditions;
@@ -49,7 +50,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Reindeer;
 
 public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout implements RowChangeListener<E>,
-		Selected<E>
+		Selected<E>, DirtyListener
 {
 
 	private static Logger logger = Logger.getLogger(BaseCrudView.class);
@@ -127,6 +128,10 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		}
 		fieldGroup = new ValidatingFieldGroup<E>(container, entityClass);
 		fieldGroup.setBuffered(true);
+
+		// disable this, as the disabling of the save/cancel button is buggy
+		//		fieldGroup.setDirtyListener(this);
+		
 
 		entityTable = getTable(container, headings);
 		entityTable.setRowChangeListener(this);
@@ -548,6 +553,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			}
 
 		});
+		saveButton.setStyleName(Reindeer.BUTTON_DEFAULT);
 
 	}
 
@@ -637,13 +643,13 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 			// commit the row to the database, and retrieve the possibly new
 			// entity
-			E newEntity = commitContainerAndGetDataBaseId();
+			E newEntity = commitContainerAndGetEntityFromDB();
 
 			for (ChildCrudListener<E> commitListener : childCrudListeners)
 			{
 				commitListener.committed(newEntity);
 			}
-
+			EntityManagerProvider.getEntityManager().flush();
 			postSaveAction(newEntity);
 
 			// select has been moved to here because when it happens earlier,
@@ -697,11 +703,11 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 * we have to hook the ItemSetChangeListener to be able to get the database
 	 * id of a new record.
 	 */
-	private E commitContainerAndGetDataBaseId()
+	private E commitContainerAndGetEntityFromDB()
 	{
 		// don't really need an AtomicReference, just using it as a mutable
 		// final variable to be used in the callback
-		final AtomicReference<E> newId = new AtomicReference<E>();
+		final AtomicReference<E> newEntity = new AtomicReference<E>();
 
 		// call back to collect the id of the new record when the container
 		// fires the ItemSetChangeEvent
@@ -727,8 +733,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 					{
 						@SuppressWarnings("unchecked")
 						E id = (E) affectedEntities.toArray()[0];
-						newId.set(id);
-						System.out.println("Found id");
+						newEntity.set(id);
+						
 					}
 				}
 			}
@@ -740,6 +746,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			container.addItemSetChangeListener(tmp);
 			// call commit
 			container.commit();
+			newEntity.set(EntityManagerProvider.getEntityManager().merge(newEntity.get()));
 		}
 		finally
 		{
@@ -748,7 +755,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		}
 
 		// return the entity
-		return newId.get();
+		return newEntity.get();
 	}
 
 	/**
@@ -1170,4 +1177,11 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 	}
 
+	//disabled as the save/cancel enable/disable is buggy
+	@Override
+	public void fieldGroupIsDirty(boolean b)
+	{
+//		saveButton.setEnabled(b);
+//		cancelButton.setEnabled(b);
+	}
 }

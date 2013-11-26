@@ -40,6 +40,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	private Filter parentFilter;
 	protected boolean dirty = false;
 	final private Class<P> parentType;
+	protected BaseCrudView<P> parentCrud;
 
 	/**
 	 * 
@@ -48,7 +49,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	 * @param childKey
 	 *            - this will be the foreign key in the child table
 	 */
-	public ChildCrudView(Class<P> parentType, Class<E> childType,
+	public ChildCrudView(BaseCrudView<P> parent, Class<P> parentType, Class<E> childType,
 			SingularAttribute<? extends CrudEntity, ? extends Object> parentKey,
 			SingularAttribute<? extends CrudEntity, ? extends Object> childKey)
 	{
@@ -56,6 +57,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 		this.parentKey = parentKey.getName();
 		this.childKey = childKey.getName();
 		this.parentType = parentType;
+		this.parentCrud = parent;
 
 		// setMargin(true);
 
@@ -135,12 +137,25 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	public void delete()
 	{
 		Object entityId = entityTable.getValue();
-		Object previousItemId = entityTable.prevItemId(entityId);
+		Object previousItemId = null;
+		try
+		{
+			previousItemId = entityTable.prevItemId(entityId);
+		}
+		catch (Exception e)
+		{
+			logger.warn(e, e);
+		}
+
 		entityTable.removeItem(entityId);
 		newEntity = null;
 
 		entityTable.select(null);
-		entityTable.select(previousItemId);
+
+		if (previousItemId != null)
+		{
+			entityTable.select(previousItemId);
+		}
 
 		dirty = true;
 
@@ -542,5 +557,16 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	{
 		// no title in child cruds
 		return null;
+	}
+
+	// disabled as the save/cancel enable/disable is buggy
+	@Override
+	public void fieldGroupIsDirty(boolean b)
+	{
+		// if (b)
+		// {
+		// dirty = true;
+		// }
+		// parentCrud.fieldGroupIsDirty(dirty);
 	}
 }

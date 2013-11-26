@@ -5,6 +5,8 @@ import java.util.Set;
 
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.data.Item;
+import com.vaadin.data.Property.ValueChangeEvent;
+import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.validator.BeanValidator;
 import com.vaadin.ui.Field;
@@ -34,6 +36,14 @@ public class ValidatingFieldGroup<E> extends FieldGroup
 
 	}
 
+	private boolean groupIsDirty;
+	private DirtyListener dirtyListener;
+	
+	public void setDirtyListener(DirtyListener listener)
+	{
+		dirtyListener = listener;
+	}
+
 	private Set<Field<?>> knownFields = new HashSet<Field<?>>();
 
 	/*
@@ -56,7 +66,7 @@ public class ValidatingFieldGroup<E> extends FieldGroup
 		if (!knownFields.contains(field))
 		{
 			// only ever add the validator once for a field
-			
+
 			// Add Bean validators if there are annotations
 			// Note that this requires a bean validation implementation to
 			// be available.
@@ -67,8 +77,51 @@ public class ValidatingFieldGroup<E> extends FieldGroup
 			{
 				validator.setLocale(field.getLocale());
 			}
+
+			ValueChangeListener changeListener = new ValueChangeListener()
+			{
+
+				@Override
+				public void valueChange(ValueChangeEvent event)
+				{
+					if (groupIsDirty == false)
+					{
+						groupIsDirty = true;
+
+						if (dirtyListener != null)
+						{
+							dirtyListener.fieldGroupIsDirty(true);
+						}
+
+					}
+
+				}
+			};
+			field.addValueChangeListener(changeListener);
 		}
 		knownFields.add(field);
+
+	}
+
+	public void discard()
+	{
+		groupIsDirty = false;
+		if (dirtyListener != null)
+		{
+			dirtyListener.fieldGroupIsDirty(false);
+		}
+		super.discard();
+
+	}
+
+	public void setItemDataSource(Item itemDataSource)
+	{
+		groupIsDirty = false;
+		if (dirtyListener != null)
+		{
+			dirtyListener.fieldGroupIsDirty(false);
+		}
+		super.setItemDataSource(itemDataSource);
 	}
 
 	public JPAContainer<E> getContainer()

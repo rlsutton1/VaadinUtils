@@ -2,8 +2,6 @@ package au.com.vaadinutils.dao;
 
 import javax.persistence.EntityManager;
 
-
-
 /**
  * The class is a place holder to allow access to an 'non-injected' entity
  * manager.
@@ -68,24 +66,31 @@ public enum EntityManagerProvider
 		INSTANCE.emf = emf;
 	}
 
-	public static void setThreadLocalEntityManager(EntityWorker worker) throws Exception
+	public static <T> T setThreadLocalEntityManager(EntityWorker<T> worker) throws Exception
 	{
-		EntityManager em = createEntityManager();
-		try
+		if (getEntityManager() == null)
 		{
+			EntityManager em = createEntityManager();
 
-			setCurrentEntityManager(em);
-			em.getTransaction().begin();
+			try
+			{
 
-			worker.exec();
-			
-			em.getTransaction().commit();
+				setCurrentEntityManager(em);
+				em.getTransaction().begin();
+
+				T ret = worker.exec();
+
+				em.getTransaction().commit();
+				return ret;
+			}
+			finally
+			{
+				setCurrentEntityManager(null);
+				em.close();
+			}
 		}
-		finally
-		{
-			setCurrentEntityManager(null);
-			em.close();
-		}
+		// there was already an active entity manager, so just use it!
+		return worker.exec();
 
 	}
 
@@ -137,10 +142,10 @@ public enum EntityManagerProvider
 
 	}
 
-	public static<T> void detach(T record)
+	public static <T> void detach(T record)
 	{
 		getEntityManager().detach(record);
-		
+
 	}
 
 }
