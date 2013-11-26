@@ -645,7 +645,8 @@ public class FormHelper<E> implements Serializable
 		{
 			sb.append("Error: " + violation.getPropertyPath() + " : " + violation.getMessage() + "\n");
 			
-		}logger.error(sb.toString());
+		}
+		logger.error(sb.toString());
 		Notification.show(sb.toString(), Type.ERROR_MESSAGE);
 	}
 

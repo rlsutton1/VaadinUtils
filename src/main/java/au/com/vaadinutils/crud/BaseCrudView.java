@@ -248,7 +248,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		return holder;
 	}
 
-	@SuppressWarnings("null")
 	private void buildActionLayout()
 	{
 		actionLayout = new HorizontalLayout();
