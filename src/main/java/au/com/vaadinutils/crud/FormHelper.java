@@ -6,21 +6,26 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
+import javax.persistence.metamodel.SetAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
 import org.apache.log4j.Logger;
 
+import au.com.vaadinutils.converter.MultiSelectConverter;
 import au.com.vaadinutils.crud.splitFields.SplitCheckBox;
 import au.com.vaadinutils.crud.splitFields.SplitComboBox;
 import au.com.vaadinutils.crud.splitFields.SplitDateField;
 import au.com.vaadinutils.crud.splitFields.SplitEditorField;
 import au.com.vaadinutils.crud.splitFields.SplitLabel;
+import au.com.vaadinutils.crud.splitFields.SplitListSelect;
 import au.com.vaadinutils.crud.splitFields.SplitPasswordField;
 import au.com.vaadinutils.crud.splitFields.SplitTextArea;
 import au.com.vaadinutils.crud.splitFields.SplitTextField;
+import au.com.vaadinutils.crud.splitFields.SplitTwinColSelect;
 import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.fields.CKEditorEmailField;
 import au.com.vaadinutils.fields.DataBoundButton;
@@ -544,6 +549,310 @@ public class FormHelper<E> implements Serializable
 		}
 
 	}
+
+	/**
+	 *  use this syntax to instance the builder:<br>
+	 *  	formHelper.new EntityFieldBuilder<{name of list class}>();
+	 *  <br><br>
+	 *  	for example<br><br>
+	 *  	
+	 *		FormHelper<TblAdvertisementSize> helper = new FormHelper<TblAdvertisementSize>(...);<br><br> 
+	 * 		ListSelect sections = helper.new ListSelectBuilder<TblSection>()<br>
+	 *			.setLabel("Sections")<br>
+	 *			.setField(TblAdvertisementSize_.tblSections)<br>
+	 *			.setListFieldName("name")<br>
+	 *			.setMultiSelect(true)<br>
+	 *			.build(); <br>
+	 * @author bhorvath
+	 * 
+	 * @param <L> the type of the list class
+	 */
+	public class ListSelectBuilder<L>
+	{
+		private SplitListSelect component = null;
+		private String label = null;
+		private JPAContainer<L> container = null;
+		private Class<L> listClazz;
+		private String listField;
+		private String field;
+		private AbstractLayout builderForm;
+		private boolean multiSelect = false;
+
+		public SplitListSelect build()
+		{
+			Preconditions.checkNotNull(label, "label may not be null");
+			Preconditions.checkNotNull(listField, "colField Property may not be null");
+			Preconditions.checkNotNull(field, "Field may not be null");
+			if (builderForm == null)
+			{
+				builderForm = form;
+			}
+			Preconditions.checkNotNull(builderForm, "Form may not be null");
+
+			if (component == null)
+			{
+				component = new SplitListSelect(label);
+			}
+
+			component.setCaption(label);
+			component.setItemCaptionMode(ItemCaptionMode.PROPERTY);
+			component.setItemCaptionPropertyId(listField);
+
+			if (container == null)
+			{
+				Preconditions.checkNotNull(listClazz, "listClazz may not be null");
+				container = JPAContainerFactory.make(listClazz, EntityManagerProvider.getEntityManager());
+			}
+
+			Preconditions.checkState(container.getContainerPropertyIds().contains(listField), listField
+				+ " is not valid, valid listFields are " + container.getContainerPropertyIds().toString());
+
+			if (container.getSortableContainerPropertyIds().contains(listField))
+				container.sort(new String[] { listField }, new boolean[] { true });
+
+			component.setContainerDataSource(container);
+
+			if (this.multiSelect == true)
+			{
+				component.setConverter(new MultiSelectConverter(component, Set.class));
+				component.setMultiSelect(true);
+			}
+			else
+			{
+				SingleSelectConverter<L> converter = new SingleSelectConverter<L>(component);
+				component.setConverter(converter);
+			}
+
+			component.setWidth("100%");
+			component.setImmediate(true);
+			component.setNullSelectionAllowed(false);
+
+			if (group != null)
+		{
+				Preconditions.checkState(group.getContainer().getContainerPropertyIds().contains(field), field
+					+ " is not valid, valid listFieldNames are "
+						+ group.getContainer().getContainerPropertyIds().toString());
+
+				doBinding(group, field, component);
+			}
+			builderForm.addComponent(component);
+			
+			return component;
+		}
+		
+		public ListSelectBuilder<L> setMultiSelect(boolean multiSelect)
+		{
+			this.multiSelect = multiSelect;
+			return this;
+		}
+
+		public ListSelectBuilder<L> setLabel(String label)
+		{
+			this.label = label;
+			return this;
+		}
+
+		public ListSelectBuilder<L> setField(SingularAttribute<E, L> field)
+		{
+			this.field = field.getName();
+			listClazz = field.getBindableJavaType();
+			return this;
+		}
+
+		public ListSelectBuilder<L> setField(SetAttribute<E, L> field)
+		{
+			this.field = field.getName();
+			listClazz = field.getBindableJavaType();
+			return this;
+		}
+
+		public ListSelectBuilder<L> setListFieldName(SingularAttribute<L, ?> colField)
+		{
+			this.listField = colField.getName();
+			return this;
+		}
+
+		public ListSelectBuilder<L> setListFieldName(String colField)
+		{
+			this.listField = colField;
+			return this;
+		}
+		
+		public ListSelectBuilder<L> setContainer(JPAContainer<L> container)
+		{
+			this.container = container;
+			return this;
+		}
+
+		public ListSelectBuilder<L> setForm(AbstractLayout form)
+		{
+			this.builderForm = form;
+			return this;
+		}
+
+		public ListSelectBuilder<L> setComponent(SplitListSelect component)
+		{
+			this.component = component;
+			return this;
+		}
+
+		public ListSelectBuilder<L> setListClass(Class<L> listClazz)
+		{
+			Preconditions.checkState(this.listClazz == null,
+					"If you set the field as a singularAttribute, the listClass is set automatically.");
+			this.listClazz = listClazz;
+			return this;
+		}
+	}
+
+	/**
+	 *  use this syntax to instance the builder:<br>
+	 *  	formHelper.new EntityFieldBuilder<{name of list class}>();
+	 *  <br><br>
+	 *  	for example<br><br>
+	 *  	
+	 *		FormHelper<TblAdvertisementSize> helper = new FormHelper<TblAdvertisementSize>(...);<br><br> 
+	 * 		TwinColSelect sections = helper.new TwinColSelectBuilder<TblSection>()<br>
+	 *			.setLabel("Sections")<br>
+	 *			.setField(TblAdvertisementSize_.tblSections)<br>
+	 *			.setListFieldName("name")<br>
+	 *			.setLeftColumnCaption("Available")
+	 *			.setRightColumnCaption("Selected")
+	 *			.build(); <br>
+	 * @author bhorvath
+	 * 
+	 * @param <L> the type of the list class
+	 */
+	public class TwinColSelectBuilder<L>
+	{
+		private SplitTwinColSelect component = null;
+		private String label = null;
+		private JPAContainer<L> container = null;
+		private Class<L> listClazz;
+		private String listField;
+		private String field;
+		private AbstractLayout builderForm;
+		private String leftColumnCaption;
+		private String rightColumnCaption;
+
+		public SplitTwinColSelect build()
+		{
+			Preconditions.checkNotNull(label, "label may not be null");
+			Preconditions.checkNotNull(listField, "colField Property may not be null");
+			Preconditions.checkNotNull(field, "Field may not be null");
+			if (builderForm == null)
+			{
+				builderForm = form;
+			}
+			Preconditions.checkNotNull(builderForm, "Form may not be null");
+
+			if (component == null)
+			{
+				component = new SplitTwinColSelect(label);
+			}
+
+			component.setCaption(label);
+			component.setItemCaptionMode(ItemCaptionMode.PROPERTY);
+			component.setItemCaptionPropertyId(listField);
+			component.setLeftColumnCaption(leftColumnCaption);
+			component.setRightColumnCaption(rightColumnCaption);
+
+			if (container == null)
+			{
+				Preconditions.checkNotNull(listClazz, "listClazz may not be null");
+				container = JPAContainerFactory.make(listClazz, EntityManagerProvider.getEntityManager());
+			}
+
+			Preconditions.checkState(container.getContainerPropertyIds().contains(listField), listField
+				+ " is not valid, valid listFields are " + container.getContainerPropertyIds().toString());
+
+			if (container.getSortableContainerPropertyIds().contains(listField))
+				container.sort(new String[] { listField }, new boolean[] { true });
+
+			component.setContainerDataSource(container);
+			component.setConverter(new MultiSelectConverter(component, Set.class));
+
+			component.setWidth("100%");
+			component.setImmediate(true);
+			component.setNullSelectionAllowed(true);
+
+			if (group != null)
+		{
+				Preconditions.checkState(group.getContainer().getContainerPropertyIds().contains(field), field
+					+ " is not valid, valid listFieldNames are "
+						+ group.getContainer().getContainerPropertyIds().toString());
+
+				doBinding(group, field, component);
+			}
+			builderForm.addComponent(component);
+			
+			return component;
+		}
+		
+		public TwinColSelectBuilder<L> setLabel(String label)
+		{
+			this.label = label;
+			return this;
+		}
+		
+		public TwinColSelectBuilder<L> setLeftColumnCaption(String leftColumnCaption)
+		{
+			this.leftColumnCaption = leftColumnCaption;
+			return this;
+		}
+		
+		public TwinColSelectBuilder<L> setRightColumnCaption(String rightColumnCaption)
+		{
+			this.rightColumnCaption = rightColumnCaption;
+			return this;
+		}
+
+		public TwinColSelectBuilder<L> setField(SetAttribute<E, L> field)
+		{
+			this.field = field.getName();
+			listClazz = field.getBindableJavaType();
+			return this;
+		}
+
+		public TwinColSelectBuilder<L> setListFieldName(SingularAttribute<L, ?> colField)
+		{
+			this.listField = colField.getName();
+			return this;
+		}
+
+		public TwinColSelectBuilder<L> setListFieldName(String colField)
+		{
+			this.listField = colField;
+			return this;
+		}
+		
+		public TwinColSelectBuilder<L> setContainer(JPAContainer<L> container)
+		{
+			this.container = container;
+			return this;
+		}
+
+		public TwinColSelectBuilder<L> setForm(AbstractLayout form)
+		{
+			this.builderForm = form;
+			return this;
+		}
+
+		public TwinColSelectBuilder<L> setComponent(SplitTwinColSelect component)
+		{
+			this.component = component;
+			return this;
+		}
+
+		public TwinColSelectBuilder<L> setListClass(Class<L> listClazz)
+		{
+			Preconditions.checkState(this.listClazz == null,
+					"If you set the field as a singularAttribute, the listClass is set automatically.");
+			this.listClazz = listClazz;
+			return this;
+		}
+	}
+
 
 	public <M> CKEditorEmailField bindEditorField(AbstractLayout form, ValidatingFieldGroup<E> group,
 			SingularAttribute<E, M> member, boolean readonly)
