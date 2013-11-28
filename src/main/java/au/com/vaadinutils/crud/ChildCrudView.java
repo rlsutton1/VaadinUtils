@@ -82,6 +82,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 		// ensure auto commit is off, so that child updates don't go to the db
 		// until the parent saves
 		container.setAutoCommit(false);
+//		container.setBuffered(true);
 
 	}
 
@@ -113,10 +114,20 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 				}
 
 			}
+
 			extendedChildCommitProcessing(newParentId, item);
+			
+
 		}
 		container.commit();
 		container.refresh();
+		
+		// somewhat dodgy use here...
+		for (ChildCrudListener<E> child:getChildCrudListeners())
+		{
+			child.committed(null);
+		}
+
 		dirty = false;
 
 	}
@@ -356,7 +367,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	 */
 	boolean saving = false;
 
-	protected void saveEditsToTemp()
+	public void saveEditsToTemp()
 	{
 		if (saving == false)
 			try
@@ -377,8 +388,8 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 						EntityItem<E> item = container.getItem(id);
 						// container.commit();
 
-						fieldGroup.setItemDataSource(item);
-						entityTable.select(item.getItemId());
+//						fieldGroup.setItemDataSource(item);
+//						entityTable.select(item.getItemId());
 						// If we leave the save button active, clicking it again
 						// duplicates the record
 						// rightLayout.setVisible(false);
@@ -392,6 +403,11 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 							// container.commit();
 						}
 					}
+				}
+				
+				for (ChildCrudListener<E> child:getChildCrudListeners())
+				{
+					child.saveEditsToTemp();
 				}
 				// Notification.show("Changes Saved",
 				// "Any changes you have made have been saved.",
@@ -568,5 +584,13 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 		// dirty = true;
 		// }
 		// parentCrud.fieldGroupIsDirty(dirty);
+	}
+
+	@Override
+	public void discard()
+	{
+		fieldGroup.discard();
+		container.discard();
+
 	}
 }

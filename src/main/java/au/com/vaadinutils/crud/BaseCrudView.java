@@ -1,6 +1,7 @@
 package au.com.vaadinutils.crud;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -94,7 +95,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	private AbstractLayout advancedSearchLayout;
 	private VerticalLayout searchLayout;
 	private CheckBox advancedSearchButton;
-	protected Set<ChildCrudListener<E>> childCrudListeners = new HashSet<ChildCrudListener<E>>();
+	private Set<ChildCrudListener<E>> childCrudListeners = new HashSet<ChildCrudListener<E>>();
 	private CrudDisplayMode displayMode = CrudDisplayMode.HORIZONTAL;
 	protected HorizontalLayout actionLayout;
 	protected ComboBox actionCombo;
@@ -130,8 +131,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		fieldGroup.setBuffered(true);
 
 		// disable this, as the disabling of the save/cancel button is buggy
-		//		fieldGroup.setDirtyListener(this);
-		
+		// fieldGroup.setDirtyListener(this);
 
 		entityTable = getTable(container, headings);
 		entityTable.setRowChangeListener(this);
@@ -497,6 +497,11 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			public void clicked(ClickEvent event)
 			{
 				fieldGroup.discard();
+				for (ChildCrudListener<E> child : childCrudListeners)
+				{
+					child.discard();
+				}
+
 				if (newEntity != null)
 				{
 					if (restoreDelete)
@@ -651,6 +656,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			EntityManagerProvider.getEntityManager().flush();
 			postSaveAction(newEntity);
 
+
 			// select has been moved to here because when it happens earlier,
 			// child cruds are caused to discard their data before saving it for
 			// a new record
@@ -733,7 +739,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 						@SuppressWarnings("unchecked")
 						E id = (E) affectedEntities.toArray()[0];
 						newEntity.set(id);
-						
+
 					}
 				}
 			}
@@ -894,7 +900,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	public void allowRowChange(final RowChangeCallback callback)
 	{
 
-		
 		boolean dirty = false;
 		for (ChildCrudListener<E> commitListener : childCrudListeners)
 		{
@@ -946,13 +951,15 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		}
 		else
 		{
-			try{
-			callback.allowRowChange();
-			}catch (Exception e)
+			try
 			{
-				logger.error(e,e);
-				Notification.show(e.getClass().getSimpleName()+" "+e.getMessage(),Type.ERROR_MESSAGE);
-				
+				callback.allowRowChange();
+			}
+			catch (Exception e)
+			{
+				logger.error(e, e);
+				Notification.show(e.getClass().getSimpleName() + " " + e.getMessage(), Type.ERROR_MESSAGE);
+
 			}
 		}
 
@@ -1108,6 +1115,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	public void addChildCrudListener(ChildCrudListener<E> listener)
 	{
 		childCrudListeners.add(listener);
+		System.out.println(getClass() + " " + childCrudListeners);
 	}
 
 	protected void newClicked()
@@ -1147,14 +1155,13 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				catch (Exception e)
 				{
 					logger.error(e, e);
-					Notification.show(e.getClass().getSimpleName()+ " "+e.getMessage(),Type.ERROR_MESSAGE);
+					Notification.show(e.getClass().getSimpleName() + " " + e.getMessage(), Type.ERROR_MESSAGE);
 					throw new RuntimeException(e);
 				}
 			}
 
 		});
 	}
-
 
 	/**
 	 * for child cruds, they overload this to ensure that the minimum necessary
@@ -1176,11 +1183,16 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 	}
 
-	//disabled as the save/cancel enable/disable is buggy
+	// disabled as the save/cancel enable/disable is buggy
 	@Override
 	public void fieldGroupIsDirty(boolean b)
 	{
-//		saveButton.setEnabled(b);
-//		cancelButton.setEnabled(b);
+		// saveButton.setEnabled(b);
+		// cancelButton.setEnabled(b);
+	}
+
+	Set<ChildCrudListener<E>> getChildCrudListeners()
+	{
+		return Collections.unmodifiableSet(childCrudListeners);
 	}
 }

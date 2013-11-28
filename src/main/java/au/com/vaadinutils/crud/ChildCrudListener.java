@@ -30,4 +30,8 @@ public interface ChildCrudListener<E>
 
 	public void validateFieldz();
 
+	public void discard();
+
+	public void saveEditsToTemp();
+
 }
