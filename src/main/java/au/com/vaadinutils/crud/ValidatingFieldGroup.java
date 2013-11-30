@@ -80,6 +80,7 @@ public class ValidatingFieldGroup<E> extends FieldGroup
 
 			ValueChangeListener changeListener = new ValueChangeListener()
 			{
+				private static final long serialVersionUID = 1L;
 
 				@Override
 				public void valueChange(ValueChangeEvent event)
