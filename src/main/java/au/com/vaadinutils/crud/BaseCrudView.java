@@ -819,10 +819,11 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 			public void textChange(final TextChangeEvent event)
 			{
-				Filter filter = getContainerFilter(event.getText());
+				String filterString = event.getText();
+				Filter filter = getContainerFilter(filterString);
 				if (advancedSearchLayout != null && advancedSearchButton.getValue())
 				{
-					filter = getAdvancedContainerFilter(filter);
+					filter = getAdvancedContainerFilter(filter, filterString);
 				}
 				applyFilter(filter);
 			}
@@ -840,7 +841,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		Filter filter = getContainerFilter(searchField.getValue());
 		if (advancedSearchButton != null && advancedSearchButton.getValue())
 		{
-			filter = getAdvancedContainerFilter(filter);
+			filter = getAdvancedContainerFilter(filter, searchField.getValue());
 		}
 		applyFilter(filter);
 	}
@@ -879,7 +880,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 * @param string
 	 * @return
 	 */
-	protected Filter getAdvancedContainerFilter(Filter filter)
+	protected Filter getAdvancedContainerFilter(Filter filter, String filterSTring)
 	{
 		return filter;
 	}
@@ -1170,6 +1171,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	protected void resetFilters()
 	{
 		container.removeAllContainerFilters();
+		((EntityTable<E>)this.entityTable).refreshRowCache();
 	}
 
 	protected boolean isNew()
