@@ -1,7 +1,6 @@
 package au.com.vaadinutils.crud.splitFields;
 
 import com.vaadin.ui.Label;
-import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.TwinColSelect;
 
 public class SplitTwinColSelect extends TwinColSelect implements SplitField
