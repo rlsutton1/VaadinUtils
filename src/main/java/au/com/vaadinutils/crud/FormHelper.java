@@ -412,20 +412,24 @@ public class FormHelper<E> implements Serializable
 	}
 
 	/**
-	 *  use this syntax to instance the builder:<br>
-	 *  	formHelper.new EntityFieldBuilder<{name of list class}>();
-	 *  <br><br>
-	 *  	for example<br><br>
-	 *  	
-	 *  	FormHelper<Tblroutestep> helper = new FormHelper<Tblroutestep>(...);<br><br>
-	 *   	ComboBox field = helper.new EntityFieldBuilder<Tblroutingscript>()<br>
-	 *   	.setLabel("Action")<br>
-	 *   	.setField(Tblroutestep_.script)<br>
-	 *   	.setListFieldName(Tblroutingscript_.name)<br>
-	 *   	.build();<br>
+	 * use this syntax to instance the builder:<br>
+	 * formHelper.new EntityFieldBuilder<{name of list class}>(); <br>
+	 * <br>
+	 * for example<br>
+	 * <br>
+	 * 
+	 * FormHelper<Tblroutestep> helper = new FormHelper<Tblroutestep>(...);<br>
+	 * <br>
+	 * ComboBox field = helper.new EntityFieldBuilder<Tblroutingscript>()<br>
+	 * .setLabel("Action")<br>
+	 * .setField(Tblroutestep_.script)<br>
+	 * .setListFieldName(Tblroutingscript_.name)<br>
+	 * .build();<br>
+	 * 
 	 * @author rsutton
 	 * 
-	 * @param <L> the type of the list class
+	 * @param <L>
+	 *            the type of the list class
 	 */
 	public class EntityFieldBuilder<L>
 	{
@@ -447,16 +451,16 @@ public class FormHelper<E> implements Serializable
 			if (builderForm == null)
 			{
 				builderForm = form;
-	}
+			}
 			Preconditions.checkNotNull(builderForm, "Form may not be null");
-	
+
 			if (component == null)
-	{
+			{
 				component = new SplitComboBox(label);
 			}
 			component.setCaption(label);
 			component.setItemCaptionMode(ItemCaptionMode.PROPERTY);
-		
+
 			if (container == null)
 			{
 				Preconditions.checkNotNull(listClazz, "listClazz may not be null");
@@ -465,10 +469,12 @@ public class FormHelper<E> implements Serializable
 			}
 
 			Preconditions.checkState(container.getContainerPropertyIds().contains(listField), listField
-				+ " is not valid, valid listFieldNames are " + container.getContainerPropertyIds().toString());
+					+ " is not valid, valid listFieldNames are " + container.getContainerPropertyIds().toString());
 
 			if (container.getSortableContainerPropertyIds().contains(listField))
-				container.sort(new String[] { listField }, new boolean[] { true });
+				container.sort(new String[]
+				{ listField }, new boolean[]
+				{ true });
 
 			component.setItemCaptionPropertyId(listField);
 			component.setContainerDataSource(container);
@@ -480,9 +486,9 @@ public class FormHelper<E> implements Serializable
 			component.setWidth("100%");
 			component.setImmediate(true);
 			if (group != null)
-		{
+			{
 				Preconditions.checkState(group.getContainer().getContainerPropertyIds().contains(field), field
-					+ " is not valid, valid listFieldNames are "
+						+ " is not valid, valid listFieldNames are "
 						+ group.getContainer().getContainerPropertyIds().toString());
 
 				doBinding(group, field, component);
@@ -551,21 +557,26 @@ public class FormHelper<E> implements Serializable
 	}
 
 	/**
-	 *  use this syntax to instance the builder:<br>
-	 *  	formHelper.new EntityFieldBuilder<{name of list class}>();
-	 *  <br><br>
-	 *  	for example<br><br>
-	 *  	
-	 *		FormHelper<TblAdvertisementSize> helper = new FormHelper<TblAdvertisementSize>(...);<br><br> 
-	 * 		ListSelect sections = helper.new ListSelectBuilder<TblSection>()<br>
-	 *			.setLabel("Sections")<br>
-	 *			.setField(TblAdvertisementSize_.tblSections)<br>
-	 *			.setListFieldName("name")<br>
-	 *			.setMultiSelect(true)<br>
-	 *			.build(); <br>
+	 * use this syntax to instance the builder:<br>
+	 * formHelper.new EntityFieldBuilder<{name of list class}>(); <br>
+	 * <br>
+	 * for example<br>
+	 * <br>
+	 * 
+	 * FormHelper<TblAdvertisementSize> helper = new
+	 * FormHelper<TblAdvertisementSize>(...);<br>
+	 * <br>
+	 * ListSelect sections = helper.new ListSelectBuilder<TblSection>()<br>
+	 * .setLabel("Sections")<br>
+	 * .setField(TblAdvertisementSize_.tblSections)<br>
+	 * .setListFieldName("name")<br>
+	 * .setMultiSelect(true)<br>
+	 * .build(); <br>
+	 * 
 	 * @author bhorvath
 	 * 
-	 * @param <L> the type of the list class
+	 * @param <L>
+	 *            the type of the list class
 	 */
 	public class ListSelectBuilder<L>
 	{
@@ -605,10 +616,12 @@ public class FormHelper<E> implements Serializable
 			}
 
 			Preconditions.checkState(container.getContainerPropertyIds().contains(listField), listField
-				+ " is not valid, valid listFields are " + container.getContainerPropertyIds().toString());
+					+ " is not valid, valid listFields are " + container.getContainerPropertyIds().toString());
 
 			if (container.getSortableContainerPropertyIds().contains(listField))
-				container.sort(new String[] { listField }, new boolean[] { true });
+				container.sort(new String[]
+				{ listField }, new boolean[]
+				{ true });
 
 			component.setContainerDataSource(container);
 
@@ -628,18 +641,18 @@ public class FormHelper<E> implements Serializable
 			component.setNullSelectionAllowed(false);
 
 			if (group != null)
-		{
+			{
 				Preconditions.checkState(group.getContainer().getContainerPropertyIds().contains(field), field
-					+ " is not valid, valid listFieldNames are "
+						+ " is not valid, valid listFieldNames are "
 						+ group.getContainer().getContainerPropertyIds().toString());
 
 				doBinding(group, field, component);
 			}
 			builderForm.addComponent(component);
-			
+
 			return component;
 		}
-		
+
 		public ListSelectBuilder<L> setMultiSelect(boolean multiSelect)
 		{
 			this.multiSelect = multiSelect;
@@ -677,7 +690,7 @@ public class FormHelper<E> implements Serializable
 			this.listField = colField;
 			return this;
 		}
-		
+
 		public ListSelectBuilder<L> setContainer(JPAContainer<L> container)
 		{
 			this.container = container;
@@ -706,22 +719,26 @@ public class FormHelper<E> implements Serializable
 	}
 
 	/**
-	 *  use this syntax to instance the builder:<br>
-	 *  	formHelper.new EntityFieldBuilder<{name of list class}>();
-	 *  <br><br>
-	 *  	for example<br><br>
-	 *  	
-	 *		FormHelper<TblAdvertisementSize> helper = new FormHelper<TblAdvertisementSize>(...);<br><br> 
-	 * 		TwinColSelect sections = helper.new TwinColSelectBuilder<TblSection>()<br>
-	 *			.setLabel("Sections")<br>
-	 *			.setField(TblAdvertisementSize_.tblSections)<br>
-	 *			.setListFieldName("name")<br>
-	 *			.setLeftColumnCaption("Available")
-	 *			.setRightColumnCaption("Selected")
-	 *			.build(); <br>
+	 * use this syntax to instance the builder:<br>
+	 * formHelper.new EntityFieldBuilder<{name of list class}>(); <br>
+	 * <br>
+	 * for example<br>
+	 * <br>
+	 * 
+	 * FormHelper<TblAdvertisementSize> helper = new
+	 * FormHelper<TblAdvertisementSize>(...);<br>
+	 * <br>
+	 * TwinColSelect sections = helper.new TwinColSelectBuilder<TblSection>()<br>
+	 * .setLabel("Sections")<br>
+	 * .setField(TblAdvertisementSize_.tblSections)<br>
+	 * .setListFieldName("name")<br>
+	 * .setLeftColumnCaption("Available") .setRightColumnCaption("Selected")
+	 * .build(); <br>
+	 * 
 	 * @author bhorvath
 	 * 
-	 * @param <L> the type of the list class
+	 * @param <L>
+	 *            the type of the list class
 	 */
 	public class TwinColSelectBuilder<L>
 	{
@@ -764,10 +781,12 @@ public class FormHelper<E> implements Serializable
 			}
 
 			Preconditions.checkState(container.getContainerPropertyIds().contains(listField), listField
-				+ " is not valid, valid listFields are " + container.getContainerPropertyIds().toString());
+					+ " is not valid, valid listFields are " + container.getContainerPropertyIds().toString());
 
 			if (container.getSortableContainerPropertyIds().contains(listField))
-				container.sort(new String[] { listField }, new boolean[] { true });
+				container.sort(new String[]
+				{ listField }, new boolean[]
+				{ true });
 
 			component.setContainerDataSource(container);
 			component.setConverter(new MultiSelectConverter(component, Set.class));
@@ -777,30 +796,30 @@ public class FormHelper<E> implements Serializable
 			component.setNullSelectionAllowed(true);
 
 			if (group != null)
-		{
+			{
 				Preconditions.checkState(group.getContainer().getContainerPropertyIds().contains(field), field
-					+ " is not valid, valid listFieldNames are "
+						+ " is not valid, valid listFieldNames are "
 						+ group.getContainer().getContainerPropertyIds().toString());
 
 				doBinding(group, field, component);
 			}
 			builderForm.addComponent(component);
-			
+
 			return component;
 		}
-		
+
 		public TwinColSelectBuilder<L> setLabel(String label)
 		{
 			this.label = label;
 			return this;
 		}
-		
+
 		public TwinColSelectBuilder<L> setLeftColumnCaption(String leftColumnCaption)
 		{
 			this.leftColumnCaption = leftColumnCaption;
 			return this;
 		}
-		
+
 		public TwinColSelectBuilder<L> setRightColumnCaption(String rightColumnCaption)
 		{
 			this.rightColumnCaption = rightColumnCaption;
@@ -825,7 +844,7 @@ public class FormHelper<E> implements Serializable
 			this.listField = colField;
 			return this;
 		}
-		
+
 		public TwinColSelectBuilder<L> setContainer(JPAContainer<L> container)
 		{
 			this.container = container;
@@ -852,7 +871,6 @@ public class FormHelper<E> implements Serializable
 			return this;
 		}
 	}
-
 
 	public <M> CKEditorEmailField bindEditorField(AbstractLayout form, ValidatingFieldGroup<E> group,
 			SingularAttribute<E, M> member, boolean readonly)
@@ -886,32 +904,40 @@ public class FormHelper<E> implements Serializable
 		form.addComponent(field);
 		return field;
 	}
-	
-//	public <L> EntityAutoCompleteField bindAutoCompleteField(AutoCompleteParent<E> parent, 
-//			String fieldLabel, ListAttribute<E, L> entityField, Class<L> listClazz)
-//	{
-//		// hack
-//		ContactDao dao = new DaoFactory().getContactDao();
-//		container = dao.createVaadinContainer();
-//		
-//		//EntityAutoCompleteField<CrudEntity, JpaBaseDao<E,Long>> field = new EntityAutoCompleteField<CrudEntity, JpaBaseDao<E,Long>>(container, dao, fieldLabel, parent);
-//		EntityAutoCompleteField field = new EntityAutoCompleteField<CrudEntity, JpaBaseDao(container, dao, fieldLabel, parent);
-//		return field;
-//				
-//	}
 
-//	public <L> EntityAutoCompleteField bindAutoCompleteField(AutoCompleteParent<E> parent, 
-//			String fieldLabel, ListAttribute<E, L> entityField, Class<L> listClazz)
-//	{
-//		// hack
-//		ContactDao dao = new DaoFactory().getContactDao();
-//		container = dao.createVaadinContainer();
-//		
-//		//EntityAutoCompleteField<CrudEntity, JpaBaseDao<E,Long>> field = new EntityAutoCompleteField<CrudEntity, JpaBaseDao<E,Long>>(container, dao, fieldLabel, parent);
-//		EntityAutoCompleteField field = new EntityAutoCompleteField<CrudEntity, JpaBaseDao(container, dao, fieldLabel, parent);
-//		return field;
-//				
-//	}
+	// public <L> EntityAutoCompleteField
+	// bindAutoCompleteField(AutoCompleteParent<E> parent,
+	// String fieldLabel, ListAttribute<E, L> entityField, Class<L> listClazz)
+	// {
+	// // hack
+	// ContactDao dao = new DaoFactory().getContactDao();
+	// container = dao.createVaadinContainer();
+	//
+	// //EntityAutoCompleteField<CrudEntity, JpaBaseDao<E,Long>> field = new
+	// EntityAutoCompleteField<CrudEntity, JpaBaseDao<E,Long>>(container, dao,
+	// fieldLabel, parent);
+	// EntityAutoCompleteField field = new EntityAutoCompleteField<CrudEntity,
+	// JpaBaseDao(container, dao, fieldLabel, parent);
+	// return field;
+	//
+	// }
+
+	// public <L> EntityAutoCompleteField
+	// bindAutoCompleteField(AutoCompleteParent<E> parent,
+	// String fieldLabel, ListAttribute<E, L> entityField, Class<L> listClazz)
+	// {
+	// // hack
+	// ContactDao dao = new DaoFactory().getContactDao();
+	// container = dao.createVaadinContainer();
+	//
+	// //EntityAutoCompleteField<CrudEntity, JpaBaseDao<E,Long>> field = new
+	// EntityAutoCompleteField<CrudEntity, JpaBaseDao<E,Long>>(container, dao,
+	// fieldLabel, parent);
+	// EntityAutoCompleteField field = new EntityAutoCompleteField<CrudEntity,
+	// JpaBaseDao(container, dao, fieldLabel, parent);
+	// return field;
+	//
+	// }
 
 	public static Container createContainerFromEnumClass(String fieldName, Class<?> clazz)
 	{
@@ -953,7 +979,7 @@ public class FormHelper<E> implements Serializable
 		for (ConstraintViolation<?> violation : e.getConstraintViolations())
 		{
 			sb.append("Error: " + violation.getPropertyPath() + " : " + violation.getMessage() + "\n");
-			
+
 		}
 		logger.error(sb.toString());
 		Notification.show(sb.toString(), Type.ERROR_MESSAGE);
@@ -994,5 +1020,4 @@ public class FormHelper<E> implements Serializable
 		return field;
 	}
 
-	
 }
