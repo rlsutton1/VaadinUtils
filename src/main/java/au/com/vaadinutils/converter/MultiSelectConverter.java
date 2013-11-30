@@ -38,12 +38,14 @@ import com.vaadin.ui.AbstractSelect;
 public class MultiSelectConverter<T> implements Converter<Collection<Object>, Collection<T>>
 {
 
+	private static final long serialVersionUID = 1L;
 	private final AbstractSelect select;
 	private Boolean owningSide;
 	private String mappedBy;
+	@SuppressWarnings("rawtypes")
 	private Class type;
 
-	public MultiSelectConverter(AbstractSelect select, Class type)
+	public MultiSelectConverter(AbstractSelect select, @SuppressWarnings("rawtypes") Class type)
 	{
 		this.select = select;
 		this.type = type;
@@ -55,6 +57,7 @@ public class MultiSelectConverter<T> implements Converter<Collection<Object>, Co
 		return (EntityContainer<T>) select.getContainerDataSource();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Collection<Object> convertToPresentation(Collection<T> value,
 			Class<? extends Collection<Object>> targetType, Locale locale)
@@ -87,6 +90,7 @@ public class MultiSelectConverter<T> implements Converter<Collection<Object>, Co
 		return identifiers;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Collection<T> convertToModel(Collection<Object> value, Class<? extends Collection<T>> targetType,
 			Locale locale) throws com.vaadin.data.util.converter.Converter.ConversionException
@@ -165,6 +169,7 @@ public class MultiSelectConverter<T> implements Converter<Collection<Object>, Co
 		return modelValue;
 	}
 
+	@SuppressWarnings("rawtypes")
 	private EntityItemProperty getPropertyDataSource()
 	{
 		if (select.getPropertyDataSource() != null)
@@ -178,11 +183,13 @@ public class MultiSelectConverter<T> implements Converter<Collection<Object>, Co
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private void removeBackReference(T entity)
 	{
 		if (!isOwningSide())
 		{
 			EntityItemProperty itemProperty = getBackReferenceItemProperty(entity);
+			@SuppressWarnings("rawtypes")
 			Collection c = (Collection) itemProperty.getValue();
 			c.remove(getPropertyDataSource().getItem().getEntity());
 			itemProperty.setValue(c);
@@ -191,11 +198,13 @@ public class MultiSelectConverter<T> implements Converter<Collection<Object>, Co
 
 	private EntityItemProperty getBackReferenceItemProperty(T entity)
 	{
+		@SuppressWarnings("rawtypes")
 		EntityItem item = getContainer().getItem(getContainer().getEntityProvider().getIdentifier(entity));
 		EntityItemProperty itemProperty = item.getItemProperty(mappedBy);
 		return itemProperty;
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void addBackReference(T entity)
 	{
 		if (!isOwningSide())
@@ -235,6 +244,7 @@ public class MultiSelectConverter<T> implements Converter<Collection<Object>, Co
 		return owningSide;
 	}
 
+	@SuppressWarnings("rawtypes")
 	static Collection createNewCollectionForType(Class<?> type) throws InstantiationException, IllegalAccessException
 	{
 		if (type.isInterface())
@@ -258,6 +268,7 @@ public class MultiSelectConverter<T> implements Converter<Collection<Object>, Co
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Class<Collection<T>> getModelType()
 	{
@@ -271,6 +282,7 @@ public class MultiSelectConverter<T> implements Converter<Collection<Object>, Co
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Class<Collection<Object>> getPresentationType()
 	{
