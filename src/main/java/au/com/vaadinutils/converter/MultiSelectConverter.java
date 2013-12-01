@@ -59,7 +59,8 @@ public class MultiSelectConverter<T> implements Converter<Collection<Object>, Co
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Collection<Object> convertToPresentation(Collection<T> value, Locale locale)
+	public Collection<Object> convertToPresentation(Collection<T> value,
+			Class<? extends Collection<Object>> targetType, Locale locale)
 			throws com.vaadin.data.util.converter.Converter.ConversionException
 	{
 		// Value here is a collection of entities, should be transformed to a
@@ -91,8 +92,8 @@ public class MultiSelectConverter<T> implements Converter<Collection<Object>, Co
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Collection<T> convertToModel(Collection<Object> value, Locale locale)
-			throws com.vaadin.data.util.converter.Converter.ConversionException
+	public Collection<T> convertToModel(Collection<Object> value, Class<? extends Collection<T>> targetType,
+			Locale locale) throws com.vaadin.data.util.converter.Converter.ConversionException
 	{
 
 		// NOTE, this currently works properly only if equals and hashcode
@@ -203,8 +204,7 @@ public class MultiSelectConverter<T> implements Converter<Collection<Object>, Co
 		return itemProperty;
 	}
 
-	@SuppressWarnings(
-	{ "rawtypes", "unchecked" })
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void addBackReference(T entity)
 	{
 		if (!isOwningSide())
