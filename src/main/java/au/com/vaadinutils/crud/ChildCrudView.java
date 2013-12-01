@@ -105,6 +105,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 			{
 				try
 				{
+					
 					item.getItemProperty(childKey).setValue(translateParentId(newParentId.getId()));
 
 				}
@@ -121,6 +122,8 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 		}
 		container.commit();
 		container.refresh();
+
+		associateChildren(newParentId);
 		
 		// somewhat dodgy use here...
 		for (ChildCrudListener<E> child:getChildCrudListeners())
@@ -130,6 +133,12 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 
 		dirty = false;
 
+	}
+
+	protected void associateChildren(P newParent)
+	{
+		// TODO Auto-generated method stub
+		
 	}
 
 	/**
