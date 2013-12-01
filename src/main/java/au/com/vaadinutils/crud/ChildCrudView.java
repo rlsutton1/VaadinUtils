@@ -393,8 +393,8 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 					{
 						interceptSaveValues(newEntity);
 
-						Object id = container.addEntity(newEntity.getEntity());
-						EntityItem<E> item = container.getItem(id);
+						container.addEntity(newEntity.getEntity());
+//						EntityItem<E> item = container.getItem(id);
 						// container.commit();
 
 //						fieldGroup.setItemDataSource(item);

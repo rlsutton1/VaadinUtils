@@ -5,6 +5,7 @@ import au.com.vaadinutils.listener.ClickEventLogged;
 import au.com.vaadinutils.listener.CompleteListener;
 import au.com.vaadinutils.listener.ProgressListener;
 
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -85,6 +86,7 @@ public class WorkingDialog extends Window implements ProgressListener<String>
 		layout.addComponent(progress);
 		progress.setIndeterminate(true);
 		messageLabel = new Label(message);
+		messageLabel.setContentMode(ContentMode.HTML);
 		layout.addComponent(messageLabel);
 		content.addComponent(layout);
 

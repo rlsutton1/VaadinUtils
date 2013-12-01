@@ -812,19 +812,12 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		 */
 		searchField.addTextChangeListener(new TextChangeListener()
 		{
-			/**
-                         *
-                         */
 			private static final long serialVersionUID = 1L;
 
 			public void textChange(final TextChangeEvent event)
 			{
-				Filter filter = getContainerFilter(event.getText());
-				if (advancedSearchLayout != null && advancedSearchButton.getValue())
-				{
-					filter = getAdvancedContainerFilter(filter);
-				}
-				applyFilter(filter);
+				String filterString = event.getText();
+				triggerFilter(filterString);
 			}
 
 		});
@@ -837,12 +830,15 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 */
 	protected void triggerFilter()
 	{
-		Filter filter = getContainerFilter(searchField.getValue());
-		if (advancedSearchButton != null && advancedSearchButton.getValue())
-		{
-			filter = getAdvancedContainerFilter(filter);
-		}
+		triggerFilter(searchField.getValue());
+	}
+	
+	private void triggerFilter(String searchText)
+	{
+		boolean advancedSearchActive = advancedSearchButton != null && advancedSearchButton.getValue();
+		Filter filter = getContainerFilter(searchText, advancedSearchActive);
 		applyFilter(filter);
+
 	}
 
 	public void applyFilter(final Filter filter)
@@ -868,21 +864,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 * @param string
 	 * @return
 	 */
-	abstract protected Filter getContainerFilter(String filterString);
-
-	/**
-	 * to initiate advanced filtering call triggerFilter();
-	 * 
-	 * this method is only invoked when the advanced filter is visible. It is
-	 * called, allowing the advanced filter to be added to the simple filter.
-	 * 
-	 * @param string
-	 * @return
-	 */
-	protected Filter getAdvancedContainerFilter(Filter filter)
-	{
-		return filter;
-	}
+	abstract protected Filter getContainerFilter(String filterString, boolean advancedSearchActive);
 
 	/**
 	 * called when the advancedFilters layout should clear it's values
@@ -1170,6 +1152,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	protected void resetFilters()
 	{
 		container.removeAllContainerFilters();
+		((EntityTable<E>)this.entityTable).refreshRowCache();
 	}
 
 	protected boolean isNew()
