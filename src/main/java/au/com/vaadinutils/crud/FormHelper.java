@@ -65,7 +65,7 @@ public class FormHelper<E> implements Serializable
 	public FormHelper(AbstractLayout form, ValidatingFieldGroup<E> group)
 	{
 		// I'm actually using this without a field group.
-		// need to makes some modes so that we formally support non-group usage.
+		// need to makes some modifications so that we formally support non-group usage.
 		// Preconditions.checkNotNull(group,
 		// "ValidatingFieldGroup can not be null");
 		this.form = form;
@@ -589,6 +589,7 @@ public class FormHelper<E> implements Serializable
 		private AbstractLayout builderForm;
 		private boolean multiSelect = false;
 
+		@SuppressWarnings({ "unchecked", "rawtypes" })
 		public SplitListSelect build()
 		{
 			Preconditions.checkNotNull(label, "label may not be null");
@@ -752,6 +753,7 @@ public class FormHelper<E> implements Serializable
 		private String leftColumnCaption;
 		private String rightColumnCaption;
 
+		@SuppressWarnings({ "unchecked", "rawtypes" })
 		public SplitTwinColSelect build()
 		{
 			Preconditions.checkNotNull(label, "label may not be null");
