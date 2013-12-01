@@ -65,7 +65,7 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		grid.setSizeFull();
 		grid.setSpacing(true);
 
-		formHelper = getFormHelper(grid, fieldGroup);
+		formHelper = getFormHelper(this, fieldGroup);
 		init();
 		this.setSizeFull();
 		super.addComponent(grid);
@@ -77,9 +77,9 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 
 	}
 
-	protected FormHelper<E> getFormHelper(GridLayout grid2, ValidatingFieldGroup<E> fieldGroup2)
+	protected FormHelper<E> getFormHelper(MultiColumnFormLayout<E> layout, ValidatingFieldGroup<E> fieldGroup2)
 	{
-		return new FormHelper<E>(grid, fieldGroup);
+		return new FormHelper<E>(layout, fieldGroup);
 	}
 
 	/**
@@ -107,6 +107,12 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	{
 		this.fieldWidths[column] = width;
 	}
+	
+	public void setComponentAlignment(Component childComponent, Alignment alignment)
+	{
+		this.grid.setComponentAlignment(childComponent, alignment);
+	}
+
 
 	private void init()
 	{
