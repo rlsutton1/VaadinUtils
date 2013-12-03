@@ -660,8 +660,10 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			// select has been moved to here because when it happens earlier,
 			// child cruds are caused to discard their data before saving it for
 			// a new record
+			
 			entityTable.select(newEntity.getId());
-
+			container.refreshItem(newEntity.getId());
+			
 			splitPanel.showFirstComponet();
 			Notification.show("Changes Saved", "Any changes you have made have been saved.", Type.TRAY_NOTIFICATION);
 

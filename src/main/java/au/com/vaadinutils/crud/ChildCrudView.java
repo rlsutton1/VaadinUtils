@@ -7,6 +7,8 @@ import javax.validation.ConstraintViolationException;
 import org.apache.log4j.Logger;
 import org.vaadin.dialogs.ConfirmDialog;
 
+import au.com.vaadinutils.dao.EntityManagerProvider;
+
 import com.google.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.EntityItemProperty;
@@ -125,22 +127,29 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 
 		associateChildren(newParentId);
 		
-		// somewhat dodgy use here...
-		for (ChildCrudListener<E> child:getChildCrudListeners())
-		{
-			child.committed(null);
-		}
-
 		dirty = false;
 
 	}
 
-	protected void associateChildren(P newParent)
+	private void associateChildren(P newParent) throws Exception
 	{
-		// TODO Auto-generated method stub
-		
+			P mParent = EntityManagerProvider.merge(newParent);
+			for (Object id : container.getItemIds())
+			{
+				E bmv = EntityManagerProvider.merge(container.getItem(id).getEntity());
+				associateChild(newParent, bmv);
+				for (ChildCrudListener<E> child:getChildCrudListeners())
+				{
+					// allow child of child crud to commit
+					child.committed(bmv);
+				}
+			}
+
+				
 	}
 
+	abstract public void associateChild(P newParent, E bmv);
+	
 	/**
 	 * @throws Exception
 	 */

@@ -62,8 +62,15 @@ public class ExampleLayout extends BaseCrudView<TblExample>
 
 	}
 
+
 	@Override
-	protected Filter getContainerFilter(String filterText)
+	protected String getTitleText()
+	{
+		return "Example";
+	}
+
+	@Override
+	protected Filter getContainerFilter(String filterText, boolean advancedSearchActive)
 	{
 		Filter filter = null;
 		String[] searchFields = new String[] { "name" };
@@ -77,12 +84,6 @@ public class ExampleLayout extends BaseCrudView<TblExample>
 		}
 
 		return filter;
-	}
-
-	@Override
-	protected String getTitleText()
-	{
-		return "Example";
 	}
 
 }
