@@ -81,7 +81,7 @@ public abstract class FilterReport extends ReportView
 		
 		
 		Button pdfButton = new Button("Print Quality");
-		startButton.addClickListener(new ClickEventLogged.ClickListener()
+		pdfButton.addClickListener(new ClickEventLogged.ClickListener()
 		{
 			/**
 			 * 

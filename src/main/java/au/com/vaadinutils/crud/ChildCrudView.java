@@ -84,7 +84,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 		// ensure auto commit is off, so that child updates don't go to the db
 		// until the parent saves
 		container.setAutoCommit(false);
-//		container.setBuffered(true);
+		// container.setBuffered(true);
 
 	}
 
@@ -107,7 +107,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 			{
 				try
 				{
-					
+
 					item.getItemProperty(childKey).setValue(translateParentId(newParentId.getId()));
 
 				}
@@ -119,37 +119,39 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 			}
 
 			extendedChildCommitProcessing(newParentId, item);
-			
 
 		}
 		container.commit();
-		container.refresh();
 
+		// on a new parent, the parent id changes and the container becomes
+		// empty. so reset the parent filter and refresh the container
+		createParentFilter(parentCrud.getContainer().getItem(newParentId.getId()));
+		resetFilters();
+
+		container.refresh();
 		associateChildren(newParentId);
-		
 		dirty = false;
 
 	}
 
 	private void associateChildren(P newParent) throws Exception
 	{
-			P mParent = EntityManagerProvider.merge(newParent);
-			for (Object id : container.getItemIds())
+		P mParent = EntityManagerProvider.merge(newParent);
+		for (Object id : container.getItemIds())
+		{
+			E bmv = EntityManagerProvider.merge(container.getItem(id).getEntity());
+			associateChild(newParent, bmv);
+			for (ChildCrudListener<E> child : getChildCrudListeners())
 			{
-				E bmv = EntityManagerProvider.merge(container.getItem(id).getEntity());
-				associateChild(newParent, bmv);
-				for (ChildCrudListener<E> child:getChildCrudListeners())
-				{
-					// allow child of child crud to commit
-					child.committed(bmv);
-				}
+				// allow child of child crud to commit
+				child.committed(bmv);
 			}
+		}
 
-				
 	}
 
 	abstract public void associateChild(P newParent, E bmv);
-	
+
 	/**
 	 * @throws Exception
 	 */
@@ -403,11 +405,11 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 						interceptSaveValues(newEntity);
 
 						container.addEntity(newEntity.getEntity());
-//						EntityItem<E> item = container.getItem(id);
+						// EntityItem<E> item = container.getItem(id);
 						// container.commit();
 
-//						fieldGroup.setItemDataSource(item);
-//						entityTable.select(item.getItemId());
+						// fieldGroup.setItemDataSource(item);
+						// entityTable.select(item.getItemId());
 						// If we leave the save button active, clicking it again
 						// duplicates the record
 						// rightLayout.setVisible(false);
@@ -422,8 +424,8 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 						}
 					}
 				}
-				
-				for (ChildCrudListener<E> child:getChildCrudListeners())
+
+				for (ChildCrudListener<E> child : getChildCrudListeners())
 				{
 					child.saveEditsToTemp();
 				}
@@ -512,21 +514,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 		try
 		{
 			saveEditsToTemp();
-			parentFilter = new Compare.Equal(childKey, translateParentId(-1l));
-			if (item != null)
-
-			{
-				EntityItemProperty key = item.getItemProperty(parentKey);
-				Preconditions.checkNotNull(key, "parentKey " + parentKey + " doesn't exist in properties");
-				parentId = key.getValue();
-				if (parentId != null)
-				{
-
-					parentFilter = new Compare.Equal(childKey, translateParentId(parentId));
-
-				}
-
-			}
+			createParentFilter(item);
 			fieldGroup.discard();
 			container.discard();
 			dirty = false;
@@ -539,6 +527,25 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 			logger.error(e, e);
 		}
 
+	}
+
+	private void createParentFilter(EntityItem<P> item) throws InstantiationException, IllegalAccessException
+	{
+		parentFilter = new Compare.Equal(childKey, translateParentId(-1l));
+		if (item != null)
+
+		{
+			EntityItemProperty key = item.getItemProperty(parentKey);
+			Preconditions.checkNotNull(key, "parentKey " + parentKey + " doesn't exist in properties");
+			parentId = key.getValue();
+			if (parentId != null)
+			{
+
+				parentFilter = new Compare.Equal(childKey, translateParentId(parentId));
+
+			}
+
+		}
 	}
 
 	/**
