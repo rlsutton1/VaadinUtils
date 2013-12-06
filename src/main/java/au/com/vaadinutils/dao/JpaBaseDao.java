@@ -1,6 +1,7 @@
 package au.com.vaadinutils.dao;
 
 import java.lang.reflect.ParameterizedType;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -9,6 +10,7 @@ import javax.persistence.Table;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.SingularAttribute;
 
@@ -112,13 +114,28 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 	@Override
 	public List<E> findAll()
 	{
+		return findAll(null);
+	}
+
+	@Override
+	public List<E> findAll(SingularAttribute<E, ?> order[])
+	{
 		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 
 		CriteriaQuery<E> criteria = builder.createQuery(entityClass);
 
 		Root<E> root = criteria.from(entityClass);
 		criteria.select(root);
-
+		if (order != null)
+		{
+			List<Order> ordering = new LinkedList<Order>(); 
+			for (SingularAttribute<E, ?> field : order)
+			{
+				ordering.add( builder.asc(root.get(field)));
+				
+			}
+			criteria.orderBy(ordering);
+		}
 		List<E> results = entityManager.createQuery(criteria).getResultList();
 
 		return results;
@@ -164,10 +181,11 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		return container;
 
 	}
+
 	@SuppressWarnings("unused")
 	private void oldCreateVaadinContainer()
 	{
-		 JPAContainerFactory.makeBatchable(entityClass, entityManager);
+		JPAContainerFactory.makeBatchable(entityClass, entityManager);
 	}
 
 	public <V> int deleteAllByAttribute(SingularAttribute<E, V> vKey, V value)
@@ -187,7 +205,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		return result;
 
 	}
-	
+
 	/**
 	 * @return the number of entities in the table.
 	 */
@@ -203,17 +221,15 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 		String qry = "select count(" + entityName + ") from " + tableName + " " + entityName;
 		Query query = entityManager.createQuery(qry);
-		Number countResult=(Number) query.getSingleResult();
+		Number countResult = (Number) query.getSingleResult();
 		return countResult.longValue();
 
 	}
-	
+
 	public void flush()
 	{
 		this.entityManager.flush();
 
 	}
-
-
 
 }
