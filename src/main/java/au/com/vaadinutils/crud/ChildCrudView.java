@@ -139,12 +139,12 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 		P mParent = EntityManagerProvider.merge(newParent);
 		for (Object id : container.getItemIds())
 		{
-			E bmv = EntityManagerProvider.merge(container.getItem(id).getEntity());
-			associateChild(newParent, bmv);
-			for (ChildCrudListener<E> child : getChildCrudListeners())
+			E child = EntityManagerProvider.merge(container.getItem(id).getEntity());
+			associateChild(newParent, child);
+			for (ChildCrudListener<E> childListener : getChildCrudListeners())
 			{
 				// allow child of child crud to commit
-				child.committed(bmv);
+				childListener.committed(child);
 			}
 		}
 
