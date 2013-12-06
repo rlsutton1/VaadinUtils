@@ -136,7 +136,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 
 	private void associateChildren(P newParent) throws Exception
 	{
-		P mParent = EntityManagerProvider.merge(newParent);
+		EntityManagerProvider.merge(newParent);
 		for (Object id : container.getItemIds())
 		{
 			E child = EntityManagerProvider.merge(container.getItem(id).getEntity());
