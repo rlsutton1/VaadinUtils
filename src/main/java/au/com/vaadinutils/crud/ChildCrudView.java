@@ -50,6 +50,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	protected boolean dirty = false;
 	final private Class<P> parentType;
 	protected BaseCrudView<P> parentCrud;
+	private ChildCrudEventHandler<E> eventHandler = getNullEventHandler();
 
 	/**
 	 * 
@@ -72,6 +73,8 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 		// setMargin(true);
 
 	}
+
+
 
 	public ChildCrudView(BaseCrudView<P> parent, Class<P> parentType, Class<E> childType,
 			SingularAttribute<? extends CrudEntity, ? extends Object> parentKey, String childKey)
@@ -174,9 +177,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 					if (changeEvent instanceof EntitiesRemovedEvent)
 					{
 						Collection<E> affectedEntitys = changeEvent.getAffectedEntities();
-
-						entitiesThatWereDeleted(affectedEntitys);
-
+						eventHandler.entitiesDeleted(affectedEntitys);
 					}
 				}
 			}
@@ -199,16 +200,14 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	}
 
 	/**
-	 * invoked when the container deletes entities, an extending class should
-	 * override this method if it needs to perform some cleanup when an entity
-	 * is deleted from a child crud
+	 * EventHandler is the preferred integration point for classes extending
+	 * ChildCrudView as it makes them less tightly coupled.
 	 * 
-	 * @param affectedEntitys
+	 * @param eventHandler
 	 */
-	protected void entitiesThatWereDeleted(Collection<E> affectedEntities)
+	public void setEventHandler(ChildCrudEventHandler<E> eventHandler)
 	{
-		// TODO Auto-generated method stub
-
+		this.eventHandler = eventHandler;
 	}
 
 	private void associateChildren(P newParent) throws Exception
@@ -694,5 +693,16 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 		fieldGroup.discard();
 		container.discard();
 
+	}
+	
+	private ChildCrudEventHandler<E> getNullEventHandler()
+	{
+		return new ChildCrudEventHandler<E>()
+		{
+			@Override
+			public void entitiesDeleted(Collection<E> entities)
+			{
+			}
+		};
 	}
 }
