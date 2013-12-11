@@ -1,7 +1,6 @@
 package au.com.vaadinutils.crud;
 
 import java.util.Collection;
-import java.util.concurrent.atomic.AtomicReference;
 
 import javax.persistence.PersistenceException;
 import javax.persistence.metamodel.SingularAttribute;
@@ -59,6 +58,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	 * @param childKey
 	 *            - this will be the foreign key in the child table
 	 */
+	@SuppressWarnings("unchecked")
 	public ChildCrudView(BaseCrudView<P> parent, Class<P> parentType, Class<E> childType,
 			SingularAttribute<? extends CrudEntity, ? extends Object> parentKey,
 			SingularAttribute<? extends CrudEntity, ? extends Object> childKey)
