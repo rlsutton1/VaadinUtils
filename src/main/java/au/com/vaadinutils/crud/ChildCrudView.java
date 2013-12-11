@@ -73,7 +73,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 
 	}
 
-	public ChildCrudView(Class<P> parentType, Class<E> childType,
+	public ChildCrudView(BaseCrudView<P> parent, Class<P> parentType, Class<E> childType,
 			SingularAttribute<? extends CrudEntity, ? extends Object> parentKey, String childKey)
 	{
 		super(CrudDisplayMode.VERTICAL);
