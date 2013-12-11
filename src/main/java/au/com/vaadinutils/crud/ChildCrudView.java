@@ -1,5 +1,8 @@
 package au.com.vaadinutils.crud;
 
+import java.util.Collection;
+import java.util.concurrent.atomic.AtomicReference;
+
 import javax.persistence.PersistenceException;
 import javax.persistence.metamodel.SingularAttribute;
 import javax.validation.ConstraintViolationException;
@@ -12,8 +15,13 @@ import au.com.vaadinutils.dao.EntityManagerProvider;
 import com.google.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.EntityItemProperty;
+import com.vaadin.addon.jpacontainer.EntityProviderChangeEvent;
+import com.vaadin.addon.jpacontainer.EntityProviderChangeEvent.EntitiesRemovedEvent;
 import com.vaadin.addon.jpacontainer.JPAContainer;
+import com.vaadin.addon.jpacontainer.JPAContainer.ProviderChangedEvent;
 import com.vaadin.data.Container.Filter;
+import com.vaadin.data.Container.ItemSetChangeEvent;
+import com.vaadin.data.Container.ItemSetChangeListener;
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.data.util.filter.Compare;
@@ -121,7 +129,8 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 			extendedChildCommitProcessing(newParentId, item);
 
 		}
-		container.commit();
+		// container.commit();
+		commitContainerWithHooks();
 
 		// on a new parent, the parent id changes and the container becomes
 		// empty. so reset the parent filter and refresh the container
@@ -131,6 +140,74 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 		container.refresh();
 		associateChildren(newParentId);
 		dirty = false;
+
+	}
+
+	/**
+	 * commits the container and retrieves the new recordid
+	 * 
+	 * we have to hook the ItemSetChangeListener to be able to get the database
+	 * id of a new record.
+	 */
+	private void commitContainerWithHooks()
+	{
+
+		// call back to collect the id of the new record when the container
+		// fires the ItemSetChangeEvent
+		ItemSetChangeListener tmp = new ItemSetChangeListener()
+		{
+
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 9132090066374531277L;
+
+			@Override
+			public void containerItemSetChange(ItemSetChangeEvent event)
+			{
+				if (event instanceof ProviderChangedEvent)
+				{
+					@SuppressWarnings("rawtypes")
+					ProviderChangedEvent pce = (ProviderChangedEvent) event;
+					@SuppressWarnings("unchecked")
+					EntityProviderChangeEvent<E> changeEvent = pce.getChangeEvent();
+					if (changeEvent instanceof EntitiesRemovedEvent)
+					{
+						Collection<E> affectedEntitys = changeEvent.getAffectedEntities();
+
+						entitiesThatWereDeleted(affectedEntitys);
+
+					}
+				}
+			}
+
+		};
+
+		try
+		{
+			// add the listener
+			container.addItemSetChangeListener(tmp);
+			// call commit
+			container.commit();
+		}
+		finally
+		{
+			// detach the listener
+			container.removeItemSetChangeListener(tmp);
+		}
+
+	}
+
+	/**
+	 * invoked when the container deletes entities, an extending class should
+	 * override this method if it needs to perform some cleanup when an entity
+	 * is deleted from a child crud
+	 * 
+	 * @param affectedEntitys
+	 */
+	protected void entitiesThatWereDeleted(Collection<E> affectedEntities)
+	{
+		// TODO Auto-generated method stub
 
 	}
 

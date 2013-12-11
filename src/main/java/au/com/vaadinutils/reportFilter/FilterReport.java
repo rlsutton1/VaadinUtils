@@ -11,7 +11,7 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
 
-public abstract class FilterReport extends ReportView 
+public abstract class FilterReport extends ReportView
 {
 
 	/**
@@ -43,10 +43,16 @@ public abstract class FilterReport extends ReportView
 		for (ReportParameter filter : filters)
 		{
 			Component component = filter.getComponent();
-			layout.addComponent(component);
-			if (filter.shouldExpand())
+			// some filters (such as constants) will not have a component to
+			// display
+			if (component != null)
 			{
-				layout.setExpandRatio(component, 1);
+
+				layout.addComponent(component);
+				if (filter.shouldExpand())
+				{
+					layout.setExpandRatio(component, 1);
+				}
 			}
 		}
 
@@ -74,12 +80,10 @@ public abstract class FilterReport extends ReportView
 
 			}
 
-			
 		});
 
 		layout.addComponent(startButton);
-		
-		
+
 		Button pdfButton = new Button("Print Quality");
 		pdfButton.addClickListener(new ClickEventLogged.ClickListener()
 		{
@@ -104,13 +108,10 @@ public abstract class FilterReport extends ReportView
 
 			}
 
-			
 		});
 
 		layout.addComponent(pdfButton);
-		
-		
-		
+
 		Button csvButton = new Button("Export CSV");
 		csvButton.addClickListener(new ClickEventLogged.ClickListener()
 		{
@@ -135,32 +136,30 @@ public abstract class FilterReport extends ReportView
 
 			}
 
-			
 		});
 
 		layout.addComponent(csvButton);
-
 
 		return layout;
 	}
 
 	protected abstract List<ReportParameter> getFilters();
-	
+
 	enum OutputFormat
 	{
-		PDF,CSV,HTML;
+		PDF, CSV, HTML;
 	}
-	
+
 	private void generateReport(OutputFormat outputFormat) throws UnsupportedEncodingException
 	{
 		String target = servletUrl;
-		target += "?OutputFormat="+outputFormat.toString();
+		target += "?OutputFormat=" + outputFormat.toString();
 		target += "&ReportName=" + java.net.URLEncoder.encode(reportFileName, "UTF-8");
 		target += "&ReportTitle=" + java.net.URLEncoder.encode(title, "UTF-8");
-		target +="&uniqueifier="+System.currentTimeMillis();
+		target += "&uniqueifier=" + System.currentTimeMillis();
 		for (ReportParameter filter : filters)
 		{
-			target += "&"+filter.getUrlEncodedKeyAndParameter();
+			target += "&" + filter.getUrlEncodedKeyAndParameter();
 		}
 
 		System.out.println(target);
