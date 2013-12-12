@@ -59,7 +59,6 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	 * @param childKey
 	 *            - this will be the foreign key in the child table
 	 */
-	@SuppressWarnings("unchecked")
 	public ChildCrudView(BaseCrudView<P> parent, Class<P> parentType, Class<E> childType,
 			SingularAttribute<? extends CrudEntity, ? extends Object> parentKey,
 			SingularAttribute<? extends CrudEntity, ? extends Object> childKey)
@@ -67,7 +66,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 		super(CrudDisplayMode.VERTICAL);
 		this.parentKey = parentKey.getName();
 		this.childKey = childKey.getName();
-		this.parentType = (Class<P>) parent.getClass();
+		this.parentType = parentType;
 		this.parentCrud = parent;
 
 		// setMargin(true);
