@@ -72,6 +72,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 		this.parentKey = parentKey.getName();
 		this.childKey = childKey;
 		this.parentType = parentType;
+		this.parentCrud = parent;
 		// setMargin(true);
 
 	}
@@ -210,14 +211,18 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	}
 
 	@Override
-	protected void enableActions(boolean enabled)
+	protected void activateEditMode(boolean activate)
 	{
-		applyButton.setEnabled(enabled);
-		actionCombo.setEnabled(enabled);
-
-		// for child new is always enabled
-		newButton.setEnabled(true);
+		actionCombo.setEnabled(!activate);
+		applyButton.setEnabled(!activate);
+	
+		// for child new is always enabled unless explicitly disallowed
+		boolean showNew = true;
+		if (isDisallowNew())
+			showNew = false;
+		newButton.setEnabled(showNew);
 	}
+
 
 	public void allowRowChange(final RowChangeCallback callback)
 	{
@@ -252,7 +257,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 								fieldGroup.discard();
 								if (restoreDelete)
 								{
-									enableActions(true);
+									activateEditMode(true);
 									restoreDelete = false;
 								}
 
@@ -293,7 +298,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 				// container.discard();
 				// dirty = false;
 				super.rowChanged(item);
-				enableActions(true);
+				activateEditMode(true);
 			}
 			finally
 			{
@@ -336,7 +341,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 					if (applyButton.isVisible())
 					{
 						restoreDelete = true;
-						enableActions(false);
+						activateEditMode(false);
 						actionLayout.setVisible(true);
 					}
 
@@ -469,7 +474,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 					newEntity = null;
 					if (restoreDelete)
 					{
-						enableActions(true);
+						activateEditMode(true);
 						restoreDelete = false;
 					}
 				}

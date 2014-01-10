@@ -24,6 +24,7 @@ import com.vaadin.addon.jpacontainer.JPAContainer.ProviderChangedEvent;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Container.ItemSetChangeEvent;
 import com.vaadin.data.Container.ItemSetChangeListener;
+import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.Validator.InvalidValueException;
@@ -99,6 +100,12 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	private CrudDisplayMode displayMode = CrudDisplayMode.HORIZONTAL;
 	protected HorizontalLayout actionLayout;
 	protected ComboBox actionCombo;
+	private boolean disallowEditing = false;
+	private boolean hideSaveCancelLayout = false;
+	private boolean disallowNew = false;
+	@SuppressWarnings("unused")
+	private boolean disallowDelete = false;
+	private Label actionLabel;
 
 	protected BaseCrudView()
 	{
@@ -256,9 +263,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 		HorizontalLayout actionArea = new HorizontalLayout();
 		actionArea.setSpacing(true);
-		Label applyLabel = new Label("Action");
-		actionArea.addComponent(applyLabel);
-		actionArea.setComponentAlignment(applyLabel, Alignment.MIDDLE_LEFT);
+		actionLabel = new Label("Action");
+		actionArea.addComponent(actionLabel);
+		actionArea.setComponentAlignment(actionLabel, Alignment.MIDDLE_LEFT);
 
 		actionCombo = new ComboBox(null);
 		actionCombo.setWidth("160");
@@ -266,6 +273,22 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 		actionArea.addComponent(actionCombo);
 
+		addCrudActions();
+		actionArea.addComponent(applyButton);
+
+		// tweak the alignments.
+		actionArea.setComponentAlignment(actionCombo, Alignment.MIDDLE_RIGHT);
+		actionLayout.addComponent(actionArea);
+		actionLayout.setComponentAlignment(actionArea, Alignment.MIDDLE_LEFT);
+
+		actionLayout.addComponent(newButton);
+		actionLayout.setComponentAlignment(newButton, Alignment.MIDDLE_RIGHT);
+
+		actionLayout.setHeight("35");
+	}
+
+	private void addCrudActions()
+	{
 		/**
 		 * Add the set of actions in.
 		 */
@@ -285,17 +308,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 		// Select the default action
 		actionCombo.setValue(defaultAction);
-		actionArea.addComponent(applyButton);
-
-		// tweak the alignments.
-		actionArea.setComponentAlignment(actionCombo, Alignment.MIDDLE_RIGHT);
-		actionLayout.addComponent(actionArea);
-		actionLayout.setComponentAlignment(actionArea, Alignment.MIDDLE_LEFT);
-
-		actionLayout.addComponent(newButton);
-		actionLayout.setComponentAlignment(newButton, Alignment.MIDDLE_RIGHT);
-
-		actionLayout.setHeight("35");
 	}
 
 	/**
@@ -424,27 +436,148 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 * 
 	 * @param show
 	 */
-	protected void enableActions(boolean enabled)
+	protected void activateEditMode(boolean activate)
 	{
-		applyButton.setEnabled(enabled);
-		actionCombo.setEnabled(enabled);
-		newButton.setEnabled(enabled);
+		actionCombo.setEnabled(!activate);
+		applyButton.setEnabled(!activate);
+		
+		boolean showNew = !activate;
+		if (disallowNew)
+			showNew = false;
+		newButton.setEnabled(showNew);
+	}
+	
+	/**
+	 * A child class can call this method to stop a user from being able
+	 * to edit a record.
+	 * When called the Save/Cancel buttons are disabled from the screen.
+	 * 
+	 * If you also set hideSaveCancelLayout to true then the save/cancel buttons
+	 * will be completely removed from the layout.
+	 * 
+	 * By default editing is allowed.
+	 * 
+	 * @param disallow
+	 */
+	protected void disallowEdit(boolean disallow, boolean hideSaveCancelLayout)
+	{
+		this.disallowEditing  = disallow;
+		this.hideSaveCancelLayout  = hideSaveCancelLayout;
+		showSaveCancel(!disallow);
+		if (this.hideSaveCancelLayout)
+			buttonLayout.setVisible(false);
+	}
+	
+	/**
+	 * A child class can call this method to stop a user from being able
+	 * to add new records.
+	 * 
+	 * When called the 'New' button is removed from the UI.
+	 * 
+	 * By default adding new records is allowed.
+	 * 
+	 * @param disallow
+	 */
+	protected void disallowNew(boolean disallow)
+	{
+		this.disallowNew  = disallow;
+		showNew(!disallow);
+	}
+	
+	protected boolean isDisallowNew()
+	{
+		return this.disallowNew;
+	}
+
+
+	/**
+	 * A child class can call this method to stop a user from being able
+	 * to delete a record.
+	 * When called the delete action is removed from the action combo. If the delete is the only
+	 * action then the action combo and apply button will also be removed.
+	 * 
+	 * By default deleting is allowed.
+	 * 
+	 * @param disallow
+	 */
+	protected void disallowDelete(boolean disallow)
+	{
+		this.disallowDelete  = disallow;
+		
+		if (disallow)
+		{
+			// find and remove the delete action
+			for (Object id : this.actionCombo.getItemIds())
+			{
+				if (id instanceof CrudActionDelete)
+				{
+					this.actionCombo.removeItem(id);
+					break;
+				}
+			} 
+			if (this.actionCombo.size() == 0)
+			{
+				this.actionCombo.setVisible(false);
+				this.applyButton.setVisible(false);
+				this.actionLabel.setVisible(false);
+			}
+		}
+		else
+		{
+			this.actionCombo.removeAllItems();
+			addCrudActions();
+			this.actionCombo.setVisible(true);
+			this.applyButton.setVisible(true);
+			this.actionLabel.setVisible(true);
+		}
+		
+		
 	}
 
 	/**
-	 * Call this method during buildEditor to suppress the display of the 'New'
-	 * button. The 'New' button will be displayed by default.
+	 * Internal method to show hide the new button when editing.
+	 * 
+	 * If the user has called disallowNew then the new button will never
+	 * be displayed.
 	 */
-	protected void showNew(boolean show)
+	private void showNew(boolean show)
 	{
+		if (disallowNew)
+			show = false;
+		
 		newButton.setVisible(show);
 	}
 
-	protected void showSaveCancel(boolean show)
+	/**
+	 * Internal method to show/hide the save and cancel buttons when 
+	 * a user enters/exit editing.
+	 * If disallowEditing has been called by a derived class then
+	 * the save/cancel buttons will never be displayed.
+	 * 
+	 * @param show
+	 */
+	private void showSaveCancel(boolean show)
 	{
-		buttonLayout.setVisible(show);
+		if (disallowEditing)
+			show = false;
+		
 		saveButton.setVisible(show);
 		cancelButton.setVisible(show);
+	}
+	
+	/**
+	 * Hides the Action layout which contains the 'New' button 
+	 * and 'Action' combo.
+	 * 
+	 * Hiding the action layout effectively stops the user from 
+	 * creating new records or applying any action such as deleting a record.
+	 * 
+	 * Hiding the action layout provides more room for the list of records.
+	 * @param show
+	 */
+	protected void showActionLayout(boolean show)
+	{
+		this.actionLayout.setVisible(show);
 	}
 
 	protected void setSplitPosition(float pos)
@@ -506,7 +639,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				{
 					if (restoreDelete)
 					{
-						enableActions(true);
+						activateEditMode(false);
 						restoreDelete = false;
 					}
 					newEntity = null;
@@ -632,7 +765,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				newEntity = null;
 				if (restoreDelete)
 				{
-					enableActions(true);
+					activateEditMode(false);
 					restoreDelete = false;
 				}
 			}
@@ -915,7 +1048,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 										fieldGroup.discard();
 										if (restoreDelete)
 										{
-											enableActions(true);
+											activateEditMode(false);
 											restoreDelete = false;
 										}
 
@@ -1127,7 +1260,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 					if (applyButton.isVisible())
 					{
 						restoreDelete = true;
-						enableActions(false);
+						activateEditMode(true);
 					}
 
 					rightLayout.setVisible(true);
