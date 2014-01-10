@@ -32,7 +32,7 @@ public class MobilePhoneValidator extends RegexpValidator {
      */
     public MobilePhoneValidator(String errorMessage) {
         super(
-                "^([0-9]){8}",
+                "^([0-9]){10}",
                 true, errorMessage.replaceAll("\\s",""));
     }
 }
