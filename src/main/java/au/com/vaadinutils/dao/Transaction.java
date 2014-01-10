@@ -28,6 +28,8 @@ public class Transaction
 	{
 		if (transaction.isActive())
 			transaction.commit();
+		else
+			throw new IllegalStateException("Commit has already been called on the transaction");
 
 	}
 
