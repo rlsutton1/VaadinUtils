@@ -285,6 +285,10 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 		}
 	}
 
+	/**
+	 * Need to over-ride as the rules display of a child's new button a different 
+	 * to those of the parent. 
+	 */
 	@Override
 	protected void activateEditMode(boolean activate)
 	{
@@ -369,9 +373,6 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 			{
 				preventRowChangeCascade = true;
 				saveEditsToTemp();
-				// fieldGroup.discard();
-				// container.discard();
-				// dirty = false;
 				super.rowChanged(item);
 				activateEditMode(false);
 			}
