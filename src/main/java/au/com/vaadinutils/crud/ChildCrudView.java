@@ -332,7 +332,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 								fieldGroup.discard();
 								if (restoreDelete)
 								{
-									activateEditMode(true);
+									activateEditMode(false);
 									restoreDelete = false;
 								}
 
@@ -373,7 +373,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 				// container.discard();
 				// dirty = false;
 				super.rowChanged(item);
-				activateEditMode(true);
+				activateEditMode(false);
 			}
 			finally
 			{
@@ -416,7 +416,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 					if (applyButton.isVisible())
 					{
 						restoreDelete = true;
-						activateEditMode(false);
+						activateEditMode(true);
 						actionLayout.setVisible(true);
 					}
 
@@ -549,7 +549,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 					newEntity = null;
 					if (restoreDelete)
 					{
-						activateEditMode(true);
+						activateEditMode(false);
 						restoreDelete = false;
 					}
 				}
