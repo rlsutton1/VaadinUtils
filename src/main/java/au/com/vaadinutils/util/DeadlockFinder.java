@@ -13,9 +13,10 @@ import org.apache.log4j.Logger;
  * 
  * @author Eric Kolotyluk
  */
-public class DeadlockFinder extends Thread
+public enum DeadlockFinder implements Runnable
 {
-	// TODO - make this a config.preferences setting. EK
+	SINGLETON;
+
 	private static final int TEST_INTERVAL = 20000;
 
 	private static final Logger LOG = Logger.getLogger(DeadlockFinder.class);
@@ -24,21 +25,28 @@ public class DeadlockFinder extends Thread
 
 	ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
 
-	public DeadlockFinder()
+	private Thread finder = null;
+
+	public void start()
 	{
-		setDaemon(true);
-		setName(getName() + " DeadlockFinder"); //$NON-NLS-1$
-		setPriority(Thread.MIN_PRIORITY + 1);
+		if (finder == null)
+		{
+			finder = new Thread(this);
+			finder.setDaemon(true);
+			finder.setName("DeadlockFinder"); //$NON-NLS-1$
+			finder.setPriority(Thread.MIN_PRIORITY + 1);
+			finder.start();
+		}
 	}
 
 	public void run()
 	{
-		LOG.info("running, priority = " + getPriority()); //$NON-NLS-1$
+		LOG.info("running, priority = " + finder.getPriority()); //$NON-NLS-1$
 		try
 		{
 			for (;;)
 			{
-				sleep(TEST_INTERVAL);
+				Thread.sleep(TEST_INTERVAL);
 				// Note: the following can be an expensive operation
 				long[] threads = threadMXBean.findMonitorDeadlockedThreads();
 
@@ -75,7 +83,8 @@ public class DeadlockFinder extends Thread
 					}
 				}
 
-				// If we get here we have deadlocked threads so shutdown having already logged the problem.
+				// If we get here we have deadlocked threads so shutdown having
+				// already logged the problem.
 				System.exit(1);
 			}
 		}
