@@ -100,7 +100,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	}
 
 	/**
-	 * this method is invoked when the parent saves, signaling the children that
+	 * this method is invoked when the parent saves, signalling the children that
 	 * they too should save.
 	 * 
 	 * @throws Exception
