@@ -447,8 +447,9 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	}
 
 	/**
-	 * for child crud, dont have save and cancel buttons
+	 * Override as children crud, don't have save and cancel buttons
 	 */
+	@Override
 	protected void addSaveAndCancelButtons()
 	{
 
