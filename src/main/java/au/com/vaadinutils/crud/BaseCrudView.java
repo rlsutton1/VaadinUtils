@@ -887,6 +887,14 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			container.commit();
 			newEntity.set(EntityManagerProvider.getEntityManager().merge(newEntity.get()));
 		}
+		catch (com.vaadin.data.Buffered.SourceException e)
+		{
+			if (e.getCause() instanceof javax.persistence.PersistenceException)
+			{
+				javax.persistence.PersistenceException cause = (javax.persistence.PersistenceException)e.getCause();
+				Notification.show(cause.getCause().getMessage(), Type.ERROR_MESSAGE);
+			}
+		}
 		finally
 		{
 			// detach the listener

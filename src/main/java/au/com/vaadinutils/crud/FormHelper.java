@@ -16,7 +16,10 @@ import javax.validation.ConstraintViolationException;
 import org.apache.log4j.Logger;
 
 import au.com.vaadinutils.converter.MultiSelectConverter;
+import au.com.vaadinutils.crud.splitFields.Color;
+import au.com.vaadinutils.crud.splitFields.ColorPickerField;
 import au.com.vaadinutils.crud.splitFields.SplitCheckBox;
+import au.com.vaadinutils.crud.splitFields.SplitColorPicker;
 import au.com.vaadinutils.crud.splitFields.SplitComboBox;
 import au.com.vaadinutils.crud.splitFields.SplitDateField;
 import au.com.vaadinutils.crud.splitFields.SplitEditorField;
@@ -297,8 +300,30 @@ public class FormHelper<E> implements Serializable
 
 		form.addComponent(field);
 		return field;
+	}
+	
+	public 	ColorPickerField  bindColorPickerField(AbstractLayout form, ValidatingFieldGroup<E> group, String fieldLabel,
+			SingularAttribute<E, Color> member)
+	{
+		ColorPickerField field = bindColorPickerField(form, group, fieldLabel, member.getName());
+		this.fieldList.add(field);
+		return field;
 
 	}
+
+	public 	ColorPickerField  bindColorPickerField(AbstractLayout form, ValidatingFieldGroup<E> group, String fieldLabel,
+			String fieldName)
+	{
+		ColorPickerField   field = new SplitColorPicker(fieldLabel);
+		field.setWidth("100%");
+		field.setImmediate(true);
+
+		doBinding(group, fieldName, field);
+
+		form.addComponent(field);
+		return field;
+	}
+
 
 	public <L> ComboBox bindComboBox(AbstractLayout form, ValidatingFieldGroup<E> fieldGroup, String fieldLabel,
 			Collection<?> options)
