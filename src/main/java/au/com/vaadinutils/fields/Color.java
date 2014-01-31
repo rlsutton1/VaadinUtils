@@ -36,6 +36,11 @@ public class Color
 	{
 		return new com.vaadin.shared.ui.colorpicker.Color(getRed(), getGreen(), getBlue(), getAlpha()).getCSS();
 	}
+	
+	public String toString()
+	{
+		return getCSS();
+	}
 
 	public int getRed()
 	{
