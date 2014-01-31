@@ -8,6 +8,8 @@ import javax.persistence.metamodel.SingularAttribute;
 
 import org.apache.log4j.Logger;
 
+import au.com.vaadinutils.crud.splitFields.Color;
+import au.com.vaadinutils.crud.splitFields.ColorPickerField;
 import au.com.vaadinutils.crud.splitFields.SplitField;
 import au.com.vaadinutils.fields.CKEditorEmailField;
 
@@ -384,6 +386,20 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		return field;
 	}
 
+	public ColorPickerField bindColorPicker(String fieldLabel, String member)
+	{
+		ColorPickerField field = formHelper.bindColorPickerField(this, fieldGroup, fieldLabel, member);
+		this.fieldList.add(field);
+		return field;
+	}
+
+	public ColorPickerField bindColorPicker(String fieldLabel, SingularAttribute<E, Color> member)
+	{
+		ColorPickerField field = formHelper.bindColorPickerField(this, fieldGroup, fieldLabel, member);
+		this.fieldList.add(field);
+		return field;
+	}
+
 	/**
 	 * Deprecated - Use EntityFieldBuilder instead
 	 * 
@@ -448,7 +464,8 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 
 	public void setReadOnly(boolean readOnly)
 	{
-		this.fieldGroup.setReadOnly(readOnly);
+		if (this.fieldGroup.getItemDataSource() != null)
+			this.fieldGroup.setReadOnly(readOnly);
 	}
 
 	/**
