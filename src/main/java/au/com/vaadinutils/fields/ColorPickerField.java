@@ -1,4 +1,4 @@
-package au.com.vaadinutils.crud.splitFields;
+package au.com.vaadinutils.fields;
 
 import com.vaadin.ui.ColorPicker;
 import com.vaadin.ui.Component;

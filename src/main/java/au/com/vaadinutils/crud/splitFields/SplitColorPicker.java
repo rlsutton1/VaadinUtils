@@ -1,5 +1,7 @@
 package au.com.vaadinutils.crud.splitFields;
 
+import au.com.vaadinutils.fields.ColorPickerField;
+
 import com.vaadin.ui.Label;
 
 public class SplitColorPicker extends ColorPickerField implements SplitField

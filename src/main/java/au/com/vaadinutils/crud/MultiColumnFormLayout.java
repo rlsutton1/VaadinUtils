@@ -8,10 +8,10 @@ import javax.persistence.metamodel.SingularAttribute;
 
 import org.apache.log4j.Logger;
 
-import au.com.vaadinutils.crud.splitFields.Color;
-import au.com.vaadinutils.crud.splitFields.ColorPickerField;
 import au.com.vaadinutils.crud.splitFields.SplitField;
 import au.com.vaadinutils.fields.CKEditorEmailField;
+import au.com.vaadinutils.fields.Color;
+import au.com.vaadinutils.fields.ColorPickerField;
 
 import com.vaadin.shared.ui.datefield.Resolution;
 import com.vaadin.ui.AbstractComponent;

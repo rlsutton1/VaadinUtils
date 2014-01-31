@@ -1,4 +1,4 @@
-package au.com.vaadinutils.crud.splitFields;
+package au.com.vaadinutils.fields;
 
 import javax.persistence.Embeddable;
 
