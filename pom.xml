@@ -135,7 +135,7 @@
 			<version>2.1.0</version>
 		</dependency>
 
-		<!-- Bean Validation API and RI -->
+		<!-- Bean Validation API and RI used by the Hibernate validation api.-->
 		<dependency>
 			<groupId>javax.validation</groupId>
 			<artifactId>validation-api</artifactId>
