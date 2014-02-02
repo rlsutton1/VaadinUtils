@@ -269,6 +269,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		actionCombo = new ComboBox(null);
 		actionCombo.setWidth("160");
 		actionCombo.setNullSelectionAllowed(false);
+		actionCombo.setTextInputAllowed(false);
 
 		actionArea.addComponent(actionCombo);
 
