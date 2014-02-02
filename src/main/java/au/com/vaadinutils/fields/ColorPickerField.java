@@ -40,18 +40,18 @@ public class ColorPickerField extends CustomField<Color>
 		return Color.class;
 	}
 
-	
 	@Override
 	public Color getInternalValue()
 	{
 		return new Color(this.colorPicker.getColor());
 	}
-	
+
 	@Override
 	public void setInternalValue(Color newFieldValue)
 	{
-		this.colorPicker.setColor(new com.vaadin.shared.ui.colorpicker.Color(newFieldValue.getRed(), newFieldValue.getGreen(),
-				newFieldValue.getBlue(), newFieldValue.getAlpha()));
+		if (newFieldValue != null)
+			this.colorPicker.setColor(new com.vaadin.shared.ui.colorpicker.Color(newFieldValue.getRed(), newFieldValue
+					.getGreen(), newFieldValue.getBlue(), newFieldValue.getAlpha()));
 		super.setInternalValue(newFieldValue);
 	}
 
