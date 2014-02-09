@@ -146,13 +146,13 @@
 		<dependency>
 			<groupId>org.vaadin.addons</groupId>
 			<artifactId>ckeditor-wrapper-for-vaadin</artifactId>
-			<version>7.8.6</version>
+			<version>7.9.0</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.vaadin.addons</groupId>
 			<artifactId>wizards-for-vaadin</artifactId>
-			<version>1.0.0-beta1</version>
+			<version>1.0.3</version>
 		</dependency>
 
 
