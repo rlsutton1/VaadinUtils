@@ -7,7 +7,7 @@ public interface ChildCrudListener<E>
 
 	/**
 	 * this method is invoked when the parent saves, signalling the children
-	 * that they too should save. The parent entity is provied so that the child
+	 * that they too should save. The parent entity is provided so that the child
 	 * crud can retrieve the parent key (for new records)
 	 * @throws Exception 
 	 */
