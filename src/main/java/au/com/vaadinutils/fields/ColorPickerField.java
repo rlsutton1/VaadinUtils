@@ -1,5 +1,7 @@
 package au.com.vaadinutils.fields;
 
+import au.com.vaadinutils.domain.Color;
+
 import com.vaadin.ui.ColorPicker;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomField;

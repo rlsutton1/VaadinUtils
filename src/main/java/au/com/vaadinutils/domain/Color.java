@@ -1,4 +1,4 @@
-package au.com.vaadinutils.fields;
+package au.com.vaadinutils.domain;
 
 import javax.persistence.Embeddable;
 
