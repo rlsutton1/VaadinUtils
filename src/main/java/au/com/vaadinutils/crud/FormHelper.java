@@ -28,7 +28,8 @@ import au.com.vaadinutils.crud.splitFields.SplitTextArea;
 import au.com.vaadinutils.crud.splitFields.SplitTextField;
 import au.com.vaadinutils.crud.splitFields.SplitTwinColSelect;
 import au.com.vaadinutils.dao.EntityManagerProvider;
-import au.com.vaadinutils.domain.Color;
+import au.com.vaadinutils.domain.iColor;
+import au.com.vaadinutils.domain.iColorFactory;
 import au.com.vaadinutils.fields.CKEditorEmailField;
 import au.com.vaadinutils.fields.ColorPickerField;
 import au.com.vaadinutils.fields.DataBoundButton;
@@ -303,19 +304,19 @@ public class FormHelper<E> implements Serializable
 		return field;
 	}
 
-	public ColorPickerField bindColorPickerField(AbstractLayout form, ValidatingFieldGroup<E> group, String fieldLabel,
-			SingularAttribute<E, Color> member)
+	public ColorPickerField bindColorPickerField(AbstractLayout form, ValidatingFieldGroup<E> group,
+			iColorFactory factory, String fieldLabel, SingularAttribute<E, iColor> member)
 	{
-		ColorPickerField field = bindColorPickerField(form, group, fieldLabel, member.getName());
+		ColorPickerField field = bindColorPickerField(form, group, factory, fieldLabel, member.getName());
 		this.fieldList.add(field);
 		return field;
 
 	}
 
-	public ColorPickerField bindColorPickerField(AbstractLayout form, ValidatingFieldGroup<E> group, String fieldLabel,
-			String fieldName)
+	public ColorPickerField bindColorPickerField(AbstractLayout form, ValidatingFieldGroup<E> group,
+			iColorFactory factory, String fieldLabel, String fieldName)
 	{
-		ColorPickerField field = new SplitColorPicker(fieldLabel);
+		ColorPickerField field = new SplitColorPicker(factory, fieldLabel);
 		field.setWidth("100%");
 		field.setImmediate(true);
 

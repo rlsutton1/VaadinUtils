@@ -9,7 +9,7 @@ import javax.persistence.metamodel.SingularAttribute;
 import org.apache.log4j.Logger;
 
 import au.com.vaadinutils.crud.splitFields.SplitField;
-import au.com.vaadinutils.domain.Color;
+import au.com.vaadinutils.domain.iColorFactory;
 import au.com.vaadinutils.fields.CKEditorEmailField;
 import au.com.vaadinutils.fields.ColorPickerField;
 
@@ -382,19 +382,19 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		return field;
 	}
 
-	public ColorPickerField bindColorPicker(String fieldLabel, String member)
+	public ColorPickerField bindColorPicker(iColorFactory factory, String fieldLabel, String member)
 	{
-		ColorPickerField field = formHelper.bindColorPickerField(this, fieldGroup, fieldLabel, member);
+		ColorPickerField field = formHelper.bindColorPickerField(this, fieldGroup, factory, fieldLabel, member);
 		this.fieldList.add(field);
 		return field;
 	}
 
-	public ColorPickerField bindColorPicker(String fieldLabel, SingularAttribute<E, Color> member)
-	{
-		ColorPickerField field = formHelper.bindColorPickerField(this, fieldGroup, fieldLabel, member);
-		this.fieldList.add(field);
-		return field;
-	}
+//	public ColorPickerField bindColorPicker(iColorFactory factory, String fieldLabel, SingularAttribute<E, iColor> member)
+//	{
+//		ColorPickerField field = formHelper.bindColorPickerField(this, fieldGroup, factory, fieldLabel, member);
+//		this.fieldList.add(field);
+//		return field;
+//	}
 
 	/**
 	 * Deprecated - Use EntityFieldBuilder instead
