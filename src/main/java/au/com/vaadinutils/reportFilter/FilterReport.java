@@ -3,7 +3,8 @@ package au.com.vaadinutils.reportFilter;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import au.com.vaadinutils.listener.ClickEventLogged;
 
@@ -15,7 +16,7 @@ import com.vaadin.ui.VerticalLayout;
 
 public abstract class FilterReport extends ReportView
 {
-	Logger logger = Logger.getLogger(FilterReport.class);
+	Logger logger = LogManager.getLogger(FilterReport.class);
 	
 	/**
 	 * 

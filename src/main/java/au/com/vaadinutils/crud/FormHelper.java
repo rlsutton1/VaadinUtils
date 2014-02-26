@@ -13,7 +13,7 @@ import javax.persistence.metamodel.SingularAttribute;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import au.com.vaadinutils.converter.MultiSelectConverter;
 import au.com.vaadinutils.crud.splitFields.SplitCheckBox;
@@ -64,7 +64,7 @@ public class FormHelper<E> implements Serializable
 	private AbstractLayout form;
 	private ValidatingFieldGroup<E> group;
 
-	static Logger logger = Logger.getLogger(FormHelper.class);
+	static org.apache.logging.log4j.Logger logger = LogManager.getLogger(FormHelper.class);
 
 	public FormHelper(AbstractLayout form, ValidatingFieldGroup<E> group)
 	{

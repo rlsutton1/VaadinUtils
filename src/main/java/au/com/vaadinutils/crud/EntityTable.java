@@ -6,7 +6,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.google.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.EntityItem;
@@ -22,7 +23,7 @@ public class EntityTable<E> extends Table implements EntityList<E>
 	private RowChangeListener<E> rowChangeListener;
 	private HeadingPropertySet<E> visibleColumns;
 
-	Logger logger = Logger.getLogger(EntityTable.class);
+	Logger logger = LogManager.getLogger(EntityTable.class);
 
 	public EntityTable(JPAContainer<E> entityContainer, HeadingPropertySet<E> headingPropertySet)
 	{

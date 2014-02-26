@@ -2,7 +2,8 @@ package au.com.vaadinutils.listener;
 
 import javax.validation.ConstraintViolationException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import au.com.vaadinutils.crud.FormHelper;
 
@@ -15,7 +16,7 @@ public class ClickEventLogged
 	{
 		private static final long serialVersionUID = 7420365324169589382L;
 
-		Logger logger = Logger.getLogger(ClickListener.class);
+		Logger logger = LogManager.getLogger(ClickListener.class);
 
 		abstract public void clicked(com.vaadin.ui.Button.ClickEvent event);
 
@@ -44,7 +45,7 @@ public class ClickEventLogged
 	{
 		private static final long serialVersionUID = 1L;
 
-		Logger logger = Logger.getLogger(ClickAdaptor.class);
+		Logger logger = LogManager.getLogger(ClickAdaptor.class);
 
 		private com.vaadin.ui.Button.ClickListener listener = null;
 
