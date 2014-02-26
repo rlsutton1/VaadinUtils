@@ -94,7 +94,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	private HorizontalLayout buttonLayout;
 	private AbstractLayout advancedSearchLayout;
 	private VerticalLayout searchLayout;
-	private CheckBox advancedSearchButton;
+	private CheckBox advancedSearchCheckbox;
 	private Set<ChildCrudListener<E>> childCrudListeners = new HashSet<ChildCrudListener<E>>();
 	private CrudDisplayMode displayMode = CrudDisplayMode.HORIZONTAL;
 	protected HorizontalLayout actionLayout;
@@ -347,7 +347,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		AbstractLayout advancedSearch = buildAdvancedSearch();
 		if (advancedSearch != null)
 		{
-			basicSearchLayout.addComponent(advancedSearchButton);
+			basicSearchLayout.addComponent(advancedSearchCheckbox);
 		}
 
 		basicSearchLayout.addComponent(searchField);
@@ -396,10 +396,10 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		advancedSearchLayout = getAdvancedSearchLayout();
 		if (advancedSearchLayout != null)
 		{
-			advancedSearchButton = new CheckBox("Advanced");
+			advancedSearchCheckbox = new CheckBox("Advanced");
 
-			advancedSearchButton.setImmediate(true);
-			advancedSearchButton.addValueChangeListener(new ValueChangeListener()
+			advancedSearchCheckbox.setImmediate(true);
+			advancedSearchCheckbox.addValueChangeListener(new ValueChangeListener()
 			{
 
 				/**
@@ -410,8 +410,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				@Override
 				public void valueChange(ValueChangeEvent arg0)
 				{
-					advancedSearchLayout.setVisible(advancedSearchButton.getValue());
-					if (!advancedSearchButton.getValue())
+					advancedSearchLayout.setVisible(advancedSearchCheckbox.getValue());
+					if (!advancedSearchCheckbox.getValue())
 					{
 						triggerFilter();
 					}
@@ -978,7 +978,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	
 	private void triggerFilter(String searchText)
 	{
-		boolean advancedSearchActive = advancedSearchButton != null && advancedSearchButton.getValue();
+		boolean advancedSearchActive = advancedSearchCheckbox != null && advancedSearchCheckbox.getValue();
 		Filter filter = getContainerFilter(searchText, advancedSearchActive);
 		applyFilter(filter);
 
