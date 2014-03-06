@@ -27,9 +27,8 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
-import com.vaadin.ui.VerticalLayout;
 
-public class MultiColumnFormLayout<E> extends VerticalLayout
+public class MultiColumnFormLayout<E> extends GridLayout
 {
 	private static Logger logger = LogManager.getLogger(MultiColumnFormLayout.class);
 	private static final long serialVersionUID = 1L;
@@ -45,7 +44,7 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	private ArrayList<AbstractComponent> fieldList = new ArrayList<AbstractComponent>();
 	private FormHelper<E> formHelper;
 
-	final private GridLayout grid;
+	//final private GridLayout grid;
 
 	int x = 0;
 	int y = 0;
@@ -64,19 +63,16 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 			this.fieldWidths[i] = DEFAULT_FIELD_WIDTH;
 		}
 
-		grid = new GridLayout(columns * 2, 1);
-		// grid.setDescription("Grid within MultiColumnLayout");
-		grid.setSizeFull();
-		grid.setSpacing(true);
+		this.setColumns(columns * 2);
+		this.setRows(1);
+		this.setSpacing(true);
 
 		formHelper = getFormHelper(this, fieldGroup);
 		init();
-		this.setSizeFull();
-		super.addComponent(grid);
 
 		for (int i = 1; i < columns * 2; i += 2)
 		{
-			grid.setColumnExpandRatio(i, 1.0f);
+			this.setColumnExpandRatio(i, 1.0f);
 		}
 
 	}
@@ -114,7 +110,7 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 
 	public void setComponentAlignment(Component childComponent, Alignment alignment)
 	{
-		this.grid.setComponentAlignment(childComponent, alignment);
+		super.setComponentAlignment(childComponent, alignment);
 	}
 
 	private void init()
@@ -132,13 +128,13 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		}
 		else
 		{
-			grid.addComponent(component);
+			super.addComponent(component);
 			x++;
 			if (x > columns)
 			{
 				x = 0;
 				y++;
-				grid.insertRow(y);
+				super.insertRow(y);
 			}
 		}
 	}
@@ -160,8 +156,7 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		{
 			x = 0;
 			y++;
-			grid.insertRow(y);
-
+			super.insertRow(y);
 		}
 		int labelWidth = this.labelWidths[x / 2];
 		Label caption;
@@ -172,8 +167,8 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		caption.setWidth("" + labelWidth);
 		logger.debug("label: caption: {}  width: {}  x: {} y: {} for col: {}", caption.getValue(), labelWidth, x, y,
 				x / 2);
-		grid.addComponent(caption, x, y, x, y);
-		grid.setComponentAlignment(caption, Alignment.MIDDLE_RIGHT);
+		super.addComponent(caption, x, y, x, y);
+		super.setComponentAlignment(caption, Alignment.MIDDLE_RIGHT);
 		x++;
 
 		String fieldWidth = getFieldWidth(x, fieldSpan);
@@ -181,10 +176,10 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 				+ fieldSpan - 1), y);
 		splitComponent.setWidth(fieldWidth);
 
-		grid.addComponent(splitComponent, x, y, x + fieldSpan - 1, y);
+		super.addComponent(splitComponent, x, y, x + fieldSpan - 1, y);
 		x += fieldSpan;
 
-		grid.setComponentAlignment(splitComponent, Alignment.MIDDLE_LEFT);
+		super.setComponentAlignment(splitComponent, Alignment.MIDDLE_LEFT);
 
 		this.colspan = 1;
 	}
@@ -211,8 +206,8 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	{
 		x = 0;
 		y++;
-		grid.insertRow(grid.getRows());
-		grid.newLine();
+		super.insertRow(super.getRows());
+		super.newLine();
 	}
 
 	/**
@@ -473,7 +468,7 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	 */
 	public void setExpandRatio(float ratio)
 	{
-		this.grid.setRowExpandRatio(this.grid.getRows() - 1, ratio);
+		super.setRowExpandRatio(super.getRows() - 1, ratio);
 	}
 
 	/**
@@ -484,7 +479,6 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	 */
 	public void setColumnExpandRatio(int columnIndex, float ratio)
 	{
-		this.grid.setColumnExpandRatio(columnIndex, ratio);
+		super.setColumnExpandRatio(columnIndex, ratio);
 	}
-
 }
