@@ -6,7 +6,8 @@ import java.util.Date;
 
 import javax.persistence.metamodel.SingularAttribute;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import au.com.vaadinutils.crud.splitFields.SplitField;
 import au.com.vaadinutils.domain.iColorFactory;
@@ -26,11 +27,10 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
-import com.vaadin.ui.VerticalLayout;
 
-public class MultiColumnFormLayout<E> extends VerticalLayout
+public class MultiColumnFormLayout<E> extends GridLayout
 {
-	private static Logger logger = Logger.getLogger(MultiColumnFormLayout.class);
+	private static Logger logger = LogManager.getLogger(MultiColumnFormLayout.class);
 	private static final long serialVersionUID = 1L;
 	private static final int DEFAULT_LABEL_WIDTH = 120;
 	private static final int DEFAULT_FIELD_WIDTH = 100;
@@ -44,7 +44,7 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	private ArrayList<AbstractComponent> fieldList = new ArrayList<AbstractComponent>();
 	private FormHelper<E> formHelper;
 
-	final private GridLayout grid;
+	//final private GridLayout grid;
 
 	int x = 0;
 	int y = 0;
@@ -63,19 +63,16 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 			this.fieldWidths[i] = DEFAULT_FIELD_WIDTH;
 		}
 
-		grid = new GridLayout(columns * 2, 1);
-		// grid.setDescription("Grid within MultiColumnLayout");
-		grid.setSizeFull();
-		grid.setSpacing(true);
+		this.setColumns(columns * 2);
+		this.setRows(1);
+		this.setSpacing(true);
 
 		formHelper = getFormHelper(this, fieldGroup);
 		init();
-		this.setSizeFull();
-		super.addComponent(grid);
 
 		for (int i = 1; i < columns * 2; i += 2)
 		{
-			grid.setColumnExpandRatio(i, 1.0f);
+			this.setColumnExpandRatio(i, 1.0f);
 		}
 
 	}
@@ -110,12 +107,11 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	{
 		this.fieldWidths[column] = width;
 	}
-	
+
 	public void setComponentAlignment(Component childComponent, Alignment alignment)
 	{
-		this.grid.setComponentAlignment(childComponent, alignment);
+		super.setComponentAlignment(childComponent, alignment);
 	}
-
 
 	private void init()
 	{
@@ -132,13 +128,13 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		}
 		else
 		{
-			grid.addComponent(component);
+			super.addComponent(component);
 			x++;
 			if (x > columns)
 			{
 				x = 0;
 				y++;
-				grid.insertRow(y);
+				super.insertRow(y);
 			}
 		}
 	}
@@ -160,8 +156,7 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		{
 			x = 0;
 			y++;
-			grid.insertRow(y);
-
+			super.insertRow(y);
 		}
 		int labelWidth = this.labelWidths[x / 2];
 		Label caption;
@@ -170,21 +165,21 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		else
 			caption = splitComponent.getLabel();
 		caption.setWidth("" + labelWidth);
-		logger.debug("label: caption:" + caption.getValue() + " width:" + labelWidth + " x:" + x + " y:" + y
-				+ " for col:" + x / 2);
-		grid.addComponent(caption, x, y, x, y);
-		grid.setComponentAlignment(caption, Alignment.MIDDLE_RIGHT);
+		logger.debug("label: caption: {}  width: {}  x: {} y: {} for col: {}", caption.getValue(), labelWidth, x, y,
+				x / 2);
+		super.addComponent(caption, x, y, x, y);
+		super.setComponentAlignment(caption, Alignment.MIDDLE_RIGHT);
 		x++;
 
 		String fieldWidth = getFieldWidth(x, fieldSpan);
-		logger.debug("field:" + caption.getValue() + " width: " + fieldWidth + " X:" + x + " Y:" + y + " X1:"
-				+ (x + fieldSpan - 1) + " Y1:" + y);
+		logger.debug("field: {} width: {} X: {} Y: {} X1: {} Y1: {}", caption.getValue(), fieldWidth, x, y, (x
+				+ fieldSpan - 1), y);
 		splitComponent.setWidth(fieldWidth);
 
-		grid.addComponent(splitComponent, x, y, x + fieldSpan - 1, y);
+		super.addComponent(splitComponent, x, y, x + fieldSpan - 1, y);
 		x += fieldSpan;
 
-		grid.setComponentAlignment(splitComponent, Alignment.MIDDLE_LEFT);
+		super.setComponentAlignment(splitComponent, Alignment.MIDDLE_LEFT);
 
 		this.colspan = 1;
 	}
@@ -211,8 +206,8 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	{
 		x = 0;
 		y++;
-		grid.insertRow(grid.getRows());
-		grid.newLine();
+		super.insertRow(super.getRows());
+		super.newLine();
 	}
 
 	/**
@@ -266,9 +261,9 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	 */
 	public TextField addTextField(String fieldLabel)
 	{
-		TextField field = formHelper.bindTextField((AbstractLayout)this, (ValidatingFieldGroup<E>) null, fieldLabel,
+		TextField field = formHelper.bindTextField((AbstractLayout) this, (ValidatingFieldGroup<E>) null, fieldLabel,
 				(String) null);
-		
+
 		this.fieldList.add(field);
 		return field;
 	}
@@ -389,12 +384,14 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		return field;
 	}
 
-//	public ColorPickerField bindColorPicker(iColorFactory factory, String fieldLabel, SingularAttribute<E, iColor> member)
-//	{
-//		ColorPickerField field = formHelper.bindColorPickerField(this, fieldGroup, factory, fieldLabel, member);
-//		this.fieldList.add(field);
-//		return field;
-//	}
+	// public ColorPickerField bindColorPicker(iColorFactory factory, String
+	// fieldLabel, SingularAttribute<E, iColor> member)
+	// {
+	// ColorPickerField field = formHelper.bindColorPickerField(this,
+	// fieldGroup, factory, fieldLabel, member);
+	// this.fieldList.add(field);
+	// return field;
+	// }
 
 	/**
 	 * Deprecated - Use EntityFieldBuilder instead
@@ -471,7 +468,7 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	 */
 	public void setExpandRatio(float ratio)
 	{
-		this.grid.setRowExpandRatio(this.grid.getRows() - 1, ratio);
+		super.setRowExpandRatio(super.getRows() - 1, ratio);
 	}
 
 	/**
@@ -482,7 +479,6 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	 */
 	public void setColumnExpandRatio(int columnIndex, float ratio)
 	{
-		this.grid.setColumnExpandRatio(columnIndex, ratio);
+		super.setColumnExpandRatio(columnIndex, ratio);
 	}
-
 }

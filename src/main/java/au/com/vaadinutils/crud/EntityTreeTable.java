@@ -4,7 +4,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.google.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.EntityItem;
@@ -20,7 +21,7 @@ public class EntityTreeTable<E> extends Tree implements EntityList<E>
 	private RowChangeListener<E> rowChangeListener;
 	private HeadingPropertySet<E> visibleColumns;
 
-	Logger logger = Logger.getLogger(EntityTreeTable.class);
+	Logger logger = LogManager.getLogger(EntityTreeTable.class);
 
 	public EntityTreeTable(JPAContainer<E> entityContainer, HeadingPropertySet<E> headingPropertySet)
 	{

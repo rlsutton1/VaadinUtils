@@ -5,13 +5,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.mail.EmailException;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.dao.Transaction;
+import au.com.vaadinutils.jasper.JasperEmailBuilder;
 import au.com.vaadinutils.jasper.JasperManager;
-import au.com.vaadinutils.jasper.JasperManager.EmailBuilder;
-import au.com.vaadinutils.jasper.JasperManager.Exporter;
+import au.com.vaadinutils.jasper.JasperManager.OutputFormat;
 import au.com.vaadinutils.jasper.RenderedReport;
 import au.com.vaadinutils.listener.CancelListener;
 import au.com.vaadinutils.util.ProgressBarTask;
@@ -22,7 +23,7 @@ import com.vaadin.ui.Notification.Type;
 
 public class SendEmailTask extends ProgressBarTask<JasperTransmission> implements CancelListener
 {
-	Logger logger = Logger.getLogger(SendEmailTask.class);
+	Logger logger = LogManager.getLogger(SendEmailTask.class);
 	private JasperProxy proxy;
 	private List<JasperTransmission> transmissions;
 	private boolean cancel = false;
@@ -67,11 +68,9 @@ public class SendEmailTask extends ProgressBarTask<JasperTransmission> implement
 				try
 				{
 					JasperManager manager = proxy.getManager();
-					manager.fillReport();
-					RenderedReport renderedHtml = manager.export(Exporter.HTML);
-					manager.fillReport();
-					RenderedReport renderedPDF = manager.export(Exporter.PDF);
-					EmailBuilder builder = new JasperManager.EmailBuilder(manager.getSettings());
+					RenderedReport renderedHtml = manager.export(OutputFormat.HTML);
+					RenderedReport renderedPDF = manager.export(OutputFormat.PDF);
+					JasperEmailBuilder builder = new JasperEmailBuilder(proxy.getEmailSettings());
 					builder.setFrom(proxy.getSenderEmailAddress())
 					.setSubject(proxy.getSubject())
 					//.setHtmlBody("<html><body></body></html>")

@@ -6,7 +6,8 @@ import javax.persistence.PersistenceException;
 import javax.persistence.metamodel.SingularAttribute;
 import javax.validation.ConstraintViolationException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.vaadin.dialogs.ConfirmDialog;
 
 import au.com.vaadinutils.dao.EntityManagerProvider;
@@ -42,7 +43,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 {
 
 	private static final long serialVersionUID = -7756584349283089830L;
-	Logger logger = Logger.getLogger(ChildCrudView.class);
+	Logger logger = LogManager.getLogger(ChildCrudView.class);
 	private String parentKey;
 	protected String childKey;
 	private Object parentId;

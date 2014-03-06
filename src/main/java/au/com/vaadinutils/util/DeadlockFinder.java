@@ -4,7 +4,8 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * This class implements a daemon thread which periodically checks to see if
@@ -19,7 +20,7 @@ public enum DeadlockFinder implements Runnable
 
 	private static final int TEST_INTERVAL = 20000;
 
-	private static final Logger LOG = Logger.getLogger(DeadlockFinder.class);
+	private static final Logger LOG = LogManager.getLogger(DeadlockFinder.class);
 
 	private long count;
 

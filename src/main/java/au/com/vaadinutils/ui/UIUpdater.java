@@ -1,7 +1,8 @@
 package au.com.vaadinutils.ui;
 
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Notification;
@@ -19,7 +20,7 @@ import com.vaadin.ui.UI;
  */
 public class UIUpdater
 {
-	private static Logger logger = Logger.getLogger(UIUpdater.class);
+	private static Logger logger = LogManager.getLogger(UIUpdater.class);
 
 	public UIUpdater(final Runnable uiRunnable)
 	{

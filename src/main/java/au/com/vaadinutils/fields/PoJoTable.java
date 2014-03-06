@@ -4,7 +4,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
@@ -25,7 +26,7 @@ public class PoJoTable<T> extends Table
 {
 	private static final long serialVersionUID = 1L;
 
-	Logger logger = Logger.getLogger(PoJoTable.class);
+	Logger logger = LogManager.getLogger(PoJoTable.class);
 
 	private Class<T> pojoClass;
 

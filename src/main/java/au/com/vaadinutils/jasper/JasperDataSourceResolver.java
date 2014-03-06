@@ -6,12 +6,12 @@ import javax.activation.DataSource;
 
 import org.apache.commons.mail.DataSourceResolver;
 
-public class JasperDataSourceResovler implements DataSourceResolver
+public class JasperDataSourceResolver implements DataSourceResolver
 {
 	
 	private RenderedReport renderedReport;
 
-	public JasperDataSourceResovler(RenderedReport renderedReport)
+	public JasperDataSourceResolver(RenderedReport renderedReport)
 	{
 		this.renderedReport = renderedReport;
 	}

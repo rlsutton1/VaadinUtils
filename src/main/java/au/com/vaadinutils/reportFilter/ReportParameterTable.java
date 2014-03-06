@@ -14,8 +14,6 @@ import com.vaadin.addon.jpacontainer.fieldfactory.MultiSelectConverter;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.ui.AbstractSelect.ItemCaptionMode;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.ListSelect;
-import com.vaadin.ui.Table;
 
 public class ReportParameterTable<T> extends ReportParameter
 {

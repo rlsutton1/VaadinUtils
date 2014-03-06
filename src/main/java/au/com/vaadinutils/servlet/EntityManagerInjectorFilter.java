@@ -12,14 +12,15 @@ import javax.servlet.ServletResponse;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.dao.Transaction;
 
 public class EntityManagerInjectorFilter implements Filter
 {
-	private static Logger logger = Logger.getLogger(EntityManagerInjectorFilter.class);
+	private static Logger logger = LogManager.getLogger(EntityManagerInjectorFilter.class);
 
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException
