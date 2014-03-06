@@ -176,14 +176,14 @@ public class JasperManager
 
 		for (Entry<JRExporterParameter, Object> param : exporter.getParameters().entrySet())
 		{
-			System.out.println(param.getKey() + ":" + param.getValue());
+			logger.info(param.getKey() + ":" + param.getValue());
 
 		}
 		exporter.exportReport();
 
 		for (Entry<JRExporterParameter, Object> param : exporter.getParameters().entrySet())
 		{
-			System.out.println(param.getKey() + ":" + param.getValue());
+			logger.info(param.getKey() + ":" + param.getValue());
 
 		}
 

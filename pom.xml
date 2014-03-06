@@ -67,12 +67,15 @@
 
 	<dependencies>
 
-<!--		<dependency>
-			<groupId>org.vaadin.addons.lazyquerycontainer</groupId>
-			<artifactId>vaadin-lazyquerycontainer</artifactId>
-			<version>2.1.0</version>
+		<!-- <dependency> <groupId>org.vaadin.addons.lazyquerycontainer</groupId> 
+			<artifactId>vaadin-lazyquerycontainer</artifactId> <version>2.1.0</version> 
+			</dependency> -->
+
+		<dependency>
+			<groupId>org.vaadin.addons</groupId>
+			<artifactId>filteringtable</artifactId>
+			<version>0.9.4.v7</version>
 		</dependency>
--->
 		<dependency>
 			<groupId>com.vaadin</groupId>
 			<artifactId>vaadin-server</artifactId>

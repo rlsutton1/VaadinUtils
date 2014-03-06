@@ -4,6 +4,7 @@ import java.util.Iterator;
 
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.event.ShortcutAction.KeyCode;
+import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -23,6 +24,7 @@ public class InputFormDialog extends Window
 
 	private HorizontalLayout buttons;
 	private Button cancelButton;
+	private Button ok;
 
 	public InputFormDialog(final UI parent, String title, Field<?> primaryFocusField, final FormLayout form,
 			final InputFormDialogRecipient recipient)
@@ -33,7 +35,8 @@ public class InputFormDialog extends Window
 		this.setResizable(false);
 
 		VerticalLayout layout = new VerticalLayout();
-		layout.setMargin(true);
+		layout.setMargin(new MarginInfo(false, true, true, true));
+		//layout.setMargin(true);
 		layout.setSizeUndefined();
 		layout.addComponent(form);
 
@@ -52,7 +55,7 @@ public class InputFormDialog extends Window
 		});
 		buttons.addComponent(cancelButton);
 
-		Button ok = new Button("Ok", new Button.ClickListener()
+		ok = new Button("Ok", new Button.ClickListener()
 		{
 			public void buttonClick(ClickEvent event)
 			{
@@ -61,8 +64,12 @@ public class InputFormDialog extends Window
 					Iterator<Component> itr = form.iterator();
 					while (itr.hasNext())
 					{
-						Field<?> field = (Field<?>) itr.next();
-						field.validate();
+						Component comp = itr.next();
+						if (comp instanceof Field<?>)
+						{
+							Field<?> field = (Field<?>) comp;
+							field.validate();
+						}
 					}
 					if (recipient.onOK())
 					{
@@ -75,6 +82,8 @@ public class InputFormDialog extends Window
 				}
 			}
 		});
+
+		ok.setId("Ok");
 
 		ok.setClickShortcut(KeyCode.ENTER);
 		ok.addStyleName("default");
@@ -92,5 +101,16 @@ public class InputFormDialog extends Window
 	public void okOnly()
 	{
 		buttons.removeComponent(cancelButton);
+	}
+
+	public void setOkButtonLabel(String label)
+	{
+		ok.setCaption(label);
+	}
+
+	public void setCancelButtonLabel(String label)
+	{
+		cancelButton.setCaption(label);
+
 	}
 }

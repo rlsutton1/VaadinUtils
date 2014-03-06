@@ -3,6 +3,8 @@ package au.com.vaadinutils.reportFilter;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import au.com.vaadinutils.listener.ClickEventLogged;
 
 import com.vaadin.ui.Button;
@@ -22,6 +24,7 @@ public abstract class FilterReport extends ReportView
 	private String title;
 	private String servletUrl;
 	private String reportFileName;
+	Logger logger = Logger.getLogger(FilterReport.class);
 
 	protected FilterReport(String title, String servletUrl, String reportFileName)
 	{
@@ -162,7 +165,7 @@ public abstract class FilterReport extends ReportView
 			target += "&" + filter.getUrlEncodedKeyAndParameter();
 		}
 
-		System.out.println(target);
+		logger.info(target);
 
 		showReport(target);
 	}

@@ -1099,7 +1099,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	public void addChildCrudListener(ChildCrudListener<E> listener)
 	{
 		childCrudListeners.add(listener);
-		System.out.println(getClass() + " " + childCrudListeners);
+		logger.info(getClass() + " " + childCrudListeners);
 	}
 
 	protected void newClicked()

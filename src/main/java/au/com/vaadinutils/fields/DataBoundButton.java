@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
 import com.vaadin.data.Property;
 import com.vaadin.data.Validator;
 import com.vaadin.data.Validator.InvalidValueException;
@@ -28,6 +30,8 @@ public class DataBoundButton<T> extends Button implements Field<T>
 
 	Set<Validator> validators = new HashSet<Validator>();
 	private boolean invalidAllowed = true;
+	
+	Logger logger = Logger.getLogger(DataBoundButton.class);
 
 	Set<ValueChangeListener> listeners = new HashSet<ValueChangeListener>();
 
@@ -145,14 +149,14 @@ public class DataBoundButton<T> extends Button implements Field<T>
 	@Override
 	public T getValue()
 	{
-		System.out.println(value);
+		logger.info(value);
 		return value;
 	}
 
 	@Override
 	public void setValue(T newValue) throws ReadOnlyException
 	{
-		System.out.println(value);
+		logger.info(value);
 		value = newValue;
 
 	}
@@ -194,7 +198,7 @@ public class DataBoundButton<T> extends Button implements Field<T>
 	@Override
 	public void valueChange(com.vaadin.data.Property.ValueChangeEvent event)
 	{
-		System.out.println("Value changed");
+		logger.info("Value changed");
 
 	}
 
@@ -202,7 +206,7 @@ public class DataBoundButton<T> extends Button implements Field<T>
 	@Override
 	public void setPropertyDataSource(Property newDataSource)
 	{
-		System.out.println("data source set");
+		logger.info("data source set");
 		this.dataSource = newDataSource;
 		value = dataSource.getValue();
 
