@@ -61,6 +61,10 @@ public class HeadingToPropertyId<E>
 		return columnGenerator;
 	}
 
+	/**
+	 * returns true if the column is a virtual table column and not in the underlying container.
+	 * @return
+	 */
 	public boolean isGenerated()
 	{
 		return columnGenerator != null;
