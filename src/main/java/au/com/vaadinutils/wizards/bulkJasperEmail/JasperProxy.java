@@ -1,13 +1,12 @@
 package au.com.vaadinutils.wizards.bulkJasperEmail;
 
-import java.io.File;
-
 import javax.persistence.EntityManager;
 
 import net.sf.jasperreports.engine.JRException;
 import au.com.vaadinutils.dao.EntityManagerProvider;
-import au.com.vaadinutils.impl.JasperSettingsImpl;
+import au.com.vaadinutils.jasper.JasperEmailSettings;
 import au.com.vaadinutils.jasper.JasperManager;
+import au.com.vaadinutils.jasper.JasperSettings;
 
 public class JasperProxy
 {
@@ -15,11 +14,17 @@ public class JasperProxy
 	private String subject;
 	private String senderEmailAddress;
 	private JasperManager manager;
+	@SuppressWarnings("unused")
+	private JasperSettings settings;
+	private JasperEmailSettings emailSettings;
 
-	public JasperProxy(File jasperReport, String subject, String senderEmailAddress) throws JRException
+	public JasperProxy(String reportName, String subject, String senderEmailAddress, JasperSettings settings
+			, JasperEmailSettings emailSettings) throws JRException
 	{
 		EntityManager em = EntityManagerProvider.createEntityManager();
-		this.manager = new JasperManager(em, jasperReport, new JasperSettingsImpl());
+		this.settings = settings;
+		this.emailSettings = emailSettings;
+		this.manager = new JasperManager(em, reportName, settings);
 		this.subject = subject;
 		this.senderEmailAddress = senderEmailAddress;
 	}
@@ -39,6 +44,11 @@ public class JasperProxy
 	public String getSenderEmailAddress()
 	{
 		return senderEmailAddress;
+	}
+
+	public JasperEmailSettings getEmailSettings()
+	{
+		return emailSettings;
 	}
 
 

@@ -10,9 +10,9 @@ import org.apache.logging.log4j.Logger;
 
 import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.dao.Transaction;
+import au.com.vaadinutils.jasper.JasperEmailBuilder;
 import au.com.vaadinutils.jasper.JasperManager;
-import au.com.vaadinutils.jasper.JasperManager.EmailBuilder;
-import au.com.vaadinutils.jasper.JasperManager.Exporter;
+import au.com.vaadinutils.jasper.JasperManager.OutputFormat;
 import au.com.vaadinutils.jasper.RenderedReport;
 import au.com.vaadinutils.listener.CancelListener;
 import au.com.vaadinutils.util.ProgressBarTask;
@@ -68,11 +68,9 @@ public class SendEmailTask extends ProgressBarTask<JasperTransmission> implement
 				try
 				{
 					JasperManager manager = proxy.getManager();
-					manager.fillReport();
-					RenderedReport renderedHtml = manager.export(Exporter.HTML);
-					manager.fillReport();
-					RenderedReport renderedPDF = manager.export(Exporter.PDF);
-					EmailBuilder builder = new JasperManager.EmailBuilder(manager.getSettings());
+					RenderedReport renderedHtml = manager.export(OutputFormat.HTML);
+					RenderedReport renderedPDF = manager.export(OutputFormat.PDF);
+					JasperEmailBuilder builder = new JasperEmailBuilder(proxy.getEmailSettings());
 					builder.setFrom(proxy.getSenderEmailAddress())
 					.setSubject(proxy.getSubject())
 					//.setHtmlBody("<html><body></body></html>")
