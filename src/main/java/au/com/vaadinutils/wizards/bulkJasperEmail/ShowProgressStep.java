@@ -6,7 +6,8 @@ import java.util.HashSet;
 
 import net.sf.jasperreports.engine.JRException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.vaadin.teemu.wizards.WizardStep;
 
 import au.com.vaadinutils.crud.CrudEntity;
@@ -29,7 +30,7 @@ import com.vaadin.ui.VerticalLayout;
 
 public class ShowProgressStep<C extends CrudEntity> implements WizardStep, ProgressTaskListener<JasperTransmission>
 {
-	static private Logger logger = Logger.getLogger(ShowProgressStep.class);
+	static private Logger logger = LogManager.getLogger(ShowProgressStep.class);
 	JPAContainer<C> entities;
 	private WizardView<?, ?, ?> wizardView;
 	private boolean sendComplete = false;

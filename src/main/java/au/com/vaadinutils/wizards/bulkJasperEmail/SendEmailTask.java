@@ -5,7 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.mail.EmailException;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.dao.Transaction;
@@ -22,7 +23,7 @@ import com.vaadin.ui.Notification.Type;
 
 public class SendEmailTask extends ProgressBarTask<JasperTransmission> implements CancelListener
 {
-	Logger logger = Logger.getLogger(SendEmailTask.class);
+	Logger logger = LogManager.getLogger(SendEmailTask.class);
 	private JasperProxy proxy;
 	private List<JasperTransmission> transmissions;
 	private boolean cancel = false;

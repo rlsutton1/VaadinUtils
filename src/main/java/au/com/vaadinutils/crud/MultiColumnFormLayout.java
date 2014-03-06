@@ -6,7 +6,8 @@ import java.util.Date;
 
 import javax.persistence.metamodel.SingularAttribute;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import au.com.vaadinutils.crud.splitFields.SplitField;
 import au.com.vaadinutils.domain.iColorFactory;
@@ -30,7 +31,7 @@ import com.vaadin.ui.VerticalLayout;
 
 public class MultiColumnFormLayout<E> extends VerticalLayout
 {
-	private static Logger logger = Logger.getLogger(MultiColumnFormLayout.class);
+	private static Logger logger = LogManager.getLogger(MultiColumnFormLayout.class);
 	private static final long serialVersionUID = 1L;
 	private static final int DEFAULT_LABEL_WIDTH = 120;
 	private static final int DEFAULT_FIELD_WIDTH = 100;
@@ -110,12 +111,11 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	{
 		this.fieldWidths[column] = width;
 	}
-	
+
 	public void setComponentAlignment(Component childComponent, Alignment alignment)
 	{
 		this.grid.setComponentAlignment(childComponent, alignment);
 	}
-
 
 	private void init()
 	{
@@ -170,15 +170,15 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		else
 			caption = splitComponent.getLabel();
 		caption.setWidth("" + labelWidth);
-		logger.debug("label: caption:" + caption.getValue() + " width:" + labelWidth + " x:" + x + " y:" + y
-				+ " for col:" + x / 2);
+		logger.debug("label: caption: {}  width: {}  x: {} y: {} for col: {}", caption.getValue(), labelWidth, x, y,
+				x / 2);
 		grid.addComponent(caption, x, y, x, y);
 		grid.setComponentAlignment(caption, Alignment.MIDDLE_RIGHT);
 		x++;
 
 		String fieldWidth = getFieldWidth(x, fieldSpan);
-		logger.debug("field:" + caption.getValue() + " width: " + fieldWidth + " X:" + x + " Y:" + y + " X1:"
-				+ (x + fieldSpan - 1) + " Y1:" + y);
+		logger.debug("field: {} width: {} X: {} Y: {} X1: {} Y1: {}", caption.getValue(), fieldWidth, x, y, (x
+				+ fieldSpan - 1), y);
 		splitComponent.setWidth(fieldWidth);
 
 		grid.addComponent(splitComponent, x, y, x + fieldSpan - 1, y);
@@ -266,9 +266,9 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	 */
 	public TextField addTextField(String fieldLabel)
 	{
-		TextField field = formHelper.bindTextField((AbstractLayout)this, (ValidatingFieldGroup<E>) null, fieldLabel,
+		TextField field = formHelper.bindTextField((AbstractLayout) this, (ValidatingFieldGroup<E>) null, fieldLabel,
 				(String) null);
-		
+
 		this.fieldList.add(field);
 		return field;
 	}
@@ -389,12 +389,14 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		return field;
 	}
 
-//	public ColorPickerField bindColorPicker(iColorFactory factory, String fieldLabel, SingularAttribute<E, iColor> member)
-//	{
-//		ColorPickerField field = formHelper.bindColorPickerField(this, fieldGroup, factory, fieldLabel, member);
-//		this.fieldList.add(field);
-//		return field;
-//	}
+	// public ColorPickerField bindColorPicker(iColorFactory factory, String
+	// fieldLabel, SingularAttribute<E, iColor> member)
+	// {
+	// ColorPickerField field = formHelper.bindColorPickerField(this,
+	// fieldGroup, factory, fieldLabel, member);
+	// this.fieldList.add(field);
+	// return field;
+	// }
 
 	/**
 	 * Deprecated - Use EntityFieldBuilder instead

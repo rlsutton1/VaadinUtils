@@ -28,7 +28,8 @@ import net.sf.jasperreports.engine.util.JRLoader;
 import org.apache.commons.mail.ByteArrayDataSource;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.ImageHtmlEmail;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import au.com.vaadinutils.dao.Transaction;
 
@@ -37,7 +38,7 @@ import com.google.gwt.thirdparty.guava.common.base.Preconditions;
 public class JasperManager
 {
 	@SuppressWarnings("unused")
-	private static Logger logger = Logger.getLogger(JasperManager.class);
+	private static Logger logger = LogManager.getLogger(JasperManager.class);
 
 	public enum Disposition
 	{

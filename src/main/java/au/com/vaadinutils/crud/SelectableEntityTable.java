@@ -6,7 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.google.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.EntityContainer;
@@ -18,7 +19,7 @@ import com.vaadin.ui.Table;
 
 public class SelectableEntityTable<Child> extends Table
 {
-	private static Logger logger = Logger.getLogger(SelectableEntityTable.class);
+	private static Logger logger = LogManager.getLogger(SelectableEntityTable.class);
 
 	private static final String HEADING_SELECTED = "Selected";
 	private static final String SELECTABLE_ENTITY_TABLE_SELECTED = "SelectableEntityTableProperty";

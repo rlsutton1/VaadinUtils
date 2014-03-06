@@ -11,7 +11,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.vaadin.dialogs.ConfirmDialog;
 
 import au.com.vaadinutils.dao.EntityManagerProvider;
@@ -54,7 +55,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		Selected<E>, DirtyListener
 {
 
-	private static Logger logger = Logger.getLogger(BaseCrudView.class);
+	private static Logger logger = LogManager.getLogger(BaseCrudView.class);
 	private static final long serialVersionUID = 1L;
 
 	protected EntityItem<E> newEntity = null;

@@ -7,7 +7,8 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import au.com.bytecode.opencsv.CSVReader;
 
@@ -21,7 +22,7 @@ import com.vaadin.ui.VerticalLayout;
 
 public class PreviewCSV
 {
-	Logger logger = Logger.getLogger(PreviewCSV.class.getName());
+	Logger logger = LogManager.getLogger(PreviewCSV.class.getName());
 
 	public Component getContentFile(File tempFile, String caption, int rowLimit)
 	{
