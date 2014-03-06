@@ -15,7 +15,8 @@ import com.vaadin.ui.VerticalLayout;
 
 public abstract class FilterReport extends ReportView
 {
-
+	Logger logger = Logger.getLogger(FilterReport.class);
+	
 	/**
 	 * 
 	 */
@@ -24,7 +25,6 @@ public abstract class FilterReport extends ReportView
 	private String title;
 	private String servletUrl;
 	private String reportFileName;
-	Logger logger = Logger.getLogger(FilterReport.class);
 
 	protected FilterReport(String title, String servletUrl, String reportFileName)
 	{
@@ -77,8 +77,7 @@ public abstract class FilterReport extends ReportView
 				}
 				catch (UnsupportedEncodingException e)
 				{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					logger.error(e,e);
 				}
 
 			}
@@ -105,8 +104,7 @@ public abstract class FilterReport extends ReportView
 				}
 				catch (UnsupportedEncodingException e)
 				{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					logger.error(e,e);
 				}
 
 			}
@@ -133,8 +131,7 @@ public abstract class FilterReport extends ReportView
 				}
 				catch (UnsupportedEncodingException e)
 				{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					logger.error(e,e);
 				}
 
 			}

@@ -7,7 +7,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<vaadin.version>7.1.8</vaadin.version>
+		<vaadin.version>7.1.11</vaadin.version>
 		<vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
 		<jasperreports.version>5.2.0</jasperreports.version>
 	</properties>
@@ -138,7 +138,7 @@
 			<version>2.1.0</version>
 		</dependency>
 
-		<!-- Bean Validation API and RI -->
+		<!-- Bean Validation API and RI used by the Hibernate validation api.-->
 		<dependency>
 			<groupId>javax.validation</groupId>
 			<artifactId>validation-api</artifactId>
@@ -149,13 +149,13 @@
 		<dependency>
 			<groupId>org.vaadin.addons</groupId>
 			<artifactId>ckeditor-wrapper-for-vaadin</artifactId>
-			<version>7.8.6</version>
+			<version>7.9.0</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.vaadin.addons</groupId>
 			<artifactId>wizards-for-vaadin</artifactId>
-			<version>1.0.0-beta1</version>
+			<version>1.0.3</version>
 		</dependency>
 
 
@@ -201,6 +201,11 @@
 
 
 
+		<dependency>
+			<groupId>commons-validator</groupId>
+			<artifactId>commons-validator</artifactId>
+			<version>1.4.0</version>
+		</dependency>
 	</dependencies>
 
 
