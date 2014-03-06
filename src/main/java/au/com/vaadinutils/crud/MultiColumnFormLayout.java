@@ -9,10 +9,13 @@ import javax.persistence.metamodel.SingularAttribute;
 import org.apache.log4j.Logger;
 
 import au.com.vaadinutils.crud.splitFields.SplitField;
+import au.com.vaadinutils.domain.iColorFactory;
 import au.com.vaadinutils.fields.CKEditorEmailField;
+import au.com.vaadinutils.fields.ColorPickerField;
 
 import com.vaadin.shared.ui.datefield.Resolution;
 import com.vaadin.ui.AbstractComponent;
+import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
@@ -261,14 +264,11 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	 * @param caption
 	 * @return
 	 */
-	public TextField addTextField(String caption)
+	public TextField addTextField(String fieldLabel)
 	{
-		TextField field = new TextField(caption);
-		field.setWidth("100%");
-		field.setImmediate(true);
-		field.setNullRepresentation("");
-		field.setNullSettingAllowed(false);
-		this.addComponent(field);
+		TextField field = formHelper.bindTextField((AbstractLayout)this, (ValidatingFieldGroup<E>) null, fieldLabel,
+				(String) null);
+		
 		this.fieldList.add(field);
 		return field;
 	}
@@ -297,8 +297,6 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 	 */
 	public PasswordField addPasswordField(String fieldLabel)
 	{
-		// PasswordField field = new PasswordField(caption);
-
 		PasswordField field = formHelper.bindPasswordField(this, (ValidatingFieldGroup<?>) null, fieldLabel,
 				(SingularAttribute<E, String>) null);
 		this.fieldList.add(field);
@@ -384,6 +382,20 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 		return field;
 	}
 
+	public ColorPickerField bindColorPicker(iColorFactory factory, String fieldLabel, String member)
+	{
+		ColorPickerField field = formHelper.bindColorPickerField(this, fieldGroup, factory, fieldLabel, member);
+		this.fieldList.add(field);
+		return field;
+	}
+
+//	public ColorPickerField bindColorPicker(iColorFactory factory, String fieldLabel, SingularAttribute<E, iColor> member)
+//	{
+//		ColorPickerField field = formHelper.bindColorPickerField(this, fieldGroup, factory, fieldLabel, member);
+//		this.fieldList.add(field);
+//		return field;
+//	}
+
 	/**
 	 * Deprecated - Use EntityFieldBuilder instead
 	 * 
@@ -448,7 +460,8 @@ public class MultiColumnFormLayout<E> extends VerticalLayout
 
 	public void setReadOnly(boolean readOnly)
 	{
-		this.fieldGroup.setReadOnly(readOnly);
+		if (this.fieldGroup.getItemDataSource() != null)
+			this.fieldGroup.setReadOnly(readOnly);
 	}
 
 	/**

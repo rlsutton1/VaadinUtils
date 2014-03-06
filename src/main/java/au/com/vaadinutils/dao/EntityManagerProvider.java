@@ -42,11 +42,19 @@ public enum EntityManagerProvider
 	private ThreadLocal<EntityManager> entityManagerThreadLocal = new ThreadLocal<EntityManager>();
 	private javax.persistence.EntityManagerFactory emf;
 
+	/**
+	 * Get the entity manager attached to this thread.
+	 * @return
+	 */
 	public static EntityManager getEntityManager()
 	{
 		return INSTANCE.entityManagerThreadLocal.get();
 	}
 
+	/**
+	 * Set an entity manager for this thread.
+	 * @param em
+	 */
 	public static void setCurrentEntityManager(EntityManager em)
 	{
 		INSTANCE.entityManagerThreadLocal.set(em);
@@ -66,6 +74,13 @@ public enum EntityManagerProvider
 		INSTANCE.emf = emf;
 	}
 
+	/**
+	 * T return type from EntityWorker.
+	 * 
+	 * @param worker
+	 * @return
+	 * @throws Exception
+	 */
 	public static <T> T setThreadLocalEntityManager(EntityWorker<T> worker) throws Exception
 	{
 		if (getEntityManager() == null)

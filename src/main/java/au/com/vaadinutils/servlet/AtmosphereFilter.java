@@ -61,9 +61,12 @@ public class AtmosphereFilter extends AtmosphereInterceptorAdapter
 		}
 		catch (Throwable e)
 		{
-			// Reset the entity manager
-			EntityManagerProvider.setCurrentEntityManager(null);
 			throw new RuntimeException(e);
+		}
+		finally
+		{
+			// Reset the entity manager as we get a new one everytime we inspect is called.
+			EntityManagerProvider.setCurrentEntityManager(null);
 		}
 
 

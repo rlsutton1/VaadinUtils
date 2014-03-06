@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 
 import au.com.vaadinutils.converter.MultiSelectConverter;
 import au.com.vaadinutils.crud.splitFields.SplitCheckBox;
+import au.com.vaadinutils.crud.splitFields.SplitColorPicker;
 import au.com.vaadinutils.crud.splitFields.SplitComboBox;
 import au.com.vaadinutils.crud.splitFields.SplitDateField;
 import au.com.vaadinutils.crud.splitFields.SplitEditorField;
@@ -27,7 +28,10 @@ import au.com.vaadinutils.crud.splitFields.SplitTextArea;
 import au.com.vaadinutils.crud.splitFields.SplitTextField;
 import au.com.vaadinutils.crud.splitFields.SplitTwinColSelect;
 import au.com.vaadinutils.dao.EntityManagerProvider;
+import au.com.vaadinutils.domain.iColor;
+import au.com.vaadinutils.domain.iColorFactory;
 import au.com.vaadinutils.fields.CKEditorEmailField;
+import au.com.vaadinutils.fields.ColorPickerField;
 import au.com.vaadinutils.fields.DataBoundButton;
 
 import com.google.common.base.Preconditions;
@@ -65,7 +69,8 @@ public class FormHelper<E> implements Serializable
 	public FormHelper(AbstractLayout form, ValidatingFieldGroup<E> group)
 	{
 		// I'm actually using this without a field group.
-		// need to makes some modifications so that we formally support non-group usage.
+		// need to makes some modifications so that we formally support
+		// non-group usage.
 		// Preconditions.checkNotNull(group,
 		// "ValidatingFieldGroup can not be null");
 		this.form = form;
@@ -297,7 +302,28 @@ public class FormHelper<E> implements Serializable
 
 		form.addComponent(field);
 		return field;
+	}
 
+	public ColorPickerField bindColorPickerField(AbstractLayout form, ValidatingFieldGroup<E> group,
+			iColorFactory factory, String fieldLabel, SingularAttribute<E, iColor> member)
+	{
+		ColorPickerField field = bindColorPickerField(form, group, factory, fieldLabel, member.getName());
+		this.fieldList.add(field);
+		return field;
+
+	}
+
+	public ColorPickerField bindColorPickerField(AbstractLayout form, ValidatingFieldGroup<E> group,
+			iColorFactory factory, String fieldLabel, String fieldName)
+	{
+		ColorPickerField field = new SplitColorPicker(factory, fieldLabel);
+		field.setWidth("100%");
+		field.setImmediate(true);
+
+		doBinding(group, fieldName, field);
+
+		form.addComponent(field);
+		return field;
 	}
 
 	public <L> ComboBox bindComboBox(AbstractLayout form, ValidatingFieldGroup<E> fieldGroup, String fieldLabel,
@@ -589,7 +615,8 @@ public class FormHelper<E> implements Serializable
 		private AbstractLayout builderForm;
 		private boolean multiSelect = false;
 
-		@SuppressWarnings({ "unchecked", "rawtypes" })
+		@SuppressWarnings(
+		{ "unchecked", "rawtypes" })
 		public SplitListSelect build()
 		{
 			Preconditions.checkNotNull(label, "label may not be null");
@@ -680,6 +707,12 @@ public class FormHelper<E> implements Serializable
 			return this;
 		}
 
+		/**
+		 * Sets the field to display from the List entity.
+		 * 
+		 * @param colField
+		 * @return
+		 */
 		public ListSelectBuilder<L> setListFieldName(SingularAttribute<L, ?> colField)
 		{
 			this.listField = colField.getName();
@@ -717,6 +750,7 @@ public class FormHelper<E> implements Serializable
 			this.listClazz = listClazz;
 			return this;
 		}
+
 	}
 
 	/**
@@ -753,7 +787,8 @@ public class FormHelper<E> implements Serializable
 		private String leftColumnCaption;
 		private String rightColumnCaption;
 
-		@SuppressWarnings({ "unchecked", "rawtypes" })
+		@SuppressWarnings(
+		{ "unchecked", "rawtypes" })
 		public SplitTwinColSelect build()
 		{
 			Preconditions.checkNotNull(label, "label may not be null");
