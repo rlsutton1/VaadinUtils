@@ -24,7 +24,9 @@ import java.util.Locale;
 import java.util.Set;
 
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 
+import com.google.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.EntityContainer;
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.EntityItemProperty;
@@ -177,10 +179,9 @@ public class MultiSelectConverter<T> implements Converter<Collection<Object>, Co
 			return (EntityItemProperty) ((TransactionalPropertyWrapper) select.getPropertyDataSource())
 					.getWrappedProperty();
 		}
-		else
-		{
-			return null;
-		}
+
+		return null;
+
 	}
 
 	@SuppressWarnings("unchecked")
@@ -189,10 +190,20 @@ public class MultiSelectConverter<T> implements Converter<Collection<Object>, Co
 		if (!isOwningSide())
 		{
 			EntityItemProperty itemProperty = getBackReferenceItemProperty(entity);
-			@SuppressWarnings("rawtypes")
-			Collection c = (Collection) itemProperty.getValue();
-			c.remove(getPropertyDataSource().getItem().getEntity());
-			itemProperty.setValue(c);
+			Object property = itemProperty.getValue();
+			if (property instanceof Collection)
+			{
+				// many to many
+				@SuppressWarnings("rawtypes")
+				Collection c = (Collection) property;
+				c.remove(getPropertyDataSource().getItem().getEntity());
+				itemProperty.setValue(c);
+			}
+			else
+			{
+				// one to many
+				itemProperty.setValue(null);
+			}
 		}
 	}
 
@@ -210,9 +221,23 @@ public class MultiSelectConverter<T> implements Converter<Collection<Object>, Co
 		if (!isOwningSide())
 		{
 			EntityItemProperty itemProperty = getBackReferenceItemProperty(entity);
-			Collection c = (Collection) itemProperty.getValue();
-			c.add(getPropertyDataSource().getItem().getEntity());
-			itemProperty.setValue(c);
+			Object property = itemProperty.getValue();
+			if (property == null || !(property instanceof Collection))
+			{
+				itemProperty.setValue(getPropertyDataSource().getItem().getEntity());
+				// one to many
+			}
+			else
+			{
+				// many to many
+				Preconditions.checkArgument(property instanceof Collection,
+						"Expected a Collection got " + itemProperty.getPropertyId() + " "
+								+ property.getClass().getCanonicalName());
+				Collection c = (Collection) property;
+				c.add(getPropertyDataSource().getItem().getEntity());
+				itemProperty.setValue(c);
+			}
+
 		}
 	}
 
@@ -233,11 +258,27 @@ public class MultiSelectConverter<T> implements Converter<Collection<Object>, Co
 					entityClass);
 			PropertyMetadata property = entityClassMetadata.getProperty(getPropertyDataSource().getPropertyId());
 			ManyToMany annotation = property.getAnnotation(ManyToMany.class);
-			if (annotation.mappedBy() != null && !annotation.mappedBy().isEmpty())
+			if (annotation != null)
 			{
-				owningSide = Boolean.FALSE;
-				mappedBy = annotation.mappedBy();
-				return owningSide;
+				if (annotation.mappedBy() != null && !annotation.mappedBy().isEmpty())
+				{
+					owningSide = Boolean.FALSE;
+					mappedBy = annotation.mappedBy();
+					return owningSide;
+				}
+			}
+			else
+			{
+				OneToMany annotation2 = property.getAnnotation(OneToMany.class);
+				if (annotation2 != null)
+				{
+					if (annotation2.mappedBy() != null && !annotation2.mappedBy().isEmpty())
+					{
+						owningSide = Boolean.FALSE;
+						mappedBy = annotation2.mappedBy();
+						return owningSide;
+					}
+				}
 			}
 			owningSide = Boolean.TRUE;
 		}
@@ -262,10 +303,9 @@ public class MultiSelectConverter<T> implements Converter<Collection<Object>, Co
 				throw new RuntimeException("Couldn't instantiate a collection for property.");
 			}
 		}
-		else
-		{
-			return (Collection) type.newInstance();
-		}
+
+		return (Collection) type.newInstance();
+
 	}
 
 	@SuppressWarnings("unchecked")
@@ -276,10 +316,9 @@ public class MultiSelectConverter<T> implements Converter<Collection<Object>, Co
 		{
 			return getPropertyDataSource().getType();
 		}
-		else
-		{
-			return this.type;
-		}
+
+		return this.type;
+
 	}
 
 	@SuppressWarnings("unchecked")
