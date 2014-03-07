@@ -5,7 +5,7 @@ import java.net.URLEncoder;
 
 import com.vaadin.ui.Component;
 
-public abstract class ReportParameter
+public abstract class ReportParameter<T>
 {
 	final String parameterName;
 
@@ -16,13 +16,14 @@ public abstract class ReportParameter
 
 	public String getUrlEncodedKeyAndParameter() throws UnsupportedEncodingException
 	{
-		return parameterName + "=" + URLEncoder.encode(getValue(), "UTF-8");
+		return parameterName + "=" + URLEncoder.encode(getValue().toString(), "UTF-8");
 	}
 
-	abstract protected String getValue();
+	public abstract T getValue();
 
 	public abstract Component getComponent();
 
 	public abstract boolean shouldExpand();
 
+	public abstract void setDefaultValue(T defaultValue);
 }

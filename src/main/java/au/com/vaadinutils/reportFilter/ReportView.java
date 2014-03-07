@@ -12,6 +12,7 @@ import org.apache.logging.log4j.Logger;
 import au.com.vaadinutils.jasper.JasperManager;
 import au.com.vaadinutils.jasper.JasperManager.OutputFormat;
 import au.com.vaadinutils.jasper.RenderedReport;
+import au.com.vaadinutils.jasper.ReportFilterUIBuilder;
 import au.com.vaadinutils.listener.ClickEventLogged;
 
 import com.vaadin.navigator.View;
@@ -19,6 +20,7 @@ import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.Resource;
 import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.BrowserFrame;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -51,6 +53,7 @@ public abstract class ReportView extends HorizontalLayout implements View
 	String reportFileName;
 
 	JasperManager manager;
+	private ReportFilterUIBuilder builder;
 
 	protected ReportView(String title, String servletUrl, String reportFileName)
 	{
@@ -65,6 +68,7 @@ public abstract class ReportView extends HorizontalLayout implements View
 		this.servletUrl = null;
 		this.reportFileName = manager.getReportName();
 		this.manager = manager;
+		this.builder = getFilterBuilder();
 	}
 
 	@Override
@@ -79,13 +83,14 @@ public abstract class ReportView extends HorizontalLayout implements View
 
 		VerticalLayout splash = new VerticalLayout();
 		splash.setMargin(true);
-		Label label = new Label("<font size='4' > Select filters and click 'Apply' to generate a report</font>");
+		Label label = new Label("<font size='4' >Set the desired filters and click 'Apply' to generate a report</font>");
 		label.setContentMode(ContentMode.HTML);
 		splash.addComponent(label);
+
 		layout.setSecondComponent(splash);
 		this.addComponent(layout);
 
-		if (fillOnOpen())
+		if (!this.builder.hasFilters())
 			try
 			{
 				generateReport(JasperManager.OutputFormat.HTML, null);
@@ -93,19 +98,18 @@ public abstract class ReportView extends HorizontalLayout implements View
 			catch (JRException e)
 			{
 				logger.catching(e);
-				Notification.show("Error",  e.getMessage(), Type.ERROR_MESSAGE);
+				Notification.show("Error", e.getMessage(), Type.ERROR_MESSAGE);
 			}
 			catch (IOException e)
 			{
 				logger.catching(e);
-				Notification.show("Error",  e.getMessage(), Type.ERROR_MESSAGE);
+				Notification.show("Error", e.getMessage(), Type.ERROR_MESSAGE);
 			}
 
 	}
 
 	public Component getOptionsPanel()
 	{
-		List<ReportParameter> filters = getFilters();
 		VerticalLayout layout = new VerticalLayout();
 		layout.setHeight("100%");
 		layout.setMargin(true);
@@ -114,34 +118,12 @@ public abstract class ReportView extends HorizontalLayout implements View
 		Label titleLabel = new Label("<h1>" + title + "</h1>");
 		titleLabel.setContentMode(ContentMode.HTML);
 		layout.addComponent(titleLabel);
-		
+
 		Label description = new Label("<p>" + getDescription() + "</p>");
 		description.setContentMode(ContentMode.HTML);
 		layout.addComponent(description);
 
-
-		VerticalLayout filterLayout = new VerticalLayout();
-		filterLayout.setSpacing(true);
-
-		if (filters != null)
-		{
-			for (ReportParameter filter : filters)
-			{
-				Component component = filter.getComponent();
-				// some filters (such as constants) will not have a component to
-				// display
-				if (component != null)
-				{
-
-					filterLayout.addComponent(component);
-					if (filter.shouldExpand())
-					{
-						filterLayout.setExpandRatio(component, 1);
-					}
-				}
-			}
-		}
-
+		AbstractLayout filterLayout = builder.buildLayout();
 		layout.addComponent(filterLayout);
 		layout.setExpandRatio(filterLayout, 1.0f);
 
@@ -162,22 +144,21 @@ public abstract class ReportView extends HorizontalLayout implements View
 			@Override
 			public void clicked(ClickEvent event)
 			{
-					ComboBoxAction action = (ComboBoxAction) actionCombo.getValue();
-					try
-					{
-						action.exec();
-					}
-					catch (Exception e)
-					{
-						logger.error(e,e);
-					}
+				ComboBoxAction action = (ComboBoxAction) actionCombo.getValue();
+				try
+				{
+					action.exec();
+				}
+				catch (Exception e)
+				{
+					logger.error(e, e);
+				}
 			}
 		});
 
 		layout.addComponent(actionCombo);
 		layout.addComponent(applyButton);
-		
-		
+
 		return layout;
 	}
 
@@ -186,7 +167,7 @@ public abstract class ReportView extends HorizontalLayout implements View
 		@Override
 		public void exec() throws Exception
 		{
-			generateReport(OutputFormat.HTML, getFilters());
+			generateReport(OutputFormat.HTML, ReportView.this.builder.getReportParameters());
 		}
 
 		public String toString()
@@ -200,8 +181,7 @@ public abstract class ReportView extends HorizontalLayout implements View
 		@Override
 		public void exec() throws Exception
 		{
-			generateReport(OutputFormat.PDF,  getFilters());
-
+			generateReport(OutputFormat.PDF, ReportView.this.builder.getReportParameters());
 		}
 
 		public String toString()
@@ -215,42 +195,15 @@ public abstract class ReportView extends HorizontalLayout implements View
 		@Override
 		public void exec() throws Exception
 		{
-			generateReport(OutputFormat.CSV,  getFilters());
-
+			generateReport(OutputFormat.CSV, ReportView.this.builder.getReportParameters());
 		}
 
-		
-		
 		public String toString()
 		{
 			return "Export to CSV";
 		}
 
 	}
-
-
-	/**
-	 * over load this member to control if the report is displayed without user
-	 * intervention. This is a nice idea if the report doesn't take any
-	 * parameters.
-	 * 
-	 * @return
-	 */
-	protected boolean fillOnOpen()
-	{
-		return getFilters() == null;
-	}
-
-	/**
-	 * Overload this method to return a set of filters that are to be exposed
-	 * to the user to filter this report.
-	 * @return
-	 */
-	protected List<ReportParameter> getFilters()
-	{
-		return null;
-	}
-
 
 	public void showReport(RenderedReport report)
 	{
@@ -268,21 +221,26 @@ public abstract class ReportView extends HorizontalLayout implements View
 
 	private BrowserFrame getDisplayPanel()
 	{
-		if (displayPanel == null)
-		{
-			displayPanel = new BrowserFrame("Report Display");
-			displayPanel.setSizeFull();
-			displayPanel.setStyleName("njadmin-hide-overflow-for-help");
-			layout.setSecondComponent(displayPanel);
-		}
+		displayPanel = new BrowserFrame("Report Display");
+		displayPanel.setSizeFull();
+		displayPanel.setStyleName("njadmin-hide-overflow-for-help");
+		layout.setSecondComponent(displayPanel);
 		return displayPanel;
 
 	}
 
-	protected void generateReport(JasperManager.OutputFormat outputFormat, List<ReportParameter> filters) throws JRException, IOException
+	protected void generateReport(JasperManager.OutputFormat outputFormat, List<ReportParameter<?>> params)
+			throws JRException, IOException
 	{
 		if (this.manager != null)
 		{
+			if (params != null)
+			{
+				for (ReportParameter<?> param : params)
+				{
+					this.manager.bindParameter(param.parameterName, param.getValue());
+				}
+			}
 			showReport(this.manager.export(outputFormat));
 		}
 		else
@@ -293,11 +251,11 @@ public abstract class ReportView extends HorizontalLayout implements View
 			target += "&ReportTitle=" + java.net.URLEncoder.encode(title, "UTF-8");
 			target += "&uniqueifier=" + System.currentTimeMillis();
 
-			if (filters != null)
+			if (params != null)
 			{
-				for (ReportParameter filter : filters)
+				for (ReportParameter<?> param : params)
 				{
-					target += "&" + filter.getUrlEncodedKeyAndParameter();
+					target += "&" + param.getUrlEncodedKeyAndParameter();
 				}
 			}
 
@@ -305,18 +263,26 @@ public abstract class ReportView extends HorizontalLayout implements View
 			showReport(target);
 		}
 	}
-	
+
 	interface ComboBoxAction
 	{
 		public void exec() throws Exception;
 	}
 
-
 	public JasperManager getJasperManager()
 	{
 		return this.manager;
-		
+
 	}
 
+	/**
+	 * Overload this method if you report needs to be filtered.
+	 * 
+	 * @return
+	 */
+	protected ReportFilterUIBuilder getFilterBuilder()
+	{
+		return new ReportFilterUIBuilder(manager);
+	}
 
 }

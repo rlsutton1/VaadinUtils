@@ -3,7 +3,7 @@ package au.com.vaadinutils.reportFilter;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.TextField;
 
-public class ReportParameterString extends ReportParameter
+public class ReportParameterString extends ReportParameter<String>
 {
 
 	protected TextField field;
@@ -16,7 +16,7 @@ public class ReportParameterString extends ReportParameter
 	}
 
 	@Override
-	protected String getValue()
+	public String getValue()
 	{
 		return field.getValue();
 	}
@@ -31,6 +31,13 @@ public class ReportParameterString extends ReportParameter
 	public boolean shouldExpand()
 	{
 		return false;
+	}
+
+	@Override
+	public void setDefaultValue(String defaultValue)
+	{
+		field.setValue(defaultValue);
+		
 	}
 
 }

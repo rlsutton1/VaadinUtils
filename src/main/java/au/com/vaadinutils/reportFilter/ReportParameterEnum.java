@@ -5,7 +5,7 @@ import au.com.vaadinutils.crud.FormHelper;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 
-public class ReportParameterEnum<T extends Enum<T>> extends ReportParameter
+public class ReportParameterEnum<T extends Enum<T>> extends ReportParameter<Enum<T>>
 {
 
 	private ComboBox field;
@@ -28,10 +28,11 @@ public class ReportParameterEnum<T extends Enum<T>> extends ReportParameter
 		field.setValue(defaultValue);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	protected String getValue()
+	public T getValue()
 	{
-		return "" + field.getValue();
+		return (T) field.getValue();
 	}
 
 	@Override
@@ -46,4 +47,10 @@ public class ReportParameterEnum<T extends Enum<T>> extends ReportParameter
 		return false;
 	}
 
+	@Override
+	public void setDefaultValue(Enum<T> defaultValue)
+	{
+		// TODO Auto-generated method stub
+		
+	}
 }
