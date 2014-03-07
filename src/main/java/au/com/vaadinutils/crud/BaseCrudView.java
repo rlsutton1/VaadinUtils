@@ -87,6 +87,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 */
 	protected JPAContainer<E> container;
 
+	
 	/* User interface components are stored in session. */
 	protected EntityList<E> entityTable;
 	protected VerticalLayout rightLayout;

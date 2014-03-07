@@ -18,6 +18,7 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
+
 @SuppressWarnings("serial")
 public class InputFormDialog extends Window
 {

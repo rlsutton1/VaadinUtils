@@ -4,7 +4,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.vaadin.data.Property;
 import com.vaadin.data.Validator;
@@ -31,7 +32,7 @@ public class DataBoundButton<T> extends Button implements Field<T>
 	Set<Validator> validators = new HashSet<Validator>();
 	private boolean invalidAllowed = true;
 	
-	Logger logger = Logger.getLogger(DataBoundButton.class);
+	Logger logger = LogManager.getLogger(DataBoundButton.class);
 
 	Set<ValueChangeListener> listeners = new HashSet<ValueChangeListener>();
 

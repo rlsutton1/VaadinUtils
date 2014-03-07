@@ -4,7 +4,8 @@ import java.util.List;
 
 import javax.persistence.metamodel.SingularAttribute;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import au.com.vaadinutils.crud.BaseCrudView;
 import au.com.vaadinutils.crud.CrudEntity;
@@ -22,7 +23,7 @@ public class UniqueFieldValidator<E extends CrudEntity, F> implements Validator
 	private Class<E> table;
 	private SingularAttribute<E, F> matchField;
 	private BaseCrudView<E> crud;
-	Logger logger = Logger.getLogger(UniqueFieldValidator.class);
+	Logger logger = LogManager.getLogger(UniqueFieldValidator.class);
 
 	public UniqueFieldValidator(Class<E> table, SingularAttribute<E, F> matchField, BaseCrudView<E> crud)
 	{

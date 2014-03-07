@@ -25,8 +25,6 @@ import net.sf.jasperreports.engine.export.JRPdfExporter;
 import net.sf.jasperreports.engine.util.JRLoader;
 
 import org.apache.commons.mail.ByteArrayDataSource;
-import org.apache.commons.mail.EmailException;
-import org.apache.commons.mail.ImageHtmlEmail;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -216,8 +214,14 @@ public class JasperManager
 			}
 			default:
 			{
-				throw new RuntimeException("Unsupported export option " + exportMethod);
-			}
+				throw new RuntimeException("Unsupported export option "+exportMethod);
+				}
+			
+		}
+
+		for (Entry<JRExporterParameter, Object> param : exporter.getParameters().entrySet())
+		{
+			logger.info(param.getKey() + ":" + param.getValue());
 
 		}
 
