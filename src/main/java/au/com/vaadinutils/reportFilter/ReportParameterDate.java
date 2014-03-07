@@ -13,7 +13,7 @@ public class ReportParameterDate extends ReportParameter
 
 	protected DateField field;
 
-	protected ReportParameterDate(String caption, String parameterName)
+	public ReportParameterDate(String caption, String parameterName)
 	{
 		super( parameterName);
 		field = new DateField(null, new DateTime().withTimeAtStartOfDay().toDate());
