@@ -119,7 +119,7 @@ public class FormHelper<E> implements Serializable
 		else
 
 		{
-			logger.warn("field " + fieldName + " was not bound");
+			logger.warn("field {}  was not bound", fieldName );
 		}
 	}
 

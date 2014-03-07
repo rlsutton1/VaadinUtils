@@ -11,18 +11,6 @@ public interface JasperSettings
 
 	File getInitParameterRealPath(String paramName);
 
-	String getSmtpFQDN();
-
-	Integer getSmtpPort();
-
-	boolean isAuthRequired();
-
-	String getUsername();
-
-	String getPassword();
-
-	boolean getUseSSL();
-
-	String getBounceEmailAddress();
+	File getReportFile(String reportName);
 
 }

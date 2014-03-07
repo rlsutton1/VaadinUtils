@@ -81,11 +81,6 @@
 			<artifactId>vaadin-server</artifactId>
 			<version>${vaadin.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.apache.logging.log4j</groupId>
-			<artifactId>log4j-api</artifactId>
-			<version>2.0-rc1</version>
-		</dependency>
 
 		<dependency>
 			<groupId>com.vaadin</groupId>
@@ -138,13 +133,12 @@
 			<version>2.1.0</version>
 		</dependency>
 
-		<!-- Bean Validation API and RI used by the Hibernate validation api.-->
 		<dependency>
-			<groupId>javax.validation</groupId>
-			<artifactId>validation-api</artifactId>
-			<version>1.1.0.Final</version>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator-annotation-processor</artifactId>
+			<version>4.2.0.Final</version>
+			<scope>compile</scope>
 		</dependency>
-
 
 		<dependency>
 			<groupId>org.vaadin.addons</groupId>
@@ -206,11 +200,47 @@
 			<artifactId>commons-validator</artifactId>
 			<version>1.4.0</version>
 		</dependency>
+		
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-core</artifactId>
 			<version>2.0-rc1</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+			<version>2.0-rc1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.logging.log4j.adapters</groupId>
+			<artifactId>log4j-1.2-api</artifactId>
+			<version>2.0-beta4</version>
+		</dependency>
+
+		<dependency>
+			<!-- route commons logging to log4j2 -->
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-jcl</artifactId>
+			<version>2.0-rc1</version>
+		</dependency>
+
+
+		<dependency>
+			<!-- route slf4j to log4j2 -->
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-slf4j-impl</artifactId>
+			<version>2.0-rc1</version>
+		</dependency>
+
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.6</version>
+		</dependency>
+
 	</dependencies>
 
 
