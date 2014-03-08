@@ -58,6 +58,7 @@ public class ReportFilterUIBuilder implements ReportFilterFieldBuilder, ReportFi
 	@Override
 	public void setDate(DateTime date)
 	{
+		@SuppressWarnings("unchecked")
 		ReportParameter<Date> param = (ReportParameter<Date>) rparams.get(rparams.size() - 1);
 		param.setDefaultValue(date.toDate());
 		
