@@ -46,4 +46,10 @@ public class ReportParameterDate extends ReportParameter<Date>
 		this.field.setValue(defaultValue);
 		
 	}
+
+	@Override
+	public String getExpectedParameterClassName()
+	{
+		return Date.class.getCanonicalName();
+	}
 }

@@ -136,7 +136,14 @@ public class JasperManager
 	 */
 	public void bindParameter(String parameterName, Object parameterValue)
 	{
-		Preconditions.checkArgument(paramExists(parameterName), "The passed Jasper Report parameter: " + parameterName
+		String tmpParam = parameterName;
+		// specific work around for prefixed report parameters
+		if (tmpParam.startsWith("ReportParameter"))
+		{
+			tmpParam = tmpParam.substring("ReportParameter".length(),parameterName.length());
+		}
+
+		Preconditions.checkArgument(paramExists(tmpParam), "The passed Jasper Report parameter: " + parameterName
 				+ " does not existing on the Report");
 
 		boundParams.put(parameterName, parameterValue);

@@ -8,6 +8,7 @@ import com.vaadin.ui.Component;
 public abstract class ReportParameter<T>
 {
 	final String parameterName;
+	String label;
 
 	public ReportParameter(String parameterName)
 	{
@@ -26,4 +27,18 @@ public abstract class ReportParameter<T>
 	public abstract boolean shouldExpand();
 
 	public abstract void setDefaultValue(T defaultValue);
+
+	public String getParameterName()
+	{
+		return parameterName;
+	}
+
+	public abstract String getExpectedParameterClassName();
+
+	public void setLabel(String label)
+	{
+		this.label = label;
+		
+	}
+	
 }

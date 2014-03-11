@@ -40,4 +40,10 @@ public class ReportParameterString extends ReportParameter<String>
 		
 	}
 
+	@Override
+	public String getExpectedParameterClassName()
+	{
+		return String.class.getCanonicalName();
+	}
+
 }

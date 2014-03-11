@@ -2,11 +2,9 @@ package au.com.vaadinutils.jasper;
 
 import org.joda.time.DateTime;
 
-public interface ReportFilterDateFieldBuilder
+public interface ReportFilterDateFieldBuilder extends ReportFilterFieldBuilder
 {
 
-	ReportFilterDateFieldBuilder addDateField(String label, String paramName);
-
-	void setDate(DateTime date);
+	ReportFilterDateFieldBuilder setDate(DateTime date);
 
 }

@@ -9,8 +9,6 @@ public interface JasperSettings
 
 	File getDocumentBase();
 
-	File getInitParameterRealPath(String paramName);
-
 	File getReportFile(String reportName);
 
 }

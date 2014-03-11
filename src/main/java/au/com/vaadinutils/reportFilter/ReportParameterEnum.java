@@ -17,7 +17,7 @@ public class ReportParameterEnum<T extends Enum<T>> extends ReportParameter<Enum
 	 * @param parameterName
 	 * @param enumClass
 	 */
-	protected ReportParameterEnum(String caption, T defaultValue,String parameterName, Class<T> enumClass)
+	public ReportParameterEnum(String caption, T defaultValue,String parameterName, Class<T> enumClass)
 	{
 		super(parameterName);
 		field = new ComboBox(caption);
@@ -50,7 +50,13 @@ public class ReportParameterEnum<T extends Enum<T>> extends ReportParameter<Enum
 	@Override
 	public void setDefaultValue(Enum<T> defaultValue)
 	{
-		// TODO Auto-generated method stub
+		field.setValue(defaultValue);
 		
+	}
+
+	@Override
+	public String getExpectedParameterClassName()
+	{
+		return String.class.getCanonicalName();
 	}
 }

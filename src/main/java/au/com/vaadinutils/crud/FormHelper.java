@@ -339,6 +339,9 @@ public class FormHelper<E> implements Serializable
 		return field;
 	}
 
+	/**
+	 * Deprecated - use EntityFieldBuilder instead
+	 */
 	@Deprecated
 	public <L> ComboBox bindEntityField(String fieldLabel, SingularAttribute<E, L> fieldName, Class<L> listClazz,
 			SingularAttribute<L, ?> listFieldName)
@@ -845,6 +848,11 @@ public class FormHelper<E> implements Serializable
 			return component;
 		}
 
+		/**
+		 * label that will appear next to the component on the screen
+		 * @param label
+		 * @return
+		 */
 		public TwinColSelectBuilder<L> setLabel(String label)
 		{
 			this.label = label;
@@ -863,6 +871,11 @@ public class FormHelper<E> implements Serializable
 			return this;
 		}
 
+		/**
+		 * the set in the parent table that holds the set of children
+		 * @param field
+		 * @return
+		 */
 		public TwinColSelectBuilder<L> setField(SetAttribute<E, L> field)
 		{
 			this.field = field.getName();

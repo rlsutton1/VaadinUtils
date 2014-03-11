@@ -1,14 +1,17 @@
 package au.com.vaadinutils.jasper;
 
-import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
-import java.util.List;
+import java.util.LinkedList;
+
+import net.sf.jasperreports.engine.JRParameter;
 
 import org.joda.time.DateTime;
 
-import net.sf.jasperreports.engine.JRParameter;
 import au.com.vaadinutils.reportFilter.ReportParameter;
 import au.com.vaadinutils.reportFilter.ReportParameterDate;
+import au.com.vaadinutils.reportFilter.ReportParameterEnum;
 import au.com.vaadinutils.reportFilter.ReportParameterString;
 
 import com.google.gwt.thirdparty.guava.common.base.Preconditions;
@@ -30,52 +33,85 @@ import com.vaadin.ui.VerticalLayout;
 public class ReportFilterUIBuilder implements ReportFilterFieldBuilder, ReportFilterDateFieldBuilder
 {
 	private JasperManager manager;
-	private List<ReportParameter<?>> rparams = new ArrayList<ReportParameter<?>>();
+	private LinkedList<ReportParameter<?>> rparams = new LinkedList<ReportParameter<?>>();
 
 	public ReportFilterUIBuilder(JasperManager manager)
 	{
 		this.manager = manager;
 	}
 
-	public ReportFilterFieldBuilder addField(String label, String parameterName)
+	@Override
+	public ReportFilterFieldBuilder addTextField(String label, String parameterName)
 	{
-		Preconditions.checkArgument(this.manager.paramExists(parameterName), "The passed Jasper Report parameter: "
-				+ parameterName + " does not existing on the Report");
+		ReportParameterString param = new ReportParameterString(label, parameterName);
+		addField(param);
 
-		JRParameter param = manager.getParameter(parameterName);
-
-		buildFieldForParamType(label, param);
-		return this;
-	}
-	
-	public ReportFilterDateFieldBuilder addDateField(String label, String parameterName)
-	{
-		addField(label, parameterName);
-		
 		return this;
 	}
 
 	@Override
-	public void setDate(DateTime date)
+	public ReportFilterDateFieldBuilder addDateField(String label, String parameterName)
 	{
-		@SuppressWarnings("unchecked")
-		ReportParameter<Date> param = (ReportParameter<Date>) rparams.get(rparams.size() - 1);
-		param.setDefaultValue(date.toDate());
-		
+		ReportParameterDate param = new ReportParameterDate(label, parameterName);
+		addField(param);
+
+		return this;
 	}
 
+	@Override
+	public <T extends Enum<?>> ReportFilterFieldBuilder addEnumField(String label, String paramName,
+			Class<T> enumClass, T defaultValue)
+	{
+		@SuppressWarnings({ "unchecked", "rawtypes" })
+		ReportParameterEnum<?> param = new ReportParameterEnum(paramName, defaultValue, paramName, enumClass);
+		return this;
+	}
 
+	@Override
+	public ReportFilterFieldBuilder addField(ReportParameter<?> param)
+	{
+		String parameterName = param.getParameterName();
+
+		// specific work around for prefixed report parameters
+		if (parameterName.startsWith("ReportParameter"))
+		{
+			parameterName = parameterName.substring("ReportParameter".length(), parameterName.length());
+		}
+		Preconditions.checkArgument(this.manager.paramExists(parameterName), "The passed Jasper Report parameter: "
+				+ parameterName + " does not exist on the Report");
+		JRParameter jrParam = manager.getParameter(parameterName);
+
+		String expectedClass = param.getExpectedParameterClassName();
+		Preconditions.checkArgument(expectedClass == null || jrParam.getValueClassName().equals(expectedClass),
+				"Expected " + expectedClass + " but the ReportParameter type is " + jrParam.getValueClassName());
+
+		rparams.add(param);
+
+		return this;
+	}
+
+	@Override
+	public ReportFilterDateFieldBuilder setDate(DateTime date)
+	{
+		@SuppressWarnings("unchecked")
+		ReportParameter<Date> param = (ReportParameter<Date>) rparams.getLast();
+		param.setDefaultValue(date.toDate());
+		return this;
+
+	}
+
+	@Override
 	public AbstractLayout buildLayout()
 	{
 		VerticalLayout layout = new VerticalLayout();
-		layout.setSpacing(true);
+		// layout.setSpacing(true);
+		// layout.setSizeFull();
 
 		if (hasFilters())
 		{
 			Label filterLabel = new Label("<b>Filters</b>");
 			filterLabel.setContentMode(ContentMode.HTML);
 			layout.addComponent(filterLabel);
-			
 
 			for (ReportParameter<?> rparam : rparams)
 			{
@@ -85,31 +121,9 @@ public class ReportFilterUIBuilder implements ReportFilterFieldBuilder, ReportFi
 		return layout;
 	}
 
-	private void buildFieldForParamType(String label, JRParameter param)
+	public Collection<ReportParameter<?>> getReportParameters()
 	{
-		ReportParameter<?> rparam = null;
-
-		String className = param.getValueClassName();
-		if (className.equals("java.util.Date"))
-		{
-
-			rparam = new ReportParameterDate(label, param.getName());
-		}
-		else if (className.equals("java.util.String"))
-		{
-			rparam = new ReportParameterString(label, param.getName());
-		}
-
-		if (rparam == null)
-			throw new IllegalArgumentException("FIXME: The jasper parameter type " + className + " is not supported.");
-
-		rparams.add(rparam);
-
-	}
-
-	public List<ReportParameter<?>> getReportParameters()
-	{
-		return rparams;
+		return Collections.unmodifiableCollection(rparams);
 	}
 
 	/**
@@ -120,5 +134,4 @@ public class ReportFilterUIBuilder implements ReportFilterFieldBuilder, ReportFi
 		return this.rparams.size() > 0;
 	}
 
-	
 }

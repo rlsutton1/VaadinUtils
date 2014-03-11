@@ -21,7 +21,7 @@ public class ReportParameterTable<T> extends ReportParameter<String>
 	private FilterTable field;
 	private Long defaultValue = null;
 	JPAContainer<T> container = null;
-	
+
 	public ReportParameterTable(String caption, String parameterName, Class<T> tableClass,
 			SingularAttribute<T, String> displayField, boolean multiSelect)
 	{
@@ -43,12 +43,12 @@ public class ReportParameterTable<T> extends ReportParameter<String>
 	{
 		field = new FilterTable(caption);
 		field.setSizeFull();
+		field.setHeight("150");
 
 		field.setItemCaptionMode(ItemCaptionMode.PROPERTY);
 		field.setItemCaptionPropertyId(displayField.getName());
 
-		container = JPAContainerFactory.makeBatchable(tableClass,
-				EntityManagerProvider.getEntityManager());
+		container = JPAContainerFactory.makeBatchable(tableClass, EntityManagerProvider.getEntityManager());
 		field.setContainerDataSource(container);
 		container.sort(new Object[] { displayField.getName() }, new boolean[] { true });
 
@@ -62,12 +62,11 @@ public class ReportParameterTable<T> extends ReportParameter<String>
 		field.setMultiSelect(multiSelect);
 		field.setFilterBarVisible(true);
 	}
-	
+
 	public void addSelectionListener(ValueChangeListener listener)
 	{
 		field.addValueChangeListener(listener);
 	}
-	
 
 	@Override
 	public String getValue()
@@ -87,7 +86,7 @@ public class ReportParameterTable<T> extends ReportParameter<String>
 				selection = selection.substring(0, selection.length() - 1);
 			}
 			// supply default if emtpy
-			if (selection.length()==0&& defaultValue != null)
+			if (selection.length() == 0 && defaultValue != null)
 			{
 				selection = "" + defaultValue;
 			}
@@ -118,7 +117,13 @@ public class ReportParameterTable<T> extends ReportParameter<String>
 	public void setDefaultValue(String defaultValue)
 	{
 		// TODO Auto-generated method stub
-		
+
+	}
+
+	@Override
+	public String getExpectedParameterClassName()
+	{
+		return String.class.getCanonicalName();
 	}
 
 }

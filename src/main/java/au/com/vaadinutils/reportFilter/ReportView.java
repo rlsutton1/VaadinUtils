@@ -2,7 +2,7 @@ package au.com.vaadinutils.reportFilter;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Collection;
 
 import net.sf.jasperreports.engine.JRException;
 
@@ -50,23 +50,22 @@ public abstract class ReportView extends HorizontalLayout implements View
 
 	String title;
 	String servletUrl;
-	String reportFileName;
 
 	JasperManager manager;
 	private ReportFilterUIBuilder builder;
 
-	protected ReportView(String title, String servletUrl, String reportFileName)
+	protected ReportView(String title, String servletUrl, JasperManager manager)
 	{
 		this.title = title;
 		this.servletUrl = servletUrl;
-		this.reportFileName = reportFileName;
+		this.manager = manager;
+		this.builder = getFilterBuilder();
 	}
 
 	protected ReportView(String title, JasperManager manager)
 	{
 		this.title = title;
 		this.servletUrl = null;
-		this.reportFileName = manager.getReportName();
 		this.manager = manager;
 		this.builder = getFilterBuilder();
 	}
@@ -229,10 +228,10 @@ public abstract class ReportView extends HorizontalLayout implements View
 
 	}
 
-	protected void generateReport(JasperManager.OutputFormat outputFormat, List<ReportParameter<?>> params)
+	protected void generateReport(JasperManager.OutputFormat outputFormat, Collection<ReportParameter<?>> params)
 			throws JRException, IOException
 	{
-		if (this.manager != null)
+		if (this.servletUrl == null)
 		{
 			if (params != null)
 			{
@@ -247,7 +246,7 @@ public abstract class ReportView extends HorizontalLayout implements View
 		{
 			String target = servletUrl;
 			target += "?OutputFormat=" + outputFormat.toString();
-			target += "&ReportName=" + java.net.URLEncoder.encode(reportFileName, "UTF-8");
+			target += "&ReportName=" + java.net.URLEncoder.encode(manager.getReportName(), "UTF-8");
 			target += "&ReportTitle=" + java.net.URLEncoder.encode(title, "UTF-8");
 			target += "&uniqueifier=" + System.currentTimeMillis();
 
