@@ -74,8 +74,6 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 
 	}
 
-
-
 	public ChildCrudView(BaseCrudView<P> parent, Class<P> parentType, Class<E> childType,
 			SingularAttribute<? extends CrudEntity, ? extends Object> parentKey, String childKey)
 	{
@@ -101,8 +99,8 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	}
 
 	/**
-	 * this method is invoked when the parent saves, signalling the children that
-	 * they too should save.
+	 * this method is invoked when the parent saves, signalling the children
+	 * that they too should save.
 	 * 
 	 * @throws Exception
 	 */
@@ -245,6 +243,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	public void delete()
 	{
 		Object entityId = entityTable.getValue();
+		preChildDelete(entityId);
 		Object previousItemId = null;
 		try
 		{
@@ -264,9 +263,33 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 		{
 			entityTable.select(previousItemId);
 		}
+		else
+			entityTable.select(entityTable.firstItemId());
+
+		postChildDelete(entityId);
 
 		dirty = true;
 
+	}
+
+	/**
+	 * Called just before a child entity is deleted so that a derived class can
+	 * inject some logic just before the delete occurs.
+	 * 
+	 * @param entityId
+	 */
+	protected void preChildDelete(Object entityId)
+	{
+	}
+
+	/**
+	 * Called just after a child entity is deleted so that a derived class can
+	 * inject some logic just after the delete occurs.
+	 * 
+	 * @param entityId
+	 */
+	protected void postChildDelete(Object entityId)
+	{
 	}
 
 	public void validateFieldz()
@@ -287,22 +310,21 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	}
 
 	/**
-	 * Need to over-ride as the rules display of a child's new button a different 
-	 * to those of the parent. 
+	 * Need to over-ride as the rules display of a child's new button a
+	 * different to those of the parent.
 	 */
 	@Override
 	protected void activateEditMode(boolean activate)
 	{
 		actionCombo.setEnabled(!activate);
 		applyButton.setEnabled(!activate);
-	
+
 		// for child new is always enabled unless explicitly disallowed
 		boolean showNew = true;
 		if (isDisallowNew())
 			showNew = false;
 		newButton.setEnabled(showNew);
 	}
-
 
 	public void allowRowChange(final RowChangeCallback callback)
 	{
@@ -701,7 +723,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 		container.discard();
 
 	}
-	
+
 	private ChildCrudEventHandler<E> getNullEventHandler()
 	{
 		return new ChildCrudEventHandler<E>()
