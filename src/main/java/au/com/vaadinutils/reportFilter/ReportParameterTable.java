@@ -15,7 +15,7 @@ import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.ui.AbstractSelect.ItemCaptionMode;
 import com.vaadin.ui.Component;
 
-public class ReportParameterTable<T> extends ReportParameter
+public class ReportParameterTable<T> extends ReportParameter<String>
 {
 
 	private FilterTable field;
@@ -70,7 +70,7 @@ public class ReportParameterTable<T> extends ReportParameter
 	
 
 	@Override
-	protected String getValue()
+	public String getValue()
 	{
 
 		if (field.isMultiSelect())
@@ -112,6 +112,13 @@ public class ReportParameterTable<T> extends ReportParameter
 	public boolean shouldExpand()
 	{
 		return true;
+	}
+
+	@Override
+	public void setDefaultValue(String defaultValue)
+	{
+		// TODO Auto-generated method stub
+		
 	}
 
 }

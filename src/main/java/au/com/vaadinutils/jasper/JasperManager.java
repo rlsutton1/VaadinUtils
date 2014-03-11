@@ -38,6 +38,12 @@ public class JasperManager
 {
 	private static Logger logger = LogManager.getLogger(JasperManager.class);
 
+	private final JasperReport jasperReport;
+	private final Map<String, Object> boundParams = new HashMap<String, Object>();
+	private final JasperSettings settings;
+	private final EntityManager em;
+	private final String reportName;
+
 	public enum Disposition
 	{
 		inline, mixed
@@ -74,12 +80,6 @@ public class JasperManager
 		abstract public String getMimeType();
 	}
 
-	final private JasperReport jasperReport;
-	final Map<String, Object> boundParams = new HashMap<String, Object>();
-	private JasperSettings settings;
-	private EntityManager em;
-	private String reportName;
-
 	/**
 	 * 
 	 * @param jasperReport
@@ -103,13 +103,56 @@ public class JasperManager
 		return jasperReport.getParameters();
 	}
 
-	public void bindParameter(String parameterName, String parameterValue)
+	boolean paramExists(String parameterName)
+	{
+		return getParameter(parameterName) != null;
+	}
+
+	public JRParameter getParameter(String parameterName)
+	{
+		JRParameter result = null;
+
+		for (JRParameter param : jasperReport.getParameters())
+		{
+			if (param.getName().equals(parameterName))
+			{
+				result = param;
+				break;
+			}
+		}
+		return result;
+
+	}
+
+	/**
+	 * Binds a value to a report parameter.
+	 * 
+	 * Essentially a report can have a no. of named parameters which are used to
+	 * filter the report or display on the report. This method allows you to set
+	 * the parameters value at runtime.
+	 * 
+	 * @param parameterName
+	 * @param parameterValue
+	 */
+	public void bindParameter(String parameterName, Object parameterValue)
 	{
 		Preconditions.checkArgument(paramExists(parameterName), "The passed Jasper Report parameter: " + parameterName
 				+ " does not existing on the Report");
 
 		boundParams.put(parameterName, parameterValue);
 	}
+
+	/**
+	 * Binds a value to a report parameter.
+	 * 
+	 * Essentially a report can have a no. of named parameters which are used to
+	 * filter the report or display on the report. This method allows you to
+	 * pass in a map (name, value) of parameter value at runtime.
+	 * 
+	 * @param parameters
+	 *            a map of name/value pairs to bind to report parameters of the
+	 *            given names.
+	 */
 
 	public void bindParameters(Map<String, Object> parameters)
 	{
@@ -141,29 +184,13 @@ public class JasperManager
 
 			t.close();
 		}
-		
+
 		return jasper_print;
 	}
-
 
 	public JasperSettings getSettings()
 	{
 		return this.settings;
-	}
-
-	private boolean paramExists(String parameterName)
-	{
-		boolean exists = false;
-
-		for (JRParameter param : getParameters())
-		{
-			if (param.getName().equals(parameterName))
-			{
-				exists = true;
-				break;
-			}
-		}
-		return exists;
 	}
 
 	public RenderedReport export(OutputFormat exportMethod) throws JRException, IOException
@@ -172,11 +199,10 @@ public class JasperManager
 		final ByteArrayOutputStream out = new ByteArrayOutputStream();
 		final HashMap<String, byte[]> images = new HashMap<String, byte[]>();
 		JRAbstractExporter exporter = null;
-		
-		JasperPrint jasper_print = fillReport();
-		
-		String renderedName = this.jasperReport.getName();
 
+		JasperPrint jasper_print = fillReport();
+
+		String renderedName = this.jasperReport.getName();
 
 		switch (exportMethod)
 		{
@@ -190,9 +216,10 @@ public class JasperManager
 
 				String context = VaadinServlet.getCurrent().getServletContext().getContextPath();
 				int contextIndex = Page.getCurrent().getLocation().toString().indexOf(context);
-				String baseurl = Page.getCurrent().getLocation().toString().substring(0, contextIndex + context.length() + 1);
+				String baseurl = Page.getCurrent().getLocation().toString()
+						.substring(0, contextIndex + context.length() + 1);
 				exporter.setParameter(JRHtmlExporterParameter.IMAGES_URI, baseurl + "images?image=");
-				
+
 				renderedName += ".htm";
 				break;
 			}
@@ -214,27 +241,11 @@ public class JasperManager
 			}
 			default:
 			{
-				throw new RuntimeException("Unsupported export option "+exportMethod);
-				}
-			
-		}
-
-		for (Entry<JRExporterParameter, Object> param : exporter.getParameters().entrySet())
-		{
-			logger.info(param.getKey() + ":" + param.getValue());
-
-		}
-
-		if (logger.isDebugEnabled())
-			for (Entry<JRExporterParameter, Object> param : exporter.getParameters().entrySet())
-			{
-				logger.debug("{} : {}", param.getKey(), param.getValue());
-
+				throw new RuntimeException("Unsupported export option " + exportMethod);
 			}
 
-		// InputStream stream =
-		// JasperRunManager.runReportToPdf(getClass().getClassLoader().getResourceAsStream(settings.getReportFile(this.reportName)),
-		// map, con);
+		}
+
 
 		if (logger.isDebugEnabled())
 			for (Entry<JRExporterParameter, Object> param : exporter.getParameters().entrySet())

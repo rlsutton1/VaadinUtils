@@ -1,6 +1,6 @@
 package au.com.vaadinutils.reportFilter;
 
-import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.joda.time.DateTime;
 
@@ -8,25 +8,24 @@ import com.vaadin.shared.ui.datefield.Resolution;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.DateField;
 
-public class ReportParameterDate extends ReportParameter
+public class ReportParameterDate extends ReportParameter<Date>
 {
-
 	protected DateField field;
 
-	protected ReportParameterDate(String caption, String parameterName)
+	public ReportParameterDate(String caption, String parameterName)
 	{
 		super( parameterName);
-		field = new DateField(null, new DateTime().withTimeAtStartOfDay().toDate());
-		field.setResolution(Resolution.SECOND);
-		field.setDateFormat("yyyy/MM/dd HH:mm:ss");
-		field.setCaption(caption);
+		field = new DateField(caption, new DateTime().withTimeAtStartOfDay().toDate());
+		field.setResolution(Resolution.DAY);
+		field.setDateFormat("yyyy/MM/dd");
 	}
 
 	@Override
-	protected String getValue()
+	public Date getValue()
 	{
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-		return sdf.format(field.getValue());
+		//SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		//return sdf.format(field.getValue());
+		return field.getValue();
 	}
 
 	@Override
@@ -41,4 +40,10 @@ public class ReportParameterDate extends ReportParameter
 		return false;
 	}
 
+	@Override
+	public void setDefaultValue(Date defaultValue)
+	{
+		this.field.setValue(defaultValue);
+		
+	}
 }

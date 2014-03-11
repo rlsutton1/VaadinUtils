@@ -6,16 +6,23 @@ import javax.persistence.EntityTransaction;
 public class Transaction 
 {
 	private EntityTransaction transaction;
+	private boolean nested = false;
 
 	public Transaction(EntityManager em)
 	{
 		transaction = em.getTransaction();
-		transaction.begin();
+		
+		// Only begin if we are not already in a transaction.
+		// Eclipselink doesn't support nested transactions
+		if (!transaction.isActive())
+			transaction.begin();
+		else
+			nested = true;
 	}
 
 	public void close()
 	{
-		if (transaction.isActive())
+		if (transaction.isActive() && !nested)
 			rollback();
 	}
 
@@ -26,10 +33,13 @@ public class Transaction
 
 	public void commit()
 	{
+		if (!nested)
+		{
 		if (transaction.isActive())
 			transaction.commit();
 		else
 			throw new IllegalStateException("Commit has already been called on the transaction");
+		}
 
 	}
 
@@ -40,7 +50,7 @@ public class Transaction
 	 */
 	public void begin()
 	{
-		if (!transaction.isActive())
+		if (transaction.isActive())
 			throw new IllegalStateException("Begin has already been called on the transaction");
 
 		transaction.begin();

@@ -20,6 +20,7 @@ public abstract class VUEntityManagerContextListener implements ServletContextLi
 	private static EntityManagerFactory emf;
 
 	@Override
+	@edu.umd.cs.findbugs.annotations.SuppressWarnings(value = "ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD", justification = "There is only a single instance of the ContextListner")
 	public void contextInitialized(ServletContextEvent event)
 	{
 
