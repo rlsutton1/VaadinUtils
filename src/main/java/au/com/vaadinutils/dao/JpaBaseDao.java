@@ -102,7 +102,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		return entity;
 	}
 
-	protected List<E> findListBySingleParameter(String queryName, String paramName, String paramValue)
+	protected List<E> findListBySingleParameter(String queryName, String paramName, Object paramValue)
 	{
 		Query query = entityManager.createNamedQuery(queryName);
 		query.setParameter(paramName, paramValue);
@@ -110,6 +110,20 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		List<E> entities = query.getResultList();
 		return entities;
 	}
+	
+	/**
+	 * Runs the given query returning all entities that matched by the query.
+	 * @param queryName
+	 * @return
+	 */
+	protected List<E> findList(String queryName)
+	{
+		Query query = entityManager.createNamedQuery(queryName);
+		@SuppressWarnings("unchecked")
+		List<E> entities = query.getResultList();
+		return entities;
+	}
+
 
 	@Override
 	public List<E> findAll()
