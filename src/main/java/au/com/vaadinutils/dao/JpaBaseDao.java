@@ -83,6 +83,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		E entity = null;
 		Query query = entityManager.createNamedQuery(queryName);
 		query.setParameter(paramName.getName(), paramValue);
+		query.setMaxResults(1);
 		@SuppressWarnings("unchecked")
 		List<E> entities = query.getResultList();
 		if (entities.size() > 0)
@@ -95,6 +96,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		E entity = null;
 		Query query = entityManager.createNamedQuery(queryName);
 		query.setParameter(paramName, paramValue);
+		query.setMaxResults(1);
 		@SuppressWarnings("unchecked")
 		List<E> entities = query.getResultList();
 		if (entities.size() > 0)
