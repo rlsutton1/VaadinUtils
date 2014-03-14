@@ -16,10 +16,10 @@ import com.vaadin.ui.UI;
 public class MenuBuilder implements Serializable
 {
 	private static final long serialVersionUID = 1L;
-	private ArrayList<ViewMap> viewMap;
+	private ArrayList<ViewMapping> viewMap;
 	private Navigator navigator;
 
-	public MenuBuilder(Navigator navigator, ArrayList<ViewMap> viewMap)
+	public MenuBuilder(Navigator navigator, ArrayList<ViewMapping> viewMap)
 	{
 		this.navigator = navigator;
 		this.viewMap = viewMap;
@@ -28,7 +28,7 @@ public class MenuBuilder implements Serializable
 	public MenuBar build()
 	{
 		MenuBar menubar = new MenuBar();
-		for (final ViewMap viewmap : this.viewMap)
+		for (final ViewMapping viewmap : this.viewMap)
 		{
 			// We don't add a menu item from the default view.
 			if (!viewmap.getViewName().equals(""))
@@ -71,7 +71,7 @@ public class MenuBuilder implements Serializable
 
 	}
 
-	private void createLeafItem(MenuBar menubar, final String displayName, final ViewMap viewmap)
+	private void createLeafItem(MenuBar menubar, final String displayName, final ViewMapping viewmap)
 	{
 		menubar.addItem(displayName, new MenuBar.Command()
 		{
@@ -96,7 +96,7 @@ public class MenuBuilder implements Serializable
 	 * @param displayName
 	 * @param pathElements
 	 */
-	private void resursiveAdd(MenuItem menuItem, final ViewMap viewmap, String displayName, String[] pathElements)
+	private void resursiveAdd(MenuItem menuItem, final ViewMapping viewmap, String displayName, String[] pathElements)
 	{
 		if (pathElements.length > 0)
 		{
@@ -123,7 +123,7 @@ public class MenuBuilder implements Serializable
 
 	}
 
-	private void createLeafItem(MenuItem menuItem, String displayName, final ViewMap viewmap)
+	private void createLeafItem(MenuItem menuItem, String displayName, final ViewMapping viewmap)
 	{
 		menuItem.addItem(displayName, new MenuBar.Command()
 		{
