@@ -63,7 +63,8 @@ public class ReportFilterUIBuilder implements ReportFilterFieldBuilder, ReportFi
 			Class<T> enumClass, T defaultValue)
 	{
 		@SuppressWarnings({ "unchecked", "rawtypes" })
-		ReportParameterEnum<?> param = new ReportParameterEnum(paramName, defaultValue, paramName, enumClass);
+		ReportParameterEnum<?> param = new ReportParameterEnum(label, defaultValue, paramName, enumClass);
+		addField(param);
 		return this;
 	}
 

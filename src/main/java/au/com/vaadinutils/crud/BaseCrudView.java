@@ -921,7 +921,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 * opportunity for implementing classes to modify or add data to the entity
 	 * being saved.
 	 * 
-	 * NOTE: modify item properties, accessing the entity is unreliable
+	 * NOTE: modify the item properties not the entity as accessing the entity is unreliable
 	 * 
 	 * @param item
 	 */

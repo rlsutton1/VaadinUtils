@@ -257,7 +257,7 @@ public abstract class ReportView extends HorizontalLayout implements View
 					target += "&" + param.getUrlEncodedKeyAndParameter();
 				}
 			}
-
+			
 			logger.debug(target);
 			showReport(target);
 		}
