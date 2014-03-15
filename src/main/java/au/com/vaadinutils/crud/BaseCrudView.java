@@ -619,6 +619,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 					container.refreshItem(entity.getItemId());
 					// actionCombo.select(actionCombo.getNullSelectionItemId());
 				}
+				else
+					Notification.show("Please select item first.");
 			}
 		});
 
