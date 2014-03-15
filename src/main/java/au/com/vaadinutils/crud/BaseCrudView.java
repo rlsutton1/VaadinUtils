@@ -620,7 +620,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 					// actionCombo.select(actionCombo.getNullSelectionItemId());
 				}
 				else
-					Notification.show("Please select item first.");
+					Notification.show("Please select record first.");
 			}
 		});
 
