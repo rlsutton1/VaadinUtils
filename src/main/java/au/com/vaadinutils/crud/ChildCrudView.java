@@ -258,13 +258,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 		newEntity = null;
 
 		entityTable.select(null);
-
-		if (previousItemId != null)
-		{
-			entityTable.select(previousItemId);
-		}
-		else
-			entityTable.select(entityTable.firstItemId());
+		entityTable.select(previousItemId);
 
 		postChildDelete(entityId);
 
@@ -433,7 +427,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 
 					newEntity = container.createEntityItem(entityClass.newInstance());
 
-					// if we call the overriden version we loop indefinately
+					// if we call the overridden version we loop indefinitely
 					ChildCrudView.super.rowChanged(newEntity);
 					// Can't delete when you are adding a new record.
 					// Use cancel instead.

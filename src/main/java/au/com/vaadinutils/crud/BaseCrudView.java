@@ -716,6 +716,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	{
 		Object entityId = entityTable.getValue();
 		Object previousItemId = entityTable.prevItemId(entityId);
+		if (previousItemId == null)
+			BaseCrudView.this.entityTable.firstItemId();
 		entityTable.removeItem(entityId);
 		newEntity = null;
 
@@ -732,10 +734,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		// get two row changes events.
 		BaseCrudView.this.entityTable.select(null);
 
-		if (previousItemId == null)
-			BaseCrudView.this.entityTable.select(BaseCrudView.this.entityTable.firstItemId());
-		else
-			BaseCrudView.this.entityTable.select(previousItemId);
+		BaseCrudView.this.entityTable.select(previousItemId);
 		container.commit();
 
 		postDelete(entityId);
@@ -818,7 +817,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		}
 		catch (Exception e)
 		{
-			if (e.getCause() instanceof InvalidValueException)
+			if (e instanceof InvalidValueException || e.getCause() instanceof InvalidValueException)
 			{
 				Notification.show("Please fix the form errors and then try again.", Type.ERROR_MESSAGE);
 			}
