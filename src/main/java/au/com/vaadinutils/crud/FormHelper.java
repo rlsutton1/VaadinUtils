@@ -578,7 +578,7 @@ public class FormHelper<E> implements Serializable
 		public EntityFieldBuilder<L> setListClass(Class<L> listClazz)
 		{
 			Preconditions.checkState(this.listClazz == null,
-					"If you set the field as a singularAttribute, the listClass is set automatically.");
+					"As you have set the field as a singularAttribute, the listClass is set automatically so there is no need to call setListClass.");
 			this.listClazz = listClazz;
 			return this;
 		}
@@ -758,8 +758,14 @@ public class FormHelper<E> implements Serializable
 
 	/**
 	 * use this syntax to instance the builder:<br>
-	 * formHelper.new EntityFieldBuilder<{name of list class}>(); <br>
+	 * The formhelper must be an Entity with an attribute containing a Set of 
+	 * items that will be selected.
+	 * 
+	 * formHelper.new EntityFieldBuilder<{class name of the items in the list}>(); <br>
 	 * <br>
+	 * If you need to filter the set of available items then you must
+	 * explicity set the list container and filter it.
+	 * 
 	 * for example<br>
 	 * <br>
 	 * 
@@ -895,6 +901,16 @@ public class FormHelper<E> implements Serializable
 			return this;
 		}
 
+		/**
+		 * Set the list container of available items.
+		 * A container will normally be generated automatically based on the 
+		 * List class <L>. 
+		 * However if you need to filter the list of available items you will
+		 * need to provide your own container which is filtered.
+		 * 
+		 * @param container
+		 * @return
+		 */
 		public TwinColSelectBuilder<L> setContainer(JPAContainer<L> container)
 		{
 			this.container = container;
