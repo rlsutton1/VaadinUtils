@@ -6,8 +6,8 @@ import au.com.vaadinutils.jasper.PrintWindow;
 
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.UI;
 import com.vaadin.ui.Notification.Type;
+import com.vaadin.ui.UI;
 
 public abstract class CrudActionPrint<E extends CrudEntity> implements CrudAction< E >
 {
