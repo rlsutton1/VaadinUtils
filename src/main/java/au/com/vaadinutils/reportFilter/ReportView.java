@@ -246,7 +246,7 @@ public abstract class ReportView extends HorizontalLayout implements View
 		{
 			String target = servletUrl;
 			target += "?OutputFormat=" + outputFormat.toString();
-			target += "&ReportName=" + java.net.URLEncoder.encode(manager.getReportName(), "UTF-8");
+			target += "&ReportName=" + java.net.URLEncoder.encode(manager.getReportFilename(), "UTF-8");
 			target += "&ReportTitle=" + java.net.URLEncoder.encode(title, "UTF-8");
 			target += "&uniqueifier=" + System.currentTimeMillis();
 
