@@ -6,6 +6,8 @@ import java.util.List;
 
 import javax.persistence.metamodel.SingularAttribute;
 
+import au.com.vaadinutils.dao.Path;
+
 import com.vaadin.ui.Table.ColumnGenerator;
 
 public class HeadingPropertySet<E>
@@ -42,6 +44,13 @@ public class HeadingPropertySet<E>
 			
 		}
 		
+		public <T extends Object> Builder<E> addColumn(String heading, Path pathToHeadingPropertyId)
+		{
+			cols.add(new HeadingToPropertyId<E>(heading,pathToHeadingPropertyId.getName(),null));
+			return this;
+			
+		}
+
 		public <T extends Object> Builder<E> addColumn(String heading, SingularAttribute<E, T> headingPropertyId)
 		{
 			cols.add(new HeadingToPropertyId<E>(heading,headingPropertyId.getName(),null));
@@ -54,6 +63,7 @@ public class HeadingPropertySet<E>
 			return this;
 			
 		}
+
 
 	}
 	public List<HeadingToPropertyId<E>> getColumns()
