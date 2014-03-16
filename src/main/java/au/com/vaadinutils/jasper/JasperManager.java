@@ -42,7 +42,7 @@ public class JasperManager
 	private final Map<String, Object> boundParams = new HashMap<String, Object>();
 	private final JasperSettings settings;
 	private final EntityManager em;
-	private final String reportName;
+	private final String reportFilename;
 
 	public enum Disposition
 	{
@@ -93,7 +93,7 @@ public class JasperManager
 
 		this.em = em;
 		this.settings = settings;
-		this.reportName = reportName;
+		this.reportFilename = reportName;
 		this.jasperReport = (JasperReport) JRLoader.loadObject(settings.getReportFile(reportName));
 
 	}
@@ -286,9 +286,14 @@ public class JasperManager
 		return file.getCanonicalPath();
 	}
 
-	public String getReportName()
+	public String getReportFilename()
 	{
-		return reportName;
+		return reportFilename;
+	}
+
+	public String getReportTitle()
+	{
+		return jasperReport.getName();
 	}
 
 }
