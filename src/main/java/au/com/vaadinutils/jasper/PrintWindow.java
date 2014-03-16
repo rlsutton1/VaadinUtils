@@ -39,7 +39,7 @@ public class PrintWindow extends Window
 
 	public PrintWindow(JasperManager manager)
 	{
-		this.title = manager.getReportName();
+		this.title = manager.getReportTitle();
 		this.manager = manager;
 
 		this.setContent(buildLayout());
