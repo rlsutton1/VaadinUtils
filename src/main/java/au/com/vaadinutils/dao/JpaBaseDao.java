@@ -248,4 +248,15 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 	}
 
+	public void refresh(E entity)
+	{
+		this.entityManager.refresh(entity);	
+	}
+
+	public void detach(E entity)
+	{
+		this.entityManager.detach(entity);
+		
+	}
+
 }
