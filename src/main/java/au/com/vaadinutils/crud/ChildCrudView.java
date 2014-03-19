@@ -74,8 +74,6 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 
 	}
 
-
-
 	public ChildCrudView(BaseCrudView<P> parent, Class<P> parentType, Class<E> childType,
 			SingularAttribute<? extends CrudEntity, ? extends Object> parentKey, String childKey)
 	{
@@ -275,8 +273,13 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	 * @param entityId
 	 */
 	protected void preChildDelete(Object entityId)
+<<<<<<< HEAD
 		{
 		}
+=======
+	{
+	}
+>>>>>>> branch 'master' of https://github.com/rlsutton1/VaadinUtils.git
 
 	/**
 	 * Called just after a child entity is deleted so that a derived class can
@@ -314,14 +317,13 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	{
 		actionCombo.setEnabled(!activate);
 		applyButton.setEnabled(!activate);
-	
+
 		// for child new is always enabled unless explicitly disallowed
 		boolean showNew = true;
 		if (isDisallowNew())
 			showNew = false;
 		newButton.setEnabled(showNew);
 	}
-
 
 	public void allowRowChange(final RowChangeCallback callback)
 	{
@@ -720,7 +722,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 		container.discard();
 
 	}
-	
+
 	private ChildCrudEventHandler<E> getNullEventHandler()
 	{
 		return new ChildCrudEventHandler<E>()

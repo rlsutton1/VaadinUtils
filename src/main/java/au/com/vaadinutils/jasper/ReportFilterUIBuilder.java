@@ -63,7 +63,11 @@ public class ReportFilterUIBuilder implements ReportFilterFieldBuilder, ReportFi
 			Class<T> enumClass, T defaultValue)
 	{
 		@SuppressWarnings({ "unchecked", "rawtypes" })
+<<<<<<< HEAD
 		ReportParameterEnum<?> param = new ReportParameterEnum(label, defaultValue, paramName, enumClass);
+=======
+		ReportParameterEnum<?> param = new ReportParameterEnum(paramName, defaultValue, paramName, enumClass);
+>>>>>>> branch 'master' of https://github.com/rlsutton1/VaadinUtils.git
 		addField(param);
 		
 		return this;

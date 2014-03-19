@@ -275,8 +275,13 @@ public class SelectableEntityTable<E> extends Table
 	@SuppressWarnings("unchecked")
 	public ArrayList<Long> getSelectedIds()
 	{
+<<<<<<< HEAD
 			selectedIds = new ArrayList<Long>();
+=======
+		selectedIds = new ArrayList<Long>();
+>>>>>>> branch 'master' of https://github.com/rlsutton1/VaadinUtils.git
 
+<<<<<<< HEAD
 			for (Object itemId : this.selectableContainer.getItemIds())
 			{
 				Item item = this.selectableContainer.getItem(itemId);
@@ -284,6 +289,15 @@ public class SelectableEntityTable<E> extends Table
 				if (property.getValue() == true)
 					selectedIds.add((Long) itemId);
 			}
+=======
+		for (Object itemId : this.selectableContainer.getItemIds())
+		{
+			Item item = this.selectableContainer.getItem(itemId);
+			Property<Boolean> property = item.getItemProperty(SELECTABLE_ENTITY_TABLE_SELECTED);
+			if (property.getValue() == true)
+				selectedIds.add((Long) itemId);
+		}
+>>>>>>> branch 'master' of https://github.com/rlsutton1/VaadinUtils.git
 		return selectedIds;
 	}
 
@@ -293,7 +307,11 @@ public class SelectableEntityTable<E> extends Table
 		resetFilters();
 		selectableContainer.addContainerFilter(filter);
 		// selectableContainer.discard();
+<<<<<<< HEAD
 		}
+=======
+	}
+>>>>>>> branch 'master' of https://github.com/rlsutton1/VaadinUtils.git
 
 	/**
 	 * for child cruds, they overload this to ensure that the minimum necessary

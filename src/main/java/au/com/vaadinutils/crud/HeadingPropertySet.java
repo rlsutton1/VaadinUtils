@@ -79,6 +79,7 @@ public class HeadingPropertySet<E>
 		}
 
 
+
 	}
 	public List<HeadingToPropertyId<E>> getColumns()
 	{

@@ -735,6 +735,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		// developers as they
 		// get two row changes events.
 		BaseCrudView.this.entityTable.select(null);
+
 		BaseCrudView.this.entityTable.select(previousItemId);
 		container.commit();
 
