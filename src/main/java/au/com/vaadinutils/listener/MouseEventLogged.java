@@ -9,7 +9,7 @@ public class MouseEventLogged
 	{
 		private static final long serialVersionUID = 7420365324169589382L;
 
-		Logger logger = LogManager.getLogger(ClickListener.class);
+		 transient Logger logger   =  LogManager.getLogger(ClickListener.class);
 
 		abstract public void clicked(com.vaadin.event.MouseEvents.ClickEvent event);
 
@@ -34,7 +34,7 @@ public class MouseEventLogged
 	{
 		private static final long serialVersionUID = 1L;
 
-		Logger logger = LogManager.getLogger(ClickAdaptor.class);
+		 transient Logger logger   =  LogManager.getLogger(ClickAdaptor.class);
 
 		private com.vaadin.event.MouseEvents.ClickListener listener = null;
 

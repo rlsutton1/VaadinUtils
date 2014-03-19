@@ -42,7 +42,7 @@ public abstract class ReportView extends HorizontalLayout implements View
 	public static final String NAME = "ReportView";
 	private static final long serialVersionUID = 1L;
 
-	static private final Logger logger = LogManager.getLogger();
+	static private final  transient Logger logger   =  LogManager.getLogger();
 
 	private BrowserFrame displayPanel;
 
@@ -246,7 +246,7 @@ public abstract class ReportView extends HorizontalLayout implements View
 		{
 			String target = servletUrl;
 			target += "?OutputFormat=" + outputFormat.toString();
-			target += "&ReportName=" + java.net.URLEncoder.encode(manager.getReportName(), "UTF-8");
+			target += "&ReportName=" + java.net.URLEncoder.encode(manager.getReportFilename(), "UTF-8");
 			target += "&ReportTitle=" + java.net.URLEncoder.encode(title, "UTF-8");
 			target += "&uniqueifier=" + System.currentTimeMillis();
 

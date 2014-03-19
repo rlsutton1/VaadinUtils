@@ -23,7 +23,7 @@ public class EntityTable<E> extends Table implements EntityList<E>
 	private RowChangeListener<E> rowChangeListener;
 	private HeadingPropertySet<E> visibleColumns;
 
-	Logger logger = LogManager.getLogger(EntityTable.class);
+	 transient Logger logger   =  LogManager.getLogger(EntityTable.class);
 
 	public EntityTable(JPAContainer<E> entityContainer, HeadingPropertySet<E> headingPropertySet)
 	{
@@ -64,6 +64,11 @@ public class EntityTable<E> extends Table implements EntityList<E>
 		for (HeadingToPropertyId<E> column : visibleColumns.getColumns())
 		{
 			this.setColumnHeader(column.getPropertyId(), column.getHeader());
+			if (column.getWidth() != null)
+			{
+				setColumnWidth(column.getPropertyId(), column.getWidth());
+			}
+
 		}
 
 		this.setSelectable(true);
@@ -150,10 +155,11 @@ public class EntityTable<E> extends Table implements EntityList<E>
 					if (entityContainer.getItemIds().contains(entityId))
 					{
 						entity = this.entityContainer.getItem(entityId);
-					}else
+					}
+					else
 					{
-						Exception e =new Exception("Trying to look up a non existent UUID");
-						logger.error(e,e);
+						Exception e = new Exception("Trying to look up a non existent UUID");
+						logger.error(e, e);
 					}
 				}
 				else

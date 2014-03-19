@@ -30,7 +30,7 @@ import com.vaadin.ui.TextField;
 
 public class MultiColumnFormLayout<E> extends GridLayout
 {
-	private static Logger logger = LogManager.getLogger(MultiColumnFormLayout.class);
+	private static  transient Logger logger   =  LogManager.getLogger(MultiColumnFormLayout.class);
 	private static final long serialVersionUID = 1L;
 	private static final int DEFAULT_LABEL_WIDTH = 120;
 	private static final int DEFAULT_FIELD_WIDTH = 100;

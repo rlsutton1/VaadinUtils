@@ -17,21 +17,21 @@ import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Table;
 
-public class SelectableEntityTable<Child> extends Table
+public class SelectableEntityTable<E> extends Table
 {
-	private static Logger logger = LogManager.getLogger(SelectableEntityTable.class);
+	private static  transient Logger logger   =  LogManager.getLogger(SelectableEntityTable.class);
 
 	private static final String HEADING_SELECTED = "Selected";
 	private static final String SELECTABLE_ENTITY_TABLE_SELECTED = "SelectableEntityTableProperty";
 	private static final long serialVersionUID = 1L;
 	private IndexedContainer selectableContainer;
-	private RowChangeListener<Child> rowChangeListener;
+	private RowChangeListener<E> rowChangeListener;
 
-	private HeadingPropertySet<Child> headingPropertySet;
+	private HeadingPropertySet<E> headingPropertySet;
 
 	private ArrayList<Long> selectedIds = null;
 
-	public SelectableEntityTable(EntityContainer<Child> childContainer, HeadingPropertySet<Child> headingPropertySet)
+	public SelectableEntityTable(EntityContainer<E> childContainer, HeadingPropertySet<E> headingPropertySet)
 	{
 		this.headingPropertySet = headingPropertySet;
 
@@ -39,7 +39,7 @@ public class SelectableEntityTable<Child> extends Table
 		this.addContainerProperty(SELECTABLE_ENTITY_TABLE_SELECTED, Boolean.class, new Boolean(true), HEADING_SELECTED,
 				null, Align.CENTER);
 		headingPropertySet.getColumns().add(
-				new HeadingToPropertyId<Child>(HEADING_SELECTED, SELECTABLE_ENTITY_TABLE_SELECTED,
+				new HeadingToPropertyId<E>(HEADING_SELECTED, SELECTABLE_ENTITY_TABLE_SELECTED,
 						new SelectedCheckBoxGenerator()));
 
 		this.selectableContainer = buildSelectableContainer(childContainer, headingPropertySet);
@@ -55,12 +55,12 @@ public class SelectableEntityTable<Child> extends Table
 	 * @param headingPropertySet2
 	 * @return
 	 */
-	private IndexedContainer buildSelectableContainer(EntityContainer<Child> entityContainer2,
-			HeadingPropertySet<Child> headingPropertySet2)
+	private IndexedContainer buildSelectableContainer(EntityContainer<E> entityContainer2,
+			HeadingPropertySet<E> headingPropertySet2)
 	{
 		IndexedContainer selectable = new IndexedContainer();
 
-		for (HeadingToPropertyId<Child> heading : headingPropertySet2.getColumns())
+		for (HeadingToPropertyId<E> heading : headingPropertySet2.getColumns())
 		{
 			if (heading.getPropertyId().equals(SELECTABLE_ENTITY_TABLE_SELECTED))
 				selectable.addContainerProperty(heading.getPropertyId(), Boolean.class, new Boolean(true));
@@ -74,7 +74,7 @@ public class SelectableEntityTable<Child> extends Table
 			Item existingItem = entityContainer2.getItem(itemId);
 
 			Item newItem = selectable.addItem(itemId);
-			for (HeadingToPropertyId<Child> heading : headingPropertySet2.getColumns())
+			for (HeadingToPropertyId<E> heading : headingPropertySet2.getColumns())
 			{
 				@SuppressWarnings("unchecked")
 				Property<Object> property = newItem.getItemProperty(heading.getPropertyId());
@@ -87,7 +87,7 @@ public class SelectableEntityTable<Child> extends Table
 		return selectable;
 	}
 
-	public void setRowChangeListener(RowChangeListener<Child> rowChangeListener)
+	public void setRowChangeListener(RowChangeListener<E> rowChangeListener)
 	{
 		this.rowChangeListener = rowChangeListener;
 	}
@@ -98,7 +98,7 @@ public class SelectableEntityTable<Child> extends Table
 		this.setContainerDataSource(selectableContainer);
 
 		List<String> colsToShow = new LinkedList<String>();
-		for (HeadingToPropertyId<Child> column : this.headingPropertySet.getColumns())
+		for (HeadingToPropertyId<E> column : this.headingPropertySet.getColumns())
 		{
 			colsToShow.add(column.getPropertyId());
 
@@ -115,7 +115,7 @@ public class SelectableEntityTable<Child> extends Table
 		}
 		this.setVisibleColumns(colsToShow.toArray());
 
-		for (HeadingToPropertyId<Child> column : headingPropertySet.getColumns())
+		for (HeadingToPropertyId<E> column : headingPropertySet.getColumns())
 		{
 			this.setColumnHeader(column.getPropertyId(), column.getHeader());
 		}
@@ -275,8 +275,6 @@ public class SelectableEntityTable<Child> extends Table
 	@SuppressWarnings("unchecked")
 	public ArrayList<Long> getSelectedIds()
 	{
-		if (selectedIds == null)
-		{
 			selectedIds = new ArrayList<Long>();
 
 			for (Object itemId : this.selectableContainer.getItemIds())
@@ -286,8 +284,24 @@ public class SelectableEntityTable<Child> extends Table
 				if (property.getValue() == true)
 					selectedIds.add((Long) itemId);
 			}
-		}
 		return selectedIds;
+	}
+
+	public void applyFilter(final Filter filter)
+	{
+		/* Reset the filter for the Entity Container. */
+		resetFilters();
+		selectableContainer.addContainerFilter(filter);
+		// selectableContainer.discard();
+		}
+
+	/**
+	 * for child cruds, they overload this to ensure that the minimum necessary
+	 * filters are always applied.
+	 */
+	protected void resetFilters()
+	{
+		selectableContainer.removeAllContainerFilters();
 	}
 
 }

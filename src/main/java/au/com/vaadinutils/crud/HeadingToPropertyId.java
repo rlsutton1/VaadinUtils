@@ -11,6 +11,7 @@ public class HeadingToPropertyId<E>
 	private final String propertyId;
 	private final ColumnGenerator columnGenerator;
 	private final SingularAttribute<E, ?> attribute;
+	private Integer width;
 
 	/**
 	 * 
@@ -43,6 +44,12 @@ public class HeadingToPropertyId<E>
 		this.attribute = null;
 		this.columnGenerator = columnGenerator2;
 	}
+	
+	public HeadingToPropertyId<E> setWidth(Integer width)
+	{
+		this.width = width;
+		return this;
+	}
 
 
 	public String getPropertyId()
@@ -68,6 +75,11 @@ public class HeadingToPropertyId<E>
 	public boolean isGenerated()
 	{
 		return columnGenerator != null;
+	}
+
+	public Integer getWidth()
+	{
+		return width;
 	}
 
 }

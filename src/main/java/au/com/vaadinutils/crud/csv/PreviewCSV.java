@@ -22,7 +22,7 @@ import com.vaadin.ui.VerticalLayout;
 
 public class PreviewCSV
 {
-	Logger logger = LogManager.getLogger(PreviewCSV.class.getName());
+	 transient Logger logger   =  LogManager.getLogger(PreviewCSV.class.getName());
 
 	public Component getContentFile(File tempFile, String caption, int rowLimit)
 	{

@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
 import javax.persistence.Table;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -83,6 +84,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		E entity = null;
 		Query query = entityManager.createNamedQuery(queryName);
 		query.setParameter(paramName.getName(), paramValue);
+		query.setMaxResults(1);
 		@SuppressWarnings("unchecked")
 		List<E> entities = query.getResultList();
 		if (entities.size() > 0)
@@ -95,6 +97,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		E entity = null;
 		Query query = entityManager.createNamedQuery(queryName);
 		query.setParameter(paramName, paramValue);
+		query.setMaxResults(1);
 		@SuppressWarnings("unchecked")
 		List<E> entities = query.getResultList();
 		if (entities.size() > 0)
@@ -102,7 +105,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		return entity;
 	}
 
-	protected List<E> findListBySingleParameter(String queryName, String paramName, String paramValue)
+	protected List<E> findListBySingleParameter(String queryName, String paramName, Object paramValue)
 	{
 		Query query = entityManager.createNamedQuery(queryName);
 		query.setParameter(paramName, paramValue);
@@ -110,6 +113,20 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		List<E> entities = query.getResultList();
 		return entities;
 	}
+
+	/**
+	 * Runs the given query returning all entities that matched by the query.
+	 * @param queryName
+	 * @return
+	 */
+	protected List<E> findList(String queryName)
+	{
+		Query query = entityManager.createNamedQuery(queryName);
+		@SuppressWarnings("unchecked")
+		List<E> entities = query.getResultList();
+		return entities;
+	}
+
 
 	@Override
 	public List<E> findAll()
@@ -181,6 +198,12 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		return container;
 
 	}
+	
+	public JPAContainer<E> createVaadinContainerAndFlushCache()
+	{
+		entityManager.getEntityManagerFactory().getCache().evict(entityClass);
+		return createVaadinContainer();
+	}
 
 	@SuppressWarnings("unused")
 	private void oldCreateVaadinContainer()
@@ -230,6 +253,17 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 	{
 		this.entityManager.flush();
 
+	}
+
+	public void refresh(E entity)
+	{
+		this.entityManager.refresh(entity);	
+	}
+
+	public void detach(E entity)
+	{
+		this.entityManager.detach(entity);
+		
 	}
 
 }

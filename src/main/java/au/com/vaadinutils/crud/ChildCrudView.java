@@ -43,7 +43,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 {
 
 	private static final long serialVersionUID = -7756584349283089830L;
-	Logger logger = LogManager.getLogger(ChildCrudView.class);
+	 transient Logger logger   =  LogManager.getLogger(ChildCrudView.class);
 	private String parentKey;
 	protected String childKey;
 	private Object parentId;
@@ -101,8 +101,8 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	}
 
 	/**
-	 * this method is invoked when the parent saves, signalling the children that
-	 * they too should save.
+	 * this method is invoked when the parent saves, signalling the children
+	 * that they too should save.
 	 * 
 	 * @throws Exception
 	 */
@@ -245,6 +245,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	public void delete()
 	{
 		Object entityId = entityTable.getValue();
+		preChildDelete(entityId);
 		Object previousItemId = null;
 		try
 		{
@@ -259,14 +260,32 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 		newEntity = null;
 
 		entityTable.select(null);
+		entityTable.select(previousItemId);
 
-		if (previousItemId != null)
-		{
-			entityTable.select(previousItemId);
-		}
+		postChildDelete(entityId);
 
 		dirty = true;
 
+	}
+
+	/**
+	 * Called just before a child entity is deleted so that a derived class can
+	 * inject some logic just before the delete occurs.
+	 * 
+	 * @param entityId
+	 */
+	protected void preChildDelete(Object entityId)
+		{
+		}
+
+	/**
+	 * Called just after a child entity is deleted so that a derived class can
+	 * inject some logic just after the delete occurs.
+	 * 
+	 * @param entityId
+	 */
+	protected void postChildDelete(Object entityId)
+	{
 	}
 
 	public void validateFieldz()
@@ -287,8 +306,8 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	}
 
 	/**
-	 * Need to over-ride as the rules display of a child's new button a different 
-	 * to those of the parent. 
+	 * Need to over-ride as the rules display of a child's new button a
+	 * different to those of the parent.
 	 */
 	@Override
 	protected void activateEditMode(boolean activate)
@@ -411,7 +430,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 
 					newEntity = container.createEntityItem(entityClass.newInstance());
 
-					// if we call the overriden version we loop indefinately
+					// if we call the overridden version we loop indefinitely
 					ChildCrudView.super.rowChanged(newEntity);
 					// Can't delete when you are adding a new record.
 					// Use cancel instead.

@@ -16,7 +16,7 @@ public class ClickEventLogged
 	{
 		private static final long serialVersionUID = 7420365324169589382L;
 
-		Logger logger = LogManager.getLogger(ClickListener.class);
+		 transient Logger logger   =  LogManager.getLogger(ClickListener.class);
 
 		abstract public void clicked(com.vaadin.ui.Button.ClickEvent event);
 
@@ -45,7 +45,7 @@ public class ClickEventLogged
 	{
 		private static final long serialVersionUID = 1L;
 
-		Logger logger = LogManager.getLogger(ClickAdaptor.class);
+		 transient Logger logger   =  LogManager.getLogger(ClickAdaptor.class);
 
 		private com.vaadin.ui.Button.ClickListener listener = null;
 

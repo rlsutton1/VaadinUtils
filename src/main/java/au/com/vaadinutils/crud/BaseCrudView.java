@@ -55,7 +55,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		Selected<E>, DirtyListener
 {
 
-	private static Logger logger = LogManager.getLogger(BaseCrudView.class);
+	private static  transient Logger logger   =  LogManager.getLogger(BaseCrudView.class);
 	private static final long serialVersionUID = 1L;
 
 	protected EntityItem<E> newEntity = null;
@@ -87,7 +87,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 */
 	protected JPAContainer<E> container;
 
-	
 	/* User interface components are stored in session. */
 	protected EntityList<E> entityTable;
 	protected VerticalLayout rightLayout;
@@ -314,7 +313,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	}
 
 	/**
-	 * overload this method to add customer actions, in your overloaded version
+	 * overload this method to add custom actions, in your overloaded version
 	 * you should call super.getCrudActions() to get a list with the
 	 * DeleteAction pre-populated
 	 */
@@ -443,17 +442,17 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	{
 		actionCombo.setEnabled(!activate);
 		applyButton.setEnabled(!activate);
-		
+
 		boolean showNew = !activate;
 		if (disallowNew)
 			showNew = false;
 		newButton.setEnabled(showNew);
 	}
-	
+
 	/**
-	 * A child class can call this method to stop a user from being able
-	 * to edit a record.
-	 * When called the Save/Cancel buttons are disabled from the screen.
+	 * A child class can call this method to stop a user from being able to edit
+	 * a record. When called the Save/Cancel buttons are disabled from the
+	 * screen.
 	 * 
 	 * If you also set hideSaveCancelLayout to true then the save/cancel buttons
 	 * will be completely removed from the layout.
@@ -464,16 +463,16 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 */
 	protected void disallowEdit(boolean disallow, boolean hideSaveCancelLayout)
 	{
-		this.disallowEditing  = disallow;
-		this.hideSaveCancelLayout  = hideSaveCancelLayout;
+		this.disallowEditing = disallow;
+		this.hideSaveCancelLayout = hideSaveCancelLayout;
 		showSaveCancel(!disallow);
 		if (this.hideSaveCancelLayout)
 			buttonLayout.setVisible(false);
 	}
-	
+
 	/**
-	 * A child class can call this method to stop a user from being able
-	 * to add new records.
+	 * A child class can call this method to stop a user from being able to add
+	 * new records.
 	 * 
 	 * When called the 'New' button is removed from the UI.
 	 * 
@@ -483,21 +482,20 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 */
 	protected void disallowNew(boolean disallow)
 	{
-		this.disallowNew  = disallow;
+		this.disallowNew = disallow;
 		showNew(!disallow);
 	}
-	
+
 	protected boolean isDisallowNew()
 	{
 		return this.disallowNew;
 	}
 
-
 	/**
-	 * A child class can call this method to stop a user from being able
-	 * to delete a record.
-	 * When called the delete action is removed from the action combo. If the delete is the only
-	 * action then the action combo and apply button will also be removed.
+	 * A child class can call this method to stop a user from being able to
+	 * delete a record. When called the delete action is removed from the action
+	 * combo. If the delete is the only action then the action combo and apply
+	 * button will also be removed.
 	 * 
 	 * By default deleting is allowed.
 	 * 
@@ -505,8 +503,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 */
 	protected void disallowDelete(boolean disallow)
 	{
-		this.disallowDelete  = disallow;
-		
+		this.disallowDelete = disallow;
+
 		if (disallow)
 		{
 			// find and remove the delete action
@@ -517,7 +515,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 					this.actionCombo.removeItem(id);
 					break;
 				}
-			} 
+			}
 			if (this.actionCombo.size() == 0)
 			{
 				this.actionCombo.setVisible(false);
@@ -533,29 +531,27 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			this.applyButton.setVisible(true);
 			this.actionLabel.setVisible(true);
 		}
-		
-		
+
 	}
 
 	/**
 	 * Internal method to show hide the new button when editing.
 	 * 
-	 * If the user has called disallowNew then the new button will never
-	 * be displayed.
+	 * If the user has called disallowNew then the new button will never be
+	 * displayed.
 	 */
 	private void showNew(boolean show)
 	{
 		if (disallowNew)
 			show = false;
-		
+
 		newButton.setVisible(show);
 	}
 
 	/**
-	 * Internal method to show/hide the save and cancel buttons when 
-	 * a user enters/exit editing.
-	 * If disallowEditing has been called by a derived class then
-	 * the save/cancel buttons will never be displayed.
+	 * Internal method to show/hide the save and cancel buttons when a user
+	 * enters/exit editing. If disallowEditing has been called by a derived
+	 * class then the save/cancel buttons will never be displayed.
 	 * 
 	 * @param show
 	 */
@@ -563,19 +559,20 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	{
 		if (disallowEditing)
 			show = false;
-		
+
 		saveButton.setVisible(show);
 		cancelButton.setVisible(show);
 	}
-	
+
 	/**
-	 * Hides the Action layout which contains the 'New' button 
-	 * and 'Action' combo.
+	 * Hides the Action layout which contains the 'New' button and 'Action'
+	 * combo.
 	 * 
-	 * Hiding the action layout effectively stops the user from 
-	 * creating new records or applying any action such as deleting a record.
+	 * Hiding the action layout effectively stops the user from creating new
+	 * records or applying any action such as deleting a record.
 	 * 
 	 * Hiding the action layout provides more room for the list of records.
+	 * 
 	 * @param show
 	 */
 	protected void showActionLayout(boolean show)
@@ -622,6 +619,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 					container.refreshItem(entity.getItemId());
 					// actionCombo.select(actionCombo.getNullSelectionItemId());
 				}
+				else
+					Notification.show("Please select record first.");
 			}
 		});
 
@@ -719,8 +718,12 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	{
 		Object entityId = entityTable.getValue();
 		Object previousItemId = entityTable.prevItemId(entityId);
+		if (previousItemId == null)
+			BaseCrudView.this.entityTable.firstItemId();
 		entityTable.removeItem(entityId);
 		newEntity = null;
+
+		preDelete(entityId);
 		// set the selection to the first item
 		// on the page.
 		// We need to set it to null first as if
@@ -739,8 +742,18 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	}
 
 	/**
-	 * hook for implements that need to do some additional cleanup after a
-	 * delete
+	 * hook for implementations that need to do some additional cleanup before a
+	 * delete.
+	 * 
+	 */
+	protected void preDelete(Object entityId)
+	{
+
+	}
+
+	/**
+	 * hook for implementations that need to do some additional cleanup after a
+	 * delete.
 	 * 
 	 */
 	protected void postDelete(Object entityId)
@@ -792,21 +805,20 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			EntityManagerProvider.getEntityManager().flush();
 			postSaveAction(newEntity);
 
-
 			// select has been moved to here because when it happens earlier,
 			// child cruds are caused to discard their data before saving it for
 			// a new record
-			
+
 			entityTable.select(newEntity.getId());
 			container.refreshItem(newEntity.getId());
-			
+
 			splitPanel.showFirstComponet();
 			Notification.show("Changes Saved", "Any changes you have made have been saved.", Type.TRAY_NOTIFICATION);
 
 		}
 		catch (Exception e)
 		{
-			if (e.getCause() instanceof InvalidValueException)
+			if (e instanceof InvalidValueException || e.getCause() instanceof InvalidValueException)
 			{
 				Notification.show("Please fix the form errors and then try again.", Type.ERROR_MESSAGE);
 			}
@@ -895,7 +907,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		{
 			if (e.getCause() instanceof javax.persistence.PersistenceException)
 			{
-				javax.persistence.PersistenceException cause = (javax.persistence.PersistenceException)e.getCause();
+				javax.persistence.PersistenceException cause = (javax.persistence.PersistenceException) e.getCause();
 				Notification.show(cause.getCause().getMessage(), Type.ERROR_MESSAGE);
 			}
 		}
@@ -921,7 +933,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 * opportunity for implementing classes to modify or add data to the entity
 	 * being saved.
 	 * 
-	 * NOTE: modify the item properties not the entity as accessing the entity is unreliable
+	 * NOTE: modify the item properties not the entity as accessing the entity
+	 * is unreliable
 	 * 
 	 * @param item
 	 */
@@ -931,31 +944,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 	private void initSearch()
 	{
-
-		/*
-		 * We want to show a subtle prompt in the search field. We could also
-		 * set a caption that would be shown above the field or description to
-		 * be shown in a tooltip.
-		 */
 		searchField.setInputPrompt("Search");
-
-		/*
-		 * Granularity for sending events over the wire can be controlled. By
-		 * default simple changes like writing a text in TextField are sent to
-		 * server with the next Ajax call. You can set your component to be
-		 * immediate to send the changes to server immediately after focus
-		 * leaves the field. Here we choose to send the text over the wire as
-		 * soon as user stops writing for a moment.
-		 */
 		searchField.setTextChangeEventMode(TextChangeEventMode.LAZY);
 		searchField.setImmediate(true);
-
-		/*
-		 * When the event happens, we handle it in the anonymous inner class.
-		 * You may choose to use separate controllers (in MVC) or presenters (in
-		 * MVP) instead. In the end, the preferred application architecture is
-		 * up to you.
-		 */
 		searchField.addTextChangeListener(new TextChangeListener()
 		{
 			private static final long serialVersionUID = 1L;
@@ -976,14 +967,21 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 */
 	protected void triggerFilter()
 	{
-		triggerFilter(searchField.getValue());
+		triggerFilter(searchField.getValue().trim());
 	}
-	
+
 	private void triggerFilter(String searchText)
 	{
 		boolean advancedSearchActive = advancedSearchCheckbox != null && advancedSearchCheckbox.getValue();
-		Filter filter = getContainerFilter(searchText, advancedSearchActive);
-		applyFilter(filter);
+		if (advancedSearchActive || searchText.length() > 0)
+		{
+			Filter filter = getContainerFilter(searchText, advancedSearchActive);
+			applyFilter(filter);
+		}
+		else
+		{
+			resetFilters();
+		}
 
 	}
 
@@ -1298,7 +1296,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	protected void resetFilters()
 	{
 		container.removeAllContainerFilters();
-		((EntityTable<E>)this.entityTable).refreshRowCache();
+		((EntityTable<E>) this.entityTable).refreshRowCache();
 	}
 
 	protected boolean isNew()

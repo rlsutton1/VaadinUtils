@@ -23,7 +23,7 @@ public class UniqueFieldValidator<E extends CrudEntity, F> implements Validator
 	private Class<E> table;
 	private SingularAttribute<E, F> matchField;
 	private BaseCrudView<E> crud;
-	Logger logger = LogManager.getLogger(UniqueFieldValidator.class);
+	 transient Logger logger   =  LogManager.getLogger(UniqueFieldValidator.class);
 
 	public UniqueFieldValidator(Class<E> table, SingularAttribute<E, F> matchField, BaseCrudView<E> crud)
 	{

@@ -20,7 +20,7 @@ import com.vaadin.ui.UI;
  */
 public class UIUpdater
 {
-	private static Logger logger = LogManager.getLogger(UIUpdater.class);
+	private static  transient Logger logger   =  LogManager.getLogger(UIUpdater.class);
 
 	public UIUpdater(final Runnable uiRunnable)
 	{

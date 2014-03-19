@@ -32,7 +32,7 @@ public class DataBoundButton<T> extends Button implements Field<T>
 	Set<Validator> validators = new HashSet<Validator>();
 	private boolean invalidAllowed = true;
 	
-	Logger logger = LogManager.getLogger(DataBoundButton.class);
+	 transient Logger logger   =  LogManager.getLogger(DataBoundButton.class);
 
 	Set<ValueChangeListener> listeners = new HashSet<ValueChangeListener>();
 

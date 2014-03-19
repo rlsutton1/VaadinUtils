@@ -20,7 +20,7 @@ import au.com.vaadinutils.dao.Transaction;
 
 public class EntityManagerInjectorFilter implements Filter
 {
-	private static Logger logger = LogManager.getLogger(EntityManagerInjectorFilter.class);
+	private static  transient Logger logger   =  LogManager.getLogger(EntityManagerInjectorFilter.class);
 
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException

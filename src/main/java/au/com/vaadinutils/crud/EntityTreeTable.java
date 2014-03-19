@@ -21,7 +21,7 @@ public class EntityTreeTable<E> extends Tree implements EntityList<E>
 	private RowChangeListener<E> rowChangeListener;
 	private HeadingPropertySet<E> visibleColumns;
 
-	Logger logger = LogManager.getLogger(EntityTreeTable.class);
+	 transient Logger logger   =  LogManager.getLogger(EntityTreeTable.class);
 
 	public EntityTreeTable(JPAContainer<E> entityContainer, HeadingPropertySet<E> headingPropertySet)
 	{

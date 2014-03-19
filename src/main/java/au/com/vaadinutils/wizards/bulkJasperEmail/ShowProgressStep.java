@@ -30,7 +30,7 @@ import com.vaadin.ui.VerticalLayout;
 
 public class ShowProgressStep<C extends CrudEntity> implements WizardStep, ProgressTaskListener<JasperTransmission>
 {
-	static private Logger logger = LogManager.getLogger(ShowProgressStep.class);
+	static private  transient Logger logger   =  LogManager.getLogger(ShowProgressStep.class);
 	JPAContainer<C> entities;
 	private WizardView<?, ?, ?> wizardView;
 	private boolean sendComplete = false;

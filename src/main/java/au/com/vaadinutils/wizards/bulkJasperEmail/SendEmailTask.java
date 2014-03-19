@@ -23,7 +23,7 @@ import com.vaadin.ui.Notification.Type;
 
 public class SendEmailTask extends ProgressBarTask<JasperTransmission> implements CancelListener
 {
-	Logger logger = LogManager.getLogger(SendEmailTask.class);
+	 transient Logger logger   =  LogManager.getLogger(SendEmailTask.class);
 	private JasperProxy proxy;
 	private List<JasperTransmission> transmissions;
 	private boolean cancel = false;

@@ -26,7 +26,7 @@ public class PoJoTable<T> extends Table
 {
 	private static final long serialVersionUID = 1L;
 
-	Logger logger = LogManager.getLogger(PoJoTable.class);
+	 transient Logger logger   =  LogManager.getLogger(PoJoTable.class);
 
 	private Class<T> pojoClass;
 
