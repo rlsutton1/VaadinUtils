@@ -273,13 +273,8 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	 * @param entityId
 	 */
 	protected void preChildDelete(Object entityId)
-<<<<<<< HEAD
-		{
-		}
-=======
 	{
 	}
->>>>>>> branch 'master' of https://github.com/rlsutton1/VaadinUtils.git
 
 	/**
 	 * Called just after a child entity is deleted so that a derived class can
