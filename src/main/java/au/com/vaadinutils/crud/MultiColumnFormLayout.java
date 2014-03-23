@@ -77,7 +77,7 @@ public class MultiColumnFormLayout<E> extends GridLayout
 
 	}
 
-	protected FormHelper<E> getFormHelper(MultiColumnFormLayout<E> layout, ValidatingFieldGroup<E> fieldGroup2)
+	protected FormHelper<E> getFormHelper(MultiColumnFormLayout<E> layout, ValidatingFieldGroup<E> fieldGroup)
 	{
 		return new FormHelper<E>(layout, fieldGroup);
 	}
