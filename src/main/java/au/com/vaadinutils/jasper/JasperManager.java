@@ -222,7 +222,7 @@ public class JasperManager
 				exporter.setParameter(JRHtmlExporterParameter.IMAGES_MAP, images);
 
 				String context = VaadinServlet.getCurrent().getServletContext().getContextPath();
-				int contextIndex = Page.getCurrent().getLocation().toString().indexOf(context);
+				int contextIndex = Page.getCurrent().getLocation().toString().lastIndexOf(context);
 				String baseurl = Page.getCurrent().getLocation().toString()
 						.substring(0, contextIndex + context.length() + 1);
 				exporter.setParameter(JRHtmlExporterParameter.IMAGES_URI, baseurl + "images?image=");
