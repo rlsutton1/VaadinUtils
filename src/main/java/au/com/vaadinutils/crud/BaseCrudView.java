@@ -1256,6 +1256,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 					resetFilters();
 
 					newEntity = container.createEntityItem(entityClass.newInstance());
+					preNew(newEntity);
 					rowChanged(newEntity);
 					// Can't delete when you are adding a new record.
 					// Use cancel instead.
@@ -1281,6 +1282,17 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 		});
 	}
+
+	/**
+	 * Override this method if you need to initialise the entity when a new
+	 * record is created.
+	 * @param newEntity
+	 */
+	protected void preNew(EntityItem<E> newEntity)
+	{
+		// default action is a noop
+	}
+
 
 	/**
 	 * for child cruds, they overload this to ensure that the minimum necessary
