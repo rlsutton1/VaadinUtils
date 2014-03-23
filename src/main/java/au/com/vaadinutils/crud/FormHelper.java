@@ -516,9 +516,18 @@ public class FormHelper<E> implements Serializable
 			component.setImmediate(true);
 			if (group != null)
 			{
-				Preconditions.checkState(group.getContainer().getContainerPropertyIds().contains(field), field
+				Collection<?  extends Object> ids = null;
+				if (group.getContainer() != null)
+					
+					ids = group.getContainer().getContainerPropertyIds();
+				else if (group.getItemDataSource() != null)
+					ids = group.getItemDataSource().getItemPropertyIds();
+				
+				Preconditions.checkArgument(ids != null, "The group must have either a Container or an ItemDataSource attached.");
+					
+				Preconditions.checkState(ids.contains(field), field
 						+ " is not valid, valid listFieldNames are "
-						+ group.getContainer().getContainerPropertyIds().toString());
+						+ ids.toString());
 
 				doBinding(group, field, component);
 			}
