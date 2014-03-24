@@ -447,12 +447,12 @@ public class FormHelper<E> implements Serializable
 	 * for example<br>
 	 * <br>
 	 * 
-	 * FormHelper<Tblroutestep> helper = new FormHelper<Tblroutestep>(...);<br>
+	 * FormHelper&lt;RaffleBook&gt; helper = new FormHelper&lt;RaffleBook&gt;(...);<br>
 	 * <br>
-	 * ComboBox field = helper.new EntityFieldBuilder<Tblroutingscript>()<br>
+	 * ComboBox field = helper.new EntityFieldBuilder&lt;RaffleAllocation&gt;()<br>
 	 * .setLabel("Action")<br>
-	 * .setField(Tblroutestep_.script)<br>
-	 * .setListFieldName(Tblroutingscript_.name)<br>
+	 * .setField(RaffleBook.allocation)<br>
+	 * .setListFieldName(RaffleAllocation_.name)<br>
 	 * .build();<br>
 	 * 
 	 * @author rsutton
