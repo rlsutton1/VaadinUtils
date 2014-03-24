@@ -1,5 +1,8 @@
 package au.com.vaadinutils.ui;
 
+import java.util.Collection;
+import java.util.concurrent.atomic.AtomicReference;
+
 import javax.validation.ConstraintViolationException;
 
 import org.apache.logging.log4j.LogManager;
@@ -9,11 +12,15 @@ import org.vaadin.teemu.wizards.WizardStep;
 import au.com.vaadinutils.crud.CrudEntity;
 import au.com.vaadinutils.crud.FormHelper;
 import au.com.vaadinutils.crud.ValidatingFieldGroup;
+import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.dao.JpaBaseDao;
 
 import com.google.gwt.thirdparty.guava.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
+import com.vaadin.addon.jpacontainer.JPAContainer.ProviderChangedEvent;
+import com.vaadin.data.Container.ItemSetChangeEvent;
+import com.vaadin.data.Container.ItemSetChangeListener;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Notification;
@@ -51,7 +58,7 @@ public abstract class SingleEntityWizardStep<E extends CrudEntity> implements Wi
 	@Override
 	public Component getContent()
 	{
-		if (editor == null)
+//		if (editor == null)
 		{
 			this.entity = findEntity();
 			EntityItem<E> entityItem;
@@ -150,7 +157,8 @@ public abstract class SingleEntityWizardStep<E extends CrudEntity> implements Wi
 					fieldGroup.setItemDataSource(entityItem);
 					isNew = false;
 				}
-				container.commit();
+				entity = commitContainerAndGetEntityFromDB();
+				// container.commit();
 				// entity = container.getItem(entity.getId()).getEntity();
 
 				valid = true;
@@ -187,5 +195,76 @@ public abstract class SingleEntityWizardStep<E extends CrudEntity> implements Wi
 	{
 		return fieldGroup;
 	}
+	
+	
+	/**
+	 * commits the container and retrieves the new recordid
+	 * 
+	 * we have to hook the ItemSetChangeListener to be able to get the database
+	 * id of a new record.
+	 */
+	private E commitContainerAndGetEntityFromDB()
+	{
+		// don't really need an AtomicReference, just using it as a mutable
+		// final variable to be used in the callback
+		final AtomicReference<E> newEntity = new AtomicReference<E>();
+
+		// call back to collect the id of the new record when the container
+		// fires the ItemSetChangeEvent
+		ItemSetChangeListener tmp = new ItemSetChangeListener()
+		{
+
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 9132090066374531277L;
+
+			@Override
+			public void containerItemSetChange(ItemSetChangeEvent event)
+			{
+				if (event instanceof ProviderChangedEvent)
+				{
+					@SuppressWarnings("rawtypes")
+					ProviderChangedEvent pce = (ProviderChangedEvent) event;
+					@SuppressWarnings("unchecked")
+					Collection<E> affectedEntities = pce.getChangeEvent().getAffectedEntities();
+
+					if (affectedEntities.size() > 0)
+					{
+						@SuppressWarnings("unchecked")
+						E id = (E) affectedEntities.toArray()[0];
+						newEntity.set(id);
+
+					}
+				}
+			}
+		};
+
+		try
+		{
+			// add the listener
+			container.addItemSetChangeListener(tmp);
+			// call commit
+			container.commit();
+			newEntity.set(EntityManagerProvider.getEntityManager().merge(newEntity.get()));
+		}
+		catch (com.vaadin.data.Buffered.SourceException e)
+		{
+			if (e.getCause() instanceof javax.persistence.PersistenceException)
+			{
+				javax.persistence.PersistenceException cause = (javax.persistence.PersistenceException) e.getCause();
+				Notification.show(cause.getCause().getMessage(), Type.ERROR_MESSAGE);
+			}
+		}
+		finally
+		{
+			// detach the listener
+			container.removeItemSetChangeListener(tmp);
+		}
+
+		// return the entity
+		return newEntity.get();
+	}
+
 
 }
