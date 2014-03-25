@@ -566,6 +566,13 @@ public class FormHelper<E> implements Serializable
 			return this;
 		}
 
+		public EntityFieldBuilder<L> setField(String field, Class<L> listClazz)
+		{
+			this.field = field;
+			this.listClazz = listClazz;
+			return this;
+		}
+		
 		public EntityFieldBuilder<L> setListFieldName(SingularAttribute<L, ?> listField)
 		{
 			this.listField = listField.getName();
