@@ -55,7 +55,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		Selected<E>, DirtyListener
 {
 
-	private static  transient Logger logger   =  LogManager.getLogger(BaseCrudView.class);
+	private static transient Logger logger = LogManager.getLogger(BaseCrudView.class);
 	private static final long serialVersionUID = 1L;
 
 	protected EntityItem<E> newEntity = null;
@@ -958,19 +958,10 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				// for triggering the filter.
 				if (advancedSearchCheckbox == null || !advancedSearchCheckbox.getValue())
 				{
-<<<<<<< HEAD
-				String filterString = event.getText();
-				triggerFilter(filterString);
-=======
 					String filterString = event.getText();
 					triggerFilter(filterString);
 				}
->>>>>>> branch 'master' of https://github.com/rlsutton1/VaadinUtils.git
 			}
-<<<<<<< HEAD
-			}
-=======
->>>>>>> branch 'master' of https://github.com/rlsutton1/VaadinUtils.git
 		});
 
 		searchField.focus();
@@ -1307,13 +1298,13 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	/**
 	 * Override this method if you need to initialise the entity when a new
 	 * record is created.
+	 * 
 	 * @param newEntity
 	 */
 	protected void preNew(EntityItem<E> newEntity)
 	{
 		// default action is a noop
 	}
-
 
 	/**
 	 * for child cruds, they overload this to ensure that the minimum necessary

@@ -180,11 +180,7 @@ public class MultiColumnFormLayout<E> extends GridLayout
 
 		if (!(splitComponent instanceof SplitLabel))
 		{
-<<<<<<< HEAD
-		super.addComponent(splitComponent, x, y, x + fieldSpan - 1, y);
-=======
 			super.addComponent(splitComponent, x, y, x + fieldSpan - 1, y);
->>>>>>> branch 'master' of https://github.com/rlsutton1/VaadinUtils.git
 			super.setComponentAlignment(splitComponent, Alignment.MIDDLE_LEFT);
 		}
 

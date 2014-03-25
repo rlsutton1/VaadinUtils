@@ -4,17 +4,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
 
 import javax.activation.DataSource;
 import javax.persistence.EntityManager;
 
-import net.sf.jasperreports.engine.DefaultJasperReportsContext;
 import net.sf.jasperreports.engine.JRAbstractExporter;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JRExporterParameter;
@@ -22,19 +19,13 @@ import net.sf.jasperreports.engine.JRParameter;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
-import net.sf.jasperreports.engine.JasperReportsContext;
-import net.sf.jasperreports.engine.design.JRCompiler;
-import net.sf.jasperreports.engine.design.JRJdtCompiler;
-import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.export.JRCsvExporter;
 import net.sf.jasperreports.engine.export.JRHtmlExporter;
 import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
 import net.sf.jasperreports.engine.export.JRPdfExporter;
 import net.sf.jasperreports.engine.fill.JRSwapFileVirtualizer;
 import net.sf.jasperreports.engine.util.JRLoader;
-import net.sf.jasperreports.engine.util.JRSaver;
 import net.sf.jasperreports.engine.util.JRSwapFile;
-import net.sf.jasperreports.engine.xml.JRXmlLoader;
 
 import org.apache.commons.mail.ByteArrayDataSource;
 import org.apache.logging.log4j.LogManager;
@@ -252,15 +243,7 @@ public class JasperManager
 
 				JasperPrint jasper_print = fillReport();
 
-<<<<<<< HEAD
 				String renderedName = this.jasperReport.getName();
-=======
-				String context = VaadinServlet.getCurrent().getServletContext().getContextPath();
-				int contextIndex = Page.getCurrent().getLocation().toString().lastIndexOf(context);
-				String baseurl = Page.getCurrent().getLocation().toString()
-						.substring(0, contextIndex + context.length() + 1);
-				exporter.setParameter(JRHtmlExporterParameter.IMAGES_URI, baseurl + "images?image=");
->>>>>>> branch 'master' of https://github.com/rlsutton1/VaadinUtils.git
 
 				switch (exportMethod)
 				{
