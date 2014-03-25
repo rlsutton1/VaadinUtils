@@ -1,7 +1,6 @@
 package au.com.vaadinutils.jasper;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 
@@ -65,7 +64,7 @@ public class ReportFilterUIBuilder implements ReportFilterFieldBuilder, ReportFi
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		ReportParameterEnum<?> param = new ReportParameterEnum(label, defaultValue, paramName, enumClass);
 		addField(param);
-		
+
 		return this;
 	}
 
@@ -80,7 +79,8 @@ public class ReportFilterUIBuilder implements ReportFilterFieldBuilder, ReportFi
 			parameterName = parameterName.substring("ReportParameter".length(), parameterName.length());
 		}
 		Preconditions.checkArgument(this.manager.paramExists(parameterName), "The passed Jasper Report parameter: "
-				+ parameterName + " does not exist on the Report");
+				+ parameterName + " does not exist in the Report " + manager.getReportFilename()
+				+ ", valid parameters are " + getParameterList());
 		JRParameter jrParam = manager.getParameter(parameterName);
 
 		String expectedClass = param.getExpectedParameterClassName();
@@ -90,6 +90,16 @@ public class ReportFilterUIBuilder implements ReportFilterFieldBuilder, ReportFi
 		rparams.add(param);
 
 		return this;
+	}
+
+	private String getParameterList()
+	{
+		String params = "\n";
+		for (JRParameter param : manager.getParameters())
+		{
+			params += param.getName() + "(" + param.getNestedTypeName() + ") \n";
+		}
+		return params;
 	}
 
 	@Override
@@ -117,7 +127,10 @@ public class ReportFilterUIBuilder implements ReportFilterFieldBuilder, ReportFi
 
 			for (ReportParameter<?> rparam : rparams)
 			{
-				layout.addComponent(rparam.getComponent());
+				if (rparam.showFilter())
+				{
+					layout.addComponent(rparam.getComponent());
+				}
 			}
 		}
 		return layout;
@@ -125,7 +138,7 @@ public class ReportFilterUIBuilder implements ReportFilterFieldBuilder, ReportFi
 
 	public Collection<ReportParameter<?>> getReportParameters()
 	{
-		return Collections.unmodifiableCollection(rparams);
+		return rparams;
 	}
 
 	/**
@@ -133,7 +146,16 @@ public class ReportFilterUIBuilder implements ReportFilterFieldBuilder, ReportFi
 	 */
 	public boolean hasFilters()
 	{
-		return this.rparams.size() > 0;
+		boolean ret = false;
+		for (ReportParameter<?> param : rparams)
+		{
+			if (param.showFilter())
+			{
+				ret = true;
+				break;
+			}
+		}
+		return ret;
 	}
 
 }

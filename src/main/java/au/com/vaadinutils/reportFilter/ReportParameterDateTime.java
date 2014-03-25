@@ -12,19 +12,44 @@ public class ReportParameterDateTime extends ReportParameter<String>
 {
 	protected DateField field;
 
+	String parameterFormat = "yyyy/MM/dd HH:mm:ss";
+
+	/**
+	 * 
+	 * @param caption
+	 *            - shown on the UI
+	 * @param parameterName
+	 *            - parameter name passed to ireport
+	 * @param resolution
+	 *            - Vaadin calendar control resolution
+	 * @param displayFormat
+	 *            - format to display to the user
+	 * @param parameterFormat
+	 *            - format of the value passed to ireport
+	 */
+	public ReportParameterDateTime(String caption, String parameterName, Resolution resolution, String displayFormat,
+			String parameterFormat)
+	{
+		super(parameterName);
+		field = new DateField(caption, new DateTime().withTimeAtStartOfDay().toDate());
+		field.setResolution(resolution);
+		field.setDateFormat(displayFormat);
+		this.parameterFormat = parameterFormat;
+	}
+
 	public ReportParameterDateTime(String caption, String parameterName)
 	{
-		super( parameterName);
+		super(parameterName);
 		field = new DateField(caption, new DateTime().withTimeAtStartOfDay().toDate());
 		field.setResolution(Resolution.DAY);
 		field.setDateFormat("yyyy/MM/dd");
-		
+
 	}
 
 	@Override
 	public String getValue()
 	{
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		SimpleDateFormat sdf = new SimpleDateFormat(parameterFormat);
 		return sdf.format(field.getValue());
 	}
 
@@ -43,8 +68,8 @@ public class ReportParameterDateTime extends ReportParameter<String>
 	@Override
 	public void setDefaultValue(String defaultValue)
 	{
-		//this.field.setValue(defaultValue);
-		
+		// this.field.setValue(defaultValue);
+
 	}
 
 	@Override

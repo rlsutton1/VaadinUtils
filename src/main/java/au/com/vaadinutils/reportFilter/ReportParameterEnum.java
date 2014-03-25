@@ -28,11 +28,10 @@ public class ReportParameterEnum<T extends Enum<T>> extends ReportParameter<Enum
 		field.setValue(defaultValue);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public T getValue()
+	public String getValue()
 	{
-		return (T) field.getValue();
+		return field.getValue().toString();
 	}
 
 	@Override

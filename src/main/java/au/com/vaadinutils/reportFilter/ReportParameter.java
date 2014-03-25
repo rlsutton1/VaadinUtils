@@ -7,7 +7,7 @@ import com.vaadin.ui.Component;
 
 public abstract class ReportParameter<T>
 {
-	final String parameterName;
+	String parameterName;
 	String label;
 
 	public ReportParameter(String parameterName)
@@ -20,7 +20,7 @@ public abstract class ReportParameter<T>
 		return parameterName + "=" + URLEncoder.encode(getValue().toString(), "UTF-8");
 	}
 
-	public abstract T getValue();
+	public abstract Object getValue();
 
 	public abstract Component getComponent();
 
@@ -38,6 +38,17 @@ public abstract class ReportParameter<T>
 	public void setLabel(String label)
 	{
 		this.label = label;
+		
+	}
+
+	public boolean showFilter()
+	{
+		return true;
+	}
+
+	public void setParameterName(String newName)
+	{
+		parameterName = newName;
 		
 	}
 	
