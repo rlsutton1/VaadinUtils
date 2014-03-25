@@ -133,6 +133,14 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		return findAll(null);
 	}
 
+	/**
+	 * Returns all rows ordered by the given set of entity attribues.
+	 * 
+	 * You may pass in an array of attributes and a order by clause 
+	 * will be added for each attribute in turn
+	 * e.g.
+	 *  order by order[0], order[1] ....
+	 */
 	@Override
 	public List<E> findAll(SingularAttribute<E, ?> order[])
 	{
@@ -148,6 +156,48 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 			for (SingularAttribute<E, ?> field : order)
 			{
 				ordering.add( builder.asc(root.get(field)));
+				
+			}
+			criteria.orderBy(ordering);
+		}
+		List<E> results = entityManager.createQuery(criteria).getResultList();
+
+		return results;
+
+	}
+
+	/**
+	 * Returns all rows ordered by the given set of entity attribues.
+	 * 
+	 * @param order
+	 * You may pass in an array of attributes and a order by clause 
+	 * will be added for each attribute in turn
+	 * e.g.
+	 *  order by order[0], order[1] ....
+	 *  
+	 * @param sortAscending
+	 * An array of booleans that must be the same size as the order. The sort
+	 * array controls whether each attribute will be sorted ascending or descending.
+	 *  
+	 */
+	public List<E> findAll(SingularAttribute<E, ?> order[], boolean sortAscending[])
+	{
+		Preconditions.checkArgument(order.length == sortAscending.length, "Both arguments must have the same no. of array elements.");
+		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+
+		CriteriaQuery<E> criteria = builder.createQuery(entityClass);
+
+		Root<E> root = criteria.from(entityClass);
+		criteria.select(root);
+		if (order != null)
+		{
+			List<Order> ordering = new LinkedList<Order>(); 
+			for (SingularAttribute<E, ?> field : order)
+			{
+				if (sortAscending[ordering.size()] == true)
+					ordering.add( builder.asc(root.get(field)));
+				else
+					ordering.add( builder.desc(root.get(field)));
 				
 			}
 			criteria.orderBy(ordering);

@@ -10,6 +10,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import au.com.vaadinutils.crud.splitFields.SplitField;
+import au.com.vaadinutils.crud.splitFields.SplitLabel;
 import au.com.vaadinutils.domain.iColorFactory;
 import au.com.vaadinutils.fields.CKEditorEmailField;
 import au.com.vaadinutils.fields.ColorPickerField;
@@ -77,7 +78,7 @@ public class MultiColumnFormLayout<E> extends GridLayout
 
 	}
 
-	protected FormHelper<E> getFormHelper(MultiColumnFormLayout<E> layout, ValidatingFieldGroup<E> fieldGroup2)
+	protected FormHelper<E> getFormHelper(MultiColumnFormLayout<E> layout, ValidatingFieldGroup<E> fieldGroup)
 	{
 		return new FormHelper<E>(layout, fieldGroup);
 	}
@@ -177,10 +178,13 @@ public class MultiColumnFormLayout<E> extends GridLayout
 				+ fieldSpan - 1), y);
 		splitComponent.setWidth(fieldWidth);
 
+		if (!(splitComponent instanceof SplitLabel))
+		{
 		super.addComponent(splitComponent, x, y, x + fieldSpan - 1, y);
-		x += fieldSpan;
+			super.setComponentAlignment(splitComponent, Alignment.MIDDLE_LEFT);
+		}
 
-		super.setComponentAlignment(splitComponent, Alignment.MIDDLE_LEFT);
+		x += fieldSpan;
 
 		this.colspan = 1;
 	}

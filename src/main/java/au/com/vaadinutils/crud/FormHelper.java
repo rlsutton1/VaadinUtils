@@ -448,12 +448,12 @@ public class FormHelper<E> implements Serializable
 	 * for example<br>
 	 * <br>
 	 * 
-	 * FormHelper<Tblroutestep> helper = new FormHelper<Tblroutestep>(...);<br>
+	 * FormHelper&lt;RaffleBook&gt; helper = new FormHelper&lt;RaffleBook&gt;(...);<br>
 	 * <br>
-	 * ComboBox field = helper.new EntityFieldBuilder<Tblroutingscript>()<br>
+	 * ComboBox field = helper.new EntityFieldBuilder&lt;RaffleAllocation&gt;()<br>
 	 * .setLabel("Action")<br>
-	 * .setField(Tblroutestep_.script)<br>
-	 * .setListFieldName(Tblroutingscript_.name)<br>
+	 * .setField(RaffleBook.allocation)<br>
+	 * .setListFieldName(RaffleAllocation_.name)<br>
 	 * .build();<br>
 	 * 
 	 * @author rsutton
@@ -517,9 +517,18 @@ public class FormHelper<E> implements Serializable
 			component.setImmediate(true);
 			if (group != null)
 			{
-				Preconditions.checkState(group.getContainer().getContainerPropertyIds().contains(field), field
+				Collection<?  extends Object> ids = null;
+				if (group.getContainer() != null)
+					
+					ids = group.getContainer().getContainerPropertyIds();
+				else if (group.getItemDataSource() != null)
+					ids = group.getItemDataSource().getItemPropertyIds();
+				
+				Preconditions.checkArgument(ids != null, "The group must have either a Container or an ItemDataSource attached.");
+					
+				Preconditions.checkState(ids.contains(field), field
 						+ " is not valid, valid listFieldNames are "
-						+ group.getContainer().getContainerPropertyIds().toString());
+						+ ids.toString());
 
 				doBinding(group, field, component);
 			}
@@ -558,6 +567,13 @@ public class FormHelper<E> implements Serializable
 			return this;
 		}
 
+		public EntityFieldBuilder<L> setField(String field, Class<L> listClazz)
+		{
+			this.field = field;
+			this.listClazz = listClazz;
+			return this;
+		}
+		
 		public EntityFieldBuilder<L> setListFieldName(SingularAttribute<L, ?> listField)
 		{
 			this.listField = listField.getName();
