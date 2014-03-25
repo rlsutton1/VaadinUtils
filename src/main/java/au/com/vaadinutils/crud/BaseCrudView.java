@@ -958,10 +958,19 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				// for triggering the filter.
 				if (advancedSearchCheckbox == null || !advancedSearchCheckbox.getValue())
 				{
+<<<<<<< HEAD
 				String filterString = event.getText();
 				triggerFilter(filterString);
+=======
+					String filterString = event.getText();
+					triggerFilter(filterString);
+				}
+>>>>>>> branch 'master' of https://github.com/rlsutton1/VaadinUtils.git
 			}
+<<<<<<< HEAD
 			}
+=======
+>>>>>>> branch 'master' of https://github.com/rlsutton1/VaadinUtils.git
 		});
 
 		searchField.focus();

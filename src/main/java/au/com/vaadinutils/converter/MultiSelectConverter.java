@@ -325,7 +325,14 @@ public class MultiSelectConverter<T> implements Converter<Collection<Object>, Co
 	@Override
 	public Class<Collection<Object>> getPresentationType()
 	{
-		return getPropertyDataSource().getType();
+		if (getPropertyDataSource() != null)
+		{
+			return getPropertyDataSource().getType();
+		}
+		else
+		{
+			return this.type;
+		}
 	}
 
 }

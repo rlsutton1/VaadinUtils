@@ -252,7 +252,15 @@ public class JasperManager
 
 				JasperPrint jasper_print = fillReport();
 
+<<<<<<< HEAD
 				String renderedName = this.jasperReport.getName();
+=======
+				String context = VaadinServlet.getCurrent().getServletContext().getContextPath();
+				int contextIndex = Page.getCurrent().getLocation().toString().lastIndexOf(context);
+				String baseurl = Page.getCurrent().getLocation().toString()
+						.substring(0, contextIndex + context.length() + 1);
+				exporter.setParameter(JRHtmlExporterParameter.IMAGES_URI, baseurl + "images?image=");
+>>>>>>> branch 'master' of https://github.com/rlsutton1/VaadinUtils.git
 
 				switch (exportMethod)
 				{
