@@ -953,10 +953,14 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 			public void textChange(final TextChangeEvent event)
 			{
-				String filterString = event.getText();
-				triggerFilter(filterString);
+				// If advanced search is active then it should be responsible
+				// for triggering the filter.
+				if (advancedSearchCheckbox == null || !advancedSearchCheckbox.getValue())
+				{
+					String filterString = event.getText();
+					triggerFilter(filterString);
+				}
 			}
-
 		});
 
 		searchField.focus();
