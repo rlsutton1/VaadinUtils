@@ -36,7 +36,7 @@ public class InputFormDialog extends Window
 		this.setResizable(false);
 
 		VerticalLayout layout = new VerticalLayout();
-		layout.setMargin(new MarginInfo(false, true, true, true));
+		layout.setMargin(new MarginInfo(false, true, true, false));
 		//layout.setMargin(true);
 		layout.setSizeUndefined();
 		layout.addComponent(form);
@@ -112,6 +112,10 @@ public class InputFormDialog extends Window
 	public void setCancelButtonLabel(String label)
 	{
 		cancelButton.setCaption(label);
-
+	}
+	
+	public void showOkButton(boolean show)
+	{
+		ok.setVisible(show);
 	}
 }

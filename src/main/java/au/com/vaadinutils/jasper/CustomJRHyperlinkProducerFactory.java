@@ -16,6 +16,10 @@ public class CustomJRHyperlinkProducerFactory extends JRHyperlinkProducerFactory
 	@Override
 	public JRHyperlinkProducer getHandler(String linkType)
 	{
+		if (useCustomHyperLinks.get() == null)
+		{
+			useCustomHyperLinks.set(false);
+		}
 		if (useCustomHyperLinks.get())
 		{
 			return new CustomJRHyperlinkProducer();
