@@ -1,7 +1,7 @@
 package au.com.vaadinutils.wizards.bulkJasperEmail;
 
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.mail.EmailException;
@@ -13,6 +13,9 @@ import au.com.vaadinutils.dao.Transaction;
 import au.com.vaadinutils.jasper.JasperEmailBuilder;
 import au.com.vaadinutils.jasper.JasperManager;
 import au.com.vaadinutils.jasper.JasperManager.OutputFormat;
+import au.com.vaadinutils.jasper.filter.ReportFilterUIBuilder;
+import au.com.vaadinutils.jasper.parameter.ReportParameter;
+import au.com.vaadinutils.jasper.ui.JasperReportDataProvider;
 import au.com.vaadinutils.jasper.RenderedReport;
 import au.com.vaadinutils.listener.CancelListener;
 import au.com.vaadinutils.util.ProgressBarTask;
@@ -21,14 +24,14 @@ import au.com.vaadinutils.util.VUNotification;
 
 import com.vaadin.ui.Notification.Type;
 
-public class SendEmailTask extends ProgressBarTask<JasperTransmission> implements CancelListener
+public class SendEmailTask extends ProgressBarTask<JasperTransmission> implements CancelListener, JasperReportDataProvider
 {
-	 transient Logger logger   =  LogManager.getLogger(SendEmailTask.class);
+	transient Logger logger = LogManager.getLogger(SendEmailTask.class);
 	private JasperProxy proxy;
 	private List<JasperTransmission> transmissions;
 	private boolean cancel = false;
 
-	public SendEmailTask(ProgressTaskListener<JasperTransmission> listener,JasperProxy proxy,
+	public SendEmailTask(ProgressTaskListener<JasperTransmission> listener, JasperProxy proxy,
 			ArrayList<JasperTransmission> transmissions)
 	{
 		super(listener);
@@ -52,13 +55,13 @@ public class SendEmailTask extends ProgressBarTask<JasperTransmission> implement
 
 	}
 
-	private void sendMessages(List<JasperTransmission> targets, JasperProxy proxy) 
-			throws IOException
+	private void sendMessages(List<JasperTransmission> targets, JasperProxy proxy)
+
 	{
 
 		int sent = 0;
 		Transaction t = new Transaction(EntityManagerProvider.createEntityManager());
-		try 
+		try
 		{
 			for (JasperTransmission transmission : targets)
 			{
@@ -68,16 +71,14 @@ public class SendEmailTask extends ProgressBarTask<JasperTransmission> implement
 				try
 				{
 					JasperManager manager = proxy.getManager();
-					RenderedReport renderedHtml = manager.export(OutputFormat.HTML);
-					RenderedReport renderedPDF = manager.export(OutputFormat.PDF);
+					RenderedReport renderedHtml = manager.export(this, OutputFormat.HTML, null);
+					RenderedReport renderedPDF = manager.export(this, OutputFormat.PDF, null);
 					JasperEmailBuilder builder = new JasperEmailBuilder(proxy.getEmailSettings());
-					builder.setFrom(proxy.getSenderEmailAddress())
-					.setSubject(proxy.getSubject())
-					//.setHtmlBody("<html><body></body></html>")
-					.setHtmlBody(renderedHtml)
-					.addTo(transmission.getRecipientEmailAddress())
-					.addAttachement(renderedPDF.getBodyAsDataSource());
-					
+					builder.setFrom(proxy.getSenderEmailAddress()).setSubject(proxy.getSubject())
+							// .setHtmlBody("<html><body></body></html>")
+							.setHtmlBody(renderedHtml).addTo(transmission.getRecipientEmailAddress())
+							.addAttachement(renderedPDF.getBodyAsDataSource());
+
 					builder.send();
 				}
 				catch (EmailException e)
@@ -133,7 +134,6 @@ public class SendEmailTask extends ProgressBarTask<JasperTransmission> implement
 			logger.error(e, e);
 			VUNotification.show(e, Type.ERROR_MESSAGE);
 
-			
 		}
 		finally
 		{
@@ -148,6 +148,56 @@ public class SendEmailTask extends ProgressBarTask<JasperTransmission> implement
 	{
 		this.cancel = true;
 
+	}
+
+	@Override
+	public ReportFilterUIBuilder getFilterBuilder(JasperManager manager)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<ReportParameter<?>> prepareData(Collection<ReportParameter<?>> params, String reportFileName)
+			throws Exception
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void cleanup()
+	{
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void prepareForOutputFormat(OutputFormat outputFormat)
+	{
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void closeDBConnection()
+	{
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void initDBConnection()
+	{
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public OutputFormat getDefaultFormat()
+	{
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

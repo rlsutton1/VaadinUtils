@@ -1,12 +1,16 @@
 package au.com.vaadinutils.jasper;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
 
 import javax.activation.DataSource;
@@ -32,12 +36,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import au.com.vaadinutils.dao.Transaction;
+import au.com.vaadinutils.jasper.parameter.ReportParameter;
+import au.com.vaadinutils.jasper.ui.JasperReportDataProvider;
 
 import com.google.gwt.thirdparty.guava.common.base.Preconditions;
 import com.vaadin.server.Page;
 import com.vaadin.server.VaadinServlet;
 
-public class JasperManager
+public class JasperManager implements Runnable
 {
 	private static transient Logger logger = LogManager.getLogger(JasperManager.class);
 
@@ -96,8 +102,9 @@ public class JasperManager
 	{
 		String reportDesignName = reportName.substring(0, reportName.indexOf("."));
 
-		Preconditions.checkArgument(settings.getReportFile(reportDesignName+".jrxml").exists(),
-				"The passed Jasper Report File doesn't exist: " + settings.getReportFile(reportDesignName).getAbsolutePath());
+		Preconditions.checkArgument(settings.getReportFile(reportDesignName + ".jrxml").exists(),
+				"The passed Jasper Report File doesn't exist: "
+						+ settings.getReportFile(reportDesignName).getAbsolutePath());
 
 		this.em = em;
 		this.settings = settings;
@@ -106,16 +113,15 @@ public class JasperManager
 		try
 		{
 
-			new JasperReportCompiler().compileReport(settings.getReportFile(reportName).getParentFile(),
-					settings.getReportFile(reportName).getParentFile(), reportDesignName);
+			new JasperReportCompiler().compileReport(settings.getReportFile(reportName).getParentFile(), settings
+					.getReportFile(reportName).getParentFile(), reportDesignName);
 
 			this.jasperReport = (JasperReport) JRLoader.loadObject(settings.getReportFile(reportName));
 
 		}
 		catch (Throwable e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error(e, e);
 			throw new RuntimeException("Bad report compilation");
 		}
 
@@ -126,7 +132,7 @@ public class JasperManager
 		return jasperReport.getParameters();
 	}
 
-	boolean paramExists(String parameterName)
+	public boolean paramExists(String parameterName)
 	{
 		return getParameter(parameterName) != null;
 	}
@@ -223,102 +229,176 @@ public class JasperManager
 		return this.settings;
 	}
 
-	public RenderedReport export(OutputFormat exportMethod) throws JRException, IOException
+	private PipedInputStream inputStream;
+
+	private PipedOutputStream outputStream;
+
+	private OutputFormat exportMethod;
+
+	CountDownLatch writerStartedBarrier;
+	CountDownLatch completeBarrier;
+	HashMap<String, byte[]> images;
+
+	private JasperReportDataProvider dataProvider;
+
+	private Collection<ReportParameter<?>> params;
+
+	private DataSource[] imagesrcs;
+
+	public RenderedReport export(JasperReportDataProvider dataProvider, OutputFormat exportMethod,
+			Collection<ReportParameter<?>> params) throws InterruptedException
 	{
 
-		final ByteArrayOutputStream out = new ByteArrayOutputStream();
-		final HashMap<String, byte[]> images = settings.getNewImageMap();
-		JRAbstractExporter exporter = null;
+		exportAsync(dataProvider, exportMethod, params);
+		completeBarrier.await();
+		return new RenderedReport(inputStream, imagesrcs, exportMethod);
 
-		// use file virtualizer to prevent out of heap
-		String fileName = "/tmp";
-		JRSwapFile file = new JRSwapFile(fileName, 100, 10);
-		JRSwapFileVirtualizer fileVirtualizer = new JRSwapFileVirtualizer(500, file);
-		boundParams.put(JRParameter.REPORT_VIRTUALIZER, fileVirtualizer);
+	}
+
+	public PipedInputStream exportAsync(JasperReportDataProvider dataProvider, OutputFormat exportMethod,
+			Collection<ReportParameter<?>> params) throws InterruptedException
+	{
+		completeBarrier = new CountDownLatch(1);
+		writerStartedBarrier = new CountDownLatch(1);
+		images = settings.getNewImageMap();
+		this.dataProvider = dataProvider;
+
+		if (params == null)
+		{
+			params = new LinkedList<ReportParameter<?>>();
+		}
+		this.params = params;
 
 		if (concurrentLimit.tryAcquire())
 		{
-			try
-			{
-
-				JasperPrint jasper_print = fillReport();
-
-				String renderedName = this.jasperReport.getName();
-
-				switch (exportMethod)
-				{
-				case HTML:
-				{
-					exporter = new JRHtmlExporter();
-
-					exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasper_print);
-					exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, out);
-					exporter.setParameter(JRHtmlExporterParameter.IMAGES_MAP, images);
-
-					String context = VaadinServlet.getCurrent().getServletContext().getContextPath();
-					int contextIndex = Page.getCurrent().getLocation().toString().lastIndexOf(context);
-					String baseurl = Page.getCurrent().getLocation().toString()
-							.substring(0, contextIndex + context.length() + 1);
-					exporter.setParameter(JRHtmlExporterParameter.IMAGES_URI, settings.getImageUriFormat(baseurl));
-
-					renderedName += ".htm";
-					break;
-				}
-				case PDF:
-				{
-					exporter = new JRPdfExporter();
-					exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasper_print);
-					exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, out);
-					renderedName += ".pdf";
-					break;
-				}
-				case CSV:
-				{
-					exporter = new JRCsvExporter();
-					exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasper_print);
-					exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, out);
-					renderedName += ".csv";
-					break;
-				}
-				default:
-				{
-					throw new RuntimeException("Unsupported export option " + exportMethod);
-				}
-
-				}
-
-				if (logger.isDebugEnabled())
-					for (Entry<JRExporterParameter, Object> param : exporter.getParameters().entrySet())
-					{
-						logger.debug("{} : {}", param.getKey(), param.getValue());
-
-					}
-
-				final DataSource[] imagesrcs = (images.size() <= 0) ? null : new DataSource[images.size()];
-				if (imagesrcs != null)
-				{
-					int xi = 0;
-					for (Map.Entry<String, byte[]> entry : images.entrySet())
-					{
-						ByteArrayDataSource image = new ByteArrayDataSource(entry.getValue(), "image/gif");
-						image.setName(entry.getKey());
-						imagesrcs[xi++] = image;
-					}
-				}
-
-				exporter.exportReport();
-
-				return new RenderedReport(this, renderedName, out, imagesrcs, exportMethod);
-			}
-			finally
-			{
-				concurrentLimit.release();
-				fileVirtualizer.cleanup();
-
-			}
+			inputStream = new PipedInputStream();
+			this.exportMethod = exportMethod;
+			new Thread(this).start();
+			writerStartedBarrier.await();
 		}
+		else
+		{
+			throw new RuntimeException("Too busy now, please try to run this report again later");
+		}
+		return inputStream;
+	}
 
-		throw new RuntimeException("Too busy now, please try to run this report again later");
+	@Override
+	public void run()
+	{
+
+		JRSwapFileVirtualizer fileVirtualizer = null;
+		try
+		{
+			outputStream = new PipedOutputStream(inputStream);
+			writerStartedBarrier.countDown();
+
+			dataProvider.initDBConnection();
+			params.addAll(dataProvider.prepareData(params, getReportFilename()));
+
+			logger.warn("Running report " + getReportFilename());
+			for (ReportParameter<?> param : params)
+			{
+				bindParameter(param.getParameterName(), param.getValue());
+				logger.warn(param.getParameterName() + " " + param.getValue());
+			}
+
+			dataProvider.prepareForOutputFormat(exportMethod);
+			CustomJRHyperlinkProducerFactory.setUseCustomHyperLinks(true);
+
+			JRAbstractExporter exporter = null;
+
+			// use file virtualizer to prevent out of heap
+			String fileName = "/tmp";
+			JRSwapFile file = new JRSwapFile(fileName, 100, 10);
+			fileVirtualizer = new JRSwapFileVirtualizer(500, file);
+			boundParams.put(JRParameter.REPORT_VIRTUALIZER, fileVirtualizer);
+
+			JasperPrint jasper_print = fillReport();
+
+			String renderedName = this.jasperReport.getName();
+
+			switch (exportMethod)
+			{
+			case HTML:
+			{
+				exporter = new JRHtmlExporter();
+
+				exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasper_print);
+				exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, outputStream);
+				exporter.setParameter(JRHtmlExporterParameter.IMAGES_MAP, images);
+
+				String context = VaadinServlet.getCurrent().getServletContext().getContextPath();
+				int contextIndex = Page.getCurrent().getLocation().toString().lastIndexOf(context);
+				String baseurl = Page.getCurrent().getLocation().toString()
+						.substring(0, contextIndex + context.length() + 1);
+				exporter.setParameter(JRHtmlExporterParameter.IMAGES_URI, settings.getImageUriFormat(baseurl));
+
+				renderedName += ".htm";
+				break;
+			}
+			case PDF:
+			{
+				exporter = new JRPdfExporter();
+				exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasper_print);
+				exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, outputStream);
+				renderedName += ".pdf";
+				break;
+			}
+			case CSV:
+			{
+				exporter = new JRCsvExporter();
+				exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasper_print);
+				exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, outputStream);
+				renderedName += ".csv";
+				break;
+			}
+			default:
+			{
+				throw new RuntimeException("Unsupported export option " + exportMethod);
+			}
+
+			}
+
+			if (logger.isDebugEnabled())
+				for (Entry<JRExporterParameter, Object> param : exporter.getParameters().entrySet())
+				{
+					logger.debug("{} : {}", param.getKey(), param.getValue());
+
+				}
+
+			imagesrcs = (images.size() <= 0) ? null : new DataSource[images.size()];
+			if (imagesrcs != null)
+			{
+				int xi = 0;
+				for (Map.Entry<String, byte[]> entry : images.entrySet())
+				{
+					ByteArrayDataSource image = new ByteArrayDataSource(entry.getValue(), "image/gif");
+					image.setName(entry.getKey());
+					imagesrcs[xi++] = image;
+				}
+			}
+
+			exporter.exportReport();
+			outputStream.close();
+
+		}
+		catch (Exception e)
+		{
+			logger.error(e, e);
+		}
+		finally
+		{
+			concurrentLimit.release();
+			dataProvider.cleanup();
+			if (fileVirtualizer != null)
+			{
+				fileVirtualizer.cleanup();
+			}
+			CustomJRHyperlinkProducerFactory.setUseCustomHyperLinks(false);
+			dataProvider.closeDBConnection();
+			completeBarrier.countDown();
+		}
 
 	}
 

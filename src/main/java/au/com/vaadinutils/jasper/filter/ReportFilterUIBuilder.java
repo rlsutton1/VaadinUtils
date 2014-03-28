@@ -1,23 +1,22 @@
-package au.com.vaadinutils.jasper;
+package au.com.vaadinutils.jasper.filter;
 
 import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.List;
 
 import net.sf.jasperreports.engine.JRParameter;
 
 import org.joda.time.DateTime;
 
-import au.com.vaadinutils.reportFilter.ReportParameter;
-import au.com.vaadinutils.reportFilter.ReportParameterDate;
-import au.com.vaadinutils.reportFilter.ReportParameterEnum;
-import au.com.vaadinutils.reportFilter.ReportParameterString;
+import au.com.vaadinutils.jasper.JasperManager;
+import au.com.vaadinutils.jasper.parameter.ReportParameter;
+import au.com.vaadinutils.jasper.parameter.ReportParameterDate;
+import au.com.vaadinutils.jasper.parameter.ReportParameterEnum;
+import au.com.vaadinutils.jasper.parameter.ReportParameterString;
 
 import com.google.gwt.thirdparty.guava.common.base.Preconditions;
-import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.AbstractLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Component;
 
 /**
  * This class is used to build report filter UI by defining how report
@@ -113,27 +112,22 @@ public class ReportFilterUIBuilder implements ReportFilterFieldBuilder, ReportFi
 	}
 
 	@Override
-	public AbstractLayout buildLayout()
+	public List<Component> buildLayout()
 	{
-		VerticalLayout layout = new VerticalLayout();
-		// layout.setSpacing(true);
-		// layout.setSizeFull();
+		List<Component>components = new LinkedList<Component>();
 
 		if (hasFilters())
 		{
-			Label filterLabel = new Label("<b>Filters</b>");
-			filterLabel.setContentMode(ContentMode.HTML);
-			layout.addComponent(filterLabel);
 
 			for (ReportParameter<?> rparam : rparams)
 			{
 				if (rparam.showFilter())
 				{
-					layout.addComponent(rparam.getComponent());
+					components.add(rparam.getComponent());
 				}
 			}
 		}
-		return layout;
+		return components;
 	}
 
 	public Collection<ReportParameter<?>> getReportParameters()

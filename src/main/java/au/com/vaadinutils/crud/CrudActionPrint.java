@@ -1,15 +1,19 @@
 package au.com.vaadinutils.crud;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import net.sf.jasperreports.engine.JRException;
 import au.com.vaadinutils.jasper.JasperManager;
-import au.com.vaadinutils.jasper.PrintWindow;
+import au.com.vaadinutils.jasper.parameter.ReportParameter;
+import au.com.vaadinutils.jasper.ui.JasperReportDataProvider;
+import au.com.vaadinutils.jasper.ui.JasperReportPopUp;
 
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
-import com.vaadin.ui.UI;
 
-public abstract class CrudActionPrint<E extends CrudEntity> implements CrudAction< E >
+public abstract class CrudActionPrint<E extends CrudEntity> implements CrudAction< E >, JasperReportDataProvider
 {
 	private static final long serialVersionUID = 1L;
 	private boolean isDefault = false;
@@ -22,9 +26,8 @@ public abstract class CrudActionPrint<E extends CrudEntity> implements CrudActio
 		{
 			manager = prepareReport(entity);
 			
-			PrintWindow window = new PrintWindow(manager);
-			
-			UI.getCurrent().addWindow(window);
+			List<ReportParameter<?>> filters = new LinkedList<ReportParameter<?>>();
+			new JasperReportPopUp(manager.getReportTitle(), manager, filters , this);
 		}
 		catch (JRException e)
 		{

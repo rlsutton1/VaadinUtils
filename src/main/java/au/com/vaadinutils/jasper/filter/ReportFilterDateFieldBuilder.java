@@ -1,4 +1,4 @@
-package au.com.vaadinutils.jasper;
+package au.com.vaadinutils.jasper.filter;
 
 import org.joda.time.DateTime;
 

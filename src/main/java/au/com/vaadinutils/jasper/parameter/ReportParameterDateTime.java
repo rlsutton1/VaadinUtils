@@ -1,4 +1,4 @@
-package au.com.vaadinutils.reportFilter;
+package au.com.vaadinutils.jasper.parameter;
 
 import java.text.SimpleDateFormat;
 

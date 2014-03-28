@@ -1,8 +1,10 @@
-package au.com.vaadinutils.jasper;
+package au.com.vaadinutils.jasper.filter;
 
-import au.com.vaadinutils.reportFilter.ReportParameter;
+import java.util.List;
 
-import com.vaadin.ui.AbstractLayout;
+import au.com.vaadinutils.jasper.parameter.ReportParameter;
+
+import com.vaadin.ui.Component;
 
 public interface ReportFilterFieldBuilder
 {
@@ -22,6 +24,6 @@ public interface ReportFilterFieldBuilder
 	ReportFilterDateFieldBuilder addDateField(String label, String paramName) ;
 	<T extends Enum<?>> ReportFilterFieldBuilder addEnumField(String label, String paramName, Class<T> class1, T day);
 	
-	AbstractLayout buildLayout();
+	List<Component> buildLayout();
 
 }

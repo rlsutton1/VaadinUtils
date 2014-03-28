@@ -1,11 +1,10 @@
-package au.com.vaadinutils.reportFilter;
+package au.com.vaadinutils.jasper.ui;
 
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-
-import net.sf.jasperreports.engine.JRException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -14,18 +13,18 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import au.com.vaadinutils.dao.EntityManagerProvider;
-import au.com.vaadinutils.jasper.CustomJRHyperlinkProducerFactory;
 import au.com.vaadinutils.jasper.JasperManager;
 import au.com.vaadinutils.jasper.JasperManager.OutputFormat;
-import au.com.vaadinutils.jasper.RenderedReport;
-import au.com.vaadinutils.jasper.ReportFilterUIBuilder;
+import au.com.vaadinutils.jasper.filter.ReportFilterUIBuilder;
+import au.com.vaadinutils.jasper.parameter.ReportParameter;
+import au.com.vaadinutils.jasper.parameter.ReportParameterConstant;
 import au.com.vaadinutils.listener.ClickEventLogged;
 
 import com.vaadin.server.ExternalResource;
-import com.vaadin.server.Resource;
+import com.vaadin.server.StreamResource;
+import com.vaadin.server.StreamResource.StreamSource;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.BrowserFrame;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -35,6 +34,7 @@ import com.vaadin.ui.HorizontalSplitPanel;
 import com.vaadin.ui.JavaScript;
 import com.vaadin.ui.JavaScriptFunction;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.NativeButton;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.VerticalLayout;
@@ -44,7 +44,7 @@ import com.vaadin.ui.themes.Reindeer;
  * Base class for a view that provides a report filter selection area and a
  * report viewing area.
  */
-public class ReportViewBase extends HorizontalSplitPanel
+ class JasperReportLayout extends HorizontalSplitPanel
 {
 	/**
 	 * 
@@ -62,9 +62,17 @@ public class ReportViewBase extends HorizontalSplitPanel
 	JasperManager manager;
 	private ReportFilterUIBuilder builder;
 
-	private ReportDataProvider dataProvider;
+	private JasperReportDataProvider dataProvider;
 
-	protected ReportViewBase(String title, JasperManager manager, ReportDataProvider dataProvider)
+	private List<Component> components;
+
+	private NativeButton showButton;
+
+	private NativeButton printButton;
+
+	private NativeButton exportButton;
+
+	protected JasperReportLayout(String title, JasperManager manager, JasperReportDataProvider dataProvider)
 	{
 		this.title = title;
 		this.manager = manager;
@@ -72,7 +80,7 @@ public class ReportViewBase extends HorizontalSplitPanel
 		this.dataProvider = dataProvider;
 	}
 
-	public void initScreen()
+	protected void initScreen()
 	{
 		this.setSizeFull();
 
@@ -100,7 +108,7 @@ public class ReportViewBase extends HorizontalSplitPanel
 		{
 			try
 			{
-				generateReport(JasperManager.OutputFormat.HTML, ReportViewBase.this.builder.getReportParameters());
+				generateReport(dataProvider.getDefaultFormat(), JasperReportLayout.this.builder.getReportParameters());
 			}
 			catch (Exception e)
 			{
@@ -156,7 +164,7 @@ public class ReportViewBase extends HorizontalSplitPanel
 						subFilters.add(new ReportParameterConstant(key, params.getString(key)));
 					}
 
-					new ReportPopUp(subTitle, subManager, subFilters, dataProvider);
+					new JasperReportPopUp(subTitle, subManager, subFilters, dataProvider);
 				}
 				catch (Exception e)
 				{
@@ -168,52 +176,74 @@ public class ReportViewBase extends HorizontalSplitPanel
 
 	}
 
-	public Component getOptionsPanel()
+	 private Component getOptionsPanel()
 	{
 		VerticalLayout layout = new VerticalLayout();
 		layout.setHeight("100%");
-		layout.setMargin(true);
+		layout.setMargin(new MarginInfo(false, false, false, false));
 		layout.setSpacing(true);
 		layout.setSizeFull();
 
+		String buttonHeight = "" + 40;
 		HorizontalLayout buttonBar = new HorizontalLayout();
 		buttonBar.setSpacing(true);
-		buttonBar.setStyleName(Reindeer.LAYOUT_BLACK);
-		buttonBar.setWidth("100");
-		buttonBar.setHeight("20");
+		buttonBar.setStyleName(Reindeer.LAYOUT_BLUE);
+		buttonBar.setWidth("100%");
+		buttonBar.setHeight(buttonHeight);
 
 		buttonBar.setMargin(new MarginInfo(false, true, false, true));
 
-		Button showButton = new Button();
-		showButton.setIcon(new ExternalResource("images/famfamicons/monitor.png"));
-		showButton.setStyleName(Reindeer.BUTTON_LINK);
-		// showButton.setWidth("70");
+		showButton = new NativeButton();
+		showButton.setIcon(new ExternalResource("images/seanau/Preview_32.png"));
+		showButton.setDescription("Preview");
+		showButton.setWidth("50");
+		showButton.setHeight(buttonHeight);
+		showButton.setDisableOnClick(true);
 		addButtonListener(showButton, OutputFormat.HTML);
 		buttonBar.addComponent(showButton);
 
-		Button printButton = new Button();
-		printButton.setIcon(new ExternalResource("images/famfamicons/printer.png"));
-		printButton.setStyleName(Reindeer.BUTTON_LINK);
+		printButton = new NativeButton();
+		printButton.setIcon(new ExternalResource("images/seanau/Print_32.png"));
+		printButton.setDescription("Print (PDF)");
+		printButton.setWidth("50");
+		printButton.setHeight(buttonHeight);
+		printButton.setDisableOnClick(true);
 		addButtonListener(printButton, OutputFormat.PDF);
 		buttonBar.addComponent(printButton);
 
-		Button exportButton = new Button();
-		exportButton.setIcon(new ExternalResource("images/famfamicons/cd.png"));
-		// exportButton.setWidth("45");
-		exportButton.setStyleName(Reindeer.BUTTON_LINK);
+		exportButton = new NativeButton();
+		exportButton.setDescription("Export (CSV)");
+		exportButton.setIcon(new ExternalResource("images/seanau/Check_32.png"));
+		exportButton.setWidth("50");
+		exportButton.setDisableOnClick(true);
+		exportButton.setHeight(buttonHeight);
+		// exportButton.setStyleName(Reindeer.BUTTON_LINK);
 		addButtonListener(exportButton, OutputFormat.CSV);
 		buttonBar.addComponent(exportButton);
 
 		layout.addComponent(buttonBar);
 
-		AbstractLayout filterLayout = builder.buildLayout();
-		layout.addComponent(filterLayout);
-		layout.setExpandRatio(filterLayout, 1.0f);
+		components = builder.buildLayout();
+		if (components.size() > 0)
+		{
+			VerticalLayout filterPanel = new VerticalLayout();
+			filterPanel.setMargin(true);
+			Label filterLabel = new Label("<b>Filters</b>");
+			filterLabel.setContentMode(ContentMode.HTML);
+			filterPanel.addComponent(filterLabel);
+
+			for (Component componet : components)
+			{
+				filterPanel.addComponent(componet);
+			}
+			layout.addComponent(filterPanel);
+			layout.setExpandRatio(filterPanel, 1.0f);
+		}
 
 		return layout;
 	}
 
-	void addButtonListener(Button button, final OutputFormat format)
+	 private void addButtonListener(Button button, final OutputFormat format)
 	{
 		button.addClickListener(new ClickEventLogged.ClickListener()
 		{
@@ -224,28 +254,31 @@ public class ReportViewBase extends HorizontalSplitPanel
 			{
 				try
 				{
-					generateReport(format, ReportViewBase.this.builder.getReportParameters());
+					printButton.setEnabled(false);
+					exportButton.setEnabled(false);
+					showButton.setEnabled(false);
+					for (Component componet : components)
+					{
+						componet.setEnabled(false);
+					}
+					generateReport(format, JasperReportLayout.this.builder.getReportParameters());
 				}
 				catch (Exception e)
 				{
 					logger.error(e, e);
 				}
+				finally
+				{
+					printButton.setEnabled(true);
+					exportButton.setEnabled(true);
+					showButton.setEnabled(true);
+					for (Component componet : components)
+					{
+						componet.setEnabled(true);
+					}
+				}
 			}
 		});
-	}
-
-	public void showReport(RenderedReport report)
-	{
-		Resource resource = report.getBodyAsResource();
-		getDisplayPanel().setSource(resource);
-	}
-
-	public void showReport(String url)
-	{
-		ExternalResource source = new ExternalResource(url);
-		// source.setMIMEType("application/pdf");
-		getDisplayPanel().setSource(source);
-
 	}
 
 	private BrowserFrame getDisplayPanel()
@@ -258,33 +291,34 @@ public class ReportViewBase extends HorizontalSplitPanel
 
 	}
 
-	protected void generateReport(JasperManager.OutputFormat outputFormat, Collection<ReportParameter<?>> params)
-			throws Exception
+	protected void generateReport(final JasperManager.OutputFormat outputFormat,final  Collection<ReportParameter<?>> params)
+			
 	{
-		if (params == null)
-		{
-			params = new LinkedList<ReportParameter<?>>();
-		}
-		params.addAll(dataProvider.prepareData(params,manager.getReportFilename()));
+		
 
-		logger.warn("Running report "+manager.getReportFilename());
-		for (ReportParameter<?> param : params)
+		@SuppressWarnings("serial")
+		StreamSource source = new StreamSource()
 		{
-			this.manager.bindParameter(param.parameterName, param.getValue());
-			logger.warn(param.parameterName+ " "+param.getValue());
-		}
 
-		try
-		{
-			dataProvider.prepareForOutputFormat(outputFormat);
-			CustomJRHyperlinkProducerFactory.setUseCustomHyperLinks(true);
-			showReport(this.manager.export(outputFormat));
-		}
-		finally
-		{
-			CustomJRHyperlinkProducerFactory.setUseCustomHyperLinks(false);
-			dataProvider.cleanup();
-		}
+			@Override
+			public InputStream getStream()
+			{
+				try
+				{
+					return manager.exportAsync(dataProvider, outputFormat,params);
+				}
+				catch (InterruptedException e)
+				{
+					logger.error(e, e);
+				}
+				return null;
+			}
+		};
+		StreamResource resource = new StreamResource(source, "report");
+		resource.setMIMEType(outputFormat.getMimeType());
+
+		getDisplayPanel().setSource(resource);
+
 	}
 
 }
