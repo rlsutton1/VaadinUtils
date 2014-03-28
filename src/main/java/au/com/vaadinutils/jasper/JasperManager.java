@@ -24,12 +24,17 @@ import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.export.JRCsvExporter;
+import net.sf.jasperreports.engine.export.JRExportProgressMonitor;
 import net.sf.jasperreports.engine.export.JRHtmlExporter;
 import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
 import net.sf.jasperreports.engine.export.JRPdfExporter;
+import net.sf.jasperreports.engine.fill.AsynchronousFillHandle;
+import net.sf.jasperreports.engine.fill.FillListener;
 import net.sf.jasperreports.engine.fill.JRSwapFileVirtualizer;
 import net.sf.jasperreports.engine.util.JRLoader;
 import net.sf.jasperreports.engine.util.JRSwapFile;
+import net.sf.jasperreports.web.servlets.AsyncJasperPrintAccessor;
+import net.sf.jasperreports.web.servlets.ReportExecutionStatus;
 
 import org.apache.commons.mail.ByteArrayDataSource;
 import org.apache.logging.log4j.LogManager;
@@ -38,6 +43,7 @@ import org.apache.logging.log4j.Logger;
 import au.com.vaadinutils.dao.Transaction;
 import au.com.vaadinutils.jasper.parameter.ReportParameter;
 import au.com.vaadinutils.jasper.ui.JasperReportDataProvider;
+import au.com.vaadinutils.listener.CompleteListener;
 
 import com.google.gwt.thirdparty.guava.common.base.Preconditions;
 import com.vaadin.server.Page;
@@ -211,9 +217,47 @@ public class JasperManager implements Runnable
 
 			java.sql.Connection connection = em.unwrap(java.sql.Connection.class);
 
-			jasper_print = JasperFillManager.fillReport(jasperReport, boundParams, connection);
+			FillListener tt;
+
+			AsynchronousFillHandle fillHandle = AsynchronousFillHandle.createHandle(jasperReport, boundParams,
+					connection);
+			fillHandle.addFillListener(new FillListener()
+			{
+
+				@Override
+				public void pageUpdated(JasperPrint jasperPrint, int pageIndex)
+				{
+					status = "pageUpdated " + pageIndex;
+				}
+
+				@Override
+				public void pageGenerated(JasperPrint jasperPrint, int pageIndex)
+				{
+					status = "pageGenerated " + pageIndex;
+				}
+			});
+
+			AsyncJasperPrintAccessor asyncAccessor = new AsyncJasperPrintAccessor(fillHandle);
+
+			fillHandle.startFill();
+
+			// jasper_print = JasperFillManager.fillReport(jasperReport,
+			// boundParams, connection);
+			while (asyncAccessor.getReportStatus().getStatus() == ReportExecutionStatus.Status.RUNNING)
+			{
+				try
+				{
+					Thread.sleep(100);
+				}
+				catch (InterruptedException e)
+				{
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 
 			t.commit();
+			return asyncAccessor.getFinalJasperPrint();
 		}
 		finally
 		{
@@ -221,7 +265,7 @@ public class JasperManager implements Runnable
 			t.close();
 		}
 
-		return jasper_print;
+		
 	}
 
 	public JasperSettings getSettings()
@@ -245,23 +289,28 @@ public class JasperManager implements Runnable
 
 	private DataSource[] imagesrcs;
 
+	private CompleteListener completeListener;
+
+	volatile private String status;
+
 	public RenderedReport export(JasperReportDataProvider dataProvider, OutputFormat exportMethod,
 			Collection<ReportParameter<?>> params) throws InterruptedException
 	{
 
-		exportAsync(dataProvider, exportMethod, params);
+		exportAsync(dataProvider, exportMethod, params, null);
 		completeBarrier.await();
 		return new RenderedReport(inputStream, imagesrcs, exportMethod);
 
 	}
 
 	public PipedInputStream exportAsync(JasperReportDataProvider dataProvider, OutputFormat exportMethod,
-			Collection<ReportParameter<?>> params) throws InterruptedException
+			Collection<ReportParameter<?>> params, CompleteListener completeListener) throws InterruptedException
 	{
 		completeBarrier = new CountDownLatch(1);
 		writerStartedBarrier = new CountDownLatch(1);
 		images = settings.getNewImageMap();
 		this.dataProvider = dataProvider;
+		this.completeListener = completeListener;
 
 		if (params == null)
 		{
@@ -293,6 +342,8 @@ public class JasperManager implements Runnable
 			outputStream = new PipedOutputStream(inputStream);
 			writerStartedBarrier.countDown();
 
+			status = "Preparing queries";
+
 			dataProvider.initDBConnection();
 			params.addAll(dataProvider.prepareData(params, getReportFilename()));
 
@@ -307,6 +358,8 @@ public class JasperManager implements Runnable
 			CustomJRHyperlinkProducerFactory.setUseCustomHyperLinks(true);
 
 			JRAbstractExporter exporter = null;
+
+			status = "Gathering data";
 
 			// use file virtualizer to prevent out of heap
 			String fileName = "/tmp";
@@ -379,8 +432,12 @@ public class JasperManager implements Runnable
 				}
 			}
 
+			createPageProgressMonitor(exporter);
+
 			exporter.exportReport();
 			outputStream.close();
+			Thread.sleep(750);
+			status = "Cleaning up";
 
 		}
 		catch (Exception e)
@@ -398,8 +455,28 @@ public class JasperManager implements Runnable
 			CustomJRHyperlinkProducerFactory.setUseCustomHyperLinks(false);
 			dataProvider.closeDBConnection();
 			completeBarrier.countDown();
+			if (completeListener != null)
+			{
+				completeListener.complete();
+			}
 		}
 
+	}
+
+	private void createPageProgressMonitor(JRAbstractExporter exporter)
+	{
+		exporter.setParameter(JRExporterParameter.PROGRESS_MONITOR, new JRExportProgressMonitor()
+		{
+			int pageCount = 0;
+
+			@Override
+			public void afterPageExport()
+			{
+				pageCount++;
+				status = "Page " + pageCount;
+
+			}
+		});
 	}
 
 	protected static String getJasperFile(final String dir, final String name) throws IOException
@@ -418,6 +495,11 @@ public class JasperManager implements Runnable
 	public String getReportTitle()
 	{
 		return jasperReport.getName();
+	}
+
+	public String getStatus()
+	{
+		return status;
 	}
 
 }

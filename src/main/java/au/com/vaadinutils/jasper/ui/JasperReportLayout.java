@@ -18,8 +18,13 @@ import au.com.vaadinutils.jasper.JasperManager.OutputFormat;
 import au.com.vaadinutils.jasper.filter.ReportFilterUIBuilder;
 import au.com.vaadinutils.jasper.parameter.ReportParameter;
 import au.com.vaadinutils.jasper.parameter.ReportParameterConstant;
+import au.com.vaadinutils.listener.CancelListener;
 import au.com.vaadinutils.listener.ClickEventLogged;
+import au.com.vaadinutils.listener.CompleteListener;
+import au.com.vaadinutils.ui.WorkingDialog;
 
+import com.github.wolfie.refresher.Refresher;
+import com.github.wolfie.refresher.Refresher.RefreshListener;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.StreamResource;
 import com.vaadin.server.StreamResource.StreamSource;
@@ -36,6 +41,7 @@ import com.vaadin.ui.JavaScriptFunction;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.NativeButton;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Reindeer;
@@ -44,7 +50,7 @@ import com.vaadin.ui.themes.Reindeer;
  * Base class for a view that provides a report filter selection area and a
  * report viewing area.
  */
- class JasperReportLayout extends HorizontalSplitPanel
+class JasperReportLayout extends HorizontalSplitPanel
 {
 	/**
 	 * 
@@ -176,7 +182,7 @@ import com.vaadin.ui.themes.Reindeer;
 
 	}
 
-	 private Component getOptionsPanel()
+	private Component getOptionsPanel()
 	{
 		VerticalLayout layout = new VerticalLayout();
 		layout.setHeight("100%");
@@ -243,7 +249,7 @@ import com.vaadin.ui.themes.Reindeer;
 		return layout;
 	}
 
-	 private void addButtonListener(Button button, final OutputFormat format)
+	private void addButtonListener(Button button, final OutputFormat format)
 	{
 		button.addClickListener(new ClickEventLogged.ClickListener()
 		{
@@ -254,6 +260,7 @@ import com.vaadin.ui.themes.Reindeer;
 			{
 				try
 				{
+
 					printButton.setEnabled(false);
 					exportButton.setEnabled(false);
 					showButton.setEnabled(false);
@@ -261,7 +268,10 @@ import com.vaadin.ui.themes.Reindeer;
 					{
 						componet.setEnabled(false);
 					}
+
 					generateReport(format, JasperReportLayout.this.builder.getReportParameters());
+
+					
 				}
 				catch (Exception e)
 				{
@@ -269,13 +279,7 @@ import com.vaadin.ui.themes.Reindeer;
 				}
 				finally
 				{
-					printButton.setEnabled(true);
-					exportButton.setEnabled(true);
-					showButton.setEnabled(true);
-					for (Component componet : components)
-					{
-						componet.setEnabled(true);
-					}
+
 				}
 			}
 		});
@@ -291,11 +295,27 @@ import com.vaadin.ui.themes.Reindeer;
 
 	}
 
-	protected void generateReport(final JasperManager.OutputFormat outputFormat,final  Collection<ReportParameter<?>> params)
-			
-	{
-		
+	protected void generateReport(final JasperManager.OutputFormat outputFormat,
+			final Collection<ReportParameter<?>> params)
 
+	{
+
+		final WorkingDialog dialog = new WorkingDialog("Generating report", "Please wait");
+		UI.getCurrent().addWindow(dialog);
+		final Refresher refresher = new Refresher();
+		RefreshListener refreshListener = new RefreshListener()
+		{
+
+			@Override
+			public void refresh(Refresher source)
+			{
+				dialog.progress(0,0,manager.getStatus());
+			}
+		};
+		refresher.addListener(refreshListener);
+		refresher.setRefreshInterval(200);
+		addExtension(refresher);
+		
 		@SuppressWarnings("serial")
 		StreamSource source = new StreamSource()
 		{
@@ -305,7 +325,24 @@ import com.vaadin.ui.themes.Reindeer;
 			{
 				try
 				{
-					return manager.exportAsync(dataProvider, outputFormat,params);
+					CompleteListener completeListener = new CompleteListener()
+					{
+
+						@Override
+						public void complete()
+						{
+							printButton.setEnabled(true);
+							exportButton.setEnabled(true);
+							showButton.setEnabled(true);
+							for (Component componet : components)
+							{
+								componet.setEnabled(true);
+							}
+							removeExtension(refresher);
+							dialog.close();
+						}
+					};
+					return manager.exportAsync(dataProvider, outputFormat, params, completeListener);
 				}
 				catch (InterruptedException e)
 				{
