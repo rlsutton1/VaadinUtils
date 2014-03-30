@@ -20,6 +20,10 @@ public class CustomJRHyperlinkProducerFactory extends JRHyperlinkProducerFactory
 		{
 			useCustomHyperLinks.set(false);
 		}
+		if (useCustomHyperLinks.get() == null)
+		{
+			useCustomHyperLinks.set(false);
+		}
 		if (useCustomHyperLinks.get())
 		{
 			return new CustomJRHyperlinkProducer();

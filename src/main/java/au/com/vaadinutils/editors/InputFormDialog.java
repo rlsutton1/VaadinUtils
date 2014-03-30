@@ -108,7 +108,7 @@ public class InputFormDialog extends Window
 	{
 		ok.setCaption(label);
 	}
-
+	
 	public void setCancelButtonLabel(String label)
 	{
 		cancelButton.setCaption(label);
