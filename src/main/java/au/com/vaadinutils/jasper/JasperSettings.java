@@ -12,9 +12,6 @@ public interface JasperSettings
 
 	File getReportFile(String reportName);
 
-	// use to default to baseurl + "images?image="
-	String getImageUriFormat(String baseurl);
 
-	HashMap<String, byte[]> getNewImageMap();
 
 }

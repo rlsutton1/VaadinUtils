@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
 
@@ -17,12 +18,18 @@ import javax.activation.DataSource;
 import javax.persistence.EntityManager;
 
 import net.sf.jasperreports.engine.JRAbstractExporter;
+import net.sf.jasperreports.engine.JRBand;
+import net.sf.jasperreports.engine.JRElement;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JRExporterParameter;
+import net.sf.jasperreports.engine.JRLine;
 import net.sf.jasperreports.engine.JRParameter;
-import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JRStaticText;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.design.JRDesignBand;
+import net.sf.jasperreports.engine.design.JRDesignElement;
+import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.export.JRCsvExporter;
 import net.sf.jasperreports.engine.export.JRExportProgressMonitor;
 import net.sf.jasperreports.engine.export.JRHtmlExporter;
@@ -42,12 +49,15 @@ import org.apache.logging.log4j.Logger;
 
 import au.com.vaadinutils.dao.Transaction;
 import au.com.vaadinutils.jasper.parameter.ReportParameter;
+import au.com.vaadinutils.jasper.servlet.VaadinJasperPrintServlet;
 import au.com.vaadinutils.jasper.ui.JasperReportDataProvider;
 import au.com.vaadinutils.listener.CompleteListener;
 
 import com.google.gwt.thirdparty.guava.common.base.Preconditions;
 import com.vaadin.server.Page;
 import com.vaadin.server.VaadinServlet;
+import com.vaadin.server.WrappedSession;
+import com.vaadin.ui.UI;
 
 public class JasperManager implements Runnable
 {
@@ -62,6 +72,8 @@ public class JasperManager implements Runnable
 	private AsynchronousFillHandle fillHandle;
 
 	volatile private boolean stop;
+
+	private String reportTitle;
 
 	private final static Semaphore concurrentLimit = new Semaphore(Math.max(
 			Runtime.getRuntime().availableProcessors() / 2, 1));
@@ -108,9 +120,10 @@ public class JasperManager implements Runnable
 	 *            path to jasper report.
 	 * @throws JRException
 	 */
-	public JasperManager(EntityManager em, String reportName, JasperSettings settings)
+	public JasperManager(EntityManager em, String reportFileName,String reportTitle, JasperSettings settings)
 	{
-		String reportDesignName = reportName.substring(0, reportName.indexOf("."));
+		this.reportTitle = reportTitle;
+		String reportDesignName = reportFileName.substring(0, reportFileName.indexOf("."));
 
 		Preconditions.checkArgument(settings.getReportFile(reportDesignName + ".jrxml").exists(),
 				"The passed Jasper Report File doesn't exist: "
@@ -118,15 +131,24 @@ public class JasperManager implements Runnable
 
 		this.em = em;
 		this.settings = settings;
-		this.reportFilename = reportName;
+		this.reportFilename = reportFileName;
 
 		try
 		{
+			// compileReport(getDesignFile(sourcePath, reportDesignName),
+			// sourcePath, sourcePath, reportDesignName);
 
-			new JasperReportCompiler().compileReport(settings.getReportFile(reportName).getParentFile(), settings
-					.getReportFile(reportName).getParentFile(), reportDesignName);
+			File sourcePath = settings.getReportFile(reportFileName).getParentFile();
+			JasperReportCompiler jasperReportCompiler = new JasperReportCompiler();
+			JasperDesign designFile = jasperReportCompiler.getDesignFile(sourcePath, reportDesignName);
 
-			this.jasperReport = (JasperReport) JRLoader.loadObject(settings.getReportFile(reportName));
+			JasperDesign headerTemplate = jasperReportCompiler.getDesignFile(sourcePath, "HeaderFooter");
+
+			replaceHeader(designFile, headerTemplate);
+
+			jasperReportCompiler.compileReport(designFile, sourcePath, sourcePath, reportDesignName);
+
+			this.jasperReport = (JasperReport) JRLoader.loadObject(settings.getReportFile(reportFileName));
 
 		}
 		catch (Throwable e)
@@ -134,6 +156,58 @@ public class JasperManager implements Runnable
 			logger.error(e, e);
 			throw new RuntimeException("Bad report compilation");
 		}
+
+	}
+
+	private void replaceHeader(JasperDesign designFile, JasperDesign template)
+	{
+		JRBand header = template.getTitle();
+		JRDesignBand newTitle = new JRDesignBand();
+
+		int maxY = 0;
+
+
+		
+		for (JRElement element : header.getElements())
+		{
+			if (element instanceof JRDesignElement)
+			{
+				JRDesignElement de = (JRDesignElement) element;
+				if (element instanceof JRStaticText)
+				{
+					JRStaticText st = (JRStaticText) element;
+					if (st.getText().equalsIgnoreCase("report name place holder"))
+					{
+						st.setText(reportTitle);
+					}
+				}
+				
+				maxY = Math.max(maxY, de.getY()+de.getHeight());
+				
+				
+				newTitle.addElement(de);
+			}
+
+		}
+		
+		int yoffset = maxY;
+		for (JRElement element : designFile.getTitle().getElements())
+		{
+			if (!(element instanceof JRLine))
+			{
+				
+				JRDesignElement de = (JRDesignElement) element;
+				de.setY(de.getY() + yoffset);
+				maxY = Math.max(maxY, de.getY() + element.getHeight());
+				newTitle.addElement(element);
+			}
+		}
+		
+		newTitle.setHeight(maxY + 2);
+		designFile.setTitle(newTitle);
+
+		JRBand footer = template.getPageFooter();
+		designFile.setPageFooter(footer);
 
 	}
 
@@ -243,7 +317,7 @@ public class JasperManager implements Runnable
 			if (!stop)
 			{
 				fillHandle.startFill();
-				
+
 			}
 
 			// jasper_print = JasperFillManager.fillReport(jasperReport,
@@ -256,8 +330,7 @@ public class JasperManager implements Runnable
 				}
 				catch (InterruptedException e)
 				{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					logger.error(e, e);
 				}
 			}
 
@@ -275,7 +348,7 @@ public class JasperManager implements Runnable
 	public void cancelPrint()
 	{
 		stop = true;
-		
+
 	}
 
 	public JasperSettings getSettings()
@@ -291,7 +364,7 @@ public class JasperManager implements Runnable
 
 	CountDownLatch writerStartedBarrier;
 	CountDownLatch completeBarrier;
-	HashMap<String, byte[]> images;
+	Map<String, byte[]> images;
 
 	private JasperReportDataProvider dataProvider;
 
@@ -316,10 +389,14 @@ public class JasperManager implements Runnable
 	public PipedInputStream exportAsync(JasperReportDataProvider dataProvider, OutputFormat exportMethod,
 			Collection<ReportParameter<?>> params, CompleteListener completeListener) throws InterruptedException
 	{
+
+		WrappedSession session = UI.getCurrent().getSession().getSession();
+		images = new ConcurrentHashMap<String, byte[]>();
+		session.setAttribute(VaadinJasperPrintServlet.IMAGES_MAP, images);
+
 		stop = false;
 		completeBarrier = new CountDownLatch(1);
 		writerStartedBarrier = new CountDownLatch(1);
-		images = settings.getNewImageMap();
 		this.dataProvider = dataProvider;
 		this.completeListener = completeListener;
 
@@ -383,6 +460,7 @@ public class JasperManager implements Runnable
 			{
 				return;
 			}
+
 			JasperPrint jasper_print = fillReport();
 
 			String renderedName = this.jasperReport.getName();
@@ -401,7 +479,10 @@ public class JasperManager implements Runnable
 				int contextIndex = Page.getCurrent().getLocation().toString().lastIndexOf(context);
 				String baseurl = Page.getCurrent().getLocation().toString()
 						.substring(0, contextIndex + context.length() + 1);
-				exporter.setParameter(JRHtmlExporterParameter.IMAGES_URI, settings.getImageUriFormat(baseurl));
+
+				String imageUrl = baseurl + "VaadinJasperPrintServlet?image=";
+
+				exporter.setParameter(JRHtmlExporterParameter.IMAGES_URI, imageUrl);
 
 				renderedName += ".htm";
 				break;

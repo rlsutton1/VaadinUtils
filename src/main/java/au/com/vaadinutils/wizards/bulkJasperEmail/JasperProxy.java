@@ -19,12 +19,12 @@ public class JasperProxy
 	private JasperEmailSettings emailSettings;
 
 	public JasperProxy(String reportName, String subject, String senderEmailAddress, JasperSettings settings
-			, JasperEmailSettings emailSettings) throws JRException
+			, JasperEmailSettings emailSettings, String title) throws JRException
 	{
 		EntityManager em = EntityManagerProvider.createEntityManager();
 		this.settings = settings;
 		this.emailSettings = emailSettings;
-		this.manager = new JasperManager(em, reportName, settings);
+		this.manager = new JasperManager(em, reportName,title, settings);
 		this.subject = subject;
 		this.senderEmailAddress = senderEmailAddress;
 	}

@@ -36,29 +36,73 @@ public class JasperReportCompiler
 	Logger logger = LogManager.getLogger();
 	protected Throwable subReportException;
 
-	public JasperReport compileReport(final File sourcePath, final File outputPath, String reportName) throws Throwable
+	public JasperReport compileReportIfNeeded(JasperDesign jasperDesign, final File sourcePath, final File outputPath,
+			String reportName) throws Throwable
 	{
-		JasperReport jasperReport = null;
-		File sourceReport = new File(sourcePath.getAbsoluteFile() + "/" + reportName + ".jrxml");
-		File outputReport = new File(outputPath.getAbsolutePath() + "/" + reportName + ".jasper");
-		if (!outputReport.exists() || sourceReport.lastModified() > outputReport.lastModified())
+		JasperReport report;
+		if (checkIfReportNeedsCompile(sourcePath, outputPath, reportName))
 		{
-			JasperDesign jasperDesign = JRXmlLoader.load(sourceReport);
-			jasperReport = JasperCompileManager.compileReport(jasperDesign);
-			JRSaver.saveObject(jasperReport, outputReport);
-			logger.warn("Saving compiled report : " + outputReport.getName());
+			JasperDesign design = getDesignFile(sourcePath, reportName);
+			report = compileReport(jasperDesign, sourcePath, outputPath, reportName);
 		}
 		else
 		{
+			File outputReport = new File(outputPath.getAbsolutePath() + "/" + reportName + ".jasper");
+
 			logger.warn("Report " + outputReport.getName() + " is up to date");
-			jasperReport = (JasperReport) JRLoader.loadObject(outputReport);
+			report = (JasperReport) JRLoader.loadObject(outputReport);
+
 		}
+		return report;
+	}
+
+	public JasperDesign getDesignFile(final File sourcePath, String reportName) throws Throwable
+	{
+		File sourceReport = new File(sourcePath.getAbsoluteFile() + "/" + reportName + ".jrxml");
+		return JRXmlLoader.load(sourceReport);
+
+	}
+
+	public JasperReport compileReport( final File sourcePath, final File outputPath,
+			String reportName) throws Throwable
+	{
+		JasperReport jasperReport = null;
+		JasperDesign jasperDesign = getDesignFile(sourcePath, reportName);
+		File outputReport = new File(outputPath.getAbsolutePath() + "/" + reportName + ".jasper");
+		jasperReport = JasperCompileManager.compileReport(jasperDesign);
+		JRSaver.saveObject(jasperReport, outputReport);
+		logger.warn("Saving compiled report : " + outputReport.getName());
+
 		// Compile sub reports
 		JRElementsVisitor.visitReport(jasperReport, createVisitor(sourcePath, outputPath));
 
 		if (subReportException != null)
 			throw new RuntimeException(subReportException);
 		return jasperReport;
+	}
+	
+	public JasperReport compileReport(JasperDesign jasperDesign, final File sourcePath, final File outputPath,
+			String reportName) throws Throwable
+	{
+		JasperReport jasperReport = null;
+		File outputReport = new File(outputPath.getAbsolutePath() + "/" + reportName + ".jasper");
+		jasperReport = JasperCompileManager.compileReport(jasperDesign);
+		JRSaver.saveObject(jasperReport, outputReport);
+		logger.warn("Saving compiled report : " + outputReport.getName());
+
+		// Compile sub reports
+		JRElementsVisitor.visitReport(jasperReport, createVisitor(sourcePath, outputPath));
+
+		if (subReportException != null)
+			throw new RuntimeException(subReportException);
+		return jasperReport;
+	}
+
+	public boolean checkIfReportNeedsCompile(final File sourcePath, final File outputPath, String reportName)
+	{
+		File sourceReport = new File(sourcePath.getAbsoluteFile() + "/" + reportName + ".jrxml");
+		File outputReport = new File(outputPath.getAbsolutePath() + "/" + reportName + ".jasper");
+		return !outputReport.exists() || sourceReport.lastModified() > outputReport.lastModified();
 	}
 
 	private JRVisitor createVisitor(final File sourcePath, final File outputPath)
@@ -133,7 +177,7 @@ public class JasperReportCompiler
 					if (completedSubReports.contains(subReportName))
 						return;
 					completedSubReports.add(subReportName);
-					compileReport(sourcePath, outputPath, subReportName);
+					compileReport( sourcePath, outputPath, subReportName);
 				}
 				catch (Throwable e)
 				{

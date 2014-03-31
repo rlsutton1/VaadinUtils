@@ -160,7 +160,7 @@ class JasperReportLayout extends HorizontalSplitPanel
 					JSONObject params = arguments.getJSONObject(1);
 
 					JasperManager subManager = new JasperManager(EntityManagerProvider.getEntityManager(),
-							subReportFileName, manager.getSettings());
+							subReportFileName,title, manager.getSettings());
 
 					List<ReportParameter<?>> subFilters = new LinkedList<ReportParameter<?>>();
 
@@ -221,7 +221,7 @@ class JasperReportLayout extends HorizontalSplitPanel
 
 		exportButton = new NativeButton();
 		exportButton.setDescription("Export (CSV)");
-		exportButton.setIcon(new ExternalResource("images/seanau/Check_32.png"));
+		exportButton.setIcon(new ExternalResource("images/exporttoexcel.png"));
 		exportButton.setWidth("50");
 		exportButton.setDisableOnClick(true);
 		exportButton.setHeight(buttonHeight);
@@ -292,6 +292,7 @@ class JasperReportLayout extends HorizontalSplitPanel
 		displayPanel = new BrowserFrame("Report Display");
 		displayPanel.setSizeFull();
 		displayPanel.setStyleName("njadmin-hide-overflow-for-help");
+		displayPanel.setImmediate(true);
 		this.setSecondComponent(displayPanel);
 		return displayPanel;
 
@@ -319,7 +320,8 @@ class JasperReportLayout extends HorizontalSplitPanel
 		StreamSource source = getReportStream(outputFormat, params, dialog, refresher);
 		StreamResource resource = new StreamResource(source, "report");
 		resource.setMIMEType(outputFormat.getMimeType());
-
+		resource.setCacheTime(-1);
+		resource.setFilename("jr-"+System.currentTimeMillis());
 		getDisplayPanel().setSource(resource);
 		
 
