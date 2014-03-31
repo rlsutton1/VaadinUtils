@@ -59,6 +59,10 @@ public class JasperManager implements Runnable
 	private final EntityManager em;
 	private final String reportFilename;
 
+	private AsynchronousFillHandle fillHandle;
+
+	volatile private boolean stop;
+
 	private final static Semaphore concurrentLimit = new Semaphore(Math.max(
 			Runtime.getRuntime().availableProcessors() / 2, 1));
 
@@ -217,29 +221,30 @@ public class JasperManager implements Runnable
 
 			java.sql.Connection connection = em.unwrap(java.sql.Connection.class);
 
-			FillListener tt;
-
-			AsynchronousFillHandle fillHandle = AsynchronousFillHandle.createHandle(jasperReport, boundParams,
-					connection);
+			fillHandle = AsynchronousFillHandle.createHandle(jasperReport, boundParams, connection);
 			fillHandle.addFillListener(new FillListener()
 			{
 
 				@Override
 				public void pageUpdated(JasperPrint jasperPrint, int pageIndex)
 				{
-					status = "pageUpdated " + pageIndex;
+					status = "Filling page " + pageIndex;
 				}
 
 				@Override
 				public void pageGenerated(JasperPrint jasperPrint, int pageIndex)
 				{
-					status = "pageGenerated " + pageIndex;
+					status = "Generating page " + pageIndex;
 				}
 			});
 
 			AsyncJasperPrintAccessor asyncAccessor = new AsyncJasperPrintAccessor(fillHandle);
 
-			fillHandle.startFill();
+			if (!stop)
+			{
+				fillHandle.startFill();
+				
+			}
 
 			// jasper_print = JasperFillManager.fillReport(jasperReport,
 			// boundParams, connection);
@@ -265,6 +270,11 @@ public class JasperManager implements Runnable
 			t.close();
 		}
 
+	}
+
+	public void cancelPrint()
+	{
+		stop = true;
 		
 	}
 
@@ -306,6 +316,7 @@ public class JasperManager implements Runnable
 	public PipedInputStream exportAsync(JasperReportDataProvider dataProvider, OutputFormat exportMethod,
 			Collection<ReportParameter<?>> params, CompleteListener completeListener) throws InterruptedException
 	{
+		stop = false;
 		completeBarrier = new CountDownLatch(1);
 		writerStartedBarrier = new CountDownLatch(1);
 		images = settings.getNewImageMap();
@@ -327,6 +338,7 @@ public class JasperManager implements Runnable
 		}
 		else
 		{
+			completeListener.complete();
 			throw new RuntimeException("Too busy now, please try to run this report again later");
 		}
 		return inputStream;
@@ -359,7 +371,7 @@ public class JasperManager implements Runnable
 
 			JRAbstractExporter exporter = null;
 
-			status = "Gathering data";
+			status = "Gathering report data";
 
 			// use file virtualizer to prevent out of heap
 			String fileName = "/tmp";
@@ -367,6 +379,10 @@ public class JasperManager implements Runnable
 			fileVirtualizer = new JRSwapFileVirtualizer(500, file);
 			boundParams.put(JRParameter.REPORT_VIRTUALIZER, fileVirtualizer);
 
+			if (stop)
+			{
+				return;
+			}
 			JasperPrint jasper_print = fillReport();
 
 			String renderedName = this.jasperReport.getName();
@@ -432,10 +448,14 @@ public class JasperManager implements Runnable
 				}
 			}
 
+			if (stop)
+			{
+				return;
+			}
 			createPageProgressMonitor(exporter);
 
 			exporter.exportReport();
-			outputStream.close();
+
 			Thread.sleep(750);
 			status = "Cleaning up";
 
@@ -446,6 +466,15 @@ public class JasperManager implements Runnable
 		}
 		finally
 		{
+			try
+			{
+				outputStream.close();
+			}
+			catch (IOException e)
+			{
+				logger.error(e, e);
+			}
+
 			concurrentLimit.release();
 			dataProvider.cleanup();
 			if (fileVirtualizer != null)
@@ -473,7 +502,7 @@ public class JasperManager implements Runnable
 			public void afterPageExport()
 			{
 				pageCount++;
-				status = "Page " + pageCount;
+				status = "Rendering page " + pageCount;
 
 			}
 		});

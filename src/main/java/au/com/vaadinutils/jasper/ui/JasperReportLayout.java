@@ -78,6 +78,8 @@ class JasperReportLayout extends HorizontalSplitPanel
 
 	private NativeButton exportButton;
 
+	private VerticalLayout splash;
+
 	protected JasperReportLayout(String title, JasperManager manager, JasperReportDataProvider dataProvider)
 	{
 		this.title = title;
@@ -97,7 +99,7 @@ class JasperReportLayout extends HorizontalSplitPanel
 			setSplitPosition(10);
 		}
 
-		VerticalLayout splash = new VerticalLayout();
+		splash = new VerticalLayout();
 		splash.setMargin(true);
 
 		Label titleLabel = new Label("<h1>" + title + "</h1>");
@@ -295,27 +297,37 @@ class JasperReportLayout extends HorizontalSplitPanel
 
 	}
 
+	private boolean cancelled;
+
 	protected void generateReport(final JasperManager.OutputFormat outputFormat,
 			final Collection<ReportParameter<?>> params)
 
 	{
 
-		final WorkingDialog dialog = new WorkingDialog("Generating report", "Please wait");
+		CancelListener cancelListener = getProgressDialogCancelListener();
+		final WorkingDialog dialog = new WorkingDialog("Generating report", "Please wait", cancelListener );
+		
+		
+		
 		UI.getCurrent().addWindow(dialog);
 		final Refresher refresher = new Refresher();
-		RefreshListener refreshListener = new RefreshListener()
-		{
-
-			@Override
-			public void refresh(Refresher source)
-			{
-				dialog.progress(0,0,manager.getStatus());
-			}
-		};
+		RefreshListener refreshListener = getProgressDialogRefreshListener(dialog, refresher);
 		refresher.addListener(refreshListener);
 		refresher.setRefreshInterval(200);
 		addExtension(refresher);
 		
+		StreamSource source = getReportStream(outputFormat, params, dialog, refresher);
+		StreamResource resource = new StreamResource(source, "report");
+		resource.setMIMEType(outputFormat.getMimeType());
+
+		getDisplayPanel().setSource(resource);
+		
+
+	}
+
+	private StreamSource getReportStream(final JasperManager.OutputFormat outputFormat,
+			final Collection<ReportParameter<?>> params, final WorkingDialog dialog, final Refresher refresher)
+	{
 		@SuppressWarnings("serial")
 		StreamSource source = new StreamSource()
 		{
@@ -348,14 +360,62 @@ class JasperReportLayout extends HorizontalSplitPanel
 				{
 					logger.error(e, e);
 				}
+				catch (RuntimeException e)
+				{
+					Notification.show(e.getMessage(),Type.ERROR_MESSAGE);
+				}
 				return null;
 			}
 		};
-		StreamResource resource = new StreamResource(source, "report");
-		resource.setMIMEType(outputFormat.getMimeType());
+		return source;
+	}
 
-		getDisplayPanel().setSource(resource);
+	private RefreshListener getProgressDialogRefreshListener(final WorkingDialog dialog, final Refresher refresher)
+	{
+		RefreshListener refreshListener = new RefreshListener()
+		{
 
+			private static final long serialVersionUID = -5641305025399715756L;
+
+			@Override
+			public void refresh(Refresher source)
+			{
+				dialog.progress(0,0,manager.getStatus());
+				if (cancelled)
+				{
+					printButton.setEnabled(true);
+					exportButton.setEnabled(true);
+					showButton.setEnabled(true);
+					for (Component componet : components)
+					{
+						componet.setEnabled(true);
+					}
+					removeExtension(refresher);
+					dialog.close();
+				}
+			}
+		};
+		return refreshListener;
+	}
+
+	private CancelListener getProgressDialogCancelListener()
+	{
+		cancelled = false;
+		CancelListener cancelListener = new CancelListener()
+		{
+			
+	
+			@Override
+			public void cancel()
+			{
+				manager.cancelPrint();
+				cancelled = true;
+				
+				// change to the splash page as the report may still complete
+				JasperReportLayout.this.setSecondComponent(splash);
+			}
+		};
+		return cancelListener;
 	}
 
 }
