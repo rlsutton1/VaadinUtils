@@ -1,6 +1,7 @@
 package au.com.vaadinutils.jasper.parameter;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.joda.time.DateTime;
 
@@ -12,7 +13,7 @@ public class ReportParameterDateTime extends ReportParameter<String>
 {
 	protected DateField field;
 
-	String parameterFormat = "yyyy/MM/dd HH:mm:ss";
+	protected String parameterFormat = "yyyy/MM/dd HH:mm:ss";
 
 	/**
 	 * 
@@ -31,7 +32,7 @@ public class ReportParameterDateTime extends ReportParameter<String>
 			String parameterFormat)
 	{
 		super(parameterName);
-		field = new DateField(caption, new DateTime().withTimeAtStartOfDay().toDate());
+		field = new DateField(caption, new DateTime().toDate());
 		field.setResolution(resolution);
 		field.setDateFormat(displayFormat);
 		this.parameterFormat = parameterFormat;
@@ -51,6 +52,11 @@ public class ReportParameterDateTime extends ReportParameter<String>
 	{
 		SimpleDateFormat sdf = new SimpleDateFormat(parameterFormat);
 		return sdf.format(field.getValue());
+	}
+	
+	public Date getDate()
+	{
+		return field.getValue();
 	}
 
 	@Override

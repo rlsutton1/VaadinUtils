@@ -23,6 +23,13 @@ public class CrudPanelSplitPairHorizontal extends HorizontalSplitPanel implement
 		super.setSplitPosition(pos);
 
 	}
+	
+	@Override
+	public void setLocked()
+	{
+		super.setLocked(true);
+	}
+	
 	@Override
 	public void showFirstComponet()
 	{

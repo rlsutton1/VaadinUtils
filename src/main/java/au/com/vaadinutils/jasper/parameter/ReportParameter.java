@@ -38,7 +38,7 @@ public abstract class ReportParameter<T>
 	public void setLabel(String label)
 	{
 		this.label = label;
-		
+
 	}
 
 	public boolean showFilter()
@@ -49,7 +49,7 @@ public abstract class ReportParameter<T>
 	public void setParameterName(String newName)
 	{
 		parameterName = newName;
-		
+
 	}
-	
+
 }

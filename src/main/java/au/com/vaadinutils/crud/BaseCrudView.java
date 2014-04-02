@@ -106,6 +106,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	@SuppressWarnings("unused")
 	private boolean disallowDelete = false;
 	private Label actionLabel;
+	private boolean noEditor;
 
 	protected BaseCrudView()
 	{
@@ -214,28 +215,47 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		/* Put a little margin around the fields in the right side editor */
 		Panel scroll = new Panel();
 		// mainEditPanel.setDescription("BaseCrud:MainEditPanel");
-		mainEditPanel.setVisible(true);
-		mainEditPanel.setSizeFull();
-		mainEditPanel.setId("MailEditPanel");
-		scroll.setSizeFull();
-		scroll.setContent(mainEditPanel);
 
+		if (!noEditor)
+		{
+			mainEditPanel.setVisible(true);
+			mainEditPanel.setSizeFull();
+			mainEditPanel.setId("MailEditPanel");
+			scroll.setSizeFull();
+			scroll.setContent(mainEditPanel);
+			rightLayout.addComponent(scroll);
+			rightLayout.setExpandRatio(scroll, 1.0f);
+			rightLayout.setSizeFull();
+			rightLayout.setId("rightLayout");
+
+			editor = buildEditor(fieldGroup);
+			Preconditions.checkNotNull(
+					editor,
+					"Your editor implementation returned null!, you better create an editor. "
+							+ entityClass.getSimpleName());
+			mainEditPanel.addComponent(editor);
+			
+		}else
+		{
+			this.setSplitPosition(100);
+			splitPanel.setLocked();
+		}
 		buildActionLayout();
 
 		leftLayout.addComponent(actionLayout);
-		rightLayout.addComponent(scroll);
-		rightLayout.setExpandRatio(scroll, 1.0f);
-		rightLayout.setSizeFull();
-		rightLayout.setId("rightLayout");
 
 		addSaveAndCancelButtons();
 
-		editor = buildEditor(fieldGroup);
-		Preconditions.checkNotNull(editor, "Your editor implementation returned null!, you better create an editor. "
-				+ entityClass.getSimpleName());
-		mainEditPanel.addComponent(editor);
-
 		rightLayout.setVisible(false);
+	}
+
+	/**
+	 * call this method before init if you intend not to provide an editor
+	 */
+	public void noEditor()
+	{
+		noEditor = true;
+		
 	}
 
 	protected String getTitleText()

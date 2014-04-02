@@ -99,8 +99,9 @@ public class WorkingDialog extends Window implements ProgressListener<String>
 		this.setClosable(false);
 		this.setResizable(false);
 		content = new VerticalLayout();
-		content.setWidth("300px");
-		content.setHeight("100px");
+//		this.setWidth("100px");
+		this.setHeight("150px");
+		content.setSizeFull();
 		content.setMargin(true);
 		content.setSpacing(true);
 

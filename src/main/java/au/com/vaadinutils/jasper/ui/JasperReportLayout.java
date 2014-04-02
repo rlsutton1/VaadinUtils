@@ -15,7 +15,9 @@ import org.json.JSONObject;
 import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.jasper.JasperManager;
 import au.com.vaadinutils.jasper.JasperManager.OutputFormat;
+import au.com.vaadinutils.jasper.filter.ExpanderComponent;
 import au.com.vaadinutils.jasper.filter.ReportFilterUIBuilder;
+import au.com.vaadinutils.jasper.parameter.ReportChooser;
 import au.com.vaadinutils.jasper.parameter.ReportParameter;
 import au.com.vaadinutils.jasper.parameter.ReportParameterConstant;
 import au.com.vaadinutils.listener.CancelListener;
@@ -25,6 +27,7 @@ import au.com.vaadinutils.ui.WorkingDialog;
 
 import com.github.wolfie.refresher.Refresher;
 import com.github.wolfie.refresher.Refresher.RefreshListener;
+import com.google.common.base.Preconditions;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.StreamResource;
 import com.vaadin.server.StreamResource.StreamSource;
@@ -70,7 +73,7 @@ class JasperReportLayout extends HorizontalSplitPanel
 
 	private JasperReportDataProvider dataProvider;
 
-	private List<Component> components;
+	private List<ExpanderComponent> components;
 
 	private NativeButton showButton;
 
@@ -160,7 +163,7 @@ class JasperReportLayout extends HorizontalSplitPanel
 					JSONObject params = arguments.getJSONObject(1);
 
 					JasperManager subManager = new JasperManager(EntityManagerProvider.getEntityManager(),
-							subReportFileName,title, manager.getSettings());
+							subReportFileName, title, manager.getSettings());
 
 					List<ReportParameter<?>> subFilters = new LinkedList<ReportParameter<?>>();
 
@@ -220,7 +223,7 @@ class JasperReportLayout extends HorizontalSplitPanel
 		buttonBar.addComponent(printButton);
 
 		exportButton = new NativeButton();
-		exportButton.setDescription("Export (CSV)");
+		exportButton.setDescription("Export (Excel - CSV)");
 		exportButton.setIcon(new ExternalResource("images/exporttoexcel.png"));
 		exportButton.setWidth("50");
 		exportButton.setDisableOnClick(true);
@@ -236,13 +239,19 @@ class JasperReportLayout extends HorizontalSplitPanel
 		{
 			VerticalLayout filterPanel = new VerticalLayout();
 			filterPanel.setMargin(true);
+			filterPanel.setSpacing(true);
+			filterPanel.setSizeFull();
 			Label filterLabel = new Label("<b>Filters</b>");
 			filterLabel.setContentMode(ContentMode.HTML);
 			filterPanel.addComponent(filterLabel);
 
-			for (Component componet : components)
+			for (ExpanderComponent componet : components)
 			{
-				filterPanel.addComponent(componet);
+				filterPanel.addComponent(componet.getComponent());
+				if (componet.shouldExpand())
+				{
+					filterPanel.setExpandRatio(componet.getComponent(), 1);
+				}
 			}
 			layout.addComponent(filterPanel);
 			layout.setExpandRatio(filterPanel, 1.0f);
@@ -266,17 +275,24 @@ class JasperReportLayout extends HorizontalSplitPanel
 					printButton.setEnabled(false);
 					exportButton.setEnabled(false);
 					showButton.setEnabled(false);
-					for (Component componet : components)
+					for (ExpanderComponent componet : components)
 					{
-						componet.setEnabled(false);
+						componet.getComponent().setEnabled(false);
 					}
 
 					generateReport(format, JasperReportLayout.this.builder.getReportParameters());
 
-					
 				}
 				catch (Exception e)
 				{
+					printButton.setEnabled(true);
+					exportButton.setEnabled(true);
+					showButton.setEnabled(true);
+					for (ExpanderComponent componet : components)
+					{
+						componet.getComponent().setEnabled(true);
+					}
+					Notification.show(e.getMessage(),Type.ERROR_MESSAGE);
 					logger.error(e, e);
 				}
 				finally
@@ -305,25 +321,34 @@ class JasperReportLayout extends HorizontalSplitPanel
 
 	{
 
+		for (ReportParameter<?> p : params)
+		{
+			if (p instanceof ReportChooser)
+			{
+				ReportChooser chooser = (ReportChooser) p;
+				manager = chooser.getJasperManager();
+				Preconditions.checkNotNull(manager,"chooser returned a NULL JasperManager.");
+				break;
+			}
+		}
+
 		CancelListener cancelListener = getProgressDialogCancelListener();
-		final WorkingDialog dialog = new WorkingDialog("Generating report", "Please wait", cancelListener );
-		
-		
-		
+		final WorkingDialog dialog = new WorkingDialog("Generating report", "Please wait", cancelListener);
+		dialog.setWidth("400");
+
 		UI.getCurrent().addWindow(dialog);
 		final Refresher refresher = new Refresher();
 		RefreshListener refreshListener = getProgressDialogRefreshListener(dialog, refresher);
 		refresher.addListener(refreshListener);
 		refresher.setRefreshInterval(200);
 		addExtension(refresher);
-		
+
 		StreamSource source = getReportStream(outputFormat, params, dialog, refresher);
 		StreamResource resource = new StreamResource(source, "report");
 		resource.setMIMEType(outputFormat.getMimeType());
 		resource.setCacheTime(-1);
-		resource.setFilename("jr-"+System.currentTimeMillis());
+		resource.setFilename("jr-" + System.currentTimeMillis());
 		getDisplayPanel().setSource(resource);
-		
 
 	}
 
@@ -348,9 +373,9 @@ class JasperReportLayout extends HorizontalSplitPanel
 							printButton.setEnabled(true);
 							exportButton.setEnabled(true);
 							showButton.setEnabled(true);
-							for (Component componet : components)
+							for (ExpanderComponent componet : components)
 							{
-								componet.setEnabled(true);
+								componet.getComponent().setEnabled(true);
 							}
 							removeExtension(refresher);
 							dialog.close();
@@ -364,7 +389,7 @@ class JasperReportLayout extends HorizontalSplitPanel
 				}
 				catch (RuntimeException e)
 				{
-					Notification.show(e.getMessage(),Type.ERROR_MESSAGE);
+					Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
 				}
 				return null;
 			}
@@ -382,15 +407,15 @@ class JasperReportLayout extends HorizontalSplitPanel
 			@Override
 			public void refresh(Refresher source)
 			{
-				dialog.progress(0,0,manager.getStatus());
+				dialog.progress(0, 0, manager.getStatus());
 				if (cancelled)
 				{
 					printButton.setEnabled(true);
 					exportButton.setEnabled(true);
 					showButton.setEnabled(true);
-					for (Component componet : components)
+					for (ExpanderComponent componet : components)
 					{
-						componet.setEnabled(true);
+						componet.getComponent().setEnabled(true);
 					}
 					removeExtension(refresher);
 					dialog.close();
@@ -405,14 +430,13 @@ class JasperReportLayout extends HorizontalSplitPanel
 		cancelled = false;
 		CancelListener cancelListener = new CancelListener()
 		{
-			
-	
+
 			@Override
 			public void cancel()
 			{
 				manager.cancelPrint();
 				cancelled = true;
-				
+
 				// change to the splash page as the report may still complete
 				JasperReportLayout.this.setSecondComponent(splash);
 			}

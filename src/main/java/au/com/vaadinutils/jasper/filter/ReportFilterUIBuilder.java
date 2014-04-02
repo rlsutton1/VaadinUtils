@@ -10,6 +10,7 @@ import net.sf.jasperreports.engine.JRParameter;
 import org.joda.time.DateTime;
 
 import au.com.vaadinutils.jasper.JasperManager;
+import au.com.vaadinutils.jasper.parameter.ReportChooser;
 import au.com.vaadinutils.jasper.parameter.ReportParameter;
 import au.com.vaadinutils.jasper.parameter.ReportParameterDate;
 import au.com.vaadinutils.jasper.parameter.ReportParameterEnum;
@@ -77,15 +78,18 @@ public class ReportFilterUIBuilder implements ReportFilterFieldBuilder, ReportFi
 		{
 			parameterName = parameterName.substring("ReportParameter".length(), parameterName.length());
 		}
-		Preconditions.checkArgument(this.manager.paramExists(parameterName), "The passed Jasper Report parameter: "
-				+ parameterName + " does not exist in the Report " + manager.getReportFilename()
-				+ ", valid parameters are " + getParameterList());
-		JRParameter jrParam = manager.getParameter(parameterName);
+		// ReportChooser is not actually a report parameter
+		if (!(param instanceof ReportChooser))
+		{
+			Preconditions.checkArgument(this.manager.paramExists(parameterName), "The passed Jasper Report parameter: "
+					+ parameterName + " does not exist in the Report " + manager.getReportFilename()
+					+ ", valid parameters are " + getParameterList());
+			JRParameter jrParam = manager.getParameter(parameterName);
 
-		String expectedClass = param.getExpectedParameterClassName();
-		Preconditions.checkArgument(expectedClass == null || jrParam.getValueClassName().equals(expectedClass),
-				"Expected " + expectedClass + " but the ReportParameter type is " + jrParam.getValueClassName());
-
+			String expectedClass = param.getExpectedParameterClassName();
+			Preconditions.checkArgument(expectedClass == null || jrParam.getValueClassName().equals(expectedClass),
+					"Expected " + expectedClass + " but the ReportParameter type is " + jrParam.getValueClassName());
+		}
 		rparams.add(param);
 
 		return this;
@@ -112,9 +116,9 @@ public class ReportFilterUIBuilder implements ReportFilterFieldBuilder, ReportFi
 	}
 
 	@Override
-	public List<Component> buildLayout()
+	public List<ExpanderComponent> buildLayout()
 	{
-		List<Component>components = new LinkedList<Component>();
+		List<ExpanderComponent> components = new LinkedList<ExpanderComponent>();
 
 		if (hasFilters())
 		{
@@ -123,7 +127,7 @@ public class ReportFilterUIBuilder implements ReportFilterFieldBuilder, ReportFi
 			{
 				if (rparam.showFilter())
 				{
-					components.add(rparam.getComponent());
+					components.add(new ExpanderComponent(rparam.getComponent(),rparam.shouldExpand()));
 				}
 			}
 		}

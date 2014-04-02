@@ -22,13 +22,14 @@ import net.sf.jasperreports.engine.JRBand;
 import net.sf.jasperreports.engine.JRElement;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JRExporterParameter;
-import net.sf.jasperreports.engine.JRLine;
 import net.sf.jasperreports.engine.JRParameter;
 import net.sf.jasperreports.engine.JRStaticText;
+import net.sf.jasperreports.engine.JRTextField;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.design.JRDesignBand;
 import net.sf.jasperreports.engine.design.JRDesignElement;
+import net.sf.jasperreports.engine.design.JRDesignExpression;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.export.JRCsvExporter;
 import net.sf.jasperreports.engine.export.JRExportProgressMonitor;
@@ -48,6 +49,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import au.com.vaadinutils.dao.Transaction;
+import au.com.vaadinutils.jasper.parameter.ReportChooser;
 import au.com.vaadinutils.jasper.parameter.ReportParameter;
 import au.com.vaadinutils.jasper.servlet.VaadinJasperPrintServlet;
 import au.com.vaadinutils.jasper.ui.JasperReportDataProvider;
@@ -120,7 +122,7 @@ public class JasperManager implements Runnable
 	 *            path to jasper report.
 	 * @throws JRException
 	 */
-	public JasperManager(EntityManager em, String reportFileName,String reportTitle, JasperSettings settings)
+	public JasperManager(EntityManager em, String reportFileName, String reportTitle, JasperSettings settings)
 	{
 		this.reportTitle = reportTitle;
 		String reportDesignName = reportFileName.substring(0, reportFileName.indexOf("."));
@@ -142,9 +144,14 @@ public class JasperManager implements Runnable
 			JasperReportCompiler jasperReportCompiler = new JasperReportCompiler();
 			JasperDesign designFile = jasperReportCompiler.getDesignFile(sourcePath, reportDesignName);
 
-			JasperDesign headerTemplate = jasperReportCompiler.getDesignFile(sourcePath, "HeaderFooter");
+			String templateName = settings.getHeaderFooterTemplateName();
+			if (templateName != null)
+			{
+				JasperDesign headerTemplate = jasperReportCompiler.getDesignFile(sourcePath, templateName);
 
-			replaceHeader(designFile, headerTemplate);
+				replaceHeader(designFile, headerTemplate);
+			}
+			setCSVOptions(designFile);
 
 			jasperReportCompiler.compileReport(designFile, sourcePath, sourcePath, reportDesignName);
 
@@ -161,13 +168,66 @@ public class JasperManager implements Runnable
 
 	private void replaceHeader(JasperDesign designFile, JasperDesign template)
 	{
-		JRBand header = template.getTitle();
+		JRBand title = template.getTitle();
 		JRDesignBand newTitle = new JRDesignBand();
 
+		int rightMargin = 70;
+		int maxY = determineSizeOfTitleTemplateAndReplaceTitlePlaceHolder(designFile, title, newTitle, rightMargin);
+
+		maxY += 2;
+
+		mergeExistingTitleWithTemplateTitle(designFile, newTitle, maxY);
+
+		JRBand footer = replaceFooterWithTemplateFooter(designFile, template, rightMargin);
+
+		designFile.setPageFooter(footer);
+
+	}
+
+	private JRBand replaceFooterWithTemplateFooter(JasperDesign designFile, JasperDesign template, int rightMargin)
+	{
+		JRBand footer = template.getPageFooter();
+		for (JRElement element : footer.getElements())
+		{
+			if (element instanceof JRDesignElement)
+			{
+				JRDesignElement de = (JRDesignElement) element;
+				if (element instanceof JRTextField)
+				{
+					JRTextField st = (JRTextField) element;
+
+					JRDesignExpression expr = (JRDesignExpression) st.getExpression();
+					expr.setText("\"" + reportTitle + "\"+" + expr.getText());
+					st.setWidth((designFile.getPageWidth() - st.getX()) - rightMargin);
+
+				}
+
+			}
+
+		}
+		return footer;
+	}
+
+	private void mergeExistingTitleWithTemplateTitle(JasperDesign designFile, JRDesignBand newTitle, int yoffset)
+	{
 		int maxY = 0;
+		for (JRElement element : designFile.getTitle().getElements())
+		{
 
+			JRDesignElement de = (JRDesignElement) element;
+			de.setY(de.getY() + yoffset);
+			maxY = Math.max(maxY, de.getY() + element.getHeight());
+			newTitle.addElement(element);
+		}
+		newTitle.setHeight(Math.max(maxY + 2,yoffset+2));
+		designFile.setTitle(newTitle);
 
-		
+	}
+
+	private int determineSizeOfTitleTemplateAndReplaceTitlePlaceHolder(JasperDesign designFile, JRBand header, JRDesignBand newTitle,
+			int rightMargin)
+	{
+		int maxY = 0;
 		for (JRElement element : header.getElements())
 		{
 			if (element instanceof JRDesignElement)
@@ -179,36 +239,27 @@ public class JasperManager implements Runnable
 					if (st.getText().equalsIgnoreCase("report name place holder"))
 					{
 						st.setText(reportTitle);
+						st.setWidth((designFile.getPageWidth() - st.getX()) - rightMargin);
 					}
 				}
-				
-				maxY = Math.max(maxY, de.getY()+de.getHeight());
-				
-				
+
+				maxY = Math.max(maxY, de.getY() + de.getHeight());
+
 				newTitle.addElement(de);
 			}
 
 		}
-		
-		int yoffset = maxY;
-		for (JRElement element : designFile.getTitle().getElements())
-		{
-			if (!(element instanceof JRLine))
-			{
-				
-				JRDesignElement de = (JRDesignElement) element;
-				de.setY(de.getY() + yoffset);
-				maxY = Math.max(maxY, de.getY() + element.getHeight());
-				newTitle.addElement(element);
-			}
-		}
-		
-		newTitle.setHeight(maxY + 2);
-		designFile.setTitle(newTitle);
+		return maxY;
+	}
 
-		JRBand footer = template.getPageFooter();
-		designFile.setPageFooter(footer);
-
+	private void setCSVOptions(JasperDesign designFile)
+	{
+		designFile.setProperty("net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.columnHeader",
+				"columnHeader");
+		designFile.setProperty("net.sf.jasperreports.export.csv.exclude.origin.band.title", "title");
+		designFile.setProperty("net.sf.jasperreports.export.csv.exclude.origin.band.pageHeader", "pageHeader");
+		designFile.setProperty("net.sf.jasperreports.export.csv.exclude.origin.band.pageFooter", "pageFooter");
+		designFile.setProperty("net.sf.jasperreports.export.csv.exclude.origin.band.footer", "footer");
 	}
 
 	public JRParameter[] getParameters()
@@ -247,43 +298,52 @@ public class JasperManager implements Runnable
 	 * @param parameterName
 	 * @param parameterValue
 	 */
-	public void bindParameter(String parameterName, Object parameterValue)
+	public void bindParameter(ReportParameter<?> param)
 	{
-		String tmpParam = parameterName;
-		// specific work around for prefixed report parameters
-		if (tmpParam.startsWith("ReportParameter"))
+		// ReportChooser is not actually a report parameter
+		if (!(param instanceof ReportChooser))
 		{
-			tmpParam = tmpParam.substring("ReportParameter".length(), parameterName.length());
-		}
+			String tmpParam = param.getParameterName();
+			// specific work around for prefixed report parameters
+			if (tmpParam.startsWith("ReportParameter"))
+			{
+				tmpParam = tmpParam.substring("ReportParameter".length(), tmpParam.length());
+			}
 
-		Preconditions.checkArgument(paramExists(tmpParam), "The passed Jasper Report parameter: " + parameterName
-				+ " does not existing on the Report");
+			if (!paramExists(tmpParam))
+			{
+				logger.warn("The passed Jasper Report parameter: " + param.getParameterName()
+						+ " does not existing on the Report");
+			}
 
-		boundParams.put(tmpParam, parameterValue);
-	}
-
-	/**
-	 * Binds a value to a report parameter.
-	 * 
-	 * Essentially a report can have a no. of named parameters which are used to
-	 * filter the report or display on the report. This method allows you to
-	 * pass in a map (name, value) of parameter value at runtime.
-	 * 
-	 * @param parameters
-	 *            a map of name/value pairs to bind to report parameters of the
-	 *            given names.
-	 */
-
-	public void bindParameters(Map<String, Object> parameters)
-	{
-		for (String parameterName : parameters.keySet())
-		{
-			Preconditions.checkArgument(paramExists(parameterName), "The passed Jasper Report parameter: "
-					+ parameterName + " does not existing on the Report");
-
-			boundParams.put(parameterName, parameters.get(parameterName));
+			boundParams.put(tmpParam, param.getValue());
 		}
 	}
+
+	// /**
+	// * Binds a value to a report parameter.
+	// *
+	// * Essentially a report can have a no. of named parameters which are used
+	// to
+	// * filter the report or display on the report. This method allows you to
+	// * pass in a map (name, value) of parameter value at runtime.
+	// *
+	// * @param parameters
+	// * a map of name/value pairs to bind to report parameters of the
+	// * given names.
+	// */
+	//
+	// private void bindParameters(Map<String, Object> parameters)
+	// {
+	// for (String parameterName : parameters.keySet())
+	// {
+	// Preconditions.checkArgument(paramExists(parameterName),
+	// "The passed Jasper Report parameter: "
+	// + parameterName + " does not existing on the Report");
+	//
+	// boundParams.put(parameterName, parameters.get(parameterName));
+	// }
+	// }
 
 	private JasperPrint fillReport() throws JRException
 	{
@@ -431,7 +491,7 @@ public class JasperManager implements Runnable
 			outputStream = new PipedOutputStream(inputStream);
 			writerStartedBarrier.countDown();
 
-			status = "Preparing queries";
+			status = "Gathering report data phase 1, please be patient";
 
 			dataProvider.initDBConnection();
 			params.addAll(dataProvider.prepareData(params, getReportFilename()));
@@ -439,7 +499,7 @@ public class JasperManager implements Runnable
 			logger.warn("Running report " + getReportFilename());
 			for (ReportParameter<?> param : params)
 			{
-				bindParameter(param.getParameterName(), param.getValue());
+				bindParameter(param);
 				logger.warn(param.getParameterName() + " " + param.getValue());
 			}
 
@@ -448,7 +508,7 @@ public class JasperManager implements Runnable
 
 			JRAbstractExporter exporter = null;
 
-			status = "Gathering report data";
+			status = "Gathering report data phase 2, please be patient";
 
 			// use file virtualizer to prevent out of heap
 			String fileName = "/tmp";

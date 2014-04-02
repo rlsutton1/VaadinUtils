@@ -12,6 +12,11 @@ public interface JasperSettings
 
 	File getReportFile(String reportName);
 
-
+	/**
+	 * 
+	 * @return the name of the template jasper file (something like
+	 *         "HeaderFooter") or null if your not using a template
+	 */
+	String getHeaderFooterTemplateName();
 
 }

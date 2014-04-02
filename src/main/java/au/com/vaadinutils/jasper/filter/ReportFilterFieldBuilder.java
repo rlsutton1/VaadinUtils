@@ -24,6 +24,6 @@ public interface ReportFilterFieldBuilder
 	ReportFilterDateFieldBuilder addDateField(String label, String paramName) ;
 	<T extends Enum<?>> ReportFilterFieldBuilder addEnumField(String label, String paramName, Class<T> class1, T day);
 	
-	List<Component> buildLayout();
+	List<ExpanderComponent> buildLayout();
 
 }

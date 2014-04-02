@@ -14,7 +14,8 @@ public interface JasperReportDataProvider
 	ReportFilterUIBuilder getFilterBuilder(JasperManager manager);
 
 	/**
-	 * return an extra param, typically the temporary table
+	 * create any temporary data that may be needed for the jasper report and
+	 * return any extra params, typically the temporary table
 	 * 
 	 * @param params
 	 * @param reportFileName
@@ -45,5 +46,6 @@ public interface JasperReportDataProvider
 	 * @return
 	 */
 	OutputFormat getDefaultFormat();
+
 
 }

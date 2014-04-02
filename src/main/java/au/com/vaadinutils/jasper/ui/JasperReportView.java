@@ -40,8 +40,5 @@ public abstract class JasperReportView extends HorizontalLayout implements View,
 
 	}
 
-	public abstract ReportFilterUIBuilder getFilterBuilder(JasperManager manager);
-
-	public abstract List<ReportParameter<?>> prepareData(Collection<ReportParameter<?>> params,String reportFileName) throws Exception;
 
 }

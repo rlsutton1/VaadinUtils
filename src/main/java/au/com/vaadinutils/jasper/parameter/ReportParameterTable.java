@@ -10,17 +10,32 @@ import au.com.vaadinutils.dao.EntityManagerProvider;
 
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.JPAContainerFactory;
+import com.vaadin.addon.jpacontainer.QueryModifierDelegate;
 import com.vaadin.addon.jpacontainer.fieldfactory.MultiSelectConverter;
+import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
+import com.vaadin.data.util.filter.SimpleStringFilter;
+import com.vaadin.event.FieldEvents.TextChangeEvent;
+import com.vaadin.event.FieldEvents.TextChangeListener;
 import com.vaadin.ui.AbstractSelect.ItemCaptionMode;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Notification.Type;
+import com.vaadin.ui.Table;
+import com.vaadin.ui.Table.ColumnHeaderMode;
+import com.vaadin.ui.TextField;
+import com.vaadin.ui.VerticalLayout;
 
 public class ReportParameterTable<T> extends ReportParameter<String>
 {
 
-	private FilterTable field;
+	private Table table;
 	private Long defaultValue = null;
 	JPAContainer<T> container = null;
+	private boolean notEmpty = false;
+	private VerticalLayout layout;
+	private String caption;
 
 	public ReportParameterTable(String caption, String parameterName, Class<T> tableClass,
 			SingularAttribute<T, String> displayField, boolean multiSelect)
@@ -38,44 +53,85 @@ public class ReportParameterTable<T> extends ReportParameter<String>
 		this.defaultValue = defaultValue;
 	}
 
-	private void init(String caption, Class<T> tableClass, SingularAttribute<T, String> displayField,
+	private void init(String caption, Class<T> tableClass, final SingularAttribute<T, String> displayField,
 			boolean multiSelect)
 	{
-		field = new FilterTable(caption);
-		field.setSizeFull();
-		field.setHeight("150");
-
-		field.setItemCaptionMode(ItemCaptionMode.PROPERTY);
-		field.setItemCaptionPropertyId(displayField.getName());
-
 		container = JPAContainerFactory.makeBatchable(tableClass, EntityManagerProvider.getEntityManager());
-		field.setContainerDataSource(container);
 		container.sort(new Object[] { displayField.getName() }, new boolean[] { true });
 
-		field.setConverter(MultiSelectConverter.class);
+		container.setQueryModifierDelegate(getQueryModifierDelegate());
 
-		field.setVisibleColumns(displayField.getName());
-		field.setSelectable(true);
-		field.setColumnHeaders(displayField.getName());
-		field.setNewItemsAllowed(false);
-		field.setNullSelectionAllowed(false);
-		field.setMultiSelect(multiSelect);
-		field.setFilterBarVisible(true);
+		layout = new VerticalLayout();
+		layout.setSizeFull();
+		this.caption = caption;
+
+		TextField searchText = new TextField();
+		searchText.setWidth("100%");
+		searchText.setImmediate(true);
+		searchText.setHeight("20");
+		TextChangeListener t;
+		searchText.addTextChangeListener(new TextChangeListener()
+		{
+
+			@Override
+			public void textChange(TextChangeEvent event)
+			{
+				String value = event.getText();
+				container.removeAllContainerFilters();
+				if (value.length() > 0)
+				{
+					container.addContainerFilter(new SimpleStringFilter(displayField.getName(), value, true, true));
+				}
+
+			}
+		});
+
+		table = new Table();
+
+		table.setSizeFull();
+		// table.setHeight("150");
+
+		table.setContainerDataSource(container);
+
+		table.setConverter(MultiSelectConverter.class);
+
+		table.setVisibleColumns(displayField.getName());
+		table.setSelectable(true);
+		table.setColumnHeaderMode(ColumnHeaderMode.HIDDEN);
+		table.setNewItemsAllowed(false);
+		table.setNullSelectionAllowed(false);
+		table.setMultiSelect(multiSelect);
+
+		layout.addComponent(new Label(caption));
+		layout.addComponent(searchText);
+		layout.addComponent(table);
+		layout.setExpandRatio(table, 1);
+	}
+
+	/**
+	 * override this method when providing a QueryModifierDelegate to filter the
+	 * rows visible in the table
+	 * 
+	 * @return
+	 */
+	protected QueryModifierDelegate getQueryModifierDelegate()
+	{
+		return null;
 	}
 
 	public void addSelectionListener(ValueChangeListener listener)
 	{
-		field.addValueChangeListener(listener);
+		table.addValueChangeListener(listener);
 	}
 
 	@Override
 	public String getValue()
 	{
 
-		if (field.isMultiSelect())
+		if (table.isMultiSelect())
 		{
 			@SuppressWarnings("unchecked")
-			Set<Long> ids = (Set<Long>) field.getValue();
+			Set<Long> ids = (Set<Long>) table.getValue();
 			String selection = "";
 			for (Long id : ids)
 			{
@@ -90,21 +146,37 @@ public class ReportParameterTable<T> extends ReportParameter<String>
 			{
 				selection = "" + defaultValue;
 			}
+			if (notEmpty && selection.length() == 0)
+			{
+				Notification.show("Please select at least one " + caption, Type.ERROR_MESSAGE);
+				throw new RuntimeException(caption + " can not be empty");
+			}
 			return selection;
 		}
-		String v = "" + field.getValue();
+		String v = "" + table.getValue();
 		if (v.length() == 0 && defaultValue != null)
 		{
 			v = "" + defaultValue;
+		}
+		if (notEmpty && v.length() == 0)
+		{
+			Notification.show("Please select at least one " + caption, Type.ERROR_MESSAGE);
+			throw new RuntimeException(caption + " can not be empty");
 		}
 		return v;
 
 	}
 
+	public ReportParameter<?> setNotEmpty()
+	{
+		notEmpty = true;
+		return this;
+	}
+
 	@Override
 	public Component getComponent()
 	{
-		return field;
+		return layout;
 	}
 
 	@Override
