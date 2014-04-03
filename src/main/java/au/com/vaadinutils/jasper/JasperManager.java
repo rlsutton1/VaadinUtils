@@ -170,21 +170,31 @@ public class JasperManager implements Runnable
 	{
 		JRBand title = template.getTitle();
 		JRDesignBand newTitle = new JRDesignBand();
+		
+		int margin = 50;
+		designFile.setLeftMargin(margin);
+		designFile.setRightMargin(margin);
+		designFile.setTopMargin(margin);
+		designFile.setBottomMargin(margin);
+		
+		
+		designFile.setPageWidth(designFile.getPageWidth()+(margin*2));
 
-		int rightMargin = 70;
-		int maxY = determineSizeOfTitleTemplateAndReplaceTitlePlaceHolder(designFile, title, newTitle, rightMargin);
+
+		
+		int maxY = determineSizeOfTitleTemplateAndReplaceTitlePlaceHolder(designFile, title, newTitle, margin);
 
 		maxY += 2;
 
 		mergeExistingTitleWithTemplateTitle(designFile, newTitle, maxY);
 
-		JRBand footer = replaceFooterWithTemplateFooter(designFile, template, rightMargin);
+		JRBand footer = replaceFooterWithTemplateFooter(designFile, template, margin);
 
 		designFile.setPageFooter(footer);
 
 	}
 
-	private JRBand replaceFooterWithTemplateFooter(JasperDesign designFile, JasperDesign template, int rightMargin)
+	private JRBand replaceFooterWithTemplateFooter(JasperDesign designFile, JasperDesign template, int margin)
 	{
 		JRBand footer = template.getPageFooter();
 		for (JRElement element : footer.getElements())
@@ -198,7 +208,7 @@ public class JasperManager implements Runnable
 
 					JRDesignExpression expr = (JRDesignExpression) st.getExpression();
 					expr.setText("\"" + reportTitle + "\"+" + expr.getText());
-					st.setWidth((designFile.getPageWidth() - st.getX()) - rightMargin);
+					st.setWidth((designFile.getPageWidth() - st.getX())-(margin*2) );
 
 				}
 
@@ -225,7 +235,7 @@ public class JasperManager implements Runnable
 	}
 
 	private int determineSizeOfTitleTemplateAndReplaceTitlePlaceHolder(JasperDesign designFile, JRBand header, JRDesignBand newTitle,
-			int rightMargin)
+			int margin)
 	{
 		int maxY = 0;
 		for (JRElement element : header.getElements())
@@ -239,7 +249,7 @@ public class JasperManager implements Runnable
 					if (st.getText().equalsIgnoreCase("report name place holder"))
 					{
 						st.setText(reportTitle);
-						st.setWidth((designFile.getPageWidth() - st.getX()) - rightMargin);
+						st.setWidth((designFile.getPageWidth() - st.getX())-(margin*2) );
 					}
 				}
 
