@@ -4,20 +4,16 @@ import java.util.Set;
 
 import javax.persistence.metamodel.SingularAttribute;
 
-import org.tepi.filtertable.FilterTable;
-
 import au.com.vaadinutils.dao.EntityManagerProvider;
 
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.JPAContainerFactory;
 import com.vaadin.addon.jpacontainer.QueryModifierDelegate;
 import com.vaadin.addon.jpacontainer.fieldfactory.MultiSelectConverter;
-import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.filter.SimpleStringFilter;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
-import com.vaadin.ui.AbstractSelect.ItemCaptionMode;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
@@ -73,6 +69,9 @@ public class ReportParameterTable<T> extends ReportParameter<String>
 		searchText.addTextChangeListener(new TextChangeListener()
 		{
 
+		
+			private static final long serialVersionUID = 1315710313315289836L;
+
 			@Override
 			public void textChange(TextChangeEvent event)
 			{
@@ -80,7 +79,7 @@ public class ReportParameterTable<T> extends ReportParameter<String>
 				container.removeAllContainerFilters();
 				if (value.length() > 0)
 				{
-					container.addContainerFilter(new SimpleStringFilter(displayField.getName(), value, true, true));
+					container.addContainerFilter(new SimpleStringFilter(displayField.getName(), value, true, false));
 				}
 
 			}

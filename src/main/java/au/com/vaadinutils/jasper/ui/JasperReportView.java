@@ -1,11 +1,8 @@
 package au.com.vaadinutils.jasper.ui;
 
-import java.util.Collection;
-import java.util.List;
+import javax.persistence.EntityManager;
 
-import au.com.vaadinutils.jasper.JasperManager;
-import au.com.vaadinutils.jasper.filter.ReportFilterUIBuilder;
-import au.com.vaadinutils.jasper.parameter.ReportParameter;
+import au.com.vaadinutils.jasper.JasperSettings;
 
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
@@ -20,15 +17,18 @@ public abstract class JasperReportView extends HorizontalLayout implements View,
 	public static final String NAME = "ReportView";
 	private static final long serialVersionUID = 1L;
 
-	//static private final transient Logger logger = LogManager.getLogger();
+	// static private final transient Logger logger = LogManager.getLogger();
 
 	final JasperReportLayout report;
 
-
-
-	protected JasperReportView(String title, JasperManager manager)
+	protected JasperReportView(ReportProperties reportProperties)
 	{
-		report = new JasperReportLayout(title, manager, this);
+		report = new JasperReportLayout(reportProperties);
+	}
+
+	protected JasperReportView(String title, String filename, EntityManager entityManager, JasperSettings settings)
+	{
+		report = new JasperReportLayout(new ReportProperties(title, filename, this, entityManager, settings));
 	}
 
 	@Override
@@ -39,6 +39,5 @@ public abstract class JasperReportView extends HorizontalLayout implements View,
 		this.addComponent(report);
 
 	}
-
 
 }

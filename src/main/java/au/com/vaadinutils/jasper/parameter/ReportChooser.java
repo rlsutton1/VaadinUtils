@@ -1,10 +1,11 @@
 package au.com.vaadinutils.jasper.parameter;
 
-import au.com.vaadinutils.jasper.JasperManager;
+import au.com.vaadinutils.jasper.ui.JasperReportDataProvider;
+import au.com.vaadinutils.jasper.ui.ReportProperties;
 
-public interface ReportChooser 
+public interface ReportChooser
 {
 
-	JasperManager getJasperManager();
+	ReportProperties getReportProperties(JasperReportDataProvider dataProvider);
 
 }

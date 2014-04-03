@@ -2,6 +2,7 @@ package au.com.vaadinutils.jasper.ui;
 
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -12,9 +13,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.jasper.JasperManager;
 import au.com.vaadinutils.jasper.JasperManager.OutputFormat;
+import au.com.vaadinutils.jasper.JasperProgressListener;
 import au.com.vaadinutils.jasper.filter.ExpanderComponent;
 import au.com.vaadinutils.jasper.filter.ReportFilterUIBuilder;
 import au.com.vaadinutils.jasper.parameter.ReportChooser;
@@ -22,7 +23,6 @@ import au.com.vaadinutils.jasper.parameter.ReportParameter;
 import au.com.vaadinutils.jasper.parameter.ReportParameterConstant;
 import au.com.vaadinutils.listener.CancelListener;
 import au.com.vaadinutils.listener.ClickEventLogged;
-import au.com.vaadinutils.listener.CompleteListener;
 import au.com.vaadinutils.ui.WorkingDialog;
 
 import com.github.wolfie.refresher.Refresher;
@@ -44,8 +44,8 @@ import com.vaadin.ui.JavaScriptFunction;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.NativeButton;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.UI;
 import com.vaadin.ui.Notification.Type;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Reindeer;
 
@@ -66,12 +66,8 @@ class JasperReportLayout extends HorizontalSplitPanel
 
 	private BrowserFrame displayPanel;
 
-	String title;
-
 	JasperManager manager;
 	private ReportFilterUIBuilder builder;
-
-	private JasperReportDataProvider dataProvider;
 
 	private List<ExpanderComponent> components;
 
@@ -83,12 +79,15 @@ class JasperReportLayout extends HorizontalSplitPanel
 
 	private VerticalLayout splash;
 
-	protected JasperReportLayout(String title, JasperManager manager, JasperReportDataProvider dataProvider)
+	private ReportProperties reportProperties;
+
+	private BrowserFrame csv;
+
+	protected JasperReportLayout(ReportProperties reportProperties)
 	{
-		this.title = title;
-		this.manager = manager;
-		this.builder = dataProvider.getFilterBuilder(manager);
-		this.dataProvider = dataProvider;
+		this.reportProperties = reportProperties;
+		this.manager = new JasperManager(reportProperties);
+		this.builder = reportProperties.getDataProvider().getFilterBuilder(manager);
 	}
 
 	protected void initScreen()
@@ -105,7 +104,7 @@ class JasperReportLayout extends HorizontalSplitPanel
 		splash = new VerticalLayout();
 		splash.setMargin(true);
 
-		Label titleLabel = new Label("<h1>" + title + "</h1>");
+		Label titleLabel = new Label("<h1>" + reportProperties.getReportTitle() + "</h1>");
 		titleLabel.setContentMode(ContentMode.HTML);
 		splash.addComponent(titleLabel);
 
@@ -119,7 +118,8 @@ class JasperReportLayout extends HorizontalSplitPanel
 		{
 			try
 			{
-				generateReport(dataProvider.getDefaultFormat(), JasperReportLayout.this.builder.getReportParameters());
+				generateReport(reportProperties.getDataProvider().getDefaultFormat(),
+						JasperReportLayout.this.builder.getReportParameters());
 			}
 			catch (Exception e)
 			{
@@ -162,8 +162,9 @@ class JasperReportLayout extends HorizontalSplitPanel
 
 					JSONObject params = arguments.getJSONObject(1);
 
-					JasperManager subManager = new JasperManager(EntityManagerProvider.getEntityManager(),
-							subReportFileName, title, manager.getSettings());
+					ReportProperties subReportProperties = new ReportProperties(subTitle, subReportFileName,
+							reportProperties.getDataProvider(), reportProperties.getEm(), reportProperties
+									.getSettings());
 
 					List<ReportParameter<?>> subFilters = new LinkedList<ReportParameter<?>>();
 
@@ -175,7 +176,7 @@ class JasperReportLayout extends HorizontalSplitPanel
 						subFilters.add(new ReportParameterConstant(key, params.getString(key)));
 					}
 
-					new JasperReportPopUp(subTitle, subManager, subFilters, dataProvider);
+					new JasperReportPopUp(subReportProperties, subFilters);
 				}
 				catch (Exception e)
 				{
@@ -240,7 +241,7 @@ class JasperReportLayout extends HorizontalSplitPanel
 			VerticalLayout filterPanel = new VerticalLayout();
 			filterPanel.setMargin(true);
 			filterPanel.setSpacing(true);
-			filterPanel.setSizeFull();
+			// filterPanel.setSizeFull();
 			Label filterLabel = new Label("<b>Filters</b>");
 			filterLabel.setContentMode(ContentMode.HTML);
 			filterPanel.addComponent(filterLabel);
@@ -256,6 +257,14 @@ class JasperReportLayout extends HorizontalSplitPanel
 			layout.addComponent(filterPanel);
 			layout.setExpandRatio(filterPanel, 1.0f);
 		}
+
+		// hidden from for downloading csv
+		csv = new BrowserFrame();
+		csv.setVisible(true);
+		csv.setHeight("0");
+		csv.setWidth("0");
+		csv.setImmediate(true);
+		layout.addComponent(csv);
 
 		return layout;
 	}
@@ -292,7 +301,7 @@ class JasperReportLayout extends HorizontalSplitPanel
 					{
 						componet.getComponent().setEnabled(true);
 					}
-					Notification.show(e.getMessage(),Type.ERROR_MESSAGE);
+					Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
 					logger.error(e, e);
 				}
 				finally
@@ -316,20 +325,32 @@ class JasperReportLayout extends HorizontalSplitPanel
 
 	private boolean cancelled;
 
+	volatile boolean streamReady = false;
+	volatile boolean streamConnected = false;
+
 	protected void generateReport(final JasperManager.OutputFormat outputFormat,
 			final Collection<ReportParameter<?>> params)
 
 	{
+		streamConnected = false;
+		streamReady = false;
 
+		manager = null;
+		// if there is a report chooser parameter then swap out the report
+		// manager for the selected report.
 		for (ReportParameter<?> p : params)
 		{
 			if (p instanceof ReportChooser)
 			{
 				ReportChooser chooser = (ReportChooser) p;
-				manager = chooser.getJasperManager();
-				Preconditions.checkNotNull(manager,"chooser returned a NULL JasperManager.");
+				manager = new JasperManager(chooser.getReportProperties(reportProperties.getDataProvider()));
+				Preconditions.checkNotNull(manager, "chooser returned a NULL JasperManager.");
 				break;
 			}
+		}
+		if (manager == null)
+		{
+			this.manager = new JasperManager(reportProperties);
 		}
 
 		CancelListener cancelListener = getProgressDialogCancelListener();
@@ -337,23 +358,125 @@ class JasperReportLayout extends HorizontalSplitPanel
 		dialog.setWidth("400");
 
 		UI.getCurrent().addWindow(dialog);
+
+		// add refresher component
 		final Refresher refresher = new Refresher();
-		RefreshListener refreshListener = getProgressDialogRefreshListener(dialog, refresher);
-		refresher.addListener(refreshListener);
 		refresher.setRefreshInterval(200);
 		addExtension(refresher);
 
-		StreamSource source = getReportStream(outputFormat, params, dialog, refresher);
-		StreamResource resource = new StreamResource(source, "report");
-		resource.setMIMEType(outputFormat.getMimeType());
-		resource.setCacheTime(-1);
-		resource.setFilename("jr-" + System.currentTimeMillis());
-		getDisplayPanel().setSource(resource);
+		RefreshListener refreshListener = getProgressDialogRefreshListener(dialog, refresher);
+		refresher.addListener(refreshListener);
+
+		RefreshListener streamListener = getStreamConnectorRefreshListener(outputFormat);
+		refresher.addListener(streamListener);
+
+		JasperProgressListener listener = getJasperManagerProgressListener(dialog, refresher);
+		manager.exportAsync(outputFormat, params, listener);
 
 	}
 
-	private StreamSource getReportStream(final JasperManager.OutputFormat outputFormat,
-			final Collection<ReportParameter<?>> params, final WorkingDialog dialog, final Refresher refresher)
+	private JasperProgressListener getJasperManagerProgressListener(final WorkingDialog dialog,
+			final Refresher refresher)
+	{
+		JasperProgressListener listener = new JasperProgressListener()
+		{
+
+			@Override
+			public void outputStreamReady()
+			{
+				// flag that the stream is ready, and on the next
+				// "Refresher call" it will connect to the stream
+				streamReady = true;
+
+			}
+
+			@Override
+			public void failed(String string)
+			{
+				// show the error message
+				Notification.show(string, Type.ERROR_MESSAGE);
+				reportFinished();
+
+			}
+
+			private void reportFinished()
+			{
+				// re-enable fields after report finished.
+				printButton.setEnabled(true);
+				exportButton.setEnabled(true);
+				showButton.setEnabled(true);
+				for (ExpanderComponent componet : components)
+				{
+					componet.getComponent().setEnabled(true);
+				}
+				removeExtension(refresher);
+				dialog.close();
+			}
+
+			@Override
+			public void completed()
+			{
+				reportFinished();
+			}
+		};
+		return listener;
+	}
+
+	private RefreshListener getStreamConnectorRefreshListener(final JasperManager.OutputFormat outputFormat)
+	{
+		RefreshListener streamListener = new RefreshListener()
+		{
+
+			private static final long serialVersionUID = -2042404606367957120L;
+
+			@Override
+			public void refresh(Refresher source)
+			{
+				if (streamReady && !streamConnected)
+				{
+					// jasper manager is ready, so get the report stream and set
+					// it as the source for the display panel
+					streamConnected = true;
+					StreamResource resource = new StreamResource(getReportStream(), "report");
+					resource.setMIMEType(outputFormat.getMimeType());
+					resource.setCacheTime(-1);
+					resource.setFilename(reportProperties.getReportTitle() + "-" + System.currentTimeMillis()
+							+ outputFormat.getFileExtension());
+
+					if (outputFormat == OutputFormat.CSV)
+					{
+						csv.setSource(resource);
+						showCsvSplash();
+					}
+					else
+					{
+						getDisplayPanel().setSource(resource);
+					}
+				}
+
+			}
+		};
+		return streamListener;
+	}
+
+	private void showCsvSplash()
+	{
+		VerticalLayout csvSplash = new VerticalLayout();
+		csvSplash.setMargin(true);
+
+		Label titleLabel = new Label("<h1>" + reportProperties.getReportTitle() + "</h1>");
+		titleLabel.setContentMode(ContentMode.HTML);
+		csvSplash.addComponent(titleLabel);
+
+		Label label = new Label("<font size='4' >Excel (CSV) download will initiated "+new Date()+".</font>");
+		label.setContentMode(ContentMode.HTML);
+		csvSplash.addComponent(label);
+
+		this.setSecondComponent(csvSplash);
+
+	}
+
+	private StreamSource getReportStream()
 	{
 		@SuppressWarnings("serial")
 		StreamSource source = new StreamSource()
@@ -364,32 +487,11 @@ class JasperReportLayout extends HorizontalSplitPanel
 			{
 				try
 				{
-					CompleteListener completeListener = new CompleteListener()
-					{
-
-						@Override
-						public void complete()
-						{
-							printButton.setEnabled(true);
-							exportButton.setEnabled(true);
-							showButton.setEnabled(true);
-							for (ExpanderComponent componet : components)
-							{
-								componet.getComponent().setEnabled(true);
-							}
-							removeExtension(refresher);
-							dialog.close();
-						}
-					};
-					return manager.exportAsync(dataProvider, outputFormat, params, completeListener);
+					return manager.getStream();
 				}
 				catch (InterruptedException e)
 				{
 					logger.error(e, e);
-				}
-				catch (RuntimeException e)
-				{
-					Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
 				}
 				return null;
 			}

@@ -2,40 +2,34 @@ package au.com.vaadinutils.wizards.bulkJasperEmail;
 
 import javax.persistence.EntityManager;
 
-import net.sf.jasperreports.engine.JRException;
 import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.jasper.JasperEmailSettings;
 import au.com.vaadinutils.jasper.JasperManager;
-import au.com.vaadinutils.jasper.JasperSettings;
+import au.com.vaadinutils.jasper.ui.ReportProperties;
 
 public class JasperProxy
 {
 
 	private String subject;
 	private String senderEmailAddress;
-	private JasperManager manager;
-	@SuppressWarnings("unused")
-	private JasperSettings settings;
 	private JasperEmailSettings emailSettings;
+	private JasperManager manager;
 
-	public JasperProxy(String reportName, String subject, String senderEmailAddress, JasperSettings settings
-			, JasperEmailSettings emailSettings, String title) throws JRException
+	public JasperProxy(String subject, String senderEmailAddress, JasperEmailSettings emailSettings,
+			ReportProperties reportProperties)
 	{
 		EntityManager em = EntityManagerProvider.createEntityManager();
-		this.settings = settings;
 		this.emailSettings = emailSettings;
-		this.manager = new JasperManager(em, reportName,title, settings);
+		this.manager = new JasperManager(reportProperties);
 		this.subject = subject;
 		this.senderEmailAddress = senderEmailAddress;
 	}
-	
+
 	JasperManager getManager()
 	{
 		return this.manager;
 	}
 
-	
-	
 	public String getSubject()
 	{
 		return subject;
@@ -50,7 +44,5 @@ public class JasperProxy
 	{
 		return emailSettings;
 	}
-
-
 
 }

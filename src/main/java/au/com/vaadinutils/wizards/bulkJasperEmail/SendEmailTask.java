@@ -71,8 +71,8 @@ public class SendEmailTask extends ProgressBarTask<JasperTransmission> implement
 				try
 				{
 					JasperManager manager = proxy.getManager();
-					RenderedReport renderedHtml = manager.export(this, OutputFormat.HTML, null);
-					RenderedReport renderedPDF = manager.export(this, OutputFormat.PDF, null);
+					RenderedReport renderedHtml = manager.export( OutputFormat.HTML, null);
+					RenderedReport renderedPDF = manager.export( OutputFormat.PDF, null);
 					JasperEmailBuilder builder = new JasperEmailBuilder(proxy.getEmailSettings());
 					builder.setFrom(proxy.getSenderEmailAddress()).setSubject(proxy.getSubject())
 							// .setHtmlBody("<html><body></body></html>")

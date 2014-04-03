@@ -8,26 +8,25 @@ import au.com.vaadinutils.jasper.JasperManager;
 import au.com.vaadinutils.jasper.parameter.ReportParameter;
 import au.com.vaadinutils.jasper.ui.JasperReportDataProvider;
 import au.com.vaadinutils.jasper.ui.JasperReportPopUp;
+import au.com.vaadinutils.jasper.ui.ReportProperties;
 
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 
-public abstract class CrudActionPrint<E extends CrudEntity> implements CrudAction< E >, JasperReportDataProvider
+public abstract class CrudActionPrint<E extends CrudEntity> implements CrudAction<E>, JasperReportDataProvider
 {
 	private static final long serialVersionUID = 1L;
 	private boolean isDefault = false;
-	
+
 	@Override
-	public void exec(final BaseCrudView<E> crud,EntityItem<E> entity)
+	public void exec(final BaseCrudView<E> crud, EntityItem<E> entity)
 	{
 		JasperManager manager;
 		try
 		{
-			manager = prepareReport(entity);
-			
 			List<ReportParameter<?>> filters = new LinkedList<ReportParameter<?>>();
-			new JasperReportPopUp(manager.getReportTitle(), manager, filters , this);
+			new JasperReportPopUp(prepareReport(entity), filters);
 		}
 		catch (JRException e)
 		{
@@ -35,9 +34,7 @@ public abstract class CrudActionPrint<E extends CrudEntity> implements CrudActio
 		}
 	}
 
-	
-	abstract protected JasperManager prepareReport(EntityItem<E> entity) throws JRException;
-	
+	abstract protected ReportProperties prepareReport(EntityItem<E> entity) throws JRException;
 
 	public String toString()
 	{
@@ -48,7 +45,7 @@ public abstract class CrudActionPrint<E extends CrudEntity> implements CrudActio
 	{
 		return isDefault;
 	}
-	
+
 	public void setIsDefault(boolean isDefault)
 	{
 		this.isDefault = isDefault;
