@@ -37,7 +37,6 @@ import net.sf.jasperreports.engine.export.JRExportProgressMonitor;
 import net.sf.jasperreports.engine.export.JRHtmlExporter;
 import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
 import net.sf.jasperreports.engine.export.JRPdfExporter;
-import net.sf.jasperreports.engine.fill.AsynchronousFillHandle;
 import net.sf.jasperreports.engine.fill.FillListener;
 import net.sf.jasperreports.engine.fill.JRSwapFileVirtualizer;
 import net.sf.jasperreports.engine.util.JRLoader;
@@ -53,8 +52,7 @@ import au.com.vaadinutils.dao.Transaction;
 import au.com.vaadinutils.jasper.parameter.ReportChooser;
 import au.com.vaadinutils.jasper.parameter.ReportParameter;
 import au.com.vaadinutils.jasper.servlet.VaadinJasperPrintServlet;
-import au.com.vaadinutils.jasper.ui.JasperReportDataProvider;
-import au.com.vaadinutils.jasper.ui.ReportProperties;
+import au.com.vaadinutils.jasper.ui.JasperReportProperties;
 
 import com.google.gwt.thirdparty.guava.common.base.Preconditions;
 import com.vaadin.server.Page;
@@ -69,11 +67,11 @@ public class JasperManager implements Runnable
 	private final JasperReport jasperReport;
 	private final Map<String, Object> boundParams = new HashMap<String, Object>();
 
-	private AsynchronousFillHandle fillHandle;
+	private CustomAsynchronousFillHandle fillHandle;
 
 	volatile private boolean stop;
 
-	private ReportProperties reportProperties;
+	private JasperReportProperties reportProperties;
 
 	private final static Semaphore concurrentLimit = new Semaphore(Math.max(
 			Runtime.getRuntime().availableProcessors() / 2, 1));
@@ -141,7 +139,7 @@ public class JasperManager implements Runnable
 	 *            path to jasper report.
 	 * @throws JRException
 	 */
-	public JasperManager(ReportProperties reportProperties)
+	public JasperManager(JasperReportProperties reportProperties)
 	{
 		this.reportProperties = reportProperties;
 		String reportFileName = reportProperties.getReportFileName();
@@ -194,9 +192,15 @@ public class JasperManager implements Runnable
 		designFile.setTopMargin(margin);
 		designFile.setBottomMargin(margin);
 
-		int pageWidth = designFile.getPageWidth() + (margin * 2);
-		int pageHeight = (int) (pageWidth * 1.5);
-		designFile.setPageWidth(pageWidth);
+		double pageWidth = designFile.getPageWidth() + (margin * 2);
+
+		double ratio = 0.75; // landscape;
+		if (designFile.getPageHeight() / pageWidth >= 1)
+		{
+			ratio = 1.5; // portrait
+		}
+		int pageHeight = (int) (pageWidth * ratio);
+		designFile.setPageWidth((int) pageWidth);
 		designFile.setPageHeight(pageHeight);
 
 		int maxY = determineSizeOfTitleTemplateAndReplaceTitlePlaceHolder(designFile, title, newTitle, margin);
@@ -340,7 +344,7 @@ public class JasperManager implements Runnable
 			if (!paramExists(tmpParam))
 			{
 				logger.warn("The passed Jasper Report parameter: " + param.getParameterName()
-						+ " does not existing on the Report");
+						+ " does not exist in the Report");
 			}
 
 			boundParams.put(tmpParam, param.getValue());
@@ -372,7 +376,7 @@ public class JasperManager implements Runnable
 	// }
 	// }
 
-	private JasperPrint fillReport() throws JRException
+	private JasperPrint fillReport(OutputFormat outputFormat) throws JRException
 	{
 		JasperPrint jasper_print;
 
@@ -382,7 +386,10 @@ public class JasperManager implements Runnable
 
 			java.sql.Connection connection = reportProperties.getEm().unwrap(java.sql.Connection.class);
 
-			fillHandle = AsynchronousFillHandle.createHandle(jasperReport, boundParams, connection);
+			fillHandle = CustomAsynchronousFillHandle.createCustomHandle(jasperReport, boundParams, connection);
+
+			fillHandle.setDataProvider(reportProperties.getDataProvider(), outputFormat);
+
 			fillHandle.addFillListener(new FillListener()
 			{
 
@@ -558,12 +565,12 @@ public class JasperManager implements Runnable
 				return;
 			}
 
-			if (exportMethod == OutputFormat.HTML || exportMethod == OutputFormat.CSV)
+			if (exportMethod == OutputFormat.CSV)
 			{
 				boundParams.put(JRParameter.IS_IGNORE_PAGINATION, true);
 			}
 
-			JasperPrint jasper_print = fillReport();
+			JasperPrint jasper_print = fillReport(exportMethod);
 
 			String renderedName = this.jasperReport.getName();
 

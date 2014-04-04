@@ -4,7 +4,7 @@ import javax.persistence.EntityManager;
 
 import au.com.vaadinutils.jasper.JasperSettings;
 
-public class ReportProperties
+public class JasperReportProperties
 {
 	private String reportFileName;
 
@@ -14,7 +14,7 @@ public class ReportProperties
 	private JasperReportDataProvider dataProvider;
 	String reportTitle;
 
-	public ReportProperties(String title, String fileName, JasperReportDataProvider dataProvider, EntityManager em,
+	public JasperReportProperties(String title, String fileName, JasperReportDataProvider dataProvider, EntityManager em,
 			JasperSettings settings)
 	{
 		this.reportTitle = title;

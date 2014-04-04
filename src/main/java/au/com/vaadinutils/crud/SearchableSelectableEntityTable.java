@@ -1,6 +1,6 @@
 package au.com.vaadinutils.crud;
 
-import java.util.ArrayList;
+import java.util.Collection;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -202,7 +202,7 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 
 	}
 
-	public ArrayList<Long> getSelectedIds()
+	public Collection<Long> getSelectedIds()
 	{
 		return selectableTable.getSelectedIds();
 	}

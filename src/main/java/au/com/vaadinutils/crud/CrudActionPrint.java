@@ -8,7 +8,7 @@ import au.com.vaadinutils.jasper.JasperManager;
 import au.com.vaadinutils.jasper.parameter.ReportParameter;
 import au.com.vaadinutils.jasper.ui.JasperReportDataProvider;
 import au.com.vaadinutils.jasper.ui.JasperReportPopUp;
-import au.com.vaadinutils.jasper.ui.ReportProperties;
+import au.com.vaadinutils.jasper.ui.JasperReportProperties;
 
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.ui.Notification;
@@ -34,7 +34,7 @@ public abstract class CrudActionPrint<E extends CrudEntity> implements CrudActio
 		}
 	}
 
-	abstract protected ReportProperties prepareReport(EntityItem<E> entity) throws JRException;
+	abstract protected JasperReportProperties prepareReport(EntityItem<E> entity) throws JRException;
 
 	public String toString()
 	{

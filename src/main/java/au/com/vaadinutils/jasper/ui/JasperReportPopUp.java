@@ -3,10 +3,7 @@ package au.com.vaadinutils.jasper.ui;
 import java.util.Collection;
 import java.util.List;
 
-import javax.persistence.EntityManager;
-
 import au.com.vaadinutils.jasper.JasperManager;
-import au.com.vaadinutils.jasper.JasperSettings;
 import au.com.vaadinutils.jasper.JasperManager.OutputFormat;
 import au.com.vaadinutils.jasper.filter.ReportFilterUIBuilder;
 import au.com.vaadinutils.jasper.parameter.ReportParameter;
@@ -29,14 +26,14 @@ public class JasperReportPopUp extends Window implements JasperReportDataProvide
 	private List<ReportParameter<?>> filters;
 	private JasperReportDataProvider dataProvider;
 
-	public JasperReportPopUp(ReportProperties subReportProperties, List<ReportParameter<?>> filters)
+	public JasperReportPopUp(JasperReportProperties subReportProperties, List<ReportParameter<?>> filters)
 	{
 		this.filters = filters;
 		this.dataProvider = subReportProperties.getDataProvider();
 
 		// replace the data provider in the report properties so this class can
 		// replace the filters
-		ReportProperties properties = new ReportProperties(subReportProperties.getReportTitle(),
+		JasperReportProperties properties = new JasperReportProperties(subReportProperties.getReportTitle(),
 				subReportProperties.getReportFileName(), this, subReportProperties.getEm(),
 				subReportProperties.getSettings());
 		report = new JasperReportLayout(properties);

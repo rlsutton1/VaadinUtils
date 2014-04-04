@@ -5,7 +5,7 @@ import javax.persistence.EntityManager;
 import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.jasper.JasperEmailSettings;
 import au.com.vaadinutils.jasper.JasperManager;
-import au.com.vaadinutils.jasper.ui.ReportProperties;
+import au.com.vaadinutils.jasper.ui.JasperReportProperties;
 
 public class JasperProxy
 {
@@ -16,7 +16,7 @@ public class JasperProxy
 	private JasperManager manager;
 
 	public JasperProxy(String subject, String senderEmailAddress, JasperEmailSettings emailSettings,
-			ReportProperties reportProperties)
+			JasperReportProperties reportProperties)
 	{
 		EntityManager em = EntityManagerProvider.createEntityManager();
 		this.emailSettings = emailSettings;

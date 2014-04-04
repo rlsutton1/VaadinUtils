@@ -33,6 +33,7 @@ public class ReportFilterUIBuilder implements ReportFilterFieldBuilder, ReportFi
 {
 	private JasperManager manager;
 	private LinkedList<ReportParameter<?>> rparams = new LinkedList<ReportParameter<?>>();
+	private Integer minWidth;
 
 	public ReportFilterUIBuilder(JasperManager manager)
 	{
@@ -154,6 +155,17 @@ public class ReportFilterUIBuilder implements ReportFilterFieldBuilder, ReportFi
 			}
 		}
 		return ret;
+	}
+
+	public void setMinWidth(int i)
+	{
+		minWidth = i;
+	}
+
+	public Integer getMinWidth()
+	{
+
+		return minWidth;
 	}
 
 }

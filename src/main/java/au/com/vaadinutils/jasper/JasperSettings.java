@@ -1,7 +1,6 @@
 package au.com.vaadinutils.jasper;
 
 import java.io.File;
-import java.util.HashMap;
 
 public interface JasperSettings
 {

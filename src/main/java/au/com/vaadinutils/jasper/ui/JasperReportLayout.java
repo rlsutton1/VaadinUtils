@@ -79,11 +79,11 @@ class JasperReportLayout extends HorizontalSplitPanel
 
 	private VerticalLayout splash;
 
-	private ReportProperties reportProperties;
+	private JasperReportProperties reportProperties;
 
 	private BrowserFrame csv;
 
-	protected JasperReportLayout(ReportProperties reportProperties)
+	protected JasperReportLayout(JasperReportProperties reportProperties)
 	{
 		this.reportProperties = reportProperties;
 		this.manager = new JasperManager(reportProperties);
@@ -98,7 +98,17 @@ class JasperReportLayout extends HorizontalSplitPanel
 		this.setFirstComponent(getOptionsPanel());
 		if (!builder.hasFilters())
 		{
-			setSplitPosition(10);
+			setSplitPosition(15);
+
+		}else
+		{
+			Integer splitAt = builder.getMinWidth();
+			if (splitAt == null)
+			{
+				splitAt = 15;
+			}
+			setSplitPosition(splitAt);
+
 		}
 
 		splash = new VerticalLayout();
@@ -114,41 +124,76 @@ class JasperReportLayout extends HorizontalSplitPanel
 
 		this.setSecondComponent(splash);
 
-		if (!this.builder.hasFilters())
+		// generate the report immediately if there are no visible filters
+		if (!builder.hasFilters())
 		{
-			try
+			// disable the buttons and any filters
+			printButton.setEnabled(false);
+			exportButton.setEnabled(false);
+			showButton.setEnabled(false);
+			for (ExpanderComponent componet : components)
 			{
-				generateReport(reportProperties.getDataProvider().getDefaultFormat(),
-						JasperReportLayout.this.builder.getReportParameters());
+				componet.getComponent().setEnabled(false);
 			}
-			catch (Exception e)
-			{
-				logger.catching(e);
-				Notification.show("Error", e.getMessage(), Type.ERROR_MESSAGE);
-			}
-		}
 
-		// window.parent.au.com.noojee.reportDrillDown(
-		// {
-		// 'reportFileName':
-		// 'CallDetailsPerTeamAgentPerHour_CallDetails.jasper',
-		// 'reportTitle': 'Call Details Per Team Agent Per Hour'
-		// },
-		// {
-		// 'ReportParameterStartDate'='$P{StartDate}',
-		// 'ReportParameterEndDate'='$P{EndDate}',
-		// 'ReportParameterExtension'='$F{loginid}',
-		// 'ReportParameterTeamId'='$P{TeamId}',
-		// 'ReportParameterHour'='$F{Day}.toString()'
-		// }
-		//
-		// );
+			// what follows is a horrible hack...
+
+			// if we create the progress dialog at the same time as the popup
+			// report window the progress dialog will be behind the popup report
+			// window.
+			// so I've created a refresher, and 1 seconds after the popup report
+			// window opens we kick of the report generation which creates the
+			// progress dialog then, which allows it to be in front.
+
+			final Refresher refresher = new Refresher();
+			refresher.addListener(new RefreshListener()
+			{
+
+				private static final long serialVersionUID = -5629950903521881207L;
+
+				@Override
+				public void refresh(Refresher source)
+				{
+
+					try
+					{
+						removeExtension(refresher);
+						generateReport(reportProperties.getDataProvider().getDefaultFormat(),
+								JasperReportLayout.this.builder.getReportParameters());
+
+					}
+					catch (Exception e)
+					{
+						logger.catching(e);
+						Notification.show("Error", e.getMessage(), Type.ERROR_MESSAGE);
+					}
+
+				}
+			});
+			addExtension(refresher);
+		}
 
 		JavaScript.getCurrent().addFunction("au.com.noojee.reportDrillDown", new JavaScriptFunction()
 		{
-			/**
-			 * 
-			 */
+
+			// expected syntax of a call to this javascript hook method
+			//
+			// window.parent.au.com.noojee.reportDrillDown(
+			// {
+			// 'reportFileName':
+			// 'CallDetailsPerTeamAgentPerHour_CallDetails.jasper',
+			// 'reportTitle': 'Call Details Per Team Agent Per Hour'
+			// },
+			// {
+			// 'ReportParameterStartDate'='$P{StartDate}',
+			// 'ReportParameterEndDate'='$P{EndDate}',
+			// 'ReportParameterExtension'='$F{loginid}',
+			// 'ReportParameterTeamId'='$P{TeamId}',
+			// 'ReportParameterHour'='$F{Day}.toString()'
+			// }
+			//
+			// );
+
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -162,9 +207,9 @@ class JasperReportLayout extends HorizontalSplitPanel
 
 					JSONObject params = arguments.getJSONObject(1);
 
-					ReportProperties subReportProperties = new ReportProperties(subTitle, subReportFileName,
-							reportProperties.getDataProvider(), reportProperties.getEm(), reportProperties
-									.getSettings());
+					JasperReportProperties subReportProperties = new JasperReportProperties(subTitle,
+							subReportFileName, reportProperties.getDataProvider(), reportProperties.getEm(),
+							reportProperties.getSettings());
 
 					List<ReportParameter<?>> subFilters = new LinkedList<ReportParameter<?>>();
 
@@ -191,10 +236,10 @@ class JasperReportLayout extends HorizontalSplitPanel
 	private Component getOptionsPanel()
 	{
 		VerticalLayout layout = new VerticalLayout();
-		layout.setHeight("100%");
 		layout.setMargin(new MarginInfo(false, false, false, false));
 		layout.setSpacing(true);
 		layout.setSizeFull();
+		
 
 		String buttonHeight = "" + 40;
 		HorizontalLayout buttonBar = new HorizontalLayout();
@@ -258,7 +303,7 @@ class JasperReportLayout extends HorizontalSplitPanel
 			layout.setExpandRatio(filterPanel, 1.0f);
 		}
 
-		// hidden from for downloading csv
+		// hidden frame for downloading csv
 		csv = new BrowserFrame();
 		csv.setVisible(true);
 		csv.setHeight("0");
@@ -468,7 +513,7 @@ class JasperReportLayout extends HorizontalSplitPanel
 		titleLabel.setContentMode(ContentMode.HTML);
 		csvSplash.addComponent(titleLabel);
 
-		Label label = new Label("<font size='4' >Excel (CSV) download will initiated "+new Date()+".</font>");
+		Label label = new Label("<font size='4' >Excel (CSV) download will initiated " + new Date() + ".</font>");
 		label.setContentMode(ContentMode.HTML);
 		csvSplash.addComponent(label);
 

@@ -5,20 +5,22 @@ import java.util.Set;
 import javax.persistence.metamodel.SingularAttribute;
 
 import au.com.vaadinutils.dao.EntityManagerProvider;
+import au.com.vaadinutils.fields.TableCheckBoxSelect;
 
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.JPAContainerFactory;
 import com.vaadin.addon.jpacontainer.QueryModifierDelegate;
 import com.vaadin.addon.jpacontainer.fieldfactory.MultiSelectConverter;
+import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.filter.SimpleStringFilter;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
-import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.ColumnHeaderMode;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
@@ -26,7 +28,7 @@ import com.vaadin.ui.VerticalLayout;
 public class ReportParameterTable<T> extends ReportParameter<String>
 {
 
-	private Table table;
+	protected TableCheckBoxSelect table;
 	private Long defaultValue = null;
 	JPAContainer<T> container = null;
 	private boolean notEmpty = false;
@@ -52,13 +54,10 @@ public class ReportParameterTable<T> extends ReportParameter<String>
 	private void init(String caption, Class<T> tableClass, final SingularAttribute<T, String> displayField,
 			boolean multiSelect)
 	{
-		container = JPAContainerFactory.makeBatchable(tableClass, EntityManagerProvider.getEntityManager());
-		container.sort(new Object[] { displayField.getName() }, new boolean[] { true });
-
-		container.setQueryModifierDelegate(getQueryModifierDelegate());
+		container = createContainer(tableClass, displayField);
 
 		layout = new VerticalLayout();
-		layout.setSizeFull();
+		// layout.setSizeFull();
 		this.caption = caption;
 
 		TextField searchText = new TextField();
@@ -69,7 +68,6 @@ public class ReportParameterTable<T> extends ReportParameter<String>
 		searchText.addTextChangeListener(new TextChangeListener()
 		{
 
-		
 			private static final long serialVersionUID = 1315710313315289836L;
 
 			@Override
@@ -85,7 +83,7 @@ public class ReportParameterTable<T> extends ReportParameter<String>
 			}
 		});
 
-		table = new Table();
+		table = new TableCheckBoxSelect();
 
 		table.setSizeFull();
 		// table.setHeight("150");
@@ -94,17 +92,66 @@ public class ReportParameterTable<T> extends ReportParameter<String>
 
 		table.setConverter(MultiSelectConverter.class);
 
-		table.setVisibleColumns(displayField.getName());
-		table.setSelectable(true);
+		table.setSelectable(false);
 		table.setColumnHeaderMode(ColumnHeaderMode.HIDDEN);
+		setVisibleColumns(displayField);
 		table.setNewItemsAllowed(false);
 		table.setNullSelectionAllowed(false);
 		table.setMultiSelect(multiSelect);
 
+		CheckBox selectAll = new CheckBox("Select all");
+
+		selectAll.addValueChangeListener(new ValueChangeListener()
+		{
+
+			private static final long serialVersionUID = 3046649134868865285L;
+
+			@Override
+			public void valueChange(ValueChangeEvent event)
+			{
+				if ((Boolean) event.getProperty().getValue() == true)
+				{
+					table.selectAll();
+				}
+				else
+				{
+					table.deselectAll();
+				}
+
+			}
+		});
+
 		layout.addComponent(new Label(caption));
 		layout.addComponent(searchText);
 		layout.addComponent(table);
+		if (multiSelect)
+		{
+			layout.addComponent(selectAll);
+		}
 		layout.setExpandRatio(table, 1);
+		// layout.setComponentAlignment(selectAll, Alignment.BOTTOM_RIGHT);
+
+	}
+
+	protected void setVisibleColumns(final SingularAttribute<T, String> displayField)
+	{
+		table.setVisibleColumns(displayField.getName());
+	}
+
+	/**
+	 * overload this method to create something more than just a single entity.
+	 * 
+	 * @param tableClass
+	 * @param displayField
+	 * @return
+	 */
+	protected JPAContainer<T> createContainer(Class<T> tableClass, final SingularAttribute<T, String> displayField)
+	{
+		JPAContainer<T> cont = JPAContainerFactory.makeBatchable(tableClass, EntityManagerProvider.getEntityManager());
+		cont.sort(new Object[] { displayField.getName() }, new boolean[] { true });
+
+		cont.setQueryModifierDelegate(getQueryModifierDelegate());
+		return cont;
 	}
 
 	/**
@@ -130,7 +177,7 @@ public class ReportParameterTable<T> extends ReportParameter<String>
 		if (table.isMultiSelect())
 		{
 			@SuppressWarnings("unchecked")
-			Set<Long> ids = (Set<Long>) table.getValue();
+			Set<Long> ids = (Set<Long>) table.getSelectedItems();
 			String selection = "";
 			for (Long id : ids)
 			{
@@ -152,7 +199,7 @@ public class ReportParameterTable<T> extends ReportParameter<String>
 			}
 			return selection;
 		}
-		String v = "" + table.getValue();
+		String v = "" + table.getSelectedItems();
 		if (v.length() == 0 && defaultValue != null)
 		{
 			v = "" + defaultValue;

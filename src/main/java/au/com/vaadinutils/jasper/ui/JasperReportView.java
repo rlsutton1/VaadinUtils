@@ -21,14 +21,14 @@ public abstract class JasperReportView extends HorizontalLayout implements View,
 
 	final JasperReportLayout report;
 
-	protected JasperReportView(ReportProperties reportProperties)
+	protected JasperReportView(JasperReportProperties reportProperties)
 	{
 		report = new JasperReportLayout(reportProperties);
 	}
 
 	protected JasperReportView(String title, String filename, EntityManager entityManager, JasperSettings settings)
 	{
-		report = new JasperReportLayout(new ReportProperties(title, filename, this, entityManager, settings));
+		report = new JasperReportLayout(new JasperReportProperties(title, filename, this, entityManager, settings));
 	}
 
 	@Override
