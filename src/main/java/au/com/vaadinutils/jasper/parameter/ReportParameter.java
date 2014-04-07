@@ -7,12 +7,13 @@ import com.vaadin.ui.Component;
 
 public abstract class ReportParameter<T>
 {
-	String parameterName;
-	String label;
+	final String parameterName;
+	final protected String label;
 
-	public ReportParameter(String parameterName)
+	public ReportParameter(String label ,String parameterName)
 	{
 		this.parameterName = parameterName;
+		this.label = label;
 	}
 
 	public String getUrlEncodedKeyAndParameter() throws UnsupportedEncodingException
@@ -35,10 +36,10 @@ public abstract class ReportParameter<T>
 
 	public abstract String getExpectedParameterClassName();
 
-	public void setLabel(String label)
-	{
-		this.label = label;
 
+	public String getLabel()
+	{
+		return label;
 	}
 
 	public boolean showFilter()
@@ -46,10 +47,8 @@ public abstract class ReportParameter<T>
 		return true;
 	}
 
-	public void setParameterName(String newName)
-	{
-		parameterName = newName;
 
-	}
+	abstract public String getDisplayValue();
+	
 
 }

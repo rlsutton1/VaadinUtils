@@ -4,6 +4,9 @@ import java.util.Set;
 
 import javax.persistence.metamodel.SingularAttribute;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.fields.TableCheckBoxSelect;
 
@@ -34,11 +37,13 @@ public class ReportParameterTable<T> extends ReportParameter<String>
 	private boolean notEmpty = false;
 	private VerticalLayout layout;
 	private String caption;
+	Logger logger = LogManager.getLogger();
+	private SingularAttribute<T, String> displayField;
 
 	public ReportParameterTable(String caption, String parameterName, Class<T> tableClass,
 			SingularAttribute<T, String> displayField, boolean multiSelect)
 	{
-		super(parameterName);
+		super(caption, parameterName);
 		init(caption, tableClass, displayField, multiSelect);
 
 	}
@@ -46,7 +51,7 @@ public class ReportParameterTable<T> extends ReportParameter<String>
 	public ReportParameterTable(String caption, String parameterName, Class<T> tableClass,
 			SingularAttribute<T, String> displayField, boolean multiSelect, long defaultValue)
 	{
-		super(parameterName);
+		super(caption, parameterName);
 		init(caption, tableClass, displayField, multiSelect);
 		this.defaultValue = defaultValue;
 	}
@@ -55,7 +60,7 @@ public class ReportParameterTable<T> extends ReportParameter<String>
 			boolean multiSelect)
 	{
 		container = createContainer(tableClass, displayField);
-
+		this.displayField = displayField;
 		layout = new VerticalLayout();
 		// layout.setSizeFull();
 		this.caption = caption;
@@ -174,7 +179,7 @@ public class ReportParameterTable<T> extends ReportParameter<String>
 	public String getValue()
 	{
 
-		if (table.isMultiSelect())
+		try
 		{
 			@SuppressWarnings("unchecked")
 			Set<Long> ids = (Set<Long>) table.getSelectedItems();
@@ -198,18 +203,13 @@ public class ReportParameterTable<T> extends ReportParameter<String>
 				throw new RuntimeException(caption + " can not be empty");
 			}
 			return selection;
+
 		}
-		String v = "" + table.getSelectedItems();
-		if (v.length() == 0 && defaultValue != null)
+		catch (Exception e)
 		{
-			v = "" + defaultValue;
+			logger.error("Exception while getting value(s) for " + parameterName);
+			throw new RuntimeException(e);
 		}
-		if (notEmpty && v.length() == 0)
-		{
-			Notification.show("Please select at least one " + caption, Type.ERROR_MESSAGE);
-			throw new RuntimeException(caption + " can not be empty");
-		}
-		return v;
 
 	}
 
@@ -242,6 +242,51 @@ public class ReportParameterTable<T> extends ReportParameter<String>
 	public String getExpectedParameterClassName()
 	{
 		return String.class.getCanonicalName();
+	}
+
+	@Override
+	public String getDisplayValue()
+	{
+		try
+		{
+
+			@SuppressWarnings("unchecked")
+			Set<Long> ids = (Set<Long>) table.getSelectedItems();
+			String selection = "";
+			int ctr = 0;
+			for (Long id : ids)
+			{
+				ctr++;
+				selection += "" + table.getItem(id).getItemProperty(displayField.getName()) + ",";
+				if (ctr > 2)
+					break;
+			}
+			if (selection.length() > 1)
+			{
+				selection = selection.substring(0, selection.length() - 1);
+			}
+			if (ctr != ids.size())
+			{
+				selection += " (+" + (ids.size() - ctr) + " more)";
+			}
+			// supply default if emtpy
+			if (selection.length() == 0 && defaultValue != null)
+			{
+				selection = "" + table.getItemCaption(defaultValue);
+			}
+			if (notEmpty && selection.length() == 0)
+			{
+				Notification.show("Please select at least one " + caption, Type.ERROR_MESSAGE);
+				throw new RuntimeException(caption + " can not be empty");
+			}
+			return selection;
+
+		}
+		catch (Exception e)
+		{
+			logger.error("Exception while getting value(s) for " + parameterName);
+			throw new RuntimeException(e);
+		}
 	}
 
 }

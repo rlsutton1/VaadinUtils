@@ -1,5 +1,6 @@
 package au.com.vaadinutils.jasper;
 
+import java.awt.Color;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -31,6 +32,7 @@ import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.design.JRDesignBand;
 import net.sf.jasperreports.engine.design.JRDesignElement;
 import net.sf.jasperreports.engine.design.JRDesignExpression;
+import net.sf.jasperreports.engine.design.JRDesignStaticText;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.export.JRCsvExporter;
 import net.sf.jasperreports.engine.export.JRExportProgressMonitor;
@@ -39,6 +41,9 @@ import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
 import net.sf.jasperreports.engine.export.JRPdfExporter;
 import net.sf.jasperreports.engine.fill.FillListener;
 import net.sf.jasperreports.engine.fill.JRSwapFileVirtualizer;
+import net.sf.jasperreports.engine.type.HorizontalAlignEnum;
+import net.sf.jasperreports.engine.type.ModeEnum;
+import net.sf.jasperreports.engine.type.WhenNoDataTypeEnum;
 import net.sf.jasperreports.engine.util.JRLoader;
 import net.sf.jasperreports.engine.util.JRSwapFile;
 import net.sf.jasperreports.web.servlets.AsyncJasperPrintAccessor;
@@ -54,6 +59,9 @@ import au.com.vaadinutils.jasper.parameter.ReportParameter;
 import au.com.vaadinutils.jasper.servlet.VaadinJasperPrintServlet;
 import au.com.vaadinutils.jasper.ui.JasperReportProperties;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.gwt.thirdparty.guava.common.base.Preconditions;
 import com.vaadin.server.Page;
 import com.vaadin.server.VaadinServlet;
@@ -64,7 +72,7 @@ public class JasperManager implements Runnable
 {
 	private static transient Logger logger = LogManager.getLogger(JasperManager.class);
 
-	private final JasperReport jasperReport;
+	
 	private final Map<String, Object> boundParams = new HashMap<String, Object>();
 
 	private CustomAsynchronousFillHandle fillHandle;
@@ -142,18 +150,18 @@ public class JasperManager implements Runnable
 	public JasperManager(JasperReportProperties reportProperties)
 	{
 		this.reportProperties = reportProperties;
-		String reportFileName = reportProperties.getReportFileName();
-		String reportDesignName = reportFileName.substring(0, reportFileName.indexOf("."));
-		JasperSettings settings = reportProperties.getSettings();
-
-		Preconditions.checkArgument(settings.getReportFile(reportDesignName + ".jrxml").exists(),
-				"The passed Jasper Report File doesn't exist: "
-						+ settings.getReportFile(reportDesignName).getAbsolutePath());
-
 		try
 		{
 			// compileReport(getDesignFile(sourcePath, reportDesignName),
 			// sourcePath, sourcePath, reportDesignName);
+
+			String reportFileName = reportProperties.getReportFileName();
+			String reportDesignName = reportFileName.substring(0, reportFileName.indexOf("."));
+			JasperSettings settings = reportProperties.getSettings();
+
+			Preconditions.checkArgument(settings.getReportFile(reportDesignName + ".jrxml").exists(),
+					"The passed Jasper Report File doesn't exist: "
+							+ settings.getReportFile(reportDesignName).getAbsolutePath());
 
 			File sourcePath = settings.getReportFile(reportFileName).getParentFile();
 			JasperReportCompiler jasperReportCompiler = new JasperReportCompiler();
@@ -203,7 +211,7 @@ public class JasperManager implements Runnable
 		designFile.setPageWidth((int) pageWidth);
 		designFile.setPageHeight(pageHeight);
 
-		int maxY = determineSizeOfTitleTemplateAndReplaceTitlePlaceHolder(designFile, title, newTitle, margin);
+		int maxY = determineSizeOfTemplateBandAndReplaceTitlePlaceHolder(designFile, title, newTitle, margin);
 
 		maxY += 2;
 
@@ -212,6 +220,13 @@ public class JasperManager implements Runnable
 		JRBand footer = replaceFooterWithTemplateFooter(designFile, template, margin);
 
 		designFile.setPageFooter(footer);
+
+		JRDesignBand noDataBand = new JRDesignBand();
+		int noDataHeight = determineSizeOfTemplateBandAndReplaceTitlePlaceHolder(designFile, template.getNoData(),
+				noDataBand, margin);
+		designFile.setNoData(noDataBand);
+		noDataBand.setHeight(noDataHeight);
+		designFile.setWhenNoDataType(WhenNoDataTypeEnum.NO_DATA_SECTION);
 
 	}
 
@@ -242,43 +257,103 @@ public class JasperManager implements Runnable
 	private void mergeExistingTitleWithTemplateTitle(JasperDesign designFile, JRDesignBand newTitle, int yoffset)
 	{
 		int maxY = 0;
-		for (JRElement element : designFile.getTitle().getElements())
-		{
+//		for (JRElement element : designFile.getTitle().getElements())
+//		{
+//
+//			JRDesignElement de = (JRDesignElement) element;
+//			de.setY(de.getY() + yoffset);
+//			maxY = Math.max(maxY, de.getY() + element.getHeight());
+//			newTitle.addElement(element);
+//		}
 
-			JRDesignElement de = (JRDesignElement) element;
-			de.setY(de.getY() + yoffset);
-			maxY = Math.max(maxY, de.getY() + element.getHeight());
-			newTitle.addElement(element);
-		}
+		
+
 		newTitle.setHeight(Math.max(maxY + 2, yoffset + 2));
 		designFile.setTitle(newTitle);
 
 	}
 
-	private int determineSizeOfTitleTemplateAndReplaceTitlePlaceHolder(JasperDesign designFile, JRBand header,
-			JRDesignBand newTitle, int margin)
+	private int determineSizeOfTemplateBandAndReplaceTitlePlaceHolder(JasperDesign designFile, JRBand templateBand,
+			JRDesignBand targetBand, int margin)
 	{
 		int maxY = 0;
-		for (JRElement element : header.getElements())
+		for (JRElement element : templateBand.getElements())
 		{
-			if (element instanceof JRDesignElement)
+
+			JRDesignElement de = (JRDesignElement) element;
+			if (element instanceof JRStaticText)
 			{
-				JRDesignElement de = (JRDesignElement) element;
-				if (element instanceof JRStaticText)
+				JRStaticText st = (JRStaticText) element;
+				if (st.getText().equalsIgnoreCase("report name place holder"))
 				{
-					JRStaticText st = (JRStaticText) element;
-					if (st.getText().equalsIgnoreCase("report name place holder"))
-					{
-						st.setText(reportProperties.getReportTitle());
-						st.setWidth((designFile.getPageWidth() - st.getX()) - (margin * 2));
-					}
+					st.setText(reportProperties.getReportTitle());
+					st.setWidth((designFile.getPageWidth() - st.getX()) - (margin * 2));
 				}
-
-				maxY = Math.max(maxY, de.getY() + de.getHeight());
-
-				newTitle.addElement(de);
 			}
 
+			maxY = Math.max(maxY, de.getY() + de.getHeight());
+
+			targetBand.addElement(de);
+
+		}
+		
+		// add parameters section to the report
+		if (params != null)
+		{
+			JRDesignStaticText paramElement = new JRDesignStaticText();
+			paramElement.setText("Parameters" );
+			paramElement.setWidth(525);
+			paramElement.setHeight(15);
+			paramElement.setBackcolor(new Color(0,0,0));
+			paramElement.setForecolor(new Color(255,255,255));
+			paramElement.setMode(ModeEnum.OPAQUE);
+			
+			paramElement.setX(0);
+			paramElement.setY(maxY + 2);
+			paramElement.setFontName("SansSerif");
+			paramElement.setBold(true);
+			paramElement.setFontSize(12);
+			paramElement.setHorizontalAlignment(HorizontalAlignEnum.CENTER);
+			
+			targetBand.addElement(paramElement);
+			maxY = paramElement.getY() + paramElement.getHeight();
+			
+			for (ReportParameter<?> param : params)
+			{
+				if (param.showFilter())
+				{
+					JRDesignStaticText labelElement = new JRDesignStaticText();
+					labelElement.setText(param.getLabel() );
+					labelElement.setWidth(125);
+					labelElement.setHeight(20);
+					labelElement.setBackcolor(new Color(208,208,208));
+					labelElement.setMode(ModeEnum.OPAQUE);
+					
+					labelElement.setX(0);
+					labelElement.setY(maxY );
+					labelElement.setFontName("SansSerif");
+					labelElement.setFontSize(12);
+					targetBand.addElement(labelElement);
+					
+					
+					
+					
+					JRDesignStaticText valueElement = new JRDesignStaticText();
+					valueElement.setText( param.getDisplayValue());
+					valueElement.setWidth(400);
+					valueElement.setHeight(20);
+					valueElement.setBackcolor(new Color(208,208,208));
+					valueElement.setMode(ModeEnum.OPAQUE);
+					
+					valueElement.setX(125);
+					valueElement.setY(maxY );
+					valueElement.setFontName("SansSerif");
+					valueElement.setFontSize(12);
+					targetBand.addElement(valueElement);
+					maxY = valueElement.getY() + valueElement.getHeight();
+					
+				}
+			}
 		}
 		return maxY;
 	}
@@ -497,6 +572,48 @@ public class JasperManager implements Runnable
 			JasperProgressListener progressListener)
 	{
 
+		try
+		{
+			if (params == null)
+			{
+				params = new LinkedList<ReportParameter<?>>();
+			}
+			this.params = params;
+			// compileReport(getDesignFile(sourcePath, reportDesignName),
+			// sourcePath, sourcePath, reportDesignName);
+
+			String reportFileName = reportProperties.getReportFileName();
+			String reportDesignName = reportFileName.substring(0, reportFileName.indexOf("."));
+			JasperSettings settings = reportProperties.getSettings();
+
+			Preconditions.checkArgument(settings.getReportFile(reportDesignName + ".jrxml").exists(),
+					"The passed Jasper Report File doesn't exist: "
+							+ settings.getReportFile(reportDesignName).getAbsolutePath());
+
+			File sourcePath = settings.getReportFile(reportFileName).getParentFile();
+			JasperReportCompiler jasperReportCompiler = new JasperReportCompiler();
+			JasperDesign designFile = jasperReportCompiler.getDesignFile(sourcePath, reportDesignName);
+
+			String templateName = settings.getHeaderFooterTemplateName();
+			if (templateName != null)
+			{
+				JasperDesign headerTemplate = jasperReportCompiler.getDesignFile(sourcePath, templateName);
+
+				replaceHeader(designFile, headerTemplate);
+			}
+			setCSVOptions(designFile);
+
+			jasperReportCompiler.compileReport(designFile, sourcePath, sourcePath, reportDesignName);
+
+			this.jasperReport = (JasperReport) JRLoader.loadObject(settings.getReportFile(reportFileName));
+
+		}
+		catch (Throwable e)
+		{
+			logger.error(e, e);
+			throw new RuntimeException("Bad report compilation");
+		}
+
 		WrappedSession session = UI.getCurrent().getSession().getSession();
 		images = new ConcurrentHashMap<String, byte[]>();
 		session.setAttribute(VaadinJasperPrintServlet.IMAGES_MAP, images);
@@ -509,11 +626,7 @@ public class JasperManager implements Runnable
 		inputStream = null;
 		outputStream = null;
 
-		if (params == null)
-		{
-			params = new LinkedList<ReportParameter<?>>();
-		}
-		this.params = params;
+	
 
 		if (concurrentLimit.tryAcquire())
 		{
@@ -727,4 +840,16 @@ public class JasperManager implements Runnable
 		return reportProperties.getReportFileName();
 	}
 
+	
+	LoadingCache<String, JasperReport> graphs = CacheBuilder.newBuilder()
+		       .maximumSize(1000)
+		       .expireAfterWrite(10, TimeUnit.MINUTES)
+		       .build(
+		           new CacheLoader<String, JasperReport>() {
+		             public JasperReport load(String key) {
+		               return null;
+		             }
+		           });
+	private JasperReport jasperReport;
+	
 }

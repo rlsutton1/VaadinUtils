@@ -9,7 +9,7 @@ public class ReportParameterConstant extends ReportParameter<String>
 
 	public ReportParameterConstant(String parameterName, String value)
 	{
-		super(parameterName);
+		super(parameterName,parameterName);
 		this.value = value;
 
 	}
@@ -51,4 +51,9 @@ public class ReportParameterConstant extends ReportParameter<String>
 		return false;
 	}
 
+	@Override
+	public String getDisplayValue()
+	{
+		throw new RuntimeException("Not Implemented");
+	}
 }

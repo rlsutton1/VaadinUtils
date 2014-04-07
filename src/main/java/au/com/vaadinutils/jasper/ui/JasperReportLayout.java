@@ -100,7 +100,8 @@ class JasperReportLayout extends HorizontalSplitPanel
 		{
 			setSplitPosition(15);
 
-		}else
+		}
+		else
 		{
 			Integer splitAt = builder.getMinWidth();
 			if (splitAt == null)
@@ -213,15 +214,30 @@ class JasperReportLayout extends HorizontalSplitPanel
 
 					List<ReportParameter<?>> subFilters = new LinkedList<ReportParameter<?>>();
 
+					boolean insitue = false;
 					@SuppressWarnings("unchecked")
 					Iterator<String> itr = params.keys();
 					while (itr.hasNext())
 					{
 						String key = itr.next();
-						subFilters.add(new ReportParameterConstant(key, params.getString(key)));
+						if (key.equalsIgnoreCase("ReportParameterInsitue"))
+						{
+							insitue = true;
+						}
+						else
+						{
+							subFilters.add(new ReportParameterConstant(key, params.getString(key)));
+						}
 					}
 
-					new JasperReportPopUp(subReportProperties, subFilters);
+					if (!insitue)
+					{
+						new JasperReportPopUp(subReportProperties, subFilters);
+					}
+					else
+					{
+						generateReport(OutputFormat.HTML, subFilters);
+					}
 				}
 				catch (Exception e)
 				{
@@ -239,7 +255,6 @@ class JasperReportLayout extends HorizontalSplitPanel
 		layout.setMargin(new MarginInfo(false, false, false, false));
 		layout.setSpacing(true);
 		layout.setSizeFull();
-		
 
 		String buttonHeight = "" + 40;
 		HorizontalLayout buttonBar = new HorizontalLayout();

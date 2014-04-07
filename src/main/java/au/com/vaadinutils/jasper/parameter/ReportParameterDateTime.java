@@ -31,7 +31,7 @@ public class ReportParameterDateTime extends ReportParameter<String>
 	public ReportParameterDateTime(String caption, String parameterName, Resolution resolution, String displayFormat,
 			String parameterFormat)
 	{
-		super(parameterName);
+		super(caption,parameterName);
 		field = new DateField(caption, new DateTime().toDate());
 		field.setResolution(resolution);
 		field.setDateFormat(displayFormat);
@@ -40,7 +40,7 @@ public class ReportParameterDateTime extends ReportParameter<String>
 
 	public ReportParameterDateTime(String caption, String parameterName)
 	{
-		super(parameterName);
+		super(caption,parameterName);
 		field = new DateField(caption, new DateTime().withTimeAtStartOfDay().toDate());
 		field.setResolution(Resolution.DAY);
 		field.setDateFormat("yyyy/MM/dd");
@@ -82,5 +82,11 @@ public class ReportParameterDateTime extends ReportParameter<String>
 	public String getExpectedParameterClassName()
 	{
 		return null;
+	}
+	
+	@Override
+	public String getDisplayValue()
+	{
+		return new SimpleDateFormat(field.getDateFormat()).format(field.getValue());
 	}
 }

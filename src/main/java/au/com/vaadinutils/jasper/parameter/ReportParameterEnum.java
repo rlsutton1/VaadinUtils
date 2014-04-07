@@ -19,7 +19,7 @@ public class ReportParameterEnum<T extends Enum<T>> extends ReportParameter<Enum
 	 */
 	public ReportParameterEnum(String caption, T defaultValue,String parameterName, Class<T> enumClass)
 	{
-		super(parameterName);
+		super(caption,parameterName);
 		field = new ComboBox(caption);
 		field.setContainerDataSource(FormHelper.createContainerFromEnumClass("value", enumClass));
 		field.setNewItemsAllowed(false);
@@ -57,5 +57,11 @@ public class ReportParameterEnum<T extends Enum<T>> extends ReportParameter<Enum
 	public String getExpectedParameterClassName()
 	{
 		return String.class.getCanonicalName();
+	}
+
+	@Override
+	public String getDisplayValue()
+	{
+		return getValue();
 	}
 }

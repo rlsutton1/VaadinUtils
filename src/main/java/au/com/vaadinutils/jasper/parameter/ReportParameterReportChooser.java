@@ -21,7 +21,7 @@ public class ReportParameterReportChooser<T extends Enum<T> & ReportChooser> ext
 	 */
 	public ReportParameterReportChooser(String caption, T defaultValue,String parameterName, Class<T> enumClass)
 	{
-		super(parameterName);
+		super(caption,parameterName);
 		field = new ComboBox(caption);
 		field.setContainerDataSource(FormHelper.createContainerFromEnumClass("value", enumClass));
 		field.setNewItemsAllowed(false);
@@ -67,6 +67,12 @@ public class ReportParameterReportChooser<T extends Enum<T> & ReportChooser> ext
 		@SuppressWarnings("unchecked")
 		T e = (T)field.getValue();
 		return e.getReportProperties(dataProvider);
+	}
+
+	@Override
+	public String getDisplayValue()
+	{
+		return getValue();
 	}
 	
 	

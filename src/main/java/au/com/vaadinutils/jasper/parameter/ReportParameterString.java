@@ -10,7 +10,7 @@ public class ReportParameterString extends ReportParameter<String>
 
 	public ReportParameterString(String caption, String parameterName)
 	{
-		super( parameterName);
+		super( caption,parameterName);
 		field = new TextField();
 		field.setCaption(caption);
 	}
@@ -44,6 +44,12 @@ public class ReportParameterString extends ReportParameter<String>
 	public String getExpectedParameterClassName()
 	{
 		return String.class.getCanonicalName();
+	}
+
+	@Override
+	public String getDisplayValue()
+	{
+		return getValue();
 	}
 
 }
