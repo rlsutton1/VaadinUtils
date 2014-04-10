@@ -74,6 +74,12 @@ public class ReportParameterReportChooser<T extends Enum<T> & ReportChooser> ext
 	{
 		return getValue();
 	}
+
+	@Override
+	public boolean validate()
+	{
+		return true;
+	}
 	
 	
 }

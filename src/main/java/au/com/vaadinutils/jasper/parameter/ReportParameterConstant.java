@@ -56,4 +56,10 @@ public class ReportParameterConstant extends ReportParameter<String>
 	{
 		throw new RuntimeException("Not Implemented");
 	}
+
+	@Override
+	public boolean validate()
+	{
+		return true;
+	}
 }

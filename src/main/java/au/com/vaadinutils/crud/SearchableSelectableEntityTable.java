@@ -7,7 +7,7 @@ import org.apache.logging.log4j.Logger;
 
 import au.com.vaadinutils.listener.ClickEventLogged;
 
-import com.vaadin.addon.jpacontainer.EntityContainer;
+import com.vaadin.data.Container;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
@@ -36,16 +36,19 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 	private VerticalLayout searchBar;
 	private CheckBox advancedSearchCheckbox;
 	private SelectableEntityTable<E> selectableTable;
+	final protected Container.Filterable container;
 
-	public SearchableSelectableEntityTable(EntityContainer<E> entityContainer, HeadingPropertySet<E> headingPropertySet)
+	public SearchableSelectableEntityTable(Container.Filterable entityContainer, HeadingPropertySet<E> headingPropertySet)
 	{
+		
 		selectableTable = new SelectableEntityTable<E>(entityContainer, headingPropertySet);
-		selectableTable.setWidth("100%");
-
+		selectableTable.setSizeFull();
+		container = entityContainer;
 		AbstractLayout searchBar = buildSearchBar();
 
 		this.addComponent(searchBar);
 		this.addComponent(selectableTable);
+		this.setExpandRatio(selectableTable, 1);
 	}
 
 	private AbstractLayout buildSearchBar()
@@ -94,6 +97,11 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 		return searchBar;
 	}
 
+	public void disableSelectable()
+	{
+		selectableTable.disableSelectable();
+	}
+	
 	/**
 	 * Filtering
 	 * 

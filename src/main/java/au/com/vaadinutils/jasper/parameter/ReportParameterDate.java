@@ -59,4 +59,12 @@ public class ReportParameterDate extends ReportParameter<Date>
 	{
 		return new SimpleDateFormat(field.getDateFormat()).format(field.getValue());
 	}
+
+	@Override
+	public boolean validate()
+	{
+		return true;
+	}
+
+	
 }

@@ -1,5 +1,6 @@
 package au.com.vaadinutils.jasper.parameter;
 
+import java.util.Collection;
 import java.util.Set;
 
 import javax.persistence.metamodel.SingularAttribute;
@@ -14,16 +15,18 @@ import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.JPAContainerFactory;
 import com.vaadin.addon.jpacontainer.QueryModifierDelegate;
 import com.vaadin.addon.jpacontainer.fieldfactory.MultiSelectConverter;
+import com.vaadin.data.Container;
+import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
+import com.vaadin.data.Validator;
 import com.vaadin.data.util.filter.SimpleStringFilter;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
+import com.vaadin.server.ErrorMessage;
+import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.Table.ColumnHeaderMode;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
@@ -34,7 +37,6 @@ public class ReportParameterTable<T> extends ReportParameter<String>
 	protected TableCheckBoxSelect table;
 	private Long defaultValue = null;
 	JPAContainer<T> container = null;
-	private boolean notEmpty = false;
 	private VerticalLayout layout;
 	private String caption;
 	Logger logger = LogManager.getLogger();
@@ -45,15 +47,17 @@ public class ReportParameterTable<T> extends ReportParameter<String>
 	{
 		super(caption, parameterName);
 		init(caption, tableClass, displayField, multiSelect);
+		setNotEmpty();
 
 	}
 
 	public ReportParameterTable(String caption, String parameterName, Class<T> tableClass,
-			SingularAttribute<T, String> displayField, boolean multiSelect, long defaultValue)
+			SingularAttribute<T, String> displayField, boolean multiSelect, Long defaultValue)
 	{
 		super(caption, parameterName);
 		init(caption, tableClass, displayField, multiSelect);
 		this.defaultValue = defaultValue;
+		setNotEmpty();
 	}
 
 	private void init(String caption, Class<T> tableClass, final SingularAttribute<T, String> displayField,
@@ -62,10 +66,11 @@ public class ReportParameterTable<T> extends ReportParameter<String>
 		container = createContainer(tableClass, displayField);
 		this.displayField = displayField;
 		layout = new VerticalLayout();
-		// layout.setSizeFull();
+		layout.setSizeFull();
 		this.caption = caption;
 
 		TextField searchText = new TextField();
+		searchText.setInputPrompt("Search");
 		searchText.setWidth("100%");
 		searchText.setImmediate(true);
 		searchText.setHeight("20");
@@ -97,9 +102,10 @@ public class ReportParameterTable<T> extends ReportParameter<String>
 
 		table.setConverter(MultiSelectConverter.class);
 
-		table.setSelectable(false);
 		table.setColumnHeaderMode(ColumnHeaderMode.HIDDEN);
 		setVisibleColumns(displayField);
+		table.setColumnWidth(displayField.getName(), 130);
+		table.setColumnExpandRatio(displayField.getName(), 1);
 		table.setNewItemsAllowed(false);
 		table.setNullSelectionAllowed(false);
 		table.setMultiSelect(multiSelect);
@@ -126,7 +132,8 @@ public class ReportParameterTable<T> extends ReportParameter<String>
 			}
 		});
 
-		layout.addComponent(new Label(caption));
+		// removed for concertina
+		// layout.addComponent(new Label(caption));
 		layout.addComponent(searchText);
 		layout.addComponent(table);
 		if (multiSelect)
@@ -175,6 +182,16 @@ public class ReportParameterTable<T> extends ReportParameter<String>
 		table.addValueChangeListener(listener);
 	}
 
+	public void removeAllContainerFilters()
+	{
+		((Container.Filterable) table.getContainerDataSource()).removeAllContainerFilters();
+	}
+
+	public void addContainerFilter(Filter filter)
+	{
+		((Container.Filterable) table.getContainerDataSource()).addContainerFilter(filter);
+	}
+
 	@Override
 	public String getValue()
 	{
@@ -197,11 +214,6 @@ public class ReportParameterTable<T> extends ReportParameter<String>
 			{
 				selection = "" + defaultValue;
 			}
-			if (notEmpty && selection.length() == 0)
-			{
-				Notification.show("Please select at least one " + caption, Type.ERROR_MESSAGE);
-				throw new RuntimeException(caption + " can not be empty");
-			}
 			return selection;
 
 		}
@@ -213,9 +225,62 @@ public class ReportParameterTable<T> extends ReportParameter<String>
 
 	}
 
-	public ReportParameter<?> setNotEmpty()
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Override
+	public boolean validate()
 	{
-		notEmpty = true;
+		return super.validateField((AbstractField) table);
+	}
+
+	public void allowEmpty()
+	{
+		table.removeAllValidators();
+	}
+
+	private ReportParameter<?> setNotEmpty()
+	{
+		Validator validator = new Validator()
+		{
+
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 8942263638713110223L;
+
+			@SuppressWarnings("unchecked")
+			@Override
+			public void validate(Object value) throws InvalidValueException
+			{
+				validateListener.setComponentError(null);
+				table.setComponentError(null);
+
+				Collection<Long> ids = (Collection<Long>) table.getSelectedItems();
+				if (ids.size() == 0)
+				{
+					ErrorMessage error = new ErrorMessage()
+					{
+
+						private static final long serialVersionUID = -6437991860908562482L;
+
+						@Override
+						public ErrorLevel getErrorLevel()
+						{
+							return ErrorLevel.ERROR;
+						}
+
+						@Override
+						public String getFormattedHtmlMessage()
+						{
+							return "You must select at least one " + caption;
+						}
+					};
+					validateListener.setComponentError(error);
+					throw new Validator.EmptyValueException("You must select at least one " + caption);
+				}
+
+			}
+		};
+		table.addValidator(validator);
 		return this;
 	}
 
@@ -273,11 +338,6 @@ public class ReportParameterTable<T> extends ReportParameter<String>
 			if (selection.length() == 0 && defaultValue != null)
 			{
 				selection = "" + table.getItemCaption(defaultValue);
-			}
-			if (notEmpty && selection.length() == 0)
-			{
-				Notification.show("Please select at least one " + caption, Type.ERROR_MESSAGE);
-				throw new RuntimeException(caption + " can not be empty");
 			}
 			return selection;
 

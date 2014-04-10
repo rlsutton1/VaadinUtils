@@ -3,7 +3,6 @@ package au.com.vaadinutils.jasper.ui;
 import java.util.Collection;
 import java.util.List;
 
-import au.com.vaadinutils.jasper.JasperManager;
 import au.com.vaadinutils.jasper.JasperManager.OutputFormat;
 import au.com.vaadinutils.jasper.filter.ReportFilterUIBuilder;
 import au.com.vaadinutils.jasper.parameter.ReportParameter;
@@ -55,9 +54,9 @@ public class JasperReportPopUp extends Window implements JasperReportDataProvide
 	}
 
 	@Override
-	public ReportFilterUIBuilder getFilterBuilder(JasperManager manager)
+	public ReportFilterUIBuilder getFilterBuilder()
 	{
-		ReportFilterUIBuilder builder = new ReportFilterUIBuilder(manager);
+		ReportFilterUIBuilder builder = new ReportFilterUIBuilder();
 
 		for (ReportParameter<?> filter : filters)
 		{
@@ -68,18 +67,13 @@ public class JasperReportPopUp extends Window implements JasperReportDataProvide
 	}
 
 	@Override
-	public List<ReportParameter<?>> prepareData(Collection<ReportParameter<?>> params, String reportFileName)
+	public List<ReportParameter<?>> prepareData(Collection<ReportParameter<?>> params, String reportFileName, CleanupCallback cleanupCallback)
 			throws Exception
 	{
-		return dataProvider.prepareData(params, reportFileName);
+		return dataProvider.prepareData(params, reportFileName, cleanupCallback);
 	}
 
-	@Override
-	public void cleanup()
-	{
-		dataProvider.cleanup();
-
-	}
+	
 
 	@Override
 	public void prepareForOutputFormat(OutputFormat outputFormat)
@@ -106,6 +100,12 @@ public class JasperReportPopUp extends Window implements JasperReportDataProvide
 	public OutputFormat getDefaultFormat()
 	{
 		return dataProvider.getDefaultFormat();
+	}
+
+	@Override
+	public CleanupCallback getCleanupCallback()
+	{
+		return dataProvider.getCleanupCallback();
 	}
 
 }

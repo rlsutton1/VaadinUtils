@@ -5,19 +5,17 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.sf.jasperreports.engine.JRParameter;
-
 import org.joda.time.DateTime;
 
-import au.com.vaadinutils.jasper.JasperManager;
-import au.com.vaadinutils.jasper.parameter.ReportChooser;
 import au.com.vaadinutils.jasper.parameter.ReportParameter;
 import au.com.vaadinutils.jasper.parameter.ReportParameterDate;
 import au.com.vaadinutils.jasper.parameter.ReportParameterEnum;
 import au.com.vaadinutils.jasper.parameter.ReportParameterString;
 
-import com.google.gwt.thirdparty.guava.common.base.Preconditions;
-import com.vaadin.ui.Component;
+import com.vaadin.server.ErrorMessage;
+import com.vaadin.ui.Accordion;
+import com.vaadin.ui.FormLayout;
+import com.vaadin.ui.TabSheet.Tab;
 
 /**
  * This class is used to build report filter UI by defining how report
@@ -31,13 +29,11 @@ import com.vaadin.ui.Component;
  */
 public class ReportFilterUIBuilder implements ReportFilterFieldBuilder, ReportFilterDateFieldBuilder
 {
-	private JasperManager manager;
 	private LinkedList<ReportParameter<?>> rparams = new LinkedList<ReportParameter<?>>();
 	private Integer minWidth;
 
-	public ReportFilterUIBuilder(JasperManager manager)
+	public ReportFilterUIBuilder()
 	{
-		this.manager = manager;
 	}
 
 	@Override
@@ -80,31 +76,35 @@ public class ReportFilterUIBuilder implements ReportFilterFieldBuilder, ReportFi
 			parameterName = parameterName.substring("ReportParameter".length(), parameterName.length());
 		}
 		// ReportChooser is not actually a report parameter
-		if (!(param instanceof ReportChooser))
-		{
-			Preconditions.checkArgument(this.manager.paramExists(parameterName), "The passed Jasper Report parameter: "
-					+ parameterName + " does not exist in the Report " + manager.getReportFilename()
-					+ ", valid parameters are " + getParameterList());
-			JRParameter jrParam = manager.getParameter(parameterName);
-
-			String expectedClass = param.getExpectedParameterClassName();
-			Preconditions.checkArgument(expectedClass == null || jrParam.getValueClassName().equals(expectedClass),
-					"Expected " + expectedClass + " but the ReportParameter type is " + jrParam.getValueClassName());
-		}
+		// if (!(param instanceof ReportChooser))
+		// {
+		// Preconditions.checkArgument(this.manager.paramExists(parameterName),
+		// "The passed Jasper Report parameter: "
+		// + parameterName + " does not exist in the Report " +
+		// manager.getReportFilename()
+		// + ", valid parameters are " + getParameterList());
+		// JRParameter jrParam = manager.getParameter(parameterName);
+		//
+		// String expectedClass = param.getExpectedParameterClassName();
+		// Preconditions.checkArgument(expectedClass == null ||
+		// jrParam.getValueClassName().equals(expectedClass),
+		// "Expected " + expectedClass + " but the ReportParameter type is " +
+		// jrParam.getValueClassName());
+		// }
 		rparams.add(param);
 
 		return this;
 	}
 
-	private String getParameterList()
-	{
-		String params = "\n";
-		for (JRParameter param : manager.getParameters())
-		{
-			params += param.getName() + "(" + param.getNestedTypeName() + ") \n";
-		}
-		return params;
-	}
+	// private String getParameterList()
+	// {
+	// String params = "\n";
+	// for (JRParameter param : manager.getParameters())
+	// {
+	// params += param.getName() + "(" + param.getNestedTypeName() + ") \n";
+	// }
+	// return params;
+	// }
 
 	@Override
 	public ReportFilterDateFieldBuilder setDate(DateTime date)
@@ -121,6 +121,7 @@ public class ReportFilterUIBuilder implements ReportFilterFieldBuilder, ReportFi
 	{
 		List<ExpanderComponent> components = new LinkedList<ExpanderComponent>();
 
+		Accordion accordian = null;
 		if (hasFilters())
 		{
 
@@ -128,9 +129,36 @@ public class ReportFilterUIBuilder implements ReportFilterFieldBuilder, ReportFi
 			{
 				if (rparam.showFilter())
 				{
-					components.add(new ExpanderComponent(rparam.getComponent(),rparam.shouldExpand()));
+					if (rparam.shouldExpand())
+					{
+						if (accordian == null)
+						{
+							accordian = new Accordion();
+							accordian.setSizeFull();
+						}
+						final Tab tab = accordian.addTab(rparam.getComponent(), rparam.getLabel());
+						rparam.addValidateListener(new ValidateListener()
+						{
+
+							@Override
+							public void setComponentError(ErrorMessage componentError)
+							{
+								tab.setComponentError(componentError);
+							}
+						});
+						rparam.validate();
+
+					}
+					else
+					{
+						components.add(new ExpanderComponent(rparam.getComponent(), rparam.shouldExpand()));
+					}
 				}
 			}
+		}
+		if (accordian != null)
+		{
+			components.add(new ExpanderComponent(accordian, true));
 		}
 		return components;
 	}

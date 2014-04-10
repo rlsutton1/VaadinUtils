@@ -13,10 +13,11 @@ import au.com.vaadinutils.dao.Transaction;
 import au.com.vaadinutils.jasper.JasperEmailBuilder;
 import au.com.vaadinutils.jasper.JasperManager;
 import au.com.vaadinutils.jasper.JasperManager.OutputFormat;
+import au.com.vaadinutils.jasper.RenderedReport;
 import au.com.vaadinutils.jasper.filter.ReportFilterUIBuilder;
 import au.com.vaadinutils.jasper.parameter.ReportParameter;
+import au.com.vaadinutils.jasper.ui.CleanupCallback;
 import au.com.vaadinutils.jasper.ui.JasperReportDataProvider;
-import au.com.vaadinutils.jasper.RenderedReport;
 import au.com.vaadinutils.listener.CancelListener;
 import au.com.vaadinutils.util.ProgressBarTask;
 import au.com.vaadinutils.util.ProgressTaskListener;
@@ -151,25 +152,18 @@ public class SendEmailTask extends ProgressBarTask<JasperTransmission> implement
 	}
 
 	@Override
-	public ReportFilterUIBuilder getFilterBuilder(JasperManager manager)
+	public ReportFilterUIBuilder getFilterBuilder()
 	{
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<ReportParameter<?>> prepareData(Collection<ReportParameter<?>> params, String reportFileName)
+	public List<ReportParameter<?>> prepareData(Collection<ReportParameter<?>> params, String reportFileName, CleanupCallback cleanupCallback)
 			throws Exception
 	{
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	@Override
-	public void cleanup()
-	{
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
@@ -195,6 +189,13 @@ public class SendEmailTask extends ProgressBarTask<JasperTransmission> implement
 
 	@Override
 	public OutputFormat getDefaultFormat()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CleanupCallback getCleanupCallback()
 	{
 		// TODO Auto-generated method stub
 		return null;

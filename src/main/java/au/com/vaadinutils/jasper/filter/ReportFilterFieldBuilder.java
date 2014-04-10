@@ -4,8 +4,6 @@ import java.util.List;
 
 import au.com.vaadinutils.jasper.parameter.ReportParameter;
 
-import com.vaadin.ui.Component;
-
 public interface ReportFilterFieldBuilder
 {
 

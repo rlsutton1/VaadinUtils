@@ -1,21 +1,28 @@
 package au.com.vaadinutils.fields;
 
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
 import com.vaadin.data.Property;
+import com.vaadin.data.Validator.InvalidValueException;
+import com.vaadin.server.ErrorMessage;
+import com.vaadin.server.ErrorMessage.ErrorLevel;
+import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Table;
-import com.vaadin.ui.themes.Reindeer;
 
 public class TableCheckBoxSelect extends Table
 {
 
+	private static final String TABLE_CHECK_BOX_SELECT = "TableCheckBoxSelect";
 	private static final long serialVersionUID = -7559267854874304189L;
 	Set<Object> markedIds = new TreeSet<Object>();
 	boolean trackingSelected = true;
 	private boolean multiselect;
+	private boolean selectable = true;
+	private Set<ValueChangeListener> valueChangeListeners = new HashSet<ValueChangeListener>();
 
 	public TableCheckBoxSelect()
 	{
@@ -29,9 +36,9 @@ public class TableCheckBoxSelect extends Table
 	public void initCheckboxMultiSelect()
 	{
 
-		this.addGeneratedColumn("TableCheckBoxSelect", getGenerator());
+		this.addGeneratedColumn(TABLE_CHECK_BOX_SELECT, getGenerator());
 		super.setMultiSelect(false);
-		setSelectable(false);
+		super.setSelectable(false);
 
 	}
 
@@ -46,6 +53,8 @@ public class TableCheckBoxSelect extends Table
 		trackingSelected = false;
 		refreshRenderedCells();
 		refreshRowCache();
+		notifyValueChange();
+
 	}
 
 	public void deselectAll()
@@ -54,7 +63,63 @@ public class TableCheckBoxSelect extends Table
 		trackingSelected = true;
 		refreshRenderedCells();
 		refreshRowCache();
+		notifyValueChange();
 
+	}
+
+	private Property.ValueChangeEvent getValueChangeEvent()
+	{
+		Property.ValueChangeEvent event = new Property.ValueChangeEvent()
+		{
+
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 3393822114324878273L;
+
+			@SuppressWarnings("rawtypes")
+			@Override
+			public Property getProperty()
+			{
+				return new Property()
+				{
+
+					
+					private static final long serialVersionUID = 8430716281101427107L;
+
+					@Override
+					public Object getValue()
+					{
+						return getSelectedItems();
+					}
+
+					@Override
+					public void setValue(Object newValue) throws ReadOnlyException
+					{
+						throw new RuntimeException("Not implemented");
+					}
+
+					@Override
+					public Class getType()
+					{
+						throw new RuntimeException("Not implemented");
+					}
+
+					@Override
+					public boolean isReadOnly()
+					{
+						return true;
+					}
+
+					@Override
+					public void setReadOnly(boolean newStatus)
+					{
+						throw new RuntimeException("Not implemented");
+					}
+				};
+			}
+		};
+		return event;
 	}
 
 	public void setColumnHeaders(String... columnHeaders)
@@ -64,7 +129,10 @@ public class TableCheckBoxSelect extends Table
 		{
 			cols.add(col);
 		}
-		cols.add("");
+		if (selectable)
+		{
+			cols.add("");
+		}
 		super.setColumnHeaders(cols.toArray(new String[] {}));
 
 	}
@@ -79,7 +147,10 @@ public class TableCheckBoxSelect extends Table
 			{
 				cols.add(col);
 			}
-			cols.add("TableCheckBoxSelect");
+			if (selectable)
+			{
+				cols.add(TABLE_CHECK_BOX_SELECT);
+			}
 			super.setVisibleColumns(cols.toArray());
 		}
 		else
@@ -95,6 +166,22 @@ public class TableCheckBoxSelect extends Table
 	public boolean isMultiSelect()
 	{
 		return true;
+	}
+
+	/**
+	 * use disableSelectable instead
+	 */
+	@Deprecated
+	@Override
+	public void setSelectable(boolean s)
+	{
+		throw new RuntimeException("Use disableSelectable instead");
+	}
+
+	public void disableSelectable()
+	{
+		selectable = false;
+		removeGeneratedColumn(TABLE_CHECK_BOX_SELECT);
 	}
 
 	@Override
@@ -113,6 +200,12 @@ public class TableCheckBoxSelect extends Table
 		result.addAll(getContainerDataSource().getItemIds());
 		result.removeAll(markedIds);
 		return result;
+	}
+
+	@Override
+	public void addValueChangeListener(ValueChangeListener listener)
+	{
+		valueChangeListeners.add(listener);
 	}
 
 	/**
@@ -145,7 +238,7 @@ public class TableCheckBoxSelect extends Table
 			{
 
 				final CheckBox checkbox = new CheckBox();
-				checkbox.setWidth("20");
+				checkbox.setWidth("25");
 				checkbox.setHeight("20");
 				checkbox.addValueChangeListener(new ValueChangeListener()
 				{
@@ -185,6 +278,7 @@ public class TableCheckBoxSelect extends Table
 								markedIds.remove(itemId);
 							}
 						}
+						notifyValueChange();
 
 					}
 
@@ -202,4 +296,49 @@ public class TableCheckBoxSelect extends Table
 			}
 		};
 	}
+
+	private void notifyValueChange()
+	{
+		for (ValueChangeListener listener:valueChangeListeners)
+		{
+			listener.valueChange(getValueChangeEvent());
+		}
+		this.validateField();
+		
+	}
+	
+	private boolean validateField()
+	{
+		boolean valid = false;
+		try
+		{
+			setComponentError(null);
+			validate();
+			valid = true;
+		}
+		catch (final InvalidValueException e)
+		{
+			setComponentError(new ErrorMessage()
+			{
+
+				private static final long serialVersionUID = -2976235476811651668L;
+
+				@Override
+				public String getFormattedHtmlMessage()
+				{
+					return e.getHtmlMessage();
+				}
+
+				@Override
+				public ErrorLevel getErrorLevel()
+				{
+					return ErrorLevel.ERROR;
+				}
+			});
+		}
+		return valid;
+
+	}
+
+
 }

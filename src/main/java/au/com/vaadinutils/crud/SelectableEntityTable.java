@@ -7,8 +7,7 @@ import java.util.List;
 import au.com.vaadinutils.fields.TableCheckBoxSelect;
 
 import com.google.common.base.Preconditions;
-import com.vaadin.addon.jpacontainer.EntityContainer;
-import com.vaadin.addon.jpacontainer.JPAContainer;
+import com.vaadin.data.Container;
 
 public class SelectableEntityTable<E> extends TableCheckBoxSelect
 {
@@ -17,7 +16,7 @@ public class SelectableEntityTable<E> extends TableCheckBoxSelect
 
 	private static final long serialVersionUID = 1L;
 
-	public SelectableEntityTable(EntityContainer<E> childContainer, HeadingPropertySet<E> headingPropertySet)
+	public SelectableEntityTable(Container.Filterable childContainer, HeadingPropertySet<E> headingPropertySet)
 	{
 		super();
 		setContainerDataSource(childContainer);
@@ -76,19 +75,17 @@ public class SelectableEntityTable<E> extends TableCheckBoxSelect
 		return (Collection<Long>) super.getSelectedItems();
 	}
 
-	@SuppressWarnings("rawtypes")
 	public void applyFilter(final Filter filter)
 	{
 		/* Reset the filter for the Entity Container. */
 		resetFilters();
-		((JPAContainer) getContainerDataSource()).addContainerFilter(filter);
+		((Container.Filterable) getContainerDataSource()).addContainerFilter(filter);
 
 	}
 
-	@SuppressWarnings("rawtypes")
 	protected void resetFilters()
 	{
-		((JPAContainer) getContainerDataSource()).removeAllContainerFilters();
+		((Container.Filterable) getContainerDataSource()).removeAllContainerFilters();
 	}
 
 }

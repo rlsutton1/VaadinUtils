@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
@@ -32,7 +33,9 @@ import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.design.JRDesignBand;
 import net.sf.jasperreports.engine.design.JRDesignElement;
 import net.sf.jasperreports.engine.design.JRDesignExpression;
+import net.sf.jasperreports.engine.design.JRDesignParameter;
 import net.sf.jasperreports.engine.design.JRDesignStaticText;
+import net.sf.jasperreports.engine.design.JRDesignTextField;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.export.JRCsvExporter;
 import net.sf.jasperreports.engine.export.JRExportProgressMonitor;
@@ -57,11 +60,9 @@ import au.com.vaadinutils.dao.Transaction;
 import au.com.vaadinutils.jasper.parameter.ReportChooser;
 import au.com.vaadinutils.jasper.parameter.ReportParameter;
 import au.com.vaadinutils.jasper.servlet.VaadinJasperPrintServlet;
+import au.com.vaadinutils.jasper.ui.CleanupCallback;
 import au.com.vaadinutils.jasper.ui.JasperReportProperties;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import com.google.gwt.thirdparty.guava.common.base.Preconditions;
 import com.vaadin.server.Page;
 import com.vaadin.server.VaadinServlet;
@@ -70,9 +71,10 @@ import com.vaadin.ui.UI;
 
 public class JasperManager implements Runnable
 {
+	private JasperReport jasperReport;
+
 	private static transient Logger logger = LogManager.getLogger(JasperManager.class);
 
-	
 	private final Map<String, Object> boundParams = new HashMap<String, Object>();
 
 	private CustomAsynchronousFillHandle fillHandle;
@@ -81,8 +83,9 @@ public class JasperManager implements Runnable
 
 	private JasperReportProperties reportProperties;
 
-	private final static Semaphore concurrentLimit = new Semaphore(Math.max(
-			Runtime.getRuntime().availableProcessors() / 2, 1));
+	private final static int reportLimit = Math.max(Runtime.getRuntime().availableProcessors() / 2, 1);
+
+	private final static Semaphore concurrentLimit = new Semaphore(reportLimit, true);
 
 	public enum Disposition
 	{
@@ -142,6 +145,12 @@ public class JasperManager implements Runnable
 	}
 
 	/**
+	 * key: report filename <br>
+	 * value: last time it was compiled
+	 */
+	final static Map<String, Long> compiledReports = new ConcurrentHashMap<String, Long>();
+
+	/**
 	 * 
 	 * @param jasperReport
 	 *            path to jasper report.
@@ -152,33 +161,38 @@ public class JasperManager implements Runnable
 		this.reportProperties = reportProperties;
 		try
 		{
-			// compileReport(getDesignFile(sourcePath, reportDesignName),
-			// sourcePath, sourcePath, reportDesignName);
-
 			String reportFileName = reportProperties.getReportFileName();
-			String reportDesignName = reportFileName.substring(0, reportFileName.indexOf("."));
 			JasperSettings settings = reportProperties.getSettings();
+			String reportDesignName = reportFileName.substring(0, reportFileName.indexOf("."));
 
-			Preconditions.checkArgument(settings.getReportFile(reportDesignName + ".jrxml").exists(),
-					"The passed Jasper Report File doesn't exist: "
-							+ settings.getReportFile(reportDesignName).getAbsolutePath());
+			File designFile = settings.getReportFile(reportDesignName + ".jrxml");
+			Preconditions.checkArgument(designFile.exists(), "The passed Jasper Report File doesn't exist: "
+					+ settings.getReportFile(reportDesignName).getAbsolutePath());
 
 			File sourcePath = settings.getReportFile(reportFileName).getParentFile();
-			JasperReportCompiler jasperReportCompiler = new JasperReportCompiler();
-			JasperDesign designFile = jasperReportCompiler.getDesignFile(sourcePath, reportDesignName);
 
-			String templateName = settings.getHeaderFooterTemplateName();
-			if (templateName != null)
+			if (!compiledReports.containsKey(reportFileName)
+					|| compiledReports.get(reportFileName) < designFile.lastModified())
 			{
-				JasperDesign headerTemplate = jasperReportCompiler.getDesignFile(sourcePath, templateName);
+				// compileReport(getDesignFile(sourcePath, reportDesignName),
+				// sourcePath, sourcePath, reportDesignName);
 
-				replaceHeader(designFile, headerTemplate);
+				JasperReportCompiler jasperReportCompiler = new JasperReportCompiler();
+				JasperDesign design = jasperReportCompiler.getDesignFile(sourcePath, reportDesignName);
+
+				String templateName = settings.getHeaderFooterTemplateName();
+				if (templateName != null)
+				{
+					JasperDesign headerTemplate = jasperReportCompiler.getDesignFile(sourcePath, templateName);
+
+					replaceHeader(design, headerTemplate);
+				}
+				setCSVOptions(design);
+
+				jasperReportCompiler.compileReport(design, sourcePath, sourcePath, reportDesignName);
 			}
-			setCSVOptions(designFile);
-
-			jasperReportCompiler.compileReport(designFile, sourcePath, sourcePath, reportDesignName);
-
 			this.jasperReport = (JasperReport) JRLoader.loadObject(settings.getReportFile(reportFileName));
+			compiledReports.put(reportFileName, designFile.lastModified());
 
 		}
 		catch (Throwable e)
@@ -189,7 +203,15 @@ public class JasperManager implements Runnable
 
 	}
 
-	private void replaceHeader(JasperDesign designFile, JasperDesign template)
+	/**
+	 * replaces the header, footer, nodata band and dynamically adds user
+	 * friendly report parameter display to the report.
+	 * 
+	 * @param designFile
+	 * @param template
+	 * @throws JRException
+	 */
+	private void replaceHeader(JasperDesign designFile, JasperDesign template) throws JRException
 	{
 		JRBand title = template.getTitle();
 		JRDesignBand newTitle = new JRDesignBand();
@@ -230,6 +252,15 @@ public class JasperManager implements Runnable
 
 	}
 
+	/**
+	 * replace the footer with the template footer, including update the place
+	 * holder for the report title in the footer
+	 * 
+	 * @param designFile
+	 * @param template
+	 * @param margin
+	 * @return
+	 */
 	private JRBand replaceFooterWithTemplateFooter(JasperDesign designFile, JasperDesign template, int margin)
 	{
 		JRBand footer = template.getPageFooter();
@@ -254,27 +285,46 @@ public class JasperManager implements Runnable
 		return footer;
 	}
 
+	/**
+	 * we are now dropping the existing title on the ground in favour of the
+	 * dynamically generated one based on the template
+	 * 
+	 * @param designFile
+	 * @param newTitle
+	 * @param yoffset
+	 */
 	private void mergeExistingTitleWithTemplateTitle(JasperDesign designFile, JRDesignBand newTitle, int yoffset)
 	{
 		int maxY = 0;
-//		for (JRElement element : designFile.getTitle().getElements())
-//		{
-//
-//			JRDesignElement de = (JRDesignElement) element;
-//			de.setY(de.getY() + yoffset);
-//			maxY = Math.max(maxY, de.getY() + element.getHeight());
-//			newTitle.addElement(element);
-//		}
-
-		
+		// for (JRElement element : designFile.getTitle().getElements())
+		// {
+		//
+		// JRDesignElement de = (JRDesignElement) element;
+		// de.setY(de.getY() + yoffset);
+		// maxY = Math.max(maxY, de.getY() + element.getHeight());
+		// newTitle.addElement(element);
+		// }
 
 		newTitle.setHeight(Math.max(maxY + 2, yoffset + 2));
 		designFile.setTitle(newTitle);
 
 	}
 
+	/**
+	 * replace the place holder in the targetBand with the report title, also
+	 * add a set of dynamically generated user friendly report parameter fields
+	 * to this band and add parameters to the report for them if not already
+	 * present.
+	 * 
+	 * @param designFile
+	 * @param templateBand
+	 * @param targetBand
+	 * @param margin
+	 * @return
+	 * @throws JRException
+	 */
 	private int determineSizeOfTemplateBandAndReplaceTitlePlaceHolder(JasperDesign designFile, JRBand templateBand,
-			JRDesignBand targetBand, int margin)
+			JRDesignBand targetBand, int margin) throws JRException
 	{
 		int maxY = 0;
 		for (JRElement element : templateBand.getElements())
@@ -296,64 +346,86 @@ public class JasperManager implements Runnable
 			targetBand.addElement(de);
 
 		}
-		
-		// add parameters section to the report
-		if (params != null)
+
+		JRDesignStaticText paramElement = new JRDesignStaticText();
+		paramElement.setText("Parameters");
+		paramElement.setWidth(525);
+		paramElement.setHeight(15);
+		paramElement.setBackcolor(new Color(95, 96, 98));
+		paramElement.setForecolor(new Color(255, 255, 255));
+		paramElement.setMode(ModeEnum.OPAQUE);
+
+		paramElement.setX(0);
+		paramElement.setY(maxY + 2);
+		paramElement.setFontName("SansSerif");
+		paramElement.setBold(true);
+		paramElement.setFontSize(12);
+		paramElement.setHorizontalAlignment(HorizontalAlignEnum.CENTER);
+
+		targetBand.addElement(paramElement);
+		maxY = paramElement.getY() + paramElement.getHeight();
+
+		maxY = addParametersToDisplayReportParameters(designFile, targetBand, maxY);
+		return maxY;
+	}
+
+	/**
+	 * add user friendly paramters to the band and report port parameters if not
+	 * already present
+	 * 
+	 * @param designFile
+	 * @param targetBand
+	 * @param maxY
+	 * @return
+	 * @throws JRException
+	 */
+	private int addParametersToDisplayReportParameters(JasperDesign designFile, JRDesignBand targetBand, int maxY)
+			throws JRException
+	{
+		for (ReportParameter<?> param : reportProperties.getDataProvider().getFilterBuilder().getReportParameters())
 		{
-			JRDesignStaticText paramElement = new JRDesignStaticText();
-			paramElement.setText("Parameters" );
-			paramElement.setWidth(525);
-			paramElement.setHeight(15);
-			paramElement.setBackcolor(new Color(0,0,0));
-			paramElement.setForecolor(new Color(255,255,255));
-			paramElement.setMode(ModeEnum.OPAQUE);
-			
-			paramElement.setX(0);
-			paramElement.setY(maxY + 2);
-			paramElement.setFontName("SansSerif");
-			paramElement.setBold(true);
-			paramElement.setFontSize(12);
-			paramElement.setHorizontalAlignment(HorizontalAlignEnum.CENTER);
-			
-			targetBand.addElement(paramElement);
-			maxY = paramElement.getY() + paramElement.getHeight();
-			
-			for (ReportParameter<?> param : params)
+			if (param.showFilter())
 			{
-				if (param.showFilter())
+				JRDesignStaticText labelElement = new JRDesignStaticText();
+				labelElement.setText(param.getLabel());
+				labelElement.setWidth(125);
+				labelElement.setHeight(20);
+				labelElement.setBackcolor(new Color(208, 208, 208));
+				labelElement.setMode(ModeEnum.OPAQUE);
+
+				labelElement.setX(0);
+				labelElement.setY(maxY);
+				labelElement.setFontName("SansSerif");
+				labelElement.setFontSize(12);
+				targetBand.addElement(labelElement);
+
+				JRDesignTextField valueElement = new JRDesignTextField();
+				valueElement.setExpression(new JRDesignExpression("$P{ParamDisplay-" + param.getParameterName() + "}"));
+				valueElement.setWidth(400);
+				valueElement.setHeight(20);
+				valueElement.setBackcolor(new Color(208, 208, 208));
+				valueElement.setMode(ModeEnum.OPAQUE);
+
+				valueElement.setX(125);
+				valueElement.setY(maxY);
+				valueElement.setFontName("SansSerif");
+				valueElement.setFontSize(12);
+				targetBand.addElement(valueElement);
+				maxY = valueElement.getY() + valueElement.getHeight();
+
+				if (!designFile.getParametersMap().containsKey("ParamDisplay-" + param.getParameterName()))
 				{
-					JRDesignStaticText labelElement = new JRDesignStaticText();
-					labelElement.setText(param.getLabel() );
-					labelElement.setWidth(125);
-					labelElement.setHeight(20);
-					labelElement.setBackcolor(new Color(208,208,208));
-					labelElement.setMode(ModeEnum.OPAQUE);
-					
-					labelElement.setX(0);
-					labelElement.setY(maxY );
-					labelElement.setFontName("SansSerif");
-					labelElement.setFontSize(12);
-					targetBand.addElement(labelElement);
-					
-					
-					
-					
-					JRDesignStaticText valueElement = new JRDesignStaticText();
-					valueElement.setText( param.getDisplayValue());
-					valueElement.setWidth(400);
-					valueElement.setHeight(20);
-					valueElement.setBackcolor(new Color(208,208,208));
-					valueElement.setMode(ModeEnum.OPAQUE);
-					
-					valueElement.setX(125);
-					valueElement.setY(maxY );
-					valueElement.setFontName("SansSerif");
-					valueElement.setFontSize(12);
-					targetBand.addElement(valueElement);
-					maxY = valueElement.getY() + valueElement.getHeight();
-					
+					JRDesignParameter parameter = new JRDesignParameter();
+					parameter.setName("ParamDisplay-" + param.getParameterName());
+					parameter.setValueClass(String.class);
+
+					parameter.setForPrompting(false);
+
+					designFile.addParameter(parameter);
 				}
+
 			}
+
 		}
 		return maxY;
 	}
@@ -471,13 +543,13 @@ public class JasperManager implements Runnable
 				@Override
 				public void pageUpdated(JasperPrint jasperPrint, int pageIndex)
 				{
-					status = "Filling page " + pageIndex;
+					queueEntry.setStatus("Filling page " + pageIndex);
 				}
 
 				@Override
 				public void pageGenerated(JasperPrint jasperPrint, int pageIndex)
 				{
-					status = "Generating page " + pageIndex;
+					queueEntry.setStatus("Generating page " + pageIndex);
 				}
 			});
 
@@ -517,6 +589,11 @@ public class JasperManager implements Runnable
 	public void cancelPrint()
 	{
 		stop = true;
+		if (queueEntry != null)
+		{
+			queueEntry.setCancelling();
+			thread.interrupt();
+		}
 
 	}
 
@@ -540,11 +617,15 @@ public class JasperManager implements Runnable
 
 	private JasperProgressListener progressListener;
 
-	volatile private String status;
-
 	private CountDownLatch readerReady;
 
 	private CountDownLatch writerReady;
+
+	volatile private QueueEntry queueEntry;
+
+	private Thread thread;
+
+	volatile private boolean inQueue;
 
 	public RenderedReport export(OutputFormat exportMethod, Collection<ReportParameter<?>> params)
 			throws InterruptedException
@@ -572,47 +653,11 @@ public class JasperManager implements Runnable
 			JasperProgressListener progressListener)
 	{
 
-		try
+		if (params == null)
 		{
-			if (params == null)
-			{
-				params = new LinkedList<ReportParameter<?>>();
-			}
-			this.params = params;
-			// compileReport(getDesignFile(sourcePath, reportDesignName),
-			// sourcePath, sourcePath, reportDesignName);
-
-			String reportFileName = reportProperties.getReportFileName();
-			String reportDesignName = reportFileName.substring(0, reportFileName.indexOf("."));
-			JasperSettings settings = reportProperties.getSettings();
-
-			Preconditions.checkArgument(settings.getReportFile(reportDesignName + ".jrxml").exists(),
-					"The passed Jasper Report File doesn't exist: "
-							+ settings.getReportFile(reportDesignName).getAbsolutePath());
-
-			File sourcePath = settings.getReportFile(reportFileName).getParentFile();
-			JasperReportCompiler jasperReportCompiler = new JasperReportCompiler();
-			JasperDesign designFile = jasperReportCompiler.getDesignFile(sourcePath, reportDesignName);
-
-			String templateName = settings.getHeaderFooterTemplateName();
-			if (templateName != null)
-			{
-				JasperDesign headerTemplate = jasperReportCompiler.getDesignFile(sourcePath, templateName);
-
-				replaceHeader(designFile, headerTemplate);
-			}
-			setCSVOptions(designFile);
-
-			jasperReportCompiler.compileReport(designFile, sourcePath, sourcePath, reportDesignName);
-
-			this.jasperReport = (JasperReport) JRLoader.loadObject(settings.getReportFile(reportFileName));
-
+			params = new LinkedList<ReportParameter<?>>();
 		}
-		catch (Throwable e)
-		{
-			logger.error(e, e);
-			throw new RuntimeException("Bad report compilation");
-		}
+		this.params = params;
 
 		WrappedSession session = UI.getCurrent().getSession().getSession();
 		images = new ConcurrentHashMap<String, byte[]>();
@@ -626,37 +671,48 @@ public class JasperManager implements Runnable
 		inputStream = null;
 		outputStream = null;
 
-	
+		queueEntry = new QueueEntry(reportProperties.getReportTitle(), reportProperties.getSettings().getUsername());
+		inQueue = true;
+		jobQueue.add(queueEntry);
 
-		if (concurrentLimit.tryAcquire())
-		{
-			this.exportMethod = exportMethod;
-			new Thread(this).start();
-		}
-		else
-		{
-			progressListener.failed("Too busy now, please try to run this report again later");
-		}
-
+		this.exportMethod = exportMethod;
+		thread = new Thread(this);
+		thread.start();
 	}
+
+	static final LinkedBlockingQueue<QueueEntry> jobQueue = new LinkedBlockingQueue<QueueEntry>();
 
 	@Override
 	public void run()
 	{
 
 		JRSwapFileVirtualizer fileVirtualizer = null;
+		CleanupCallback cleanupCallback = null;
+		boolean initialized = false;
 		try
 		{
+			concurrentLimit.acquire();
+			initialized = true;
+			inQueue = false;
 
-			status = "Gathering report data phase 1, please be patient";
+			queueEntry.setStatus("Gathering report data phase 1");
 
 			reportProperties.getDataProvider().initDBConnection();
-			params.addAll(reportProperties.getDataProvider().prepareData(params, reportProperties.getReportFileName()));
+
+			cleanupCallback = reportProperties.getDataProvider().getCleanupCallback();
+			params.addAll(reportProperties.getDataProvider().prepareData(params, reportProperties.getReportFileName(),
+					cleanupCallback));
 
 			logger.warn("Running report " + reportProperties.getReportFileName());
 			for (ReportParameter<?> param : params)
 			{
 				bindParameter(param);
+				if (param.showFilter())
+				{
+					// populate dynamically added parameters to display user
+					// friendly parameters on the report
+					boundParams.put("ParamDisplay-" + param.getParameterName(), param.getDisplayValue());
+				}
 				logger.warn(param.getParameterName() + " " + param.getValue());
 			}
 
@@ -665,7 +721,7 @@ public class JasperManager implements Runnable
 
 			JRAbstractExporter exporter = null;
 
-			status = "Gathering report data phase 2, please be patient";
+			queueEntry.setStatus("Gathering report data phase 2");
 
 			// use file virtualizer to prevent out of heap
 			String fileName = "/tmp";
@@ -754,7 +810,7 @@ public class JasperManager implements Runnable
 			}
 			createPageProgressMonitor(exporter);
 
-			status = "Waiting for browser to start streaming";
+			queueEntry.setStatus("Waiting for browser to start streaming");
 			progressListener.outputStreamReady();
 			if (readerReady.await(10, TimeUnit.SECONDS))
 			{
@@ -768,7 +824,7 @@ public class JasperManager implements Runnable
 				logger.error("Couldn't attach to reader stream");
 			}
 			Thread.sleep(750);
-			status = "Cleaning up";
+			queueEntry.setStatus("Cleaning up");
 
 		}
 		catch (Exception e)
@@ -777,6 +833,11 @@ public class JasperManager implements Runnable
 		}
 		finally
 		{
+			if (queueEntry != null)
+			{
+				jobQueue.remove(queueEntry);
+				queueEntry = null;
+			}
 			try
 			{
 				if (outputStream != null)
@@ -789,14 +850,41 @@ public class JasperManager implements Runnable
 				logger.error(e, e);
 			}
 
-			concurrentLimit.release();
-			reportProperties.getDataProvider().cleanup();
+			if (cleanupCallback != null)
+			{
+				try
+				{
+					cleanupCallback.cleanup();
+				}
+				catch (Exception e)
+				{
+					logger.error(e, e);
+				}
+			}
 			if (fileVirtualizer != null)
 			{
-				fileVirtualizer.cleanup();
+				try
+				{
+					fileVirtualizer.cleanup();
+				}
+				catch (Exception e)
+				{
+					logger.error(e, e);
+				}
 			}
 			CustomJRHyperlinkProducerFactory.setUseCustomHyperLinks(false);
-			reportProperties.getDataProvider().closeDBConnection();
+			if (initialized)
+			{
+				concurrentLimit.release();
+				try
+				{
+					reportProperties.getDataProvider().closeDBConnection();
+				}
+				catch (Exception e)
+				{
+					logger.error(e, e);
+				}
+			}
 			completeBarrier.countDown();
 			if (progressListener != null)
 			{
@@ -816,7 +904,7 @@ public class JasperManager implements Runnable
 			public void afterPageExport()
 			{
 				pageCount++;
-				status = "Rendering page " + pageCount;
+				queueEntry.setStatus("Rendering page " + pageCount);
 
 			}
 		});
@@ -830,9 +918,49 @@ public class JasperManager implements Runnable
 		return file.getCanonicalPath();
 	}
 
-	public String getStatus()
+	public ReportStatus getStatus()
 	{
-		return status;
+		ReportStatus reportStatus = new ReportStatus();
+		try
+		{
+			if (queueEntry == null)
+			{
+				reportStatus.setStatus("Complete");
+			}
+			else
+			{
+				reportStatus.setStatus(queueEntry.getStatus());
+			}
+			if (inQueue)
+			{
+
+				int pos = 0;
+				int ctr = 0;
+				for (QueueEntry entry : jobQueue)
+				{
+					ctr++;
+					if (entry == queueEntry)
+					{
+						// status += "<b>" + entry + "</b><br>";
+						pos = ctr;
+						break;
+					}
+
+					reportStatus.addQueueEntry(entry);
+
+				}
+				reportStatus.setStatus("Waiting for " + (pos - reportLimit) + " of the queued reports to complete");
+			}
+		}
+		catch (Exception e)
+		{
+			// there are possible race conditions that could lead to queueEntry
+			// being null here, so just catch and log it. this state should be
+			// transient
+			reportStatus.setStatus("waiting...");
+			logger.error(e, e);
+		}
+		return reportStatus;
 	}
 
 	public String getReportFilename()
@@ -840,16 +968,4 @@ public class JasperManager implements Runnable
 		return reportProperties.getReportFileName();
 	}
 
-	
-	LoadingCache<String, JasperReport> graphs = CacheBuilder.newBuilder()
-		       .maximumSize(1000)
-		       .expireAfterWrite(10, TimeUnit.MINUTES)
-		       .build(
-		           new CacheLoader<String, JasperReport>() {
-		             public JasperReport load(String key) {
-		               return null;
-		             }
-		           });
-	private JasperReport jasperReport;
-	
 }

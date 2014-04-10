@@ -64,4 +64,10 @@ public class ReportParameterEnum<T extends Enum<T>> extends ReportParameter<Enum
 	{
 		return getValue();
 	}
+
+	@Override
+	public boolean validate()
+	{
+		return true;
+	}
 }

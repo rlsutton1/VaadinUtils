@@ -18,4 +18,6 @@ public interface JasperSettings
 	 */
 	String getHeaderFooterTemplateName();
 
+	String getUsername();
+
 }

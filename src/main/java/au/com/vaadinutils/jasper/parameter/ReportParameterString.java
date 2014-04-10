@@ -1,5 +1,8 @@
 package au.com.vaadinutils.jasper.parameter;
 
+import com.vaadin.data.Validator;
+import com.vaadin.data.Validator.InvalidValueException;
+import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.TextField;
 
@@ -51,5 +54,32 @@ public class ReportParameterString extends ReportParameter<String>
 	{
 		return getValue();
 	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Override
+	public boolean validate()
+	{
+		return super.validateField(field);
+	}
+	
+	public ReportParameter<?> setNotEmpty()
+	{
+		Validator validator = new Validator(){
+
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 8942263638713110223L;
+
+			@Override
+			public void validate(Object value) throws InvalidValueException
+			{
+				System.out.println(value);
+				
+			}};
+			field.addValidator(validator);
+		return this;
+	}
+
 
 }

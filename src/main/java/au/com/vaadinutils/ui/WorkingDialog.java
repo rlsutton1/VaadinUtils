@@ -10,9 +10,11 @@ import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.ProgressBar;
+import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
@@ -43,6 +45,7 @@ public class WorkingDialog extends Window implements ProgressListener<String>
 	private Button cancel;
 	private CancelListener cancelListener;
 	private CompleteListener completeListener;
+	private VerticalLayout layout;
 
 	/**
 	 * Displays a dialog designed to be shown when a long running task is in
@@ -99,7 +102,7 @@ public class WorkingDialog extends Window implements ProgressListener<String>
 		this.setClosable(false);
 		this.setResizable(false);
 		content = new VerticalLayout();
-//		this.setWidth("100px");
+		// this.setWidth("100px");
 		this.setHeight("150px");
 		content.setSizeFull();
 		content.setMargin(true);
@@ -107,14 +110,16 @@ public class WorkingDialog extends Window implements ProgressListener<String>
 
 		this.cancelListener = listener;
 
-		HorizontalLayout layout = new HorizontalLayout();
+		layout = new VerticalLayout();
 		layout.setSpacing(true);
+		layout.setSizeFull();
 
 		ProgressBar progress = new ProgressBar();
 		layout.addComponent(progress);
 		progress.setIndeterminate(true);
 		messageLabel = new Label(message);
 		messageLabel.setContentMode(ContentMode.HTML);
+		messageLabel.setSizeFull();
 		layout.addComponent(messageLabel);
 		content.addComponent(layout);
 
@@ -200,6 +205,18 @@ public class WorkingDialog extends Window implements ProgressListener<String>
 
 	}
 
+	public void addUserComponent(final Component component)
+	{
+		new UIUpdater(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				layout.addComponent(component);
+			}
+		});
+	}
+
 	public void progress(int count, int max, final String message)
 	{
 		new UIUpdater(new Runnable()
@@ -233,6 +250,12 @@ public class WorkingDialog extends Window implements ProgressListener<String>
 		if (this.completeListener != null)
 			this.completeListener.complete();
 		WorkingDialog.this.close();
+	}
+
+	public void removeUserComponent(Component component)
+	{
+		layout.removeComponent(component);
+		
 	}
 
 }
