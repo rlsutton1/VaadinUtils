@@ -114,13 +114,17 @@ public class WorkingDialog extends Window implements ProgressListener<String>
 		layout.setSpacing(true);
 		layout.setSizeFull();
 
+		HorizontalLayout progressArea = new HorizontalLayout();
+		progressArea.setSizeFull();
 		ProgressBar progress = new ProgressBar();
-		layout.addComponent(progress);
+		progressArea.addComponent(progress);
 		progress.setIndeterminate(true);
 		messageLabel = new Label(message);
 		messageLabel.setContentMode(ContentMode.HTML);
 		messageLabel.setSizeFull();
-		layout.addComponent(messageLabel);
+		progressArea.addComponent(messageLabel);
+		progressArea.setExpandRatio(messageLabel, 1);
+		layout.addComponent(progressArea);
 		content.addComponent(layout);
 
 		if (listener != null)

@@ -38,6 +38,7 @@ import com.vaadin.server.StreamResource;
 import com.vaadin.server.StreamResource.StreamSource;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.BrowserFrame;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -59,7 +60,7 @@ import com.vaadin.ui.themes.Reindeer;
  * Base class for a view that provides a report filter selection area and a
  * report viewing area.
  */
-class JasperReportLayout extends HorizontalSplitPanel
+class JasperReportLayout extends VerticalLayout
 {
 	/**
 	 * 
@@ -89,21 +90,26 @@ class JasperReportLayout extends HorizontalSplitPanel
 
 	private BrowserFrame csv;
 
+	private SplitPanel splitPanel;
+
 	protected JasperReportLayout(JasperReportProperties reportProperties)
 	{
 		this.reportProperties = reportProperties;
 		this.builder = reportProperties.getDataProvider().getFilterBuilder();
 	}
 
-	protected void initScreen()
+	protected void initScreen(SplitPanel panel)
 	{
 		this.setSizeFull();
+		
+		 splitPanel = panel;
+		this.addComponent(splitPanel.getComponent());
 
-		this.setSplitPosition(20);
-		this.setFirstComponent(getOptionsPanel());
+		splitPanel.setSplitPosition(20);
+		splitPanel.setFirstComponent((AbstractComponent) getOptionsPanel());
 		if (!builder.hasFilters())
 		{
-			setSplitPosition(15);
+			splitPanel.setSplitPosition(15);
 
 		}
 		else
@@ -113,7 +119,7 @@ class JasperReportLayout extends HorizontalSplitPanel
 			{
 				splitAt = 18;
 			}
-			setSplitPosition(splitAt);
+			splitPanel.setSplitPosition(splitAt);
 
 		}
 
@@ -128,7 +134,7 @@ class JasperReportLayout extends HorizontalSplitPanel
 		label.setContentMode(ContentMode.HTML);
 		splash.addComponent(label);
 
-		this.setSecondComponent(splash);
+		splitPanel.setSecondComponent(splash);
 
 		// generate the report immediately if there are no visible filters
 		if (!builder.hasFilters())
@@ -253,6 +259,8 @@ class JasperReportLayout extends HorizontalSplitPanel
 		});
 
 	}
+
+	
 
 	private Component getOptionsPanel()
 	{
@@ -386,7 +394,7 @@ class JasperReportLayout extends HorizontalSplitPanel
 		displayPanel.setSizeFull();
 		displayPanel.setStyleName("njadmin-hide-overflow-for-help");
 		displayPanel.setImmediate(true);
-		this.setSecondComponent(displayPanel);
+		splitPanel.setSecondComponent(displayPanel);
 		return displayPanel;
 
 	}
@@ -439,8 +447,7 @@ class JasperReportLayout extends HorizontalSplitPanel
 
 		CancelListener cancelListener = getProgressDialogCancelListener();
 		final WorkingDialog dialog = new WorkingDialog("Generating report, please be patient", "Please wait", cancelListener);
-		dialog.setWidth("700");
-		dialog.setHeight("200");
+		dialog.setHeight("150");
 
 		UI.getCurrent().addWindow(dialog);
 
@@ -580,7 +587,7 @@ class JasperReportLayout extends HorizontalSplitPanel
 		label.setContentMode(ContentMode.HTML);
 		csvSplash.addComponent(label);
 
-		this.setSecondComponent(csvSplash);
+splitPanel.setSecondComponent(csvSplash);
 
 	}
 
@@ -655,13 +662,18 @@ class JasperReportLayout extends HorizontalSplitPanel
 							dialog.addUserComponent(reportQueue);
 							tableAdded = true;
 						}
+						dialog.setWidth("600");
 
-						dialog.setHeight("400");
+						dialog.setHeight("350");
+						dialog.center();
 					}
 					else
 					{
 						dialog.removeUserComponent(reportQueue);
-						dialog.setHeight("200");
+						dialog.setWidth("300");
+
+						dialog.setHeight("150");
+						dialog.center();
 					}
 				}
 				if (cancelled)
@@ -695,7 +707,7 @@ class JasperReportLayout extends HorizontalSplitPanel
 				cancelled = true;
 
 				// change to the splash page as the report may still complete
-				JasperReportLayout.this.setSecondComponent(splash);
+				splitPanel.setSecondComponent(splash);
 			}
 		};
 		return cancelListener;

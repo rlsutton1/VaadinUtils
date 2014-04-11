@@ -35,7 +35,7 @@ public abstract class JasperReportView extends HorizontalLayout implements View,
 	public void enter(ViewChangeEvent event)
 	{
 		this.setSizeFull();
-		report.initScreen();
+		report.initScreen(new MainReportSplitPanel());
 		this.addComponent(report);
 
 	}

@@ -45,7 +45,7 @@ public class JasperReportPopUp extends Window implements JasperReportDataProvide
 	{
 		this.setWidth("90%");
 		this.setHeight("80%");
-		report.initScreen();
+		report.initScreen(new DrillDownReportSplitPanel());
 		this.setContent(report);
 		setModal(true);
 		// center();
