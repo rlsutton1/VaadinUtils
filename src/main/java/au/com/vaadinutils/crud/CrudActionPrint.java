@@ -4,7 +4,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.sf.jasperreports.engine.JRException;
-import au.com.vaadinutils.jasper.JasperManager;
 import au.com.vaadinutils.jasper.parameter.ReportParameter;
 import au.com.vaadinutils.jasper.ui.JasperReportDataProvider;
 import au.com.vaadinutils.jasper.ui.JasperReportPopUp;
@@ -22,7 +21,6 @@ public abstract class CrudActionPrint<E extends CrudEntity> implements CrudActio
 	@Override
 	public void exec(final BaseCrudView<E> crud, EntityItem<E> entity)
 	{
-		JasperManager manager;
 		try
 		{
 			List<ReportParameter<?>> filters = new LinkedList<ReportParameter<?>>();

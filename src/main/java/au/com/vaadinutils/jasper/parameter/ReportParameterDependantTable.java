@@ -1,8 +1,6 @@
 package au.com.vaadinutils.jasper.parameter;
 
 import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 import javax.persistence.metamodel.SingularAttribute;
@@ -57,7 +55,6 @@ abstract public class ReportParameterDependantTable<P extends ReportParameterTab
 				removeAllContainerFilters();
 				if (selectedIds.size() > 0)
 				{
-					List<Filter> filters = new LinkedList<Filter>();
 					Filter filter = null;
 					for (Long parentId : selectedIds)
 					{

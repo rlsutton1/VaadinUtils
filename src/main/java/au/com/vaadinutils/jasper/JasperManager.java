@@ -25,9 +25,6 @@ import net.sf.jasperreports.engine.JRBand;
 import net.sf.jasperreports.engine.JRElement;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JRExporterParameter;
-import net.sf.jasperreports.engine.JRExpression;
-import net.sf.jasperreports.engine.JRExpressionChunk;
-import net.sf.jasperreports.engine.JRImage;
 import net.sf.jasperreports.engine.JRParameter;
 import net.sf.jasperreports.engine.JRStaticText;
 import net.sf.jasperreports.engine.JRTextField;
@@ -274,7 +271,6 @@ public class JasperManager implements Runnable
 		{
 			if (element instanceof JRDesignElement)
 			{
-				JRDesignElement de = (JRDesignElement) element;
 				if (element instanceof JRTextField)
 				{
 					JRTextField st = (JRTextField) element;
@@ -549,8 +545,6 @@ public class JasperManager implements Runnable
 
 	private JasperPrint fillReport(OutputFormat outputFormat) throws JRException
 	{
-		JasperPrint jasper_print;
-
 		Transaction t = new Transaction(reportProperties.getEm());
 		try
 		{
@@ -765,8 +759,6 @@ public class JasperManager implements Runnable
 
 			JasperPrint jasper_print = fillReport(exportMethod);
 
-			String renderedName = this.jasperReport.getName();
-
 			switch (exportMethod)
 			{
 			case HTML:
@@ -784,22 +776,18 @@ public class JasperManager implements Runnable
 				String imageUrl = baseurl + "VaadinJasperPrintServlet?image=";
 
 				exporter.setParameter(JRHtmlExporterParameter.IMAGES_URI, imageUrl);
-
-				renderedName += ".htm";
 				break;
 			}
 			case PDF:
 			{
 				exporter = new JRPdfExporter();
 				exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasper_print);
-				renderedName += ".pdf";
 				break;
 			}
 			case CSV:
 			{
 				exporter = new JRCsvExporter();
 				exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasper_print);
-				renderedName += ".csv";
 				break;
 			}
 			default:

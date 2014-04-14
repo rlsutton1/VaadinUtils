@@ -1,8 +1,5 @@
 package au.com.vaadinutils.wizards.bulkJasperEmail;
 
-import javax.persistence.EntityManager;
-
-import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.jasper.JasperEmailSettings;
 import au.com.vaadinutils.jasper.JasperManager;
 import au.com.vaadinutils.jasper.ui.JasperReportProperties;
@@ -18,7 +15,6 @@ public class JasperProxy
 	public JasperProxy(String subject, String senderEmailAddress, JasperEmailSettings emailSettings,
 			JasperReportProperties reportProperties)
 	{
-		EntityManager em = EntityManagerProvider.createEntityManager();
 		this.emailSettings = emailSettings;
 		this.manager = new JasperManager(reportProperties);
 		this.subject = subject;

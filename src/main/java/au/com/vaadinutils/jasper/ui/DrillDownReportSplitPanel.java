@@ -2,9 +2,7 @@ package au.com.vaadinutils.jasper.ui;
 
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.HorizontalSplitPanel;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.VerticalSplitPanel;
 import com.vaadin.ui.themes.Reindeer;
 
 public class DrillDownReportSplitPanel extends VerticalLayout implements SplitPanel
