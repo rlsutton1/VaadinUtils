@@ -108,4 +108,10 @@ public class JasperReportPopUp extends Window implements JasperReportDataProvide
 		return dataProvider.getCleanupCallback();
 	}
 
+	@Override
+	public String generateDynamicHeaderImage(int pageWidth, String reportTitle)
+	{
+		return dataProvider.generateDynamicHeaderImage(pageWidth, reportTitle);
+	}
+
 }

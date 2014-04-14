@@ -25,6 +25,9 @@ import net.sf.jasperreports.engine.JRBand;
 import net.sf.jasperreports.engine.JRElement;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JRExporterParameter;
+import net.sf.jasperreports.engine.JRExpression;
+import net.sf.jasperreports.engine.JRExpressionChunk;
+import net.sf.jasperreports.engine.JRImage;
 import net.sf.jasperreports.engine.JRParameter;
 import net.sf.jasperreports.engine.JRStaticText;
 import net.sf.jasperreports.engine.JRTextField;
@@ -33,6 +36,7 @@ import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.design.JRDesignBand;
 import net.sf.jasperreports.engine.design.JRDesignElement;
 import net.sf.jasperreports.engine.design.JRDesignExpression;
+import net.sf.jasperreports.engine.design.JRDesignImage;
 import net.sf.jasperreports.engine.design.JRDesignParameter;
 import net.sf.jasperreports.engine.design.JRDesignStaticText;
 import net.sf.jasperreports.engine.design.JRDesignTextField;
@@ -46,6 +50,7 @@ import net.sf.jasperreports.engine.fill.FillListener;
 import net.sf.jasperreports.engine.fill.JRSwapFileVirtualizer;
 import net.sf.jasperreports.engine.type.HorizontalAlignEnum;
 import net.sf.jasperreports.engine.type.ModeEnum;
+import net.sf.jasperreports.engine.type.VerticalAlignEnum;
 import net.sf.jasperreports.engine.type.WhenNoDataTypeEnum;
 import net.sf.jasperreports.engine.util.JRLoader;
 import net.sf.jasperreports.engine.util.JRSwapFile;
@@ -223,6 +228,7 @@ public class JasperManager implements Runnable
 		designFile.setBottomMargin(margin);
 
 		double pageWidth = designFile.getPageWidth() + (margin * 2);
+		
 
 		double ratio = 0.75; // landscape;
 		if (designFile.getPageHeight() / pageWidth >= 1)
@@ -340,6 +346,19 @@ public class JasperManager implements Runnable
 					st.setWidth((designFile.getPageWidth() - st.getX()) - (margin * 2));
 				}
 			}
+			
+			if (element instanceof JRDesignImage)
+			{
+				JRDesignImage im = (JRDesignImage) element;
+				String fileName = reportProperties.getDataProvider().generateDynamicHeaderImage(designFile.getPageWidth()-(margin*2), reportProperties.getReportTitle());
+				im.setWidth(designFile.getPageWidth()-(margin*2));
+				String expr = im.getExpression().getText();
+				expr = expr.replace("logo.png", fileName);
+				im.setExpression(new JRDesignExpression(expr));
+				
+				
+
+			}
 
 			maxY = Math.max(maxY, de.getY() + de.getHeight());
 
@@ -357,10 +376,11 @@ public class JasperManager implements Runnable
 
 		paramElement.setX(0);
 		paramElement.setY(maxY + 2);
-		paramElement.setFontName("SansSerif");
+		paramElement.setFontName("Arial");
 		paramElement.setBold(true);
 		paramElement.setFontSize(12);
 		paramElement.setHorizontalAlignment(HorizontalAlignEnum.CENTER);
+		paramElement.setVerticalAlignment(VerticalAlignEnum.MIDDLE);
 
 		targetBand.addElement(paramElement);
 		maxY = paramElement.getY() + paramElement.getHeight();
@@ -392,6 +412,8 @@ public class JasperManager implements Runnable
 				labelElement.setHeight(20);
 				labelElement.setBackcolor(new Color(208, 208, 208));
 				labelElement.setMode(ModeEnum.OPAQUE);
+				labelElement.setVerticalAlignment(VerticalAlignEnum.MIDDLE);
+
 
 				labelElement.setX(0);
 				labelElement.setY(maxY);
@@ -410,6 +432,8 @@ public class JasperManager implements Runnable
 				valueElement.setY(maxY);
 				valueElement.setFontName("SansSerif");
 				valueElement.setFontSize(12);
+				valueElement.setVerticalAlignment(VerticalAlignEnum.MIDDLE);
+
 				targetBand.addElement(valueElement);
 				maxY = valueElement.getY() + valueElement.getHeight();
 

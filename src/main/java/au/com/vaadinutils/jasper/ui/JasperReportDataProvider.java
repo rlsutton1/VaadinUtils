@@ -68,4 +68,12 @@ public interface JasperReportDataProvider
 	 */
 	OutputFormat getDefaultFormat();
 
+	/**
+	 * return the name of the generated header image file
+	 * @param pageWidth
+	 * @param reportTitle TODO
+	 * @return
+	 */
+	String generateDynamicHeaderImage(int pageWidth, String reportTitle);
+
 }

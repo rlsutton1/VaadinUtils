@@ -15,6 +15,7 @@ public class MainReportSplitPanel extends HorizontalSplitPanel implements SplitP
 	MainReportSplitPanel()
 	{
 		super.setSizeFull();
+		
 	}
 	
 	@Override

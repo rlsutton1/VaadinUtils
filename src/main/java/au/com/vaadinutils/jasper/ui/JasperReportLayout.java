@@ -44,7 +44,6 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.HorizontalSplitPanel;
 import com.vaadin.ui.JavaScript;
 import com.vaadin.ui.JavaScriptFunction;
 import com.vaadin.ui.Label;
@@ -70,6 +69,8 @@ class JasperReportLayout extends VerticalLayout
 	public static final String NAME = "ReportView";
 
 	static private final transient Logger logger = LogManager.getLogger();
+
+	private static final String PRINT_PANEL_ID = "nj-print-panel-id-for-pdf";
 
 	private BrowserFrame displayPanel;
 
@@ -101,8 +102,8 @@ class JasperReportLayout extends VerticalLayout
 	protected void initScreen(SplitPanel panel)
 	{
 		this.setSizeFull();
-		
-		 splitPanel = panel;
+
+		splitPanel = panel;
 		this.addComponent(splitPanel.getComponent());
 
 		splitPanel.setSplitPosition(20);
@@ -130,7 +131,7 @@ class JasperReportLayout extends VerticalLayout
 		titleLabel.setContentMode(ContentMode.HTML);
 		splash.addComponent(titleLabel);
 
-		Label label = new Label("<font size='4' >Set the desired filters and click 'Apply' to generate a report</font>");
+		Label label = new Label("<font size='4' >Set the desired filters and click a print button to generate a report</font>");
 		label.setContentMode(ContentMode.HTML);
 		splash.addComponent(label);
 
@@ -260,8 +261,6 @@ class JasperReportLayout extends VerticalLayout
 
 	}
 
-	
-
 	private Component getOptionsPanel()
 	{
 		VerticalLayout layout = new VerticalLayout();
@@ -279,6 +278,11 @@ class JasperReportLayout extends VerticalLayout
 		buttonBar.setHeight(buttonHeight);
 
 		buttonBar.setMargin(new MarginInfo(false, true, false, true));
+		
+		HorizontalLayout buttonContainer = new HorizontalLayout();
+		buttonContainer.setSizeFull();
+		buttonContainer.setWidth("145");
+		
 
 		showButton = new NativeButton();
 		showButton.setIcon(new ExternalResource("images/seanau/Preview_32.png"));
@@ -287,7 +291,7 @@ class JasperReportLayout extends VerticalLayout
 		showButton.setHeight(buttonHeight);
 		showButton.setDisableOnClick(true);
 		addButtonListener(showButton, OutputFormat.HTML);
-		buttonBar.addComponent(showButton);
+		buttonContainer.addComponent(showButton);
 
 		printButton = new NativeButton();
 		printButton.setIcon(new ExternalResource("images/seanau/Print_32.png"));
@@ -296,7 +300,7 @@ class JasperReportLayout extends VerticalLayout
 		printButton.setHeight(buttonHeight);
 		printButton.setDisableOnClick(true);
 		addButtonListener(printButton, OutputFormat.PDF);
-		buttonBar.addComponent(printButton);
+		buttonContainer.addComponent(printButton);
 
 		exportButton = new NativeButton();
 		exportButton.setDescription("Export (Excel - CSV)");
@@ -306,8 +310,9 @@ class JasperReportLayout extends VerticalLayout
 		exportButton.setHeight(buttonHeight);
 		// exportButton.setStyleName(Reindeer.BUTTON_LINK);
 		addButtonListener(exportButton, OutputFormat.CSV);
-		buttonBar.addComponent(exportButton);
+		buttonContainer.addComponent(exportButton);
 
+		buttonBar.addComponent(buttonContainer);
 		layout.addComponent(buttonBar);
 
 		components = builder.buildLayout();
@@ -390,12 +395,35 @@ class JasperReportLayout extends VerticalLayout
 
 	private BrowserFrame getDisplayPanel()
 	{
-		displayPanel = new BrowserFrame("Report Display");
+		displayPanel = new BrowserFrame();
 		displayPanel.setSizeFull();
 		displayPanel.setStyleName("njadmin-hide-overflow-for-help");
 		displayPanel.setImmediate(true);
+		displayPanel.setId(PRINT_PANEL_ID);
+
 		splitPanel.setSecondComponent(displayPanel);
 		return displayPanel;
+
+	}
+
+	/**
+	 * intended to allow the pdf to print as it opens.
+	 * 
+	 * firefox prevents it, and for large pdfs in chrome it is firing too soon
+	 * and prevents display of the pdf as a result
+	 */
+	protected void readyToPrint(final OutputFormat format)
+	{
+
+		// if (format == OutputFormat.PDF)
+		// {
+		// JavaScript.getCurrent().execute(
+		// "window.document.getElementById('" + PRINT_PANEL_ID +
+		// "').childNodes[0].contentWindow.focus()");
+		// JavaScript.getCurrent().execute(
+		// "window.document.getElementById('" + PRINT_PANEL_ID +
+		// "').childNodes[0].contentWindow.print()");
+		// }
 
 	}
 
@@ -446,7 +474,8 @@ class JasperReportLayout extends VerticalLayout
 		}
 
 		CancelListener cancelListener = getProgressDialogCancelListener();
-		final WorkingDialog dialog = new WorkingDialog("Generating report, please be patient", "Please wait", cancelListener);
+		final WorkingDialog dialog = new WorkingDialog("Generating report, please be patient", "Please wait",
+				cancelListener);
 		dialog.setHeight("150");
 
 		UI.getCurrent().addWindow(dialog);
@@ -462,13 +491,13 @@ class JasperReportLayout extends VerticalLayout
 		RefreshListener streamListener = getStreamConnectorRefreshListener(outputFormat);
 		refresher.addListener(streamListener);
 
-		JasperProgressListener listener = getJasperManagerProgressListener(dialog, refresher);
+		JasperProgressListener listener = getJasperManagerProgressListener(dialog, refresher, outputFormat);
 		manager.exportAsync(outputFormat, params, listener);
 
 	}
 
 	private JasperProgressListener getJasperManagerProgressListener(final WorkingDialog dialog,
-			final Refresher refresher)
+			final Refresher refresher, final OutputFormat outputFormat)
 	{
 		JasperProgressListener listener = new JasperProgressListener()
 		{
@@ -514,9 +543,10 @@ class JasperReportLayout extends VerticalLayout
 					public void run()
 					{
 						reportFinished();
+						JasperReportLayout.this.readyToPrint(outputFormat);
 					}
 				});
-				
+
 			}
 		};
 		return listener;
@@ -587,7 +617,7 @@ class JasperReportLayout extends VerticalLayout
 		label.setContentMode(ContentMode.HTML);
 		csvSplash.addComponent(label);
 
-splitPanel.setSecondComponent(csvSplash);
+		splitPanel.setSecondComponent(csvSplash);
 
 	}
 

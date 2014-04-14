@@ -201,4 +201,11 @@ public class SendEmailTask extends ProgressBarTask<JasperTransmission> implement
 		return null;
 	}
 
+	@Override
+	public String generateDynamicHeaderImage(int pageWidth, String reportTitle)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
