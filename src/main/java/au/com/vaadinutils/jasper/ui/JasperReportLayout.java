@@ -448,7 +448,7 @@ class JasperReportLayout extends VerticalLayout
 			if (p instanceof ReportChooser)
 			{
 				ReportChooser chooser = (ReportChooser) p;
-				manager = new JasperManager(chooser.getReportProperties(reportProperties));
+			 	manager = new JasperManager(chooser.getReportProperties(reportProperties));
 				Preconditions.checkNotNull(manager, "chooser returned a NULL JasperManager.");
 			}
 			else

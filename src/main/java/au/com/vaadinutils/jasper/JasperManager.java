@@ -78,7 +78,7 @@ public class JasperManager implements Runnable
 	private static transient Logger logger = LogManager.getLogger(JasperManager.class);
 
 	private final Map<String, Object> boundParams = new HashMap<String, Object>();
-
+ 
 	private CustomAsynchronousFillHandle fillHandle;
 
 	volatile private boolean stop;

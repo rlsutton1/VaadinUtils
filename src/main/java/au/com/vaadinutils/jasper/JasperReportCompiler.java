@@ -44,7 +44,7 @@ public class JasperReportCompiler
 		{
  			JasperDesign design = getDesignFile(sourcePath, reportName);
 			report = compileReport(jasperDesign, sourcePath, outputPath, reportName);
-		}
+	 	}
 		else
 		{
 			File outputReport = new File(outputPath.getAbsolutePath() + "/" + reportName + ".jasper");
