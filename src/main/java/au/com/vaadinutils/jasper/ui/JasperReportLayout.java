@@ -133,7 +133,7 @@ class JasperReportLayout extends VerticalLayout
 
 		Label splashLabel = new Label("<font size='4' >Set the desired filters and click a print button to generate a report</font>");
 		splashLabel.setContentMode(ContentMode.HTML);
-
+ 
 		splitPanel.setSecondComponent(splash);
 
 		// generate the report immediately if there are no visible filters

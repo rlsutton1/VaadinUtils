@@ -450,7 +450,7 @@ public class JasperManager implements Runnable
 
 					parameter.setForPrompting(false);
 
-					designFile.addParameter(parameter);
+	 				designFile.addParameter(parameter);
 				}
 			}
 		}

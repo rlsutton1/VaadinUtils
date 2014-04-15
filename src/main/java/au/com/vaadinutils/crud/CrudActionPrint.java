@@ -21,7 +21,7 @@ public abstract class CrudActionPrint<E extends CrudEntity> implements CrudActio
 	@Override
 	public void exec(final BaseCrudView<E> crud, EntityItem<E> entity)
 	{
-		JasperManager manager;
+		JasperManager manager; 
 		try
 		{
 			List<ReportParameter<?>> filters = new LinkedList<ReportParameter<?>>();
