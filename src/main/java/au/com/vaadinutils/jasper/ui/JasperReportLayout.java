@@ -96,7 +96,7 @@ class JasperReportLayout extends VerticalLayout
 	protected JasperReportLayout(JasperReportProperties reportProperties)
 	{
 		this.reportProperties = reportProperties;
-		this.builder = reportProperties.getDataProvider().getFilterBuilder();
+		this.builder = reportProperties.getFilterBuilder();
 	}
 
 	protected void initScreen(SplitPanel panel)
@@ -131,15 +131,17 @@ class JasperReportLayout extends VerticalLayout
 		titleLabel.setContentMode(ContentMode.HTML);
 		splash.addComponent(titleLabel);
 
-		Label label = new Label("<font size='4' >Set the desired filters and click a print button to generate a report</font>");
-		label.setContentMode(ContentMode.HTML);
-		splash.addComponent(label);
+		Label splashLabel = new Label("<font size='4' >Set the desired filters and click a print button to generate a report</font>");
+		splashLabel.setContentMode(ContentMode.HTML);
 
 		splitPanel.setSecondComponent(splash);
 
 		// generate the report immediately if there are no visible filters
 		if (!builder.hasFilters())
 		{
+			splashLabel = new Label("<font size='4' >Please wait whilst we generate your report</font>");
+			splashLabel.setContentMode(ContentMode.HTML);
+
 			// disable the buttons and any filters
 			printButton.setEnabled(false);
 			exportButton.setEnabled(false);
@@ -171,7 +173,7 @@ class JasperReportLayout extends VerticalLayout
 					try
 					{
 						removeExtension(refresher);
-						generateReport(reportProperties.getDataProvider().getDefaultFormat(),
+						generateReport(reportProperties.getDefaultFormat(),
 								JasperReportLayout.this.builder.getReportParameters());
 
 					}
@@ -185,6 +187,7 @@ class JasperReportLayout extends VerticalLayout
 			});
 			addExtension(refresher);
 		}
+		splash.addComponent(splashLabel);
 
 		JavaScript.getCurrent().addFunction("au.com.noojee.reportDrillDown", new JavaScriptFunction()
 		{
@@ -220,10 +223,6 @@ class JasperReportLayout extends VerticalLayout
 
 					JSONObject params = arguments.getJSONObject(1);
 
-					JasperReportProperties subReportProperties = new JasperReportProperties(subTitle,
-							subReportFileName, reportProperties.getDataProvider(), reportProperties.getEm(),
-							reportProperties.getSettings());
-
 					List<ReportParameter<?>> subFilters = new LinkedList<ReportParameter<?>>();
 
 					boolean insitue = false;
@@ -238,13 +237,14 @@ class JasperReportLayout extends VerticalLayout
 						}
 						else
 						{
-							subFilters.add(new ReportParameterConstant(key, params.getString(key)));
+							subFilters.add(new ReportParameterConstant(key, params.getString(key),key,params.getString(key)));
 						}
 					}
 
 					if (!insitue)
 					{
-						new JasperReportPopUp(subReportProperties, subFilters);
+						new JasperReportPopUp(subTitle,
+								subReportFileName,reportProperties, subFilters);
 					}
 					else
 					{
@@ -448,7 +448,7 @@ class JasperReportLayout extends VerticalLayout
 			if (p instanceof ReportChooser)
 			{
 				ReportChooser chooser = (ReportChooser) p;
-				manager = new JasperManager(chooser.getReportProperties(reportProperties.getDataProvider()));
+				manager = new JasperManager(chooser.getReportProperties(reportProperties));
 				Preconditions.checkNotNull(manager, "chooser returned a NULL JasperManager.");
 			}
 			else
@@ -613,7 +613,7 @@ class JasperReportLayout extends VerticalLayout
 		titleLabel.setContentMode(ContentMode.HTML);
 		csvSplash.addComponent(titleLabel);
 
-		Label label = new Label("<font size='4' >Excel (CSV) download initiated " + new Date() + ".</font>");
+		Label label = new Label("<font size='4' >Excel (CSV) download initiated.</font>");
 		label.setContentMode(ContentMode.HTML);
 		csvSplash.addComponent(label);
 
@@ -666,6 +666,7 @@ class JasperReportLayout extends VerticalLayout
 
 			private static final long serialVersionUID = -5641305025399715756L;
 
+			@SuppressWarnings("unchecked")
 			@Override
 			public void refresh(Refresher source)
 			{

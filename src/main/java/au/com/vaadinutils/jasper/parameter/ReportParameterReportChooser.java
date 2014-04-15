@@ -1,7 +1,6 @@
 package au.com.vaadinutils.jasper.parameter;
 
 import au.com.vaadinutils.crud.FormHelper;
-import au.com.vaadinutils.jasper.ui.JasperReportDataProvider;
 import au.com.vaadinutils.jasper.ui.JasperReportProperties;
 
 import com.vaadin.ui.ComboBox;
@@ -62,11 +61,11 @@ public class ReportParameterReportChooser<T extends Enum<T> & ReportChooser> ext
 	}
 
 	@Override
-	public JasperReportProperties getReportProperties(JasperReportDataProvider dataProvider)
+	public JasperReportProperties getReportProperties(JasperReportProperties reportProperties)
 	{
 		@SuppressWarnings("unchecked")
 		T e = (T)field.getValue();
-		return e.getReportProperties(dataProvider);
+		return e.getReportProperties(reportProperties);
 	}
 
 	@Override

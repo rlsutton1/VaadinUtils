@@ -105,4 +105,9 @@ public abstract class ReportParameter<T>
 
 	}
 
+	public boolean displayInreport()
+	{
+		return true;
+	}
+
 }

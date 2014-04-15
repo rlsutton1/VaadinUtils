@@ -6,7 +6,6 @@ import java.util.List;
 import net.sf.jasperreports.engine.JRException;
 import au.com.vaadinutils.jasper.JasperManager;
 import au.com.vaadinutils.jasper.parameter.ReportParameter;
-import au.com.vaadinutils.jasper.ui.JasperReportDataProvider;
 import au.com.vaadinutils.jasper.ui.JasperReportPopUp;
 import au.com.vaadinutils.jasper.ui.JasperReportProperties;
 
@@ -14,7 +13,7 @@ import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 
-public abstract class CrudActionPrint<E extends CrudEntity> implements CrudAction<E>, JasperReportDataProvider
+public abstract class CrudActionPrint<E extends CrudEntity> implements CrudAction<E>, JasperReportProperties
 {
 	private static final long serialVersionUID = 1L;
 	private boolean isDefault = false;

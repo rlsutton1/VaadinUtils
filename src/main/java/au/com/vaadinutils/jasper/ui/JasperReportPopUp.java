@@ -1,5 +1,7 @@
 package au.com.vaadinutils.jasper.ui;
 
+import java.io.File;
+import java.sql.Connection;
 import java.util.Collection;
 import java.util.List;
 
@@ -14,7 +16,7 @@ import com.vaadin.ui.Window;
  * Base class for a view that provides a report filter selection area and a
  * report viewing area.
  */
-public class JasperReportPopUp extends Window implements JasperReportDataProvider
+public class JasperReportPopUp extends Window implements JasperReportProperties
 {
 	public static final String NAME = "ReportView";
 	private static final long serialVersionUID = 1L;
@@ -23,22 +25,39 @@ public class JasperReportPopUp extends Window implements JasperReportDataProvide
 
 	final JasperReportLayout report;
 	private List<ReportParameter<?>> filters;
-	private JasperReportDataProvider dataProvider;
+	private JasperReportProperties reportPropertiesTemplate;
+	private String title;
+	private String fileName;
 
-	public JasperReportPopUp(JasperReportProperties subReportProperties, List<ReportParameter<?>> filters)
+	public JasperReportPopUp(String subTitle, String subReportFileName, JasperReportProperties reportPropertiesTemplate, List<ReportParameter<?>> filters)
 	{
 		this.filters = filters;
-		this.dataProvider = subReportProperties.getDataProvider();
+		
+		title = subTitle;
+		fileName = subReportFileName;
 
 		// replace the data provider in the report properties so this class can
 		// replace the filters
-		JasperReportProperties properties = new JasperReportProperties(subReportProperties.getReportTitle(),
-				subReportProperties.getReportFileName(), this, subReportProperties.getEm(),
-				subReportProperties.getSettings());
-		report = new JasperReportLayout(properties);
+		this.reportPropertiesTemplate = reportPropertiesTemplate;
+		report = new JasperReportLayout(this);
 
 		init();
 
+	}
+
+	public JasperReportPopUp(JasperReportProperties reportPropertiesTemplate, List<ReportParameter<?>> filters)
+	{
+		this.filters = filters;
+		
+		title = reportPropertiesTemplate.getReportTitle();
+		fileName = reportPropertiesTemplate.getReportFileName();
+
+		// replace the data provider in the report properties so this class can
+		// replace the filters
+		this.reportPropertiesTemplate = reportPropertiesTemplate;
+		report = new JasperReportLayout(this);
+
+		init();
 	}
 
 	private void init()
@@ -70,7 +89,7 @@ public class JasperReportPopUp extends Window implements JasperReportDataProvide
 	public List<ReportParameter<?>> prepareData(Collection<ReportParameter<?>> params, String reportFileName, CleanupCallback cleanupCallback)
 			throws Exception
 	{
-		return dataProvider.prepareData(params, reportFileName, cleanupCallback);
+		return reportPropertiesTemplate.prepareData(params, reportFileName, cleanupCallback);
 	}
 
 	
@@ -78,40 +97,82 @@ public class JasperReportPopUp extends Window implements JasperReportDataProvide
 	@Override
 	public void prepareForOutputFormat(OutputFormat outputFormat)
 	{
-		dataProvider.prepareForOutputFormat(outputFormat);
+		reportPropertiesTemplate.prepareForOutputFormat(outputFormat);
 
 	}
 
 	@Override
 	public void closeDBConnection()
 	{
-		dataProvider.closeDBConnection();
+		reportPropertiesTemplate.closeDBConnection();
 
 	}
 
 	@Override
 	public void initDBConnection()
 	{
-		dataProvider.initDBConnection();
+		reportPropertiesTemplate.initDBConnection();
 
 	}
 
 	@Override
 	public OutputFormat getDefaultFormat()
 	{
-		return dataProvider.getDefaultFormat();
+		return reportPropertiesTemplate.getDefaultFormat();
 	}
 
 	@Override
 	public CleanupCallback getCleanupCallback()
 	{
-		return dataProvider.getCleanupCallback();
+		return reportPropertiesTemplate.getCleanupCallback();
 	}
 
 	@Override
 	public String generateDynamicHeaderImage(int pageWidth, String reportTitle)
 	{
-		return dataProvider.generateDynamicHeaderImage(pageWidth, reportTitle);
+		return reportPropertiesTemplate.generateDynamicHeaderImage(pageWidth, reportTitle);
+	}
+
+	@Override
+	public boolean isDevMode()
+	{
+		return reportPropertiesTemplate.isDevMode();
+	}
+
+	@Override
+	public String getReportFileName()
+	{
+		return fileName;
+	}
+
+	@Override
+	public String getReportTitle()
+	{
+		return title;
+	}
+
+	@Override
+	public String getHeaderFooterTemplateName()
+	{
+		return reportPropertiesTemplate.getHeaderFooterTemplateName();
+	}
+
+	@Override
+	public String getUsername()
+	{
+		return reportPropertiesTemplate.getUsername();
+	}
+
+	@Override
+	public Connection getConnection()
+	{
+		return reportPropertiesTemplate.getConnection();
+	}
+
+	@Override
+	public File getReportFolder()
+	{
+		return reportPropertiesTemplate.getReportFolder();
 	}
 
 }

@@ -6,12 +6,52 @@ public class ReportParameterConstant extends ReportParameter<String>
 {
 
 	private String value;
+	private String displayValue;
+	private boolean displayInReport;
+	private String displayLabel;
 
+	/**
+	 * calling this constructor will mean that this report parameter will not be
+	 * visiable in the "Parameters" section of the report
+	 * 
+	 * @param parameterName
+	 * @param value
+	 */
 	public ReportParameterConstant(String parameterName, String value)
 	{
-		super(parameterName,parameterName);
+		super(parameterName, parameterName);
 		this.value = value;
+		displayInReport = false;
 
+	}
+
+	/**
+	 * use this constructor if you want this parameter to show in the "Parameters" section of the report. 
+	 * @param parameterName
+	 * @param value
+	 * @param displayLabel
+	 * @param displayValue
+	 */
+	public ReportParameterConstant(String parameterName, String value, String displayLabel, String displayValue)
+	{
+		super(parameterName, parameterName);
+		this.value = value;
+		this.displayValue = displayValue;
+		displayInReport = true;
+		this.displayLabel = displayLabel;
+
+	}
+
+	@Override
+	public String getLabel()
+	{
+		return displayLabel;
+	}
+	
+	@Override
+	public boolean displayInreport()
+	{
+		return displayInReport;
 	}
 
 	@Override
@@ -54,7 +94,7 @@ public class ReportParameterConstant extends ReportParameter<String>
 	@Override
 	public String getDisplayValue()
 	{
-		throw new RuntimeException("Not Implemented");
+		return displayValue;
 	}
 
 	@Override
