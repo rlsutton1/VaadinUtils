@@ -74,7 +74,6 @@ public class ReportParameterTable<T> extends ReportParameter<String>
 		searchText.setWidth("100%");
 		searchText.setImmediate(true);
 		searchText.setHeight("20");
-		TextChangeListener t;
 		searchText.addTextChangeListener(new TextChangeListener()
 		{
 

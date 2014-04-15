@@ -1,7 +1,6 @@
 package au.com.vaadinutils.jasper;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URL;
 import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -27,7 +26,6 @@ public class CustomJRHyperlinkProducer implements JRHyperlinkProducer
 		String ref = hyperlink.getHyperlinkReference();
 		if (ref == null)
 			return ref;
-		URL url;
 		try
 		{
 

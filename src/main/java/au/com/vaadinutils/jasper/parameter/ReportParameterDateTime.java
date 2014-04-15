@@ -6,9 +6,7 @@ import java.util.Date;
 import org.joda.time.DateTime;
 
 import com.vaadin.data.Property.ValueChangeListener;
-import com.vaadin.data.Validator;
 import com.vaadin.shared.ui.datefield.Resolution;
-import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.DateField;
 

@@ -42,7 +42,6 @@ public class JasperReportCompiler
 		JasperReport report;
 		if (checkIfReportNeedsCompile(sourcePath, outputPath, reportName))
 		{
- 			JasperDesign design = getDesignFile(sourcePath, reportName);
 			report = compileReport(jasperDesign, sourcePath, outputPath, reportName);
 	 	}
 		else
