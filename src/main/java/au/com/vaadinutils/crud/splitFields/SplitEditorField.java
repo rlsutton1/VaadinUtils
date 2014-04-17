@@ -1,6 +1,9 @@
 package au.com.vaadinutils.crud.splitFields;
 
+import java.util.Map;
+
 import au.com.vaadinutils.fields.CKEditorEmailField;
+import au.com.vaadinutils.fields.CKEditorEmailField.ConfigModifier;
 
 import com.vaadin.ui.Label;
 
@@ -14,6 +17,11 @@ public class SplitEditorField extends CKEditorEmailField implements SplitField
 	public SplitEditorField(boolean readonly)
 	{
 		super(readonly);
+	}
+
+	public SplitEditorField(boolean readonly,  ConfigModifier configModifier)
+	{
+		super(readonly,configModifier);
 	}
 
 	@Override

@@ -34,6 +34,7 @@ import au.com.vaadinutils.domain.iColorFactory;
 import au.com.vaadinutils.fields.CKEditorEmailField;
 import au.com.vaadinutils.fields.ColorPickerField;
 import au.com.vaadinutils.fields.DataBoundButton;
+import au.com.vaadinutils.fields.CKEditorEmailField.ConfigModifier;
 
 import com.google.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.JPAContainer;
@@ -347,7 +348,7 @@ public class FormHelper<E> implements Serializable
 	public <L> ComboBox bindEntityField(String fieldLabel, SingularAttribute<E, L> fieldName, Class<L> listClazz,
 			SingularAttribute<L, ?> listFieldName)
 	{
-		return new EntityFieldBuilder<L>().setLabel(fieldLabel).setField(fieldName).setListClass(listClazz)
+		return new EntityFieldBuilder<L>().setLabel(fieldLabel).setField(fieldName)
 				.setListFieldName(listFieldName).build();
 
 	}
@@ -1098,6 +1099,17 @@ public class FormHelper<E> implements Serializable
 
 		field.setImmediate(true);
 
+		doBinding(group, fieldName, field);
+		form.addComponent(field);
+		return field;
+	}
+
+	public CKEditorEmailField bindEditorField(AbstractLayout form, ValidatingFieldGroup<E> group, String fieldName,
+			boolean readonly,  ConfigModifier configModifier)
+	{
+		SplitEditorField field = new SplitEditorField(readonly,configModifier);
+		field.setWidth("100%");
+		field.setImmediate(true);
 		doBinding(group, fieldName, field);
 		form.addComponent(field);
 		return field;

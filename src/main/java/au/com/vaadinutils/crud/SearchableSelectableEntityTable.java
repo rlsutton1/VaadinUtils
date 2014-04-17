@@ -20,6 +20,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Table.ColumnGenerator;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Reindeer;
@@ -51,6 +52,12 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 		this.setExpandRatio(selectableTable, 1);
 	}
 
+	public void addGeneratedColumn(Object id, ColumnGenerator generatedColumn)
+	{
+		selectableTable.addGeneratedColumn(id, generatedColumn);
+	}
+	
+	
 	private AbstractLayout buildSearchBar()
 	{
 		searchBar = new VerticalLayout();

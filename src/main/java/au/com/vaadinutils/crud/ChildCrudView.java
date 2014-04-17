@@ -43,7 +43,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 {
 
 	private static final long serialVersionUID = -7756584349283089830L;
-	 transient Logger logger   =  LogManager.getLogger(ChildCrudView.class);
+	transient Logger logger = LogManager.getLogger(ChildCrudView.class);
 	private String parentKey;
 	protected String childKey;
 	private Object parentId;
@@ -618,7 +618,25 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 			container.discard();
 			dirty = false;
 			resetFilters();
-			entityTable.select(entityTable.firstItemId());
+			Object id = entityTable.firstItemId();
+			if (id != null)
+			{
+				entityTable.select(entityTable.firstItemId());
+			}
+			else
+			{
+				try
+				{
+					entityTable.select(null);
+				}
+				catch (Exception e)
+				{
+					// ignore this. if we don't do this the child continues to
+					// show data from the previously selected row
+
+					// TODO: come up with a better solution
+				}
+			}
 			searchField.setValue("");
 		}
 		catch (Exception e)

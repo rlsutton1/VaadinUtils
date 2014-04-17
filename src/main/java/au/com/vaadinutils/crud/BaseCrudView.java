@@ -600,7 +600,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		this.actionLayout.setVisible(show);
 	}
 
-	protected void setSplitPosition(float pos)
+	public void setSplitPosition(float pos)
 	{
 		splitPanel.setSplitPosition(pos);
 	}
