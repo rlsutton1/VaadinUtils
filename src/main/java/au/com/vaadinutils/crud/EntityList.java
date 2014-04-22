@@ -2,6 +2,7 @@ package au.com.vaadinutils.crud;
 
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.Table.ColumnGenerator;
 
 public interface EntityList<E> extends Component 
 {
@@ -28,4 +29,6 @@ public interface EntityList<E> extends Component
 	public Object prevItemId(Object entityId);
 
 	public void setColumnCollapsingAllowed(boolean b);
+
+	public void addGeneratedColumn(Object id, ColumnGenerator generatedColumn);
 }
