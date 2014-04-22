@@ -11,7 +11,7 @@ import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.JasperReportsContext;
 import net.sf.jasperreports.engine.fill.AsynchronousFillHandle;
 import au.com.vaadinutils.jasper.JasperManager.OutputFormat;
-import au.com.vaadinutils.jasper.ui.JasperReportDataProvider;
+import au.com.vaadinutils.jasper.ui.JasperReportProperties;
 
 public class CustomAsynchronousFillHandle extends AsynchronousFillHandle
 {
@@ -28,13 +28,10 @@ public class CustomAsynchronousFillHandle extends AsynchronousFillHandle
 		super(jasperReportsContext, jasperReport, parameters, null, conn);
 	}
 
-	
-
-	
-	volatile private JasperReportDataProvider dataProvider;
+	volatile private JasperReportProperties dataProvider;
 	volatile public OutputFormat outputFormat;
 
-	public void setDataProvider(JasperReportDataProvider dataProvider, OutputFormat outputFormat)
+	public void setDataProvider(JasperReportProperties dataProvider, OutputFormat outputFormat)
 	{
 		this.dataProvider = dataProvider;
 		this.outputFormat = outputFormat;
@@ -84,34 +81,30 @@ public class CustomAsynchronousFillHandle extends AsynchronousFillHandle
 	/**
 	 * @see #createHandle(JasperReportsContext, JasperReport, Map, Connection)
 	 */
-	public static CustomAsynchronousFillHandle createCustomHandle(
-		JasperReport jasperReport,
-		Map<String,Object> parameters,
-		Connection conn
-		) throws JRException
+	public static CustomAsynchronousFillHandle createCustomHandle(JasperReport jasperReport,
+			Map<String, Object> parameters, Connection conn) throws JRException
 	{
 		return createCustomHandle(DefaultJasperReportsContext.getInstance(), jasperReport, parameters, conn);
 	}
-	
+
 	/**
 	 * Creates an asychronous filling handle.
 	 * 
-	 * @param jasperReportsContext the context
-	 * @param jasperReport the report
-	 * @param parameters the parameter map
-	 * @param conn the connection
+	 * @param jasperReportsContext
+	 *            the context
+	 * @param jasperReport
+	 *            the report
+	 * @param parameters
+	 *            the parameter map
+	 * @param conn
+	 *            the connection
 	 * @return the handle
 	 * @throws JRException
 	 */
-	public static CustomAsynchronousFillHandle createCustomHandle(
-		JasperReportsContext jasperReportsContext,
-		JasperReport jasperReport,
-		Map<String,Object> parameters,
-		Connection conn
-		) throws JRException
+	public static CustomAsynchronousFillHandle createCustomHandle(JasperReportsContext jasperReportsContext,
+			JasperReport jasperReport, Map<String, Object> parameters, Connection conn) throws JRException
 	{
 		return new CustomAsynchronousFillHandle(jasperReportsContext, jasperReport, parameters, conn);
 	}
-
 
 }

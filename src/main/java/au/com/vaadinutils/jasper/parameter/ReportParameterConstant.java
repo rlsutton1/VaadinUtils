@@ -1,23 +1,50 @@
 package au.com.vaadinutils.jasper.parameter;
 
+import java.lang.reflect.ParameterizedType;
+
 import com.vaadin.ui.Component;
 
-public class ReportParameterConstant extends ReportParameter<String>
+public class ReportParameterConstant<T> extends ReportParameter<T>
 {
 
-	private String value;
+	private T value;
+	private String displayValue;
+	private boolean displayInReport;
+	private String displayLabel;
 
-	public ReportParameterConstant(String parameterName, String value)
+	/**
+	 * calling this constructor will mean that this report parameter will not be
+	 * visiable in the "Parameters" section of the report
+	 * 
+	 * @param parameterName
+	 * @param value
+	 */
+	public ReportParameterConstant(String parameterName, T value)
 	{
-		super(parameterName,parameterName);
+		super(parameterName, parameterName);
 		this.value = value;
+		this.displayInReport = false;
+	}
 
+	/**
+	 * use this constructor if you want this parameter to show in the "Parameters" section of the report. 
+	 * @param parameterName
+	 * @param value
+	 * @param displayLabel
+	 * @param displayValue
+	 */
+	public ReportParameterConstant(String parameterName, T value, String displayLabel, String displayValue)
+	{
+		super(parameterName, parameterName);
+		this.value = value;
+		this.displayValue = displayValue;
+		this.displayInReport = true;
+		this.displayLabel = displayLabel;
 	}
 
 	@Override
-	public String getValue()
+	public T getValue()
 	{
-
 		return value;
 	}
 
@@ -34,16 +61,17 @@ public class ReportParameterConstant extends ReportParameter<String>
 	}
 
 	@Override
-	public void setDefaultValue(String defaultValue)
+	public void setDefaultValue(T defaultValue)
 	{
-		// TODO Auto-generated method stub
+		// NOOP
 
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public String getExpectedParameterClassName()
 	{
-		return String.class.getCanonicalName();
+		return ((Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0]).getCanonicalName();
 	}
 
 	public boolean showFilter()
@@ -54,7 +82,7 @@ public class ReportParameterConstant extends ReportParameter<String>
 	@Override
 	public String getDisplayValue()
 	{
-		throw new RuntimeException("Not Implemented");
+		return displayValue;
 	}
 
 	@Override

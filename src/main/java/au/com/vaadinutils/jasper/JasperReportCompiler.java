@@ -42,9 +42,8 @@ public class JasperReportCompiler
 		JasperReport report;
 		if (checkIfReportNeedsCompile(sourcePath, outputPath, reportName))
 		{
-			getDesignFile(sourcePath, reportName);
 			report = compileReport(jasperDesign, sourcePath, outputPath, reportName);
-		}
+	 	}
 		else
 		{
 			File outputReport = new File(outputPath.getAbsolutePath() + "/" + reportName + ".jasper");
@@ -58,7 +57,12 @@ public class JasperReportCompiler
 
 	public JasperDesign getDesignFile(final File sourcePath, String reportName) throws Throwable
 	{
-		File sourceReport = new File(sourcePath.getAbsoluteFile() + "/" + reportName + ".jrxml");
+		String name = reportName;
+		if (!name.contains(".jrxml"))
+		{
+			name = name+".jrxml";
+		}
+		File sourceReport = new File(sourcePath.getAbsoluteFile() + "/" + name);
 		return JRXmlLoader.load(sourceReport);
 
 	}
@@ -66,9 +70,14 @@ public class JasperReportCompiler
 	public JasperReport compileReport( final File sourcePath, final File outputPath,
 			String reportName) throws Throwable
 	{
+		String name = reportName;
+		if (!name.contains(".jasper"))
+		{
+			name = name+".jasper";
+		}
 		JasperReport jasperReport = null;
 		JasperDesign jasperDesign = getDesignFile(sourcePath, reportName);
-		File outputReport = new File(outputPath.getAbsolutePath() + "/" + reportName + ".jasper");
+		File outputReport = new File(outputPath.getAbsolutePath() + "/" + name);
 		jasperReport = JasperCompileManager.compileReport(jasperDesign);
 		JRSaver.saveObject(jasperReport, outputReport);
 		logger.warn("Saving compiled report : " + outputReport.getName());

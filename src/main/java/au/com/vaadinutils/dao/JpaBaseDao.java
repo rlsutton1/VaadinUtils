@@ -246,6 +246,12 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 	}
 
+	public void flushCache()
+	{
+		entityManager.getEntityManagerFactory().getCache().evict(entityClass);
+
+	}
+	
 	public JPAContainer<E> createVaadinContainerAndFlushCache()
 	{
 		entityManager.getEntityManagerFactory().getCache().evict(entityClass);
