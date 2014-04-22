@@ -43,6 +43,18 @@ public class ReportParameterConstant<T> extends ReportParameter<T>
 	}
 
 	@Override
+	public String getLabel()
+	{
+		return displayLabel;
+	}
+	
+	@Override
+	public boolean displayInreport()
+	{
+		return displayInReport;
+	}
+
+	@Override
 	public T getValue()
 	{
 		return value;
