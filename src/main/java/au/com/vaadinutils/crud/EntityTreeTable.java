@@ -11,6 +11,7 @@ import com.google.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.data.Property;
+import com.vaadin.ui.Table.ColumnGenerator;
 import com.vaadin.ui.Tree;
 
 public class EntityTreeTable<E> extends Tree implements EntityList<E>
@@ -168,6 +169,13 @@ public class EntityTreeTable<E> extends Tree implements EntityList<E>
 
 	@Override
 	public void setColumnCollapsingAllowed(boolean b)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void addGeneratedColumn(Object id, ColumnGenerator generatedColumn)
 	{
 		// TODO Auto-generated method stub
 		

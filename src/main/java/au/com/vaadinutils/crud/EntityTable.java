@@ -237,4 +237,11 @@ public class EntityTable<E> extends Table implements EntityList<E>
 		return ret;
 	}
 
+	@Override
+	public void addGeneratedColumn(Object id, ColumnGenerator generatedColumn)
+	{
+		super.addGeneratedColumn(id, generatedColumn);
+		
+	}
+
 }

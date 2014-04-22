@@ -46,6 +46,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.Table.ColumnGenerator;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
@@ -154,6 +155,11 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		showNoSelectionMessage();
 		entityTable.select(entityTable.firstItemId());
 
+	}
+	
+	public void addGeneratedColumn(Object id, ColumnGenerator generator)
+	{
+		entityTable.addGeneratedColumn(id, generator);
 	}
 
 	protected EntityList<E> getTable(JPAContainer<E> container, HeadingPropertySet<E> headings)
