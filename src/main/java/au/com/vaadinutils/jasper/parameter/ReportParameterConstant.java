@@ -1,11 +1,13 @@
 package au.com.vaadinutils.jasper.parameter;
 
+import java.lang.reflect.ParameterizedType;
+
 import com.vaadin.ui.Component;
 
-public class ReportParameterConstant extends ReportParameter<String>
+public class ReportParameterConstant<T> extends ReportParameter<T>
 {
 
-	private String value;
+	private T value;
 	private String displayValue;
 	private boolean displayInReport;
 	private String displayLabel;
@@ -17,12 +19,11 @@ public class ReportParameterConstant extends ReportParameter<String>
 	 * @param parameterName
 	 * @param value
 	 */
-	public ReportParameterConstant(String parameterName, String value)
+	public ReportParameterConstant(String parameterName, T value)
 	{
 		super(parameterName, parameterName);
 		this.value = value;
-		displayInReport = false;
-
+		this.displayInReport = false;
 	}
 
 	/**
@@ -32,14 +33,13 @@ public class ReportParameterConstant extends ReportParameter<String>
 	 * @param displayLabel
 	 * @param displayValue
 	 */
-	public ReportParameterConstant(String parameterName, String value, String displayLabel, String displayValue)
+	public ReportParameterConstant(String parameterName, T value, String displayLabel, String displayValue)
 	{
 		super(parameterName, parameterName);
 		this.value = value;
 		this.displayValue = displayValue;
-		displayInReport = true;
+		this.displayInReport = true;
 		this.displayLabel = displayLabel;
-
 	}
 
 	@Override
@@ -55,9 +55,8 @@ public class ReportParameterConstant extends ReportParameter<String>
 	}
 
 	@Override
-	public String getValue()
+	public T getValue()
 	{
-
 		return value;
 	}
 
@@ -74,16 +73,17 @@ public class ReportParameterConstant extends ReportParameter<String>
 	}
 
 	@Override
-	public void setDefaultValue(String defaultValue)
+	public void setDefaultValue(T defaultValue)
 	{
-		// TODO Auto-generated method stub
+		// NOOP
 
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public String getExpectedParameterClassName()
 	{
-		return String.class.getCanonicalName();
+		return ((Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0]).getCanonicalName();
 	}
 
 	public boolean showFilter()

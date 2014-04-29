@@ -237,7 +237,7 @@ class JasperReportLayout extends VerticalLayout
 						}
 						else
 						{
-							subFilters.add(new ReportParameterConstant(key, params.getString(key),key,params.getString(key)));
+							subFilters.add(new ReportParameterConstant<String>(key, params.getString(key),key,params.getString(key)));
 						}
 					}
 

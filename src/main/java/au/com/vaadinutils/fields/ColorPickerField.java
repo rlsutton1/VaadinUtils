@@ -61,4 +61,7 @@ public class ColorPickerField extends CustomField<iColor>
 		super.setInternalValue(newFieldValue);
 	}
 
+	
+
+	
 }

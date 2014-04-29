@@ -551,8 +551,6 @@ public class JasperManager implements Runnable
 
 	private JasperPrint fillReport(OutputFormat outputFormat) throws JRException
 	{
-		JasperPrint jasper_print;
-
 		Connection connection = reportProperties.getConnection();
 
 		fillHandle = CustomAsynchronousFillHandle.createCustomHandle(jasperReport, boundParams, connection);
