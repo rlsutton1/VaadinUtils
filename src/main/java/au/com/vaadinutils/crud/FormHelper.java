@@ -3,6 +3,7 @@ package au.com.vaadinutils.crud;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -35,6 +36,7 @@ import au.com.vaadinutils.fields.CKEditorEmailField;
 import au.com.vaadinutils.fields.ColorPickerField;
 import au.com.vaadinutils.fields.DataBoundButton;
 import au.com.vaadinutils.fields.CKEditorEmailField.ConfigModifier;
+import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailScheduleEntity;
 
 import com.google.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.JPAContainer;
@@ -176,6 +178,14 @@ public class FormHelper<E> implements Serializable
 	public DateField bindDateField(String fieldLabel, String fieldName)
 	{
 		DateField field = bindDateField(form, group, fieldLabel, fieldName);
+		this.fieldList.add(field);
+		return field;
+	}
+	
+	public DateField bindDateField(String label,
+			SingularAttribute<ReportEmailScheduleEntity, Date> member, String dateFormat, Resolution resolution)
+	{
+		DateField field = bindDateField(form, group, label, member.getName(), dateFormat, resolution);
 		this.fieldList.add(field);
 		return field;
 	}
@@ -328,7 +338,7 @@ public class FormHelper<E> implements Serializable
 		return field;
 	}
 
-	public <L> ComboBox bindComboBox(AbstractLayout form, ValidatingFieldGroup<E> fieldGroup, String fieldLabel,
+	public <L> ComboBox bindComboBox(AbstractLayout form, ValidatingFieldGroup<E> fieldGroup,String fieldName, String fieldLabel,
 			Collection<?> options)
 	{
 		ComboBox field = new SplitComboBox(fieldLabel, options);
@@ -338,6 +348,7 @@ public class FormHelper<E> implements Serializable
 		field.setWidth("100%");
 		field.setImmediate(true);
 		form.addComponent(field);
+		doBinding(group,fieldName,field);
 		return field;
 	}
 
@@ -1114,5 +1125,7 @@ public class FormHelper<E> implements Serializable
 		form.addComponent(field);
 		return field;
 	}
+
+	
 
 }

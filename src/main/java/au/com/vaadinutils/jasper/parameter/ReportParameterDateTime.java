@@ -1,11 +1,16 @@
 package au.com.vaadinutils.jasper.parameter;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.joda.time.DateTime;
 
+import au.com.vaadinutils.jasper.scheduler.DateParameterType;
+
+import com.vaadin.data.Property.ReadOnlyException;
 import com.vaadin.data.Property.ValueChangeListener;
+import com.vaadin.data.util.converter.Converter.ConversionException;
 import com.vaadin.shared.ui.datefield.Resolution;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.DateField;
@@ -107,6 +112,24 @@ public class ReportParameterDateTime extends ReportParameter<String>
 	{
 		return true;
 	}
+
+	@Override
+	public void setValueAsString(String value) throws ReadOnlyException, ConversionException, ParseException
+	{
+		SimpleDateFormat sdf = new SimpleDateFormat(parameterFormat);
+		field.setValue(sdf.parse(value));
+		
+	}
 	
-	
+	@Override
+	public boolean isDateField()
+	{
+		return true;
+	}
+
+	@Override
+	public DateParameterType getDateParameterType()
+	{
+		return DateParameterType.DATE;
+	}
 }

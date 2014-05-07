@@ -315,6 +315,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		actionLayout.setHeight("35");
 	}
 
+	@SuppressWarnings("null")
 	private void addCrudActions()
 	{
 		/**

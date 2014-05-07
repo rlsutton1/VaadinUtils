@@ -17,7 +17,6 @@ import au.com.vaadinutils.fields.ColorPickerField;
 
 import com.vaadin.shared.ui.datefield.Resolution;
 import com.vaadin.ui.AbstractComponent;
-import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
@@ -266,7 +265,7 @@ public class MultiColumnFormLayout<E> extends GridLayout
 	 */
 	public TextField addTextField(String fieldLabel)
 	{
-		TextField field = formHelper.bindTextField((AbstractLayout) this, (ValidatingFieldGroup<E>) null, fieldLabel,
+		TextField field = formHelper.bindTextField(this, (ValidatingFieldGroup<E>) null, fieldLabel,
 				(String) null);
 
 		this.fieldList.add(field);
@@ -438,9 +437,9 @@ public class MultiColumnFormLayout<E> extends GridLayout
 		return field;
 	}
 
-	public ComboBox bindComboBox(String fieldLabel, Collection<?> options)
+	public ComboBox bindComboBox(String fieldLabel, String fieldName,Collection<?> options)
 	{
-		ComboBox field = formHelper.bindComboBox(this, fieldGroup, fieldLabel, options);
+		ComboBox field = formHelper.bindComboBox(this, fieldGroup, fieldName,fieldLabel, options);
 		this.fieldList.add(field);
 		return field;
 	}

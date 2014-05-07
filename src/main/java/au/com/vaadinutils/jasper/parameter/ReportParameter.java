@@ -2,10 +2,15 @@ package au.com.vaadinutils.jasper.parameter;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.text.ParseException;
+import java.util.Date;
 
 import au.com.vaadinutils.jasper.filter.ValidateListener;
+import au.com.vaadinutils.jasper.scheduler.DateParameterType;
 
+import com.vaadin.data.Property.ReadOnlyException;
 import com.vaadin.data.Validator.InvalidValueException;
+import com.vaadin.data.util.converter.Converter.ConversionException;
 import com.vaadin.server.ErrorMessage;
 import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.Component;
@@ -108,6 +113,17 @@ public abstract class ReportParameter<T>
 	public boolean displayInreport()
 	{
 		return true;
+	}
+
+	abstract public void setValueAsString(String value) throws ReadOnlyException, ConversionException, ParseException;
+
+	abstract public boolean isDateField();
+
+	abstract public DateParameterType getDateParameterType();
+
+	public Date getDate()
+	{
+		throw new RuntimeException("Date Parameters must overide and implement this method: "+this.getClass().getCanonicalName());
 	}
 
 }

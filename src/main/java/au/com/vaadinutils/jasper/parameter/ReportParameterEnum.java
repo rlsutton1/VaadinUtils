@@ -1,6 +1,7 @@
 package au.com.vaadinutils.jasper.parameter;
 
 import au.com.vaadinutils.crud.FormHelper;
+import au.com.vaadinutils.jasper.scheduler.DateParameterType;
 
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
@@ -9,6 +10,7 @@ public class ReportParameterEnum<T extends Enum<T>> extends ReportParameter<Enum
 {
 
 	private ComboBox field;
+	private Class<T> enumClass;
 
 	/**
 	 * 
@@ -17,10 +19,11 @@ public class ReportParameterEnum<T extends Enum<T>> extends ReportParameter<Enum
 	 * @param parameterName
 	 * @param enumClass
 	 */
-	public ReportParameterEnum(String caption, T defaultValue,String parameterName, Class<T> enumClass)
+	public ReportParameterEnum(String caption, T defaultValue, String parameterName, Class<T> enumClass)
 	{
-		super(caption,parameterName);
+		super(caption, parameterName);
 		field = new ComboBox(caption);
+		this.enumClass = enumClass;
 		field.setContainerDataSource(FormHelper.createContainerFromEnumClass("value", enumClass));
 		field.setNewItemsAllowed(false);
 		field.setNullSelectionAllowed(false);
@@ -50,7 +53,7 @@ public class ReportParameterEnum<T extends Enum<T>> extends ReportParameter<Enum
 	public void setDefaultValue(Enum<T> defaultValue)
 	{
 		field.setValue(defaultValue);
-		
+
 	}
 
 	@Override
@@ -70,4 +73,25 @@ public class ReportParameterEnum<T extends Enum<T>> extends ReportParameter<Enum
 	{
 		return true;
 	}
+
+	@Override
+	public void setValueAsString(String value)
+	{
+
+		field.setValue(Enum.valueOf(enumClass, value));
+
+	}
+	@Override
+	public boolean isDateField()
+	{
+		return false;
+	}
+
+	@Override
+	public DateParameterType getDateParameterType()
+	{
+		throw new RuntimeException("Not implemented");
+	}
+
+
 }

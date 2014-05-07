@@ -2,13 +2,17 @@ package au.com.vaadinutils.layout;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
+import java.util.LinkedList;
 
+import com.vaadin.data.Property;
 import com.vaadin.data.Validator;
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
+import com.vaadin.ui.Field;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.NativeButton;
@@ -18,7 +22,8 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.Reindeer;
 
-public class TimePicker extends HorizontalLayout
+@SuppressWarnings("rawtypes")
+public class TimePicker extends HorizontalLayout implements Field
 {
 
 	private static final long serialVersionUID = 1826417125815798837L;
@@ -35,12 +40,23 @@ public class TimePicker extends HorizontalLayout
 	private ChangedHandler changedHandler;
 	private String title;
 	private TextField field;
+	private Property<Date> datasource;
+	private boolean isRequired;
+	private String requiredErrorMessage;
+	private int tabIndex;
+	private boolean isBuffered;
+	private Validator validator;
 
 	public TimePicker(String title)
 	{
 
 		setCaption(title);
-		displayTime.addValidator(new Validator()
+		field = new TextField();
+		field.setWidth("125");
+		field.setStyleName("v-datefield-textfield");
+		field.setImmediate(true);
+		displayTime.setImmediate(true);
+		validator = new Validator()
 		{
 
 			private static final long serialVersionUID = 6579163030027373837L;
@@ -63,15 +79,13 @@ public class TimePicker extends HorizontalLayout
 				}
 
 			}
-		});
+		};
+		displayTime.addValidator(validator);
+		field.addValidator(validator);
 
 		this.title = title;
 		HorizontalLayout hl = new HorizontalLayout();
 		hl.setStyleName("v-datefield v-datefield-popupcalendar v-datefield-day");
-
-		field = new TextField();
-		field.setWidth("125");
-		field.setStyleName("v-datefield-textfield");
 
 		NativeButton b = new NativeButton();
 		b.setStyleName("v-datefield-button");
@@ -91,6 +105,11 @@ public class TimePicker extends HorizontalLayout
 			}
 		});
 		addComponent(hl);
+	}
+
+	public void focus()
+	{
+		this.focus();
 	}
 
 	private void showPopupTimePicker()
@@ -458,6 +477,7 @@ public class TimePicker extends HorizontalLayout
 		amPm = "AM";
 		isSet = false;
 		displayTime.setValue(EMPTY);
+		field.setValue(EMPTY);
 
 	}
 
@@ -489,15 +509,269 @@ public class TimePicker extends HorizontalLayout
 			hour = "12";
 		}
 		displayTime.setValue(getValueAsString());
+		field.setValue(getValueAsString());
+		System.out.println("set to " + getValueAsString());
 	}
 
 	private void setNewValue()
 	{
 		displayTime.setValue(getValueAsString());
+		field.setValue(getValueAsString());
 		if (changedHandler != null)
 		{
 			changedHandler.onChanged(getValueAsString());
 
 		}
+	}
+
+	@Override
+	public boolean isInvalidCommitted()
+	{
+		return false;
+	}
+
+	@Override
+	public void setInvalidCommitted(boolean isCommitted)
+	{
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void commit() throws SourceException, InvalidValueException
+	{
+		datasource.setValue((Date) getValue());
+
+	}
+
+	@Override
+	public void discard() throws SourceException
+	{
+		setValues(datasource.getValue());
+
+	}
+
+	@Override
+	public void setBuffered(boolean buffered)
+	{
+		this.isBuffered = buffered;
+
+	}
+
+	@Override
+	public boolean isBuffered()
+	{
+		return isBuffered;
+	}
+
+	@Override
+	public boolean isModified()
+	{
+		Date value = (Date) getValue();
+		Date dsValue = datasource.getValue();
+		if (dsValue == null && value == null)
+		{
+			return false;
+		}
+		if (dsValue != null && value == null)
+		{
+			return true;
+		}
+		if (dsValue == null && value != null)
+		{
+			return true;
+		}
+		return !dsValue.equals(value);
+	}
+
+	@Override
+	public void addValidator(Validator validator)
+	{
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void removeValidator(Validator validator)
+	{
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void removeAllValidators()
+	{
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public Collection<Validator> getValidators()
+	{
+		Collection<Validator> validators = new LinkedList<Validator>();
+		validators.add(validator);
+		 return validators;
+	}
+
+	@Override
+	public boolean isValid()
+	{
+		boolean valid = true;
+		try
+		{
+			validator.validate(getValueAsString());
+		}
+		catch (Exception e)
+		{
+			valid = false;
+		}
+		return valid;
+	}
+
+	@Override
+	public void validate() throws InvalidValueException
+	{
+		validator.validate(getValueAsString());
+
+	}
+
+	@Override
+	public boolean isInvalidAllowed()
+	{
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void setInvalidAllowed(boolean invalidValueAllowed) throws UnsupportedOperationException
+	{
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public Object getValue()
+	{
+		SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+		try
+		{
+			if (getValueAsString() == null)
+			{
+				return null;
+			}
+			return sdf.parse(getValueAsString());
+		}
+		catch (ParseException e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+
+	@Override
+	public void setValue(Object newValue) throws ReadOnlyException
+	{
+		setValues((Date) newValue);
+
+	}
+
+	@Override
+	public Class getType()
+	{
+
+		return Date.class;
+	}
+
+	@Override
+	public void addValueChangeListener(ValueChangeListener listener)
+	{
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void addListener(ValueChangeListener listener)
+	{
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void removeValueChangeListener(ValueChangeListener listener)
+	{
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void removeListener(ValueChangeListener listener)
+	{
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void valueChange(com.vaadin.data.Property.ValueChangeEvent event)
+	{
+		System.out.println("Value change");
+
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public void setPropertyDataSource(Property newDataSource)
+	{
+		clearValue();
+		datasource = newDataSource;
+		if (datasource.getValue() != null)
+		{
+			setValues(datasource.getValue());
+		}
+
+	}
+
+	@Override
+	public Property<Date> getPropertyDataSource()
+	{
+		return datasource;
+	}
+
+	@Override
+	public int getTabIndex()
+	{
+		return tabIndex;
+	}
+
+	@Override
+	public void setTabIndex(int tabIndex)
+	{
+		this.tabIndex = tabIndex;
+
+	}
+
+	@Override
+	public boolean isRequired()
+	{
+		return isVisible();
+		
+	}
+
+	@Override
+	public void setRequired(boolean required)
+	{
+		isRequired = required;
+
+	}
+
+	@Override
+	public void setRequiredError(String requiredMessage)
+	{
+		requiredErrorMessage = requiredMessage;
+
+	}
+
+	@Override
+	public String getRequiredError()
+	{
+		return requiredErrorMessage;
 	}
 }

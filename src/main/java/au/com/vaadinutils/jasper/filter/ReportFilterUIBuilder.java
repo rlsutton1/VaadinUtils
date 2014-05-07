@@ -116,7 +116,7 @@ public class ReportFilterUIBuilder implements ReportFilterFieldBuilder, ReportFi
 	}
 
 	@Override
-	public List<ExpanderComponent> buildLayout()
+	public List<ExpanderComponent> buildLayout(Boolean hideDateFields)
 	{
 		List<ExpanderComponent> components = new LinkedList<ExpanderComponent>();
 
@@ -128,29 +128,33 @@ public class ReportFilterUIBuilder implements ReportFilterFieldBuilder, ReportFi
 			{
 				if (rparam.showFilter())
 				{
-					if (rparam.shouldExpand())
+					// check if we should hide date fields, used for the scheduler
+					if (!hideDateFields || !rparam.isDateField())
 					{
-						if (accordian == null)
+						if (rparam.shouldExpand())
 						{
-							accordian = new Accordion();
-							accordian.setSizeFull();
-						}
-						final Tab tab = accordian.addTab(rparam.getComponent(), rparam.getLabel());
-						rparam.addValidateListener(new ValidateListener()
-						{
-
-							@Override
-							public void setComponentError(ErrorMessage componentError)
+							if (accordian == null)
 							{
-								tab.setComponentError(componentError);
+								accordian = new Accordion();
+								accordian.setSizeFull();
 							}
-						});
-						rparam.validate();
+							final Tab tab = accordian.addTab(rparam.getComponent(), rparam.getLabel());
+							rparam.addValidateListener(new ValidateListener()
+							{
 
-					}
-					else
-					{
-						components.add(new ExpanderComponent(rparam.getComponent(), rparam.shouldExpand()));
+								@Override
+								public void setComponentError(ErrorMessage componentError)
+								{
+									tab.setComponentError(componentError);
+								}
+							});
+							rparam.validate();
+
+						}
+						else
+						{
+							components.add(new ExpanderComponent(rparam.getComponent(), rparam.shouldExpand()));
+						}
 					}
 				}
 			}

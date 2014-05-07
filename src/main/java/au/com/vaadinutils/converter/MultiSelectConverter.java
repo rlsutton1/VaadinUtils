@@ -329,10 +329,9 @@ public class MultiSelectConverter<T> implements Converter<Collection<Object>, Co
 		{
 			return getPropertyDataSource().getType();
 		}
-		else
-		{
-			return this.type;
-		}
+
+		return this.type;
+
 	}
 
 }

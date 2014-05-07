@@ -1,6 +1,8 @@
 package au.com.vaadinutils.jasper.parameter;
 
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.metamodel.SingularAttribute;
@@ -10,6 +12,7 @@ import org.apache.logging.log4j.Logger;
 
 import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.fields.TableCheckBoxSelect;
+import au.com.vaadinutils.jasper.scheduler.DateParameterType;
 
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.JPAContainerFactory;
@@ -346,6 +349,31 @@ public class ReportParameterTable<T> extends ReportParameter<String>
 			logger.error("Exception while getting value(s) for " + parameterName);
 			throw new RuntimeException(e);
 		}
+	}
+
+	@Override
+	public void setValueAsString(String value)
+	{
+		String[] values = value.split(",");
+		List<Long> idList = new LinkedList<Long>();
+		for (String id :values)
+		{
+			Long intId = Long.parseLong(id);
+			idList.add(intId);
+		}
+		table.setSelectedValue(idList);
+		
+	}
+	@Override
+	public boolean isDateField()
+	{
+		return false;
+	}
+
+	@Override
+	public DateParameterType getDateParameterType()
+	{
+		throw new RuntimeException("Not implemented");
 	}
 
 }

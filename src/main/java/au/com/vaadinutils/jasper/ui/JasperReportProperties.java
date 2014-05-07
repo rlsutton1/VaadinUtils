@@ -18,20 +18,21 @@ public interface JasperReportProperties
 	 */
 	public abstract String getReportTitle();
 
-	
 	/**
 	 * the name of the jasper report file with or without extension.
+	 * 
 	 * @return
 	 */
 	public abstract String getReportFileName();
-	
+
 	/**
-	 * the folder where the jasper report (.jrxml) can be found and the .jasper file will be written.
+	 * the folder where the jasper report (.jrxml) can be found and the .jasper
+	 * file will be written.
+	 * 
 	 * @return
 	 */
 	public abstract File getReportFolder();
 
-	
 	/**
 	 * 
 	 * @return the name of the template jasper file (something like
@@ -150,5 +151,15 @@ public interface JasperReportProperties
 	 * @return
 	 */
 	public abstract boolean isDevMode();
+
+	/**
+	 * the name of the class that knows how to render the filter builder and prepare data
+	 * and provide a jasperreportprovider
+	 * 
+	 * @return
+	 */
+	public abstract Class<? extends JasperReportProperties> getReportClass();
+
+	public abstract String getUserEmailAddress();
 
 }

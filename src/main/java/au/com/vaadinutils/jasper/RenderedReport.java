@@ -2,6 +2,7 @@ package au.com.vaadinutils.jasper;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import javax.activation.DataSource;
 
@@ -40,23 +41,31 @@ public class RenderedReport
 		return exportMethod == OutputFormat.CSV;
 	}
 
-	public String getBodyAsHtml()
+	public String getBodyAsHtml() 
 	{
-		return reportBody.toString();
+		InputStreamReader isr = new InputStreamReader(reportBody);
+		return isr.toString();
+
 	}
 
-	public DataSource getBodyAsDataSource() throws IOException
+	public DataSource getBodyAsDataSource(String fileName, AttachmentType type) throws IOException
 	{
-		final ByteArrayDataSource body = new ByteArrayDataSource(reportBody.toString(), "text/html");
-		body.setName("Body");
+
+		final ByteArrayDataSource body = new ByteArrayDataSource(reportBody, type.toString());
+		body.setName(fileName);
+
 		return body;
 	}
-
-
 
 	public DataSource[] getImages()
 	{
 		return images;
+	}
+
+	public void close() throws IOException
+	{
+		reportBody.close();
+
 	}
 
 }

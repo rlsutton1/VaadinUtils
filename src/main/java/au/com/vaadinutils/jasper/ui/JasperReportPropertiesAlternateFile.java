@@ -123,5 +123,16 @@ public class JasperReportPropertiesAlternateFile implements JasperReportProperti
 		return reportPropertiesTemplate.getReportFolder();
 	}
 
+	@Override
+	public Class<? extends JasperReportProperties> getReportClass()
+	{
+		return reportPropertiesTemplate.getReportClass();
+	}
+	@Override
+	public String getUserEmailAddress()
+	{
+		return reportPropertiesTemplate.getUserEmailAddress();
+	}
+
 
 }

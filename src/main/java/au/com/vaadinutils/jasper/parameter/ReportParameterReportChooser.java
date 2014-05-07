@@ -1,6 +1,7 @@
 package au.com.vaadinutils.jasper.parameter;
 
 import au.com.vaadinutils.crud.FormHelper;
+import au.com.vaadinutils.jasper.scheduler.DateParameterType;
 import au.com.vaadinutils.jasper.ui.JasperReportProperties;
 
 import com.vaadin.ui.ComboBox;
@@ -10,6 +11,7 @@ public class ReportParameterReportChooser<T extends Enum<T> & ReportChooser> ext
 {
 
 	private ComboBox field;
+	private Class<T> enumClass;
 
 	/**
 	 * 
@@ -22,6 +24,7 @@ public class ReportParameterReportChooser<T extends Enum<T> & ReportChooser> ext
 	{
 		super(caption,parameterName);
 		field = new ComboBox(caption);
+		this.enumClass = enumClass;
 		field.setContainerDataSource(FormHelper.createContainerFromEnumClass("value", enumClass));
 		field.setNewItemsAllowed(false);
 		field.setNullSelectionAllowed(false);
@@ -80,5 +83,24 @@ public class ReportParameterReportChooser<T extends Enum<T> & ReportChooser> ext
 		return true;
 	}
 	
-	
+	@Override
+	public void setValueAsString(String value)
+	{
+
+		field.setValue(Enum.valueOf(enumClass, value));
+
+	}
+
+	@Override
+	public boolean isDateField()
+	{
+		return false;
+	}
+
+	@Override
+	public DateParameterType getDateParameterType()
+	{
+		throw new RuntimeException("Not implemented");
+	}
+
 }

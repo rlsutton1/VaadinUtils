@@ -24,6 +24,7 @@ import au.com.vaadinutils.jasper.filter.ReportFilterUIBuilder;
 import au.com.vaadinutils.jasper.parameter.ReportChooser;
 import au.com.vaadinutils.jasper.parameter.ReportParameter;
 import au.com.vaadinutils.jasper.parameter.ReportParameterConstant;
+import au.com.vaadinutils.jasper.scheduler.JasperReportSchedulerWindow;
 import au.com.vaadinutils.listener.CancelListener;
 import au.com.vaadinutils.listener.ClickEventLogged;
 import au.com.vaadinutils.ui.UIUpdater;
@@ -93,6 +94,8 @@ class JasperReportLayout extends VerticalLayout
 
 	private SplitPanel splitPanel;
 
+	private NativeButton scheduleButton;
+
 	protected JasperReportLayout(JasperReportProperties reportProperties)
 	{
 		this.reportProperties = reportProperties;
@@ -131,9 +134,10 @@ class JasperReportLayout extends VerticalLayout
 		titleLabel.setContentMode(ContentMode.HTML);
 		splash.addComponent(titleLabel);
 
-		Label splashLabel = new Label("<font size='4' >Set the desired filters and click a print button to generate a report</font>");
+		Label splashLabel = new Label(
+				"<font size='4' >Set the desired filters and click a print button to generate a report</font>");
 		splashLabel.setContentMode(ContentMode.HTML);
- 
+
 		splitPanel.setSecondComponent(splash);
 
 		// generate the report immediately if there are no visible filters
@@ -237,14 +241,14 @@ class JasperReportLayout extends VerticalLayout
 						}
 						else
 						{
-							subFilters.add(new ReportParameterConstant<String>(key, params.getString(key),key,params.getString(key)));
+							subFilters.add(new ReportParameterConstant<String>(key, params.getString(key), key, params
+									.getString(key)));
 						}
 					}
 
 					if (!insitue)
 					{
-						new JasperReportPopUp(subTitle,
-								subReportFileName,reportProperties, subFilters);
+						new JasperReportPopUp(subTitle, subReportFileName, reportProperties, subFilters);
 					}
 					else
 					{
@@ -278,11 +282,10 @@ class JasperReportLayout extends VerticalLayout
 		buttonBar.setHeight(buttonHeight);
 
 		buttonBar.setMargin(new MarginInfo(false, true, false, true));
-		
+
 		HorizontalLayout buttonContainer = new HorizontalLayout();
 		buttonContainer.setSizeFull();
 		buttonContainer.setWidth("145");
-		
 
 		showButton = new NativeButton();
 		showButton.setIcon(new ExternalResource("images/seanau/Preview_32.png"));
@@ -312,10 +315,33 @@ class JasperReportLayout extends VerticalLayout
 		addButtonListener(exportButton, OutputFormat.CSV);
 		buttonContainer.addComponent(exportButton);
 
+		scheduleButton = new NativeButton("Schedule");
+		// scheduleButton.setIcon(new
+		// ExternalResource("images/seanau/Preview_32.png"));
+		scheduleButton.setDescription("Schedule");
+		scheduleButton.setWidth("50");
+		scheduleButton.setHeight(buttonHeight);
+		scheduleButton.setDisableOnClick(true);
+		scheduleButton.addClickListener(new ClickEventLogged.ClickListener()
+		{
+
+			private static final long serialVersionUID = 7207441556779172217L;
+
+			@Override
+			public void clicked(ClickEvent event)
+			{
+				new JasperReportSchedulerWindow( reportProperties, builder.getReportParameters());
+				
+
+
+			}
+		});
+		buttonContainer.addComponent(scheduleButton);
+
 		buttonBar.addComponent(buttonContainer);
 		layout.addComponent(buttonBar);
 
-		components = builder.buildLayout();
+		components = builder.buildLayout(false);
 		if (components.size() > 0)
 		{
 			VerticalLayout filterPanel = new VerticalLayout();
@@ -448,7 +474,7 @@ class JasperReportLayout extends VerticalLayout
 			if (p instanceof ReportChooser)
 			{
 				ReportChooser chooser = (ReportChooser) p;
-			 	manager = new JasperManager(chooser.getReportProperties(reportProperties));
+				manager = new JasperManager(chooser.getReportProperties(reportProperties));
 				Preconditions.checkNotNull(manager, "chooser returned a NULL JasperManager.");
 			}
 			else

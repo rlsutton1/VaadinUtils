@@ -1,5 +1,6 @@
 package au.com.vaadinutils.fields;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -16,7 +17,7 @@ public class TableCheckBoxSelect extends Table
 
 	private static final String TABLE_CHECK_BOX_SELECT = "TableCheckBoxSelect";
 	private static final long serialVersionUID = -7559267854874304189L;
-	Set<Object> markedIds = new TreeSet<Object>();
+	final Set<Object> markedIds = new TreeSet<Object>();
 	boolean trackingSelected = true;
 	private boolean multiselect;
 	private boolean selectable = true;
@@ -82,7 +83,6 @@ public class TableCheckBoxSelect extends Table
 				return new Property()
 				{
 
-					
 					private static final long serialVersionUID = 8430716281101427107L;
 
 					@Override
@@ -157,6 +157,29 @@ public class TableCheckBoxSelect extends Table
 			// ours in npe's out
 			super.setVisibleColumns(visibleColumns);
 		}
+
+	}
+
+	/**
+	 * use setSelectedValue instead, this method gets called before
+	 * initialization
+	 */
+	@Deprecated
+	public void setValue(Object value)
+	{
+		super.setValue(value);
+	}
+
+	@SuppressWarnings("unchecked")
+	public void setSelectedValue(Object value)
+	{
+		// super.setValue(newValue);
+		markedIds.clear();
+		markedIds.addAll((Collection<Long>) value);
+		
+		trackingSelected = true;
+		
+		this.refreshRowCache();
 
 	}
 
@@ -297,14 +320,14 @@ public class TableCheckBoxSelect extends Table
 
 	private void notifyValueChange()
 	{
-		for (ValueChangeListener listener:valueChangeListeners)
+		for (ValueChangeListener listener : valueChangeListeners)
 		{
 			listener.valueChange(getValueChangeEvent());
 		}
 		this.validateField();
-		
+
 	}
-	
+
 	private boolean validateField()
 	{
 		boolean valid = false;
@@ -337,6 +360,5 @@ public class TableCheckBoxSelect extends Table
 		return valid;
 
 	}
-
 
 }

@@ -78,7 +78,7 @@ public class JasperManager implements Runnable
 	private static transient Logger logger = LogManager.getLogger(JasperManager.class);
 
 	private final Map<String, Object> boundParams = new HashMap<String, Object>();
- 
+
 	private CustomAsynchronousFillHandle fillHandle;
 
 	volatile private boolean stop;
@@ -449,7 +449,7 @@ public class JasperManager implements Runnable
 
 					parameter.setForPrompting(false);
 
-	 				designFile.addParameter(parameter);
+					designFile.addParameter(parameter);
 				}
 			}
 		}
@@ -641,11 +641,16 @@ public class JasperManager implements Runnable
 
 		exportAsync(exportMethod, params, null);
 		InputStream stream = getStream();
-		completeBarrier.await();
+		//completeBarrier.await();
 		return new RenderedReport(stream, imagesrcs, exportMethod);
 
 	}
 
+	public int checkQueueSize()
+	{
+		return concurrentLimit.getQueueLength();
+	}
+	
 	public InputStream getStream() throws InterruptedException
 	{
 		inputStream = new PipedInputStream();
@@ -667,15 +672,47 @@ public class JasperManager implements Runnable
 		}
 		this.params = params;
 
-		WrappedSession session = UI.getCurrent().getSession().getSession();
+		if (UI.getCurrent() != null)
+		{
+			WrappedSession session = UI.getCurrent().getSession().getSession();
+			session.setAttribute(VaadinJasperPrintServlet.IMAGES_MAP, images);
+		}
+		else
+		{
+			logger.warn("No vaadin UI present");
+		}
 		images = new ConcurrentHashMap<String, byte[]>();
-		session.setAttribute(VaadinJasperPrintServlet.IMAGES_MAP, images);
 
 		stop = false;
 		writerReady = new CountDownLatch(1);
 		completeBarrier = new CountDownLatch(1);
 		readerReady = new CountDownLatch(1);
 		this.progressListener = progressListener;
+		if(progressListener == null)
+		{
+			this.progressListener = new JasperProgressListener(){
+
+				@Override
+				public void failed(String string)
+				{
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void completed()
+				{
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void outputStreamReady()
+				{
+					// TODO Auto-generated method stub
+					
+				}};
+		}
 		inputStream = null;
 		outputStream = null;
 
@@ -757,14 +794,20 @@ public class JasperManager implements Runnable
 				exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasper_print);
 				exporter.setParameter(JRHtmlExporterParameter.IMAGES_MAP, images);
 
-				String context = VaadinServlet.getCurrent().getServletContext().getContextPath();
-				int contextIndex = Page.getCurrent().getLocation().toString().lastIndexOf(context);
-				String baseurl = Page.getCurrent().getLocation().toString()
-						.substring(0, contextIndex + context.length() + 1);
+				if (VaadinServlet.getCurrent() != null)
+				{
+					String context = VaadinServlet.getCurrent().getServletContext().getContextPath();
+					int contextIndex = Page.getCurrent().getLocation().toString().lastIndexOf(context);
+					String baseurl = Page.getCurrent().getLocation().toString()
+							.substring(0, contextIndex + context.length() + 1);
 
-				String imageUrl = baseurl + "VaadinJasperPrintServlet?image=";
+					String imageUrl = baseurl + "VaadinJasperPrintServlet?image=";
 
-				exporter.setParameter(JRHtmlExporterParameter.IMAGES_URI, imageUrl);
+					exporter.setParameter(JRHtmlExporterParameter.IMAGES_URI, imageUrl);
+				}else
+				{
+					logger.warn("Vaadin Servlet doens't have a current context");
+				}
 				break;
 			}
 			case PDF:
