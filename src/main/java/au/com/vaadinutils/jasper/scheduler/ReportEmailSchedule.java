@@ -1,6 +1,7 @@
 package au.com.vaadinutils.jasper.scheduler;
 
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -32,7 +33,7 @@ public interface ReportEmailSchedule
 	String message();
 	
 	// key = Report Parameter name, value = is the parameter value
-	List<ReportEmailParameter> getReportParameters();
+Collection<ReportEmailParameter> getReportParameters();
 	
 	// days of week  0 = sunday
 	String getScheduledDaysOfWeek();

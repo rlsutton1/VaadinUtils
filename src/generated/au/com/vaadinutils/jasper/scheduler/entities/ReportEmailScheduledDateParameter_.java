@@ -4,10 +4,10 @@
 
 package au.com.vaadinutils.jasper.scheduler.entities;
 
-import au.com.vaadinutils.jasper.scheduler.DateParameterType;
 import java.lang.Long;
 import java.lang.String;
 import java.util.Date;
+
 import javax.persistence.metamodel.SingularAttribute;
 
 @javax.persistence.metamodel.StaticMetamodel

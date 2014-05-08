@@ -1,95 +1,217 @@
 package au.com.vaadinutils.jasper.scheduler.entities;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
+
+import org.joda.time.DateTime;
 
 public enum DateParameterOffsetType
 {
 	CONSTANT
 	{
 		@Override
-		public String convertDate(Date parameterTime, Date scheduledDate)
+		public String convertStartDate(Date parameterTime, Date scheduledDate, DateParameterType formatType)
 		{
-			SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+			SimpleDateFormat formatter = new SimpleDateFormat(formatType.getDateFormat());
+			return formatter.format(parameterTime);
+		}
+
+		@Override
+		public String convertEndDate(Date parameterTime, Date scheduledDate, DateParameterType formatType)
+		{
+			SimpleDateFormat formatter = new SimpleDateFormat(formatType.getDateFormat());
 			return formatter.format(parameterTime);
 		}
 	},
-	DAY_OF_SCHEDULE
+
+	TODAY
 	{
 		@Override
-		public String convertDate(Date parameterTime, Date scheduledDate)
+		public String convertStartDate(Date parameterTime, Date scheduledDate, DateParameterType formatType)
 		{
-			SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-			Calendar pTime = getCalendar(parameterTime);
-			Calendar sDate = getCalendar(scheduledDate);
+			Date result;
+			DateTime scheduled = new DateTime(scheduledDate);
+			if (formatType == DateParameterType.DATE)
+			{
+				result = scheduled.withTimeAtStartOfDay().toDate();
+			}
+			else
+			{
+				result = scheduled.withTimeAtStartOfDay().plusMinutes(new DateTime(parameterTime).getMinuteOfDay())
+						.toDate();
 
-			Calendar tmpDate = Calendar.getInstance();
-			tmpDate.setTime(scheduledDate);
-			tmpDate.set(Calendar.HOUR_OF_DAY, pTime.get(Calendar.HOUR_OF_DAY));
-			tmpDate.set(Calendar.MINUTE, pTime.get(Calendar.MINUTE));
-			return formatter.format(tmpDate.getTime());
+			}
+			SimpleDateFormat formatter = new SimpleDateFormat(formatType.getDateFormat());
+			return formatter.format(result);
+
+		}
+
+		@Override
+		public String convertEndDate(Date parameterTime, Date scheduledDate, DateParameterType formatType)
+		{
+			Date result;
+			DateTime scheduled = new DateTime(scheduledDate);
+			if (formatType == DateParameterType.DATE)
+			{
+				result = scheduled.withTimeAtStartOfDay().plusDays(1).toDate();
+			}
+			else
+			{
+				result = scheduled.withTimeAtStartOfDay().plusDays(1)
+						.plusMinutes(new DateTime(parameterTime).getMinuteOfDay()).toDate();
+
+			}
+			SimpleDateFormat formatter = new SimpleDateFormat(formatType.getDateFormat());
+			return formatter.format(result);
 		}
 	},
-	DAY_BEFORE_SCHEDULE
+	YESTERDAY
 	{
 		@Override
-		public String convertDate(Date parameterTime, Date scheduledDate)
+		public String convertStartDate(Date parameterTime, Date scheduledDate, DateParameterType formatType)
 		{
-			SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-			Calendar pTime = getCalendar(parameterTime);
-			Calendar sDate = getCalendar(scheduledDate);
+			Date result;
+			DateTime scheduled = new DateTime(scheduledDate);
+			if (formatType == DateParameterType.DATE)
+			{
+				result = scheduled.withTimeAtStartOfDay().minusDays(1).toDate();
+			}
+			else
+			{
+				result = scheduled.withTimeAtStartOfDay().minusDays(1)
+						.plusMinutes(new DateTime(parameterTime).getMinuteOfDay()).toDate();
 
-			Calendar tmpDate = Calendar.getInstance();
-			tmpDate.setTime(scheduledDate);
-			tmpDate.set(Calendar.HOUR_OF_DAY, pTime.get(Calendar.HOUR_OF_DAY));
-			tmpDate.set(Calendar.MINUTE, pTime.get(Calendar.MINUTE));
-			tmpDate.add(Calendar.DATE, -1);
-			return formatter.format(tmpDate);
+			}
+			SimpleDateFormat formatter = new SimpleDateFormat(formatType.getDateFormat());
+			return formatter.format(result);
+		}
+
+		@Override
+		public String convertEndDate(Date parameterTime, Date scheduledDate, DateParameterType formatType)
+		{
+			Date result;
+			DateTime scheduled = new DateTime(scheduledDate);
+			if (formatType == DateParameterType.DATE)
+			{
+				result = scheduled.withTimeAtStartOfDay().toDate();
+			}
+			else
+			{
+				result = scheduled.withTimeAtStartOfDay().plusMinutes(new DateTime(parameterTime).getMinuteOfDay())
+						.toDate();
+
+			}
+			SimpleDateFormat formatter = new SimpleDateFormat(formatType.getDateFormat());
+			return formatter.format(result);
 		}
 	},
-	WEEK_BEFORE_SCHEDULE
+	THIS_WEEK
 	{
 		@Override
-		public String convertDate(Date parameterTime, Date scheduledDate)
+		public String convertStartDate(Date parameterTime, Date scheduledDate, DateParameterType formatType)
 		{
-			SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-			Calendar pTime = getCalendar(parameterTime);
-			Calendar sDate = getCalendar(scheduledDate);
+			Date result;
+			DateTime scheduled = new DateTime(scheduledDate);
 
-			Calendar tmpDate = Calendar.getInstance();
-			tmpDate.setTime(scheduledDate);
-			tmpDate.set(Calendar.HOUR_OF_DAY, pTime.get(Calendar.HOUR_OF_DAY));
-			tmpDate.set(Calendar.MINUTE, pTime.get(Calendar.MINUTE));
-			tmpDate.add(Calendar.WEEK_OF_YEAR, -1);
-			return formatter.format(tmpDate);
+			result = scheduled.withDayOfWeek(1).withTimeAtStartOfDay().toDate();
+
+			SimpleDateFormat formatter = new SimpleDateFormat(formatType.getDateFormat());
+			return formatter.format(result);
+		}
+
+		@Override
+		public String convertEndDate(Date parameterTime, Date scheduledDate, DateParameterType formatType)
+		{
+			Date result;
+			DateTime scheduled = new DateTime(scheduledDate);
+
+			result = scheduled.withDayOfWeek(1).withTimeAtStartOfDay().plusWeeks(1).toDate();
+
+			SimpleDateFormat formatter = new SimpleDateFormat(formatType.getDateFormat());
+			return formatter.format(result);
 		}
 	},
-	MONTH_BEFORE_SCHEDULE
+	LAST_WEEK
 	{
 		@Override
-		public String convertDate(Date parameterTime, Date scheduledDate)
+		public String convertStartDate(Date parameterTime, Date scheduledDate, DateParameterType formatType)
 		{
-			SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-			Calendar pTime = getCalendar(parameterTime);
-			Calendar sDate = getCalendar(scheduledDate);
+			Date result;
+			DateTime scheduled = new DateTime(scheduledDate);
 
-			Calendar tmpDate = Calendar.getInstance();
-			tmpDate.setTime(scheduledDate);
-			tmpDate.set(Calendar.HOUR_OF_DAY, pTime.get(Calendar.HOUR_OF_DAY));
-			tmpDate.set(Calendar.MINUTE, pTime.get(Calendar.MINUTE));
-			tmpDate.add(Calendar.MONTH, -1);
-			return formatter.format(tmpDate);
+			result = scheduled.withDayOfWeek(1).withTimeAtStartOfDay().plusWeeks(-1).toDate();
+
+			SimpleDateFormat formatter = new SimpleDateFormat(formatType.getDateFormat());
+			return formatter.format(result);
+		}
+
+		@Override
+		public String convertEndDate(Date parameterTime, Date scheduledDate, DateParameterType formatType)
+		{
+			Date result;
+			DateTime scheduled = new DateTime(scheduledDate);
+
+			result = scheduled.withDayOfWeek(1).withTimeAtStartOfDay().toDate();
+
+			SimpleDateFormat formatter = new SimpleDateFormat(formatType.getDateFormat());
+			return formatter.format(result);
+		}
+	},
+	THIS_MONTH
+	{
+		@Override
+		public String convertStartDate(Date parameterTime, Date scheduledDate, DateParameterType formatType)
+		{
+			Date result;
+			DateTime scheduled = new DateTime(scheduledDate);
+
+			result = scheduled.withDayOfMonth(1).withTimeAtStartOfDay().toDate();
+
+			SimpleDateFormat formatter = new SimpleDateFormat(formatType.getDateFormat());
+			return formatter.format(result);
+		}
+
+		@Override
+		public String convertEndDate(Date parameterTime, Date scheduledDate, DateParameterType formatType)
+		{
+			Date result;
+			DateTime scheduled = new DateTime(scheduledDate);
+
+			result = scheduled.withDayOfMonth(1).withTimeAtStartOfDay().plusMonths(1).toDate();
+
+			SimpleDateFormat formatter = new SimpleDateFormat(formatType.getDateFormat());
+			return formatter.format(result);
+		}
+	},
+	LAST_MONTH
+	{
+		@Override
+		public String convertStartDate(Date parameterTime, Date scheduledDate, DateParameterType formatType)
+		{
+			Date result;
+			DateTime scheduled = new DateTime(scheduledDate);
+
+			result = scheduled.withDayOfMonth(1).withTimeAtStartOfDay().minusMonths(1).toDate();
+
+			SimpleDateFormat formatter = new SimpleDateFormat(formatType.getDateFormat());
+			return formatter.format(result);
+		}
+
+		@Override
+		public String convertEndDate(Date parameterTime, Date scheduledDate, DateParameterType formatType)
+		{
+			Date result;
+			DateTime scheduled = new DateTime(scheduledDate);
+
+			result = scheduled.withDayOfMonth(1).withTimeAtStartOfDay().toDate();
+
+			SimpleDateFormat formatter = new SimpleDateFormat(formatType.getDateFormat());
+			return formatter.format(result);
 		}
 	};
 
-	abstract public String convertDate(Date parameterTime, Date scheduledDate);
+	abstract public String convertStartDate(Date parameterTime, Date scheduledDate, DateParameterType formatType);
 
-	private static Calendar getCalendar(Date date)
-	{
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(date);
-		return cal;
-	}
+	abstract public String convertEndDate(Date parameterTime, Date scheduledDate, DateParameterType formatType);
 
 }

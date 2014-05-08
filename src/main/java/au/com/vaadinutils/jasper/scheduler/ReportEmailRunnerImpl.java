@@ -86,11 +86,15 @@ public class ReportEmailRunnerImpl implements ReportEmailRunner, JasperReportPro
 			params.add(new ReportParameterConstant<String>(param.getName(), param.getValue()));
 		}
 
-		// set modified data params
+		// set modified date params
 		for (ScheduledDateParameter param : schedule.getDateParameters())
 		{
-			params.add(new ReportParameterConstant<String>(param.getName(), param.getOffsetType().convertDate(
-					param.getDate(), scheduledTime)));
+
+			params.add(new ReportParameterConstant<String>(param.getStartName(), param.getOffsetType()
+					.convertStartDate(param.getStartDate(), scheduledTime, param.getType())));
+			params.add(new ReportParameterConstant<String>(param.getEndName(), param.getOffsetType().convertEndDate(
+					param.getEndDate(), scheduledTime, param.getType())));
+
 		}
 
 		return params;

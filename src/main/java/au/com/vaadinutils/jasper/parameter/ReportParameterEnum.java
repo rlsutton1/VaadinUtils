@@ -1,7 +1,7 @@
 package au.com.vaadinutils.jasper.parameter;
 
 import au.com.vaadinutils.crud.FormHelper;
-import au.com.vaadinutils.jasper.scheduler.DateParameterType;
+import au.com.vaadinutils.jasper.scheduler.entities.DateParameterType;
 
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
@@ -32,7 +32,7 @@ public class ReportParameterEnum<T extends Enum<T>> extends ReportParameter<Enum
 	}
 
 	@Override
-	public String getValue()
+	public String getValue(String parameterName)
 	{
 		return field.getValue().toString();
 	}
@@ -63,9 +63,9 @@ public class ReportParameterEnum<T extends Enum<T>> extends ReportParameter<Enum
 	}
 
 	@Override
-	public String getDisplayValue()
+	public String getDisplayValue(String parameterName)
 	{
-		return getValue();
+		return getValue(null);
 	}
 
 	@Override
@@ -75,7 +75,7 @@ public class ReportParameterEnum<T extends Enum<T>> extends ReportParameter<Enum
 	}
 
 	@Override
-	public void setValueAsString(String value)
+	public void setValueAsString(String value, String parameterName)
 	{
 
 		field.setValue(Enum.valueOf(enumClass, value));

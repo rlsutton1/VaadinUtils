@@ -12,7 +12,6 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import au.com.vaadinutils.jasper.scheduler.DateParameterType;
 import au.com.vaadinutils.jasper.scheduler.ScheduledDateParameter;
 
 @Entity
@@ -30,12 +29,17 @@ public class ReportEmailScheduledDateParameter implements ScheduledDateParameter
 	@Enumerated(EnumType.STRING)
 	private DateParameterOffsetType offsetType;
 
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date date;
-
-	private String name;
-
 	private String label;
+
+	private String startName;
+
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date startDate;
+
+	private String endName;
+
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date endDate;
 
 	@Override
 	public DateParameterType getType()
@@ -43,31 +47,7 @@ public class ReportEmailScheduledDateParameter implements ScheduledDateParameter
 		return type;
 	}
 
-	@Override
-	public Date getDate()
-	{
-		return date;
-	}
-
-	// Logger logger = LogManager.getLogger();
-
-	@Override
-	public String getName()
-	{
-		return name;
-	}
-
-	public void setName(String parameterName)
-	{
-		name = parameterName;
-
-	}
-
-	public void setDate(Date date)
-	{
-		this.date = date;
-
-	}
+	
 
 	public void setType(DateParameterType type)
 	{
@@ -98,4 +78,71 @@ public class ReportEmailScheduledDateParameter implements ScheduledDateParameter
 		this.label = label2;
 		
 	}
+	
+	public void setStartName(String string)
+	{
+		startName = string;
+		
+	}
+
+
+	public void setStartDate(Date value2)
+	{
+		startDate = value2;
+		
+	}
+
+
+	public void setEndName(String string)
+	{
+		endName= string;
+		
+	}
+
+
+	public void setEndDate(Date value2)
+	{
+		endDate =value2;
+		
+	}
+
+
+
+	@Override
+	public Date getStartDate()
+	{
+		return startDate;
+	}
+
+
+
+	@Override
+	public String getStartName()
+	{
+		return startName;
+	}
+
+
+
+	@Override
+	public Date getEndDate()
+	{
+		return endDate;
+	}
+
+
+
+	@Override
+	public String getEndName()
+	{
+		return endName;
+	}
+
+
+
+
+
+
+	
+
 }

@@ -12,13 +12,15 @@ import au.com.vaadinutils.crud.BaseCrudView;
 import au.com.vaadinutils.crud.FormHelper;
 import au.com.vaadinutils.crud.HeadingPropertySet;
 import au.com.vaadinutils.crud.ValidatingFieldGroup;
+import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.dao.JpaBaseDao;
 import au.com.vaadinutils.jasper.filter.ExpanderComponent;
 import au.com.vaadinutils.jasper.filter.ReportFilterUIBuilder;
 import au.com.vaadinutils.jasper.parameter.ReportParameter;
 import au.com.vaadinutils.jasper.scheduler.entities.DateParameterOffsetType;
+import au.com.vaadinutils.jasper.scheduler.entities.DateParameterType;
+import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailParameterEntity;
 import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailRecipient;
-import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailRecipientVisibility;
 import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailScheduleEntity;
 import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailScheduleEntity_;
 import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailSender;
@@ -27,37 +29,30 @@ import au.com.vaadinutils.jasper.scheduler.entities.ScheduleMode;
 import au.com.vaadinutils.jasper.ui.JasperReportProperties;
 import au.com.vaadinutils.layout.TimePicker;
 import au.com.vaadinutils.layout.TopVerticalLayout;
-import au.com.vaadinutils.validator.EmailValidator;
 
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
+import com.vaadin.data.Container;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
-import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.data.util.filter.Or;
 import com.vaadin.data.util.filter.SimpleStringFilter;
-import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.datefield.Resolution;
-import com.vaadin.ui.AbstractSelect.NewItemHandler;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.DateField;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.Reindeer;
 
 /** A start view for navigating to the main view */
 public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailScheduleEntity>
 {
-
-	private final VerticalLayout recipientListHolder = new VerticalLayout();
 
 	Logger logger = LogManager.getLogger();
 
@@ -67,35 +62,72 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 
 	private JasperReportProperties reportProperties;
 
+	EmailTargetLayout emailTargetLayout = new EmailTargetLayout();
+
+	private ScheduleCreater scheduleCreater;
+
+	private ComboBox sender;
+
 	public JasperReportScheduleLayout()
 	{
 		JPAContainer<ReportEmailScheduleEntity> container = makeJPAContainer();
 
 		HeadingPropertySet<ReportEmailScheduleEntity> headings = new HeadingPropertySet.Builder<ReportEmailScheduleEntity>()
-				
-				.addColumn("Report", ReportEmailScheduleEntity_.reportTitle)
+
+		.addColumn("Report", ReportEmailScheduleEntity_.reportTitle)
 				.addColumn("Subject", ReportEmailScheduleEntity_.subject)
 				.addColumn("Owner", ReportEmailScheduleEntity_.sender)
-				.addColumn("Enabled",ReportEmailScheduleEntity_.enabled)
-				.addColumn("Last Run",ReportEmailScheduleEntity_.lastRuntime).build();
+				.addColumn("Enabled", ReportEmailScheduleEntity_.enabled)
+				.addColumn("Last Run", ReportEmailScheduleEntity_.lastRuntime).build();
 
 		init(ReportEmailScheduleEntity.class, container, headings);
 		this.disallowNew(true);
 	}
 
-	public JasperReportScheduleLayout(Long id)
+	public JasperReportScheduleLayout(ScheduleCreater creater)
 	{
+		this.scheduleCreater = creater;
 		JPAContainer<ReportEmailScheduleEntity> container = makeJPAContainer();
 
 		HeadingPropertySet<ReportEmailScheduleEntity> headings = new HeadingPropertySet.Builder<ReportEmailScheduleEntity>()
-				.addColumn("Message", ReportEmailScheduleEntity_.message)
-				.addColumn("Report", ReportEmailScheduleEntity_.reportFileName)
+
+		.addColumn("Report", ReportEmailScheduleEntity_.reportTitle)
 				.addColumn("Subject", ReportEmailScheduleEntity_.subject)
-				.addColumn("Owner", ReportEmailScheduleEntity_.sender).build();
+				.addColumn("Owner", ReportEmailScheduleEntity_.sender)
+				.addColumn("Enabled", ReportEmailScheduleEntity_.enabled)
+				.addColumn("Last Run", ReportEmailScheduleEntity_.lastRuntime).build();
 
 		init(ReportEmailScheduleEntity.class, container, headings);
-		this.disallowNew(true);
-		entityTable.select(id);
+
+	}
+
+	protected ReportEmailScheduleEntity preNew() throws InstantiationException, IllegalAccessException
+	{
+		return scheduleCreater.create();
+	}
+
+	@SuppressWarnings("unchecked")
+	protected void postNew(EntityItem<ReportEmailScheduleEntity> newEntity)
+	{
+		try
+		{
+			// set the sender
+			Container ds = sender.getContainerDataSource();
+			Object id = ds.addItem();
+			Item item = ds.getItem(id);
+			item.getItemProperty(ReportEmailSender_.username.getName()).setValue(
+					newEntity.getEntity().getSendersUsername());
+			item.getItemProperty(ReportEmailSender_.emailAddress.getName()).setValue(
+					newEntity.getEntity().getSendersEmailAddress());
+			sender.setReadOnly(false);
+			sender.select(id);
+			sender.setReadOnly(true);
+		}
+		catch (Exception e)
+		{
+			Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
+			logger.error(e, e);
+		}
 	}
 
 	public JPAContainer<ReportEmailScheduleEntity> makeJPAContainer()
@@ -125,37 +157,21 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 		main.setMargin(true);
 		main.setSizeFull();
 
-		recipientListHolder.setSizeFull();
-		recipientListHolder.setSpacing(true);
-		recipientListHolder.setMargin(new MarginInfo(true, true, false, true));
-
-		main.addComponent(recipientListHolder);
+		main.addComponent(emailTargetLayout);
 
 		FormHelper<ReportEmailScheduleEntity> helper = new FormHelper<ReportEmailScheduleEntity>(main, fieldGroup);
 
-		// MultiColumnFormLayout<ReportEmailScheduleEntity> layout = new
-		// MultiColumnFormLayout<ReportEmailScheduleEntity>(
-		// 1, validatingFieldGroup);
-		// layout.setColumnFieldWidth(0, 250);
-
 		wrapper.addComponent(main);
-		// main.addComponent(wrapper);
 
 		helper.bindTextField("Report", ReportEmailScheduleEntity_.reportTitle).setReadOnly(true);
 
-		helper.bindEntityField("From", ReportEmailScheduleEntity_.sender, ReportEmailSender.class,
+		sender = helper.bindEntityField("From", ReportEmailScheduleEntity_.sender, ReportEmailSender.class,
 				ReportEmailSender_.username);
+		sender.setReadOnly(true);
 
 		helper.bindTextField("Subject", ReportEmailScheduleEntity_.subject);
 
-		helper.bindTextAreaField("Message", ReportEmailScheduleEntity_.message.getName(), 5);
-
-		helper.bindTextAreaField("Report Log", ReportEmailScheduleEntity_.reportLog.getName(), 10).setReadOnly(true);
-		// layout.bindTextField("Class",
-		// ReportEmailScheduleEntity_.JasperReportPropertiesClassName).setReadOnly(true);
-
-		// layout.bindTextField("Report file name",
-		// ReportEmailScheduleEntity_.reportFileName).setReadOnly(true);
+		helper.bindTextField("Report Log", ReportEmailScheduleEntity_.reportLog.getName()).setReadOnly(true);
 
 		TopVerticalLayout scheduleWrapper = new TopVerticalLayout();
 		scheduleWrapper.setSizeFull();
@@ -173,18 +189,6 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 		paramForm.setSizeFull();
 		paramWrapper.addComponent(paramForm);
 
-		// TopVerticalLayout dateParamWrapper = new TopVerticalLayout();
-		// dateParamWrapper.setSizeFull();
-		// tabsheet.addTab(dateParamWrapper, "Dates Params");
-		// dateParamForm = new VerticalLayout();
-		// dateParamForm.setSizeFull();
-		// dateParamWrapper.addComponent(dateParamForm);
-
-		// layout.bindTextField("Days of Month",
-		// ReportEmailScheduleEntity_.scheduledDaysOfMonth);
-		// layout.bindTextField("Days of Week",
-		// ReportEmailScheduleEntity_.scheduledDaysOfWeek);
-
 		return tabsheet;
 
 	}
@@ -195,7 +199,6 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 
 		helper.bindBooleanField(main, validatingFieldGroup, "Enabled", ReportEmailScheduleEntity_.enabled);
 
-		
 		helper.bindDateField(main, validatingFieldGroup, "Last Run Time", ReportEmailScheduleEntity_.lastRuntime,
 				"yyyy/MM/dd HH:mm", Resolution.MINUTE).setReadOnly(true);
 
@@ -204,9 +207,6 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 
 		final DateField oneTime = helper.bindDateField(main, validatingFieldGroup, "Scheduled at",
 				ReportEmailScheduleEntity_.oneTimeRunDateTime, "yyyy/MM/dd HH:mm", Resolution.MINUTE);
-		// final DateField timeOfDay = helper.bindDateField("Schedule Time",
-		// ReportEmailScheduleEntity_.timeOfDayToRun,
-		// "yyyy/MM/dd HH:mm", Resolution.MINUTE);
 
 		final TimePicker timeOfDay = new TimePicker("Start time");
 		main.addComponent(timeOfDay);
@@ -300,15 +300,21 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 
 		private String name;
 		private ComboBox offsetType;
-		private DateField dateField;
-		private TimePicker timePicker;
+		private DateField startDateField;
+		private TimePicker startTimePicker;
+		private DateField endDateField;
+		private TimePicker endTimePicker;
 
-		public EntityParamUpdater(String name, ComboBox offsetType, DateField dateField, TimePicker timePicker)
+		public EntityParamUpdater(String name, ComboBox offsetType, DateField startDateField,
+				TimePicker startTimePicker, DateField endDateField, TimePicker endTimePicker)
 		{
 			this.name = name;
 			this.offsetType = offsetType;
-			this.dateField = dateField;
-			this.timePicker = timePicker;
+			this.startDateField = startDateField;
+			this.startTimePicker = startTimePicker;
+			this.endDateField = endDateField;
+			this.endTimePicker = endTimePicker;
+
 		}
 
 	}
@@ -337,16 +343,30 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 				HorizontalLayout dateLayout = new HorizontalLayout();
 				dateLayout.setSizeFull();
 				dateLayout.setSpacing(true);
+
 				final ComboBox offsetType = new ComboBox(dateParam.getLabel(), offsetTypes);
 				offsetType.setImmediate(true);
 				offsetType.setNullSelectionAllowed(false);
 
-				final DateField dateField = new DateField("", dateParam.getDate());
-				dateField.setResolution(Resolution.DAY);
-				dateField.setDateFormat("yyyy/MM/dd");
-				final TimePicker timePicker = new TimePicker("");
-				timePicker.setValues(dateParam.getDate());
-				timePicker.setVisible(dateParam.getType() == DateParameterType.DATE_TIME);
+				final DateField startDateField = new DateField("", dateParam.getStartDate());
+				startDateField.setResolution(Resolution.DAY);
+				startDateField.setDateFormat("yyyy/MM/dd");
+
+				// pickers visability doesn't change, it's determined by the
+				// parameter type which can't be changed here
+				final TimePicker startTimePicker = new TimePicker("");
+				startTimePicker.setValues(dateParam.getStartDate());
+				startTimePicker.setVisible(dateParam.getType() == DateParameterType.DATE_TIME);
+
+				final DateField endDateField = new DateField("", dateParam.getEndDate());
+				endDateField.setResolution(Resolution.DAY);
+				endDateField.setDateFormat("yyyy/MM/dd");
+
+				// pickers visability doesn't change, it's determined by the
+				// parameter type which can't be changed here
+				final TimePicker endTimePicker = new TimePicker("");
+				endTimePicker.setValues(dateParam.getStartDate());
+				endTimePicker.setVisible(dateParam.getType() == DateParameterType.DATE_TIME);
 
 				offsetType.addValueChangeListener(new ValueChangeListener()
 				{
@@ -358,17 +378,21 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 					{
 						DateParameterOffsetType offsetTypeValue = (DateParameterOffsetType) event.getProperty()
 								.getValue();
-						dateField.setVisible(offsetTypeValue == DateParameterOffsetType.CONSTANT);
+						startDateField.setVisible(offsetTypeValue == DateParameterOffsetType.CONSTANT);
+						endDateField.setVisible(offsetTypeValue == DateParameterOffsetType.CONSTANT);
 
 					}
 				});
 				offsetType.setValue(dateParam.getOffsetType());
 				dateLayout.addComponent(offsetType);
-				dateLayout.addComponent(dateField);
-				dateLayout.addComponent(timePicker);
+				dateLayout.addComponent(startDateField);
+				dateLayout.addComponent(startTimePicker);
+				dateLayout.addComponent(endDateField);
+				dateLayout.addComponent(endTimePicker);
 				paramForm.addComponent(dateLayout);
 
-				updaters.add(new EntityParamUpdater(dateParam.getName(), offsetType, dateField, timePicker));
+				updaters.add(new EntityParamUpdater(dateParam.getLabel(), offsetType, startDateField, startTimePicker,
+						endDateField, endTimePicker));
 
 			}
 		}
@@ -398,9 +422,13 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 			{
 				for (ReportEmailParameter schedParam : entity.getReportParameters())
 				{
-					if (schedParam.getName().equalsIgnoreCase(builtParam.getParameterName()))
+					for (String parameterName : builtParam.getParameterNames())
 					{
-						builtParam.setValueAsString(schedParam.getValue());
+						if (schedParam.getName().equalsIgnoreCase(parameterName))
+						{
+							builtParam.setValueAsString(schedParam.getValue(), parameterName);
+							break;
+						}
 					}
 				}
 
@@ -417,9 +445,8 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 
 	private void emailRecipientsHandleRowChange(EntityItem<ReportEmailScheduleEntity> item)
 	{
-		recipientListHolder.removeAllComponents();
 		int ctr = 0;
-		lines.clear();
+		emailTargetLayout.clear();
 
 		if (item != null)
 		{
@@ -429,11 +456,11 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 				for (ReportEmailRecipient recip : entity.getRecipients())
 				{
 					ctr++;
-					lines.add(insertTargetLine(lines.size(), recip));
+					emailTargetLayout.add(recip);
 				}
 				if (ctr == 0)
 				{
-					lines.add(insertTargetLine(lines.size(), null));
+					emailTargetLayout.add(null);
 				}
 			}
 		}
@@ -444,7 +471,7 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 	{
 		ReportEmailScheduleEntity entity = entityItem.getEntity();
 		List<ReportEmailRecipient> recips = entity.getRecipients();
-		for (TargetLine line : lines)
+		for (TargetLine line : emailTargetLayout.getTargets())
 		{
 			// check if the recipient exists
 			String email = (String) line.targetAddress.getValue();
@@ -475,11 +502,61 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 	 */
 	protected void postSaveAction(ReportEmailScheduleEntity entityItem)
 	{
+		removeDeletedRecipients(entityItem);
+
+		saveChangesToReportParameters(entityItem);
+		for (EntityParamUpdater updater : updaters)
+		{
+			for (ScheduledDateParameter dateParam : entityItem.getDateParameters())
+			{
+				if (dateParam.getLabel().equalsIgnoreCase(updater.name))
+				{
+					// merge date & time
+					Date startDate = updater.startDateField.getValue();
+					Date startTime = (Date) updater.startTimePicker.getValue();
+
+					Calendar startDateCal = Calendar.getInstance();
+					startDateCal.setTime(startDate);
+					Calendar startTimeCal = Calendar.getInstance();
+					startTimeCal.setTime(startTime);
+					startDateCal.set(Calendar.HOUR_OF_DAY, startTimeCal.get(Calendar.HOUR_OF_DAY));
+					startDateCal.set(Calendar.MINUTE, startTimeCal.get(Calendar.MINUTE));
+					startDateCal.set(Calendar.SECOND, 0);
+					startDateCal.set(Calendar.MILLISECOND, 0);
+
+					dateParam.setStartDate(startDateCal.getTime());
+
+					// merge date & time
+					Date endDate = updater.endDateField.getValue();
+					Date endTime = (Date) updater.endTimePicker.getValue();
+
+					Calendar endDateCal = Calendar.getInstance();
+					endDateCal.setTime(endDate);
+					Calendar endTimeCal = Calendar.getInstance();
+					endTimeCal.setTime(endTime);
+					endDateCal.set(Calendar.HOUR_OF_DAY, startTimeCal.get(Calendar.HOUR_OF_DAY));
+					endDateCal.set(Calendar.MINUTE, startTimeCal.get(Calendar.MINUTE));
+					endDateCal.set(Calendar.SECOND, 0);
+					endDateCal.set(Calendar.MILLISECOND, 0);
+
+					dateParam.setEndDate(endDateCal.getTime());
+
+					dateParam.setOffsetType((DateParameterOffsetType) updater.offsetType.getValue());
+
+					break;
+				}
+			}
+		}
+
+	}
+
+	private void removeDeletedRecipients(ReportEmailScheduleEntity entityItem)
+	{
 		List<ReportEmailRecipient> toRemove = new LinkedList<ReportEmailRecipient>();
 		for (ReportEmailRecipient recip : entityItem.getRecipients())
 		{
 			boolean found = false;
-			for (TargetLine line : lines)
+			for (TargetLine line : emailTargetLayout.getTargets())
 			{
 				String email = (String) line.targetAddress.getValue();
 
@@ -500,218 +577,40 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 		{
 			recip.setOwner(null);
 		}
-
-		saveChangesToReportParameters(entityItem);
-		for (EntityParamUpdater updater : updaters)
-		{
-			for (ScheduledDateParameter dateParam : entityItem.getDateParameters())
-			{
-				if (dateParam.getName().equalsIgnoreCase(updater.name))
-				{
-					// merge date & time
-					Date date = updater.dateField.getValue();
-					Date time = (Date) updater.timePicker.getValue();
-
-					Calendar dateCal = Calendar.getInstance();
-					dateCal.setTime(date);
-					Calendar timeCal = Calendar.getInstance();
-					timeCal.setTime(time);
-					dateCal.set(Calendar.HOUR_OF_DAY, timeCal.get(Calendar.HOUR_OF_DAY));
-					dateCal.set(Calendar.MINUTE, timeCal.get(Calendar.MINUTE));
-					dateCal.set(Calendar.SECOND, 0);
-					dateCal.set(Calendar.MILLISECOND, 0);
-
-					dateParam.setDate(dateCal.getTime());
-					dateParam.setOffsetType((DateParameterOffsetType) updater.offsetType.getValue());
-
-					break;
-				}
-			}
-		}
-
 	}
 
 	private void saveChangesToReportParameters(ReportEmailScheduleEntity entityItem)
 	{
 		for (ReportParameter<?> bParam : builder.getReportParameters())
 		{
+			boolean set = false;
 			for (ReportEmailParameter eParam : entityItem.getReportParameters())
 			{
-				if (bParam.getParameterName().equalsIgnoreCase(eParam.getName()))
+				for (String parameterName : bParam.getParameterNames())
 				{
-					eParam.setValue((String) bParam.getValue());
-					break;
+					if (parameterName.equalsIgnoreCase(eParam.getName()))
+					{
+						eParam.setValue((String) bParam.getValue(parameterName));
+						set = true;
+						break;
+					}
 				}
 			}
-		}
-	}
-
-	class TargetLine
-	{
-		ComboBox targetTypeCombo;
-		ComboBox targetAddress;
-		Button actionButton;
-		public int row;
-	}
-
-	List<TargetLine> lines = new LinkedList<TargetLine>();
-
-	private TargetLine insertTargetLine(final int row, ReportEmailRecipient recip)
-	{
-
-		final HorizontalLayout recipientHolder = new HorizontalLayout();
-		recipientHolder.setSizeFull();
-		recipientHolder.setSpacing(true);
-
-		final List<ReportEmailRecipientVisibility> targetTypes = new LinkedList<ReportEmailRecipientVisibility>();
-		for (ReportEmailRecipientVisibility rerv : ReportEmailRecipientVisibility.values())
-		{
-			targetTypes.add(rerv);
-		}
-
-		final TargetLine line = new TargetLine();
-		line.row = row;
-
-		line.targetTypeCombo = new ComboBox(null, targetTypes);
-		line.targetTypeCombo.setWidth("60");
-		line.targetTypeCombo.select(targetTypes.get(0));
-
-		line.targetAddress = new ComboBox(null);
-		line.targetAddress.setImmediate(true);
-		line.targetAddress.setTextInputAllowed(true);
-		line.targetAddress.setInputPrompt("Enter Contact Name or email address");
-		line.targetAddress.setWidth("100%");
-		line.targetAddress.addValidator(new EmailValidator("Please enter a valid email address."));
-
-		line.targetAddress.setContainerDataSource(getValidEmailContacts());
-		line.targetAddress.setItemCaptionPropertyId("namedemail");
-		line.targetAddress.setNewItemsAllowed(true);
-		if (recip != null && recip.getEmail() != null)
-		{
-			line.targetAddress.setValue(recip.getEmail());
-		}
-
-		line.targetAddress.setNewItemHandler(new NewItemHandler()
-		{
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void addNewItem(final String newItemCaption)
+			if (!set && !bParam.isDateField())
 			{
-				final IndexedContainer container = (IndexedContainer) line.targetAddress.getContainerDataSource();
+				// add missing parameter
 
-				final Item item = addItem(container, "", newItemCaption);
-				if (item != null)
-				{
-					line.targetAddress.addItem(item.getItemProperty("id").getValue());
-					line.targetAddress.setValue(item.getItemProperty("id").getValue());
-				}
-			}
-		});
+				ReportEmailParameterEntity reportEmailParameterEntity = new ReportEmailParameterEntity();
+				reportEmailParameterEntity.setLabel(bParam.getLabel());
 
-		if (recip != null)
-		{
+				String[] names = bParam.getParameterNames().toArray(new String[] {});
+				reportEmailParameterEntity.setName(names[0]);
+				reportEmailParameterEntity.setValue((String) bParam.getValue(names[0]));
 
-		}
-
-		if (row == 0)
-		{
-			line.actionButton = new Button("+");
-			line.actionButton.setDescription("Click to add another email address line.");
-			line.actionButton.setStyleName(Reindeer.BUTTON_SMALL);
-			line.actionButton.addClickListener(new ClickListener()
-			{
-
-				private static final long serialVersionUID = 6505218353927273720L;
-
-				@Override
-				public void buttonClick(ClickEvent event)
-				{
-					lines.add(insertTargetLine(lines.size(), null));
-				}
-			});
-		}
-		else
-		{
-			line.actionButton = new Button("-");
-			line.actionButton.setDescription("Click to remove this email address line.");
-			line.actionButton.setStyleName(Reindeer.BUTTON_SMALL);
-			line.actionButton.addClickListener(new ClickListener()
-			{
-
-				private static final long serialVersionUID = 3104323607502279386L;
-
-				@Override
-				public void buttonClick(ClickEvent event)
-				{
-					recipientListHolder.removeComponent(recipientHolder);
-					lines.remove(line);
-
-				}
-			});
-		}
-
-		recipientHolder.addComponent(line.targetTypeCombo);
-		recipientHolder.addComponent(line.targetAddress);
-		recipientHolder.addComponent(line.actionButton);
-		recipientHolder.setExpandRatio(line.targetAddress, 1);
-
-		recipientListHolder.addComponent(recipientHolder);
-
-		return line;
-	}
-
-	private IndexedContainer getValidEmailContacts()
-	{
-		final IndexedContainer container = new IndexedContainer();
-
-		JpaBaseDao<ReportEmailRecipient, Long> reportEmailRecipient = getGenericDao(ReportEmailRecipient.class);
-
-		container.addContainerProperty("id", String.class, null);
-		container.addContainerProperty("email", String.class, null);
-		container.addContainerProperty("namedemail", String.class, null);
-
-		for (final ReportEmailRecipient contact : reportEmailRecipient.findAll())
-		{
-			if (contact.getEmail() != null)
-			{
-				addItem(container, null, contact.getEmail());
+				EntityManagerProvider.getEntityManager().persist(reportEmailParameterEntity);
+				entityItem.addReportParameter(reportEmailParameterEntity);
 			}
 		}
-		return container;
-	}
-
-	@SuppressWarnings("unchecked")
-	private Item addItem(final IndexedContainer container, final String named, String email)
-	{
-		// When we are editing an email (as second time) we can end up with
-		// double brackets so we strip them off here.
-		if (email.startsWith("<"))
-		{
-			email = email.substring(1);
-		}
-		if (email.endsWith(">"))
-		{
-			email = email.substring(0, email.length() - 1);
-		}
-
-		final Item item = container.addItem(email);
-		if (item != null)
-		{
-			item.getItemProperty("id").setValue(email);
-			item.getItemProperty("email").setValue(email);
-			String namedEmail;
-			if (named != null && named.trim().length() > 0)
-			{
-				namedEmail = named + " <" + email + ">";
-			}
-			else
-			{
-				namedEmail = "<" + email + ">";
-			}
-			item.getItemProperty("namedemail").setValue(namedEmail);
-		}
-		return item;
 	}
 
 	@Override

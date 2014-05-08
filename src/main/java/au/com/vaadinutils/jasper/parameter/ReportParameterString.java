@@ -1,6 +1,6 @@
 package au.com.vaadinutils.jasper.parameter;
 
-import au.com.vaadinutils.jasper.scheduler.DateParameterType;
+import au.com.vaadinutils.jasper.scheduler.entities.DateParameterType;
 
 import com.vaadin.data.Validator;
 import com.vaadin.ui.Component;
@@ -19,7 +19,7 @@ public class ReportParameterString extends ReportParameter<String>
 	}
 
 	@Override
-	public String getValue()
+	public String getValue(String parameterName)
 	{
 		return field.getValue();
 	}
@@ -50,9 +50,9 @@ public class ReportParameterString extends ReportParameter<String>
 	}
 
 	@Override
-	public String getDisplayValue()
+	public String getDisplayValue(String parameterName)
 	{
-		return getValue();
+		return getValue(null);
 	}
 
 	@Override
@@ -81,7 +81,7 @@ public class ReportParameterString extends ReportParameter<String>
 	}
 
 	@Override
-	public void setValueAsString(String value)
+	public void setValueAsString(String value, String parameterName)
 	{
 		field.setValue(value);
 		

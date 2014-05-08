@@ -156,7 +156,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		entityTable.select(entityTable.firstItemId());
 
 	}
-	
+
 	public void addGeneratedColumn(Object id, ColumnGenerator generator)
 	{
 		entityTable.addGeneratedColumn(id, generator);
@@ -240,8 +240,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 					"Your editor implementation returned null!, you better create an editor. "
 							+ entityClass.getSimpleName());
 			mainEditPanel.addComponent(editor);
-			
-		}else
+
+		}
+		else
 		{
 			this.setSplitPosition(100);
 			splitPanel.setLocked();
@@ -261,7 +262,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	public void noEditor()
 	{
 		noEditor = true;
-		
+
 	}
 
 	protected String getTitleText()
@@ -1294,8 +1295,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 					resetFilters();
 
-					newEntity = container.createEntityItem(entityClass.newInstance());
-					preNew(newEntity);
+					newEntity = container.createEntityItem(preNew());
+
 					rowChanged(newEntity);
 					// Can't delete when you are adding a new record.
 					// Use cancel instead.
@@ -1306,6 +1307,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 					}
 
 					rightLayout.setVisible(true);
+					postNew(newEntity);
 				}
 				catch (ConstraintViolationException e)
 				{
@@ -1323,14 +1325,30 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	}
 
 	/**
+	 * override this method if you have child entities, you can use this
+	 * opportunity to do some dirty hacking to populate fields
+	 * 
+	 * @param newEntity
+	 */
+
+	protected void postNew(EntityItem<E> newEntity)
+	{
+		// TODO Auto-generated method stub
+
+	}
+
+	/**
 	 * Override this method if you need to initialise the entity when a new
 	 * record is created.
 	 * 
 	 * @param newEntity
+	 * @return
+	 * @throws IllegalAccessException
+	 * @throws InstantiationException
 	 */
-	protected void preNew(EntityItem<E> newEntity)
+	protected E preNew() throws InstantiationException, IllegalAccessException
 	{
-		// default action is a noop
+		return entityClass.newInstance();
 	}
 
 	/**

@@ -24,6 +24,7 @@ import au.com.vaadinutils.jasper.filter.ReportFilterUIBuilder;
 import au.com.vaadinutils.jasper.parameter.ReportChooser;
 import au.com.vaadinutils.jasper.parameter.ReportParameter;
 import au.com.vaadinutils.jasper.parameter.ReportParameterConstant;
+import au.com.vaadinutils.jasper.scheduler.JasperReportEmailWindow;
 import au.com.vaadinutils.jasper.scheduler.JasperReportSchedulerWindow;
 import au.com.vaadinutils.listener.CancelListener;
 import au.com.vaadinutils.listener.ClickEventLogged;
@@ -315,28 +316,8 @@ class JasperReportLayout extends VerticalLayout
 		addButtonListener(exportButton, OutputFormat.CSV);
 		buttonContainer.addComponent(exportButton);
 
-		scheduleButton = new NativeButton("Schedule");
-		// scheduleButton.setIcon(new
-		// ExternalResource("images/seanau/Preview_32.png"));
-		scheduleButton.setDescription("Schedule");
-		scheduleButton.setWidth("50");
-		scheduleButton.setHeight(buttonHeight);
-		scheduleButton.setDisableOnClick(true);
-		scheduleButton.addClickListener(new ClickEventLogged.ClickListener()
-		{
-
-			private static final long serialVersionUID = 7207441556779172217L;
-
-			@Override
-			public void clicked(ClickEvent event)
-			{
-				new JasperReportSchedulerWindow( reportProperties, builder.getReportParameters());
-				
-
-
-			}
-		});
-		buttonContainer.addComponent(scheduleButton);
+		createScheduleButton(buttonHeight, buttonContainer);
+		createEmailButton(buttonHeight, buttonContainer);
 
 		buttonBar.addComponent(buttonContainer);
 		layout.addComponent(buttonBar);
@@ -374,6 +355,50 @@ class JasperReportLayout extends VerticalLayout
 		layout.addComponent(csv);
 
 		return layout;
+	}
+
+	private void createEmailButton(String buttonHeight, HorizontalLayout buttonContainer)
+	{
+		scheduleButton = new NativeButton("Email");
+		// scheduleButton.setIcon(new
+		// ExternalResource("images/seanau/Preview_32.png"));
+		scheduleButton.setDescription("Email");
+		scheduleButton.setWidth("50");
+		scheduleButton.setHeight(buttonHeight);
+		scheduleButton.addClickListener(new ClickEventLogged.ClickListener()
+		{
+
+			private static final long serialVersionUID = 7207441556779172217L;
+
+			@Override
+			public void clicked(ClickEvent event)
+			{
+				new JasperReportEmailWindow(reportProperties, builder.getReportParameters());
+			}
+		});
+		buttonContainer.addComponent(scheduleButton);
+	}
+
+	private void createScheduleButton(String buttonHeight, HorizontalLayout buttonContainer)
+	{
+		scheduleButton = new NativeButton("Schedule");
+		// scheduleButton.setIcon(new
+		// ExternalResource("images/seanau/Preview_32.png"));
+		scheduleButton.setDescription("Schedule");
+		scheduleButton.setWidth("50");
+		scheduleButton.setHeight(buttonHeight);
+		scheduleButton.addClickListener(new ClickEventLogged.ClickListener()
+		{
+
+			private static final long serialVersionUID = 7207441556779172217L;
+
+			@Override
+			public void clicked(ClickEvent event)
+			{
+				new JasperReportSchedulerWindow(reportProperties, builder.getReportParameters());
+			}
+		});
+		buttonContainer.addComponent(scheduleButton);
 	}
 
 	private void addButtonListener(Button button, final OutputFormat format)
@@ -619,7 +644,12 @@ class JasperReportLayout extends VerticalLayout
 				{
 					if (param.showFilter())
 					{
-						name += "-" + param.getLabel() + "-" + param.getDisplayValue();
+						name += "-" + param.getLabel();
+						for (String parameterName : param.getParameterNames())
+						{
+							name += "-" + param.getDisplayValue(parameterName);
+
+						}
 					}
 				}
 

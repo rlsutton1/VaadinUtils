@@ -74,17 +74,13 @@ public class Scheduler implements Runnable
 					try
 					{
 						Calendar now = Calendar.getInstance();
-						Calendar selectedScheduleTime = checkScheduleForTimeOfDay(schedule, now);
-
+						Calendar selectedScheduleTime = null;
 						switch (schedule.getScheduleMode())
 						{
 						case DAY_OF_MONTH:
-							if (selectedScheduleTime == null)
-							{
-								schedule.setLastRuntime(now.getTime(), "No valid run time");
-								schedule.setEnabled(false);
-							}
-							else
+							selectedScheduleTime = checkScheduleForTimeOfDay(schedule, now);
+
+							if (selectedScheduleTime != null)
 							{
 								ScheduleTriState checkDayOfMonthSchedule = checkDayOfMonthSchedule(schedule, now);
 								if (checkDayOfMonthSchedule == ScheduleTriState.FOUND)
@@ -108,12 +104,8 @@ public class Scheduler implements Runnable
 
 							break;
 						case DAY_OF_WEEK:
-							if (selectedScheduleTime == null)
-							{
-								schedule.setLastRuntime(now.getTime(), "No valid run time");
-								schedule.setEnabled(false);
-							}
-							else
+							selectedScheduleTime = checkScheduleForTimeOfDay(schedule, now);
+							if (selectedScheduleTime != null)
 							{
 								ScheduleTriState checkDayOfWeekSchedule = checkDayOfWeekSchedule(schedule, now);
 								if (checkDayOfWeekSchedule == ScheduleTriState.FOUND)
@@ -137,12 +129,8 @@ public class Scheduler implements Runnable
 							}
 							break;
 						case EVERY_DAY:
-							if (selectedScheduleTime == null)
-							{
-								schedule.setLastRuntime(now.getTime(), "No valid run time");
-								schedule.setEnabled(false);
-							}
-							else
+							selectedScheduleTime = checkScheduleForTimeOfDay(schedule, now);
+							if (selectedScheduleTime != null)
 							{
 								if (reportRunner.runReport(schedule, selectedScheduleTime.getTime(), emailSettings))
 								{
@@ -166,7 +154,7 @@ public class Scheduler implements Runnable
 								if (reportRunner.runReport(schedule, schedule.getOneTimeRunDateTime(), emailSettings))
 								{
 									schedule.setLastRuntime(now.getTime(), "Report successfully run");
-									
+
 									scheduleProvider.delete(schedule);
 								}
 								else
@@ -251,17 +239,23 @@ public class Scheduler implements Runnable
 					{
 						selectedScheduleTime = time;
 					}
-					else if (time.get(Calendar.HOUR_OF_DAY) >= lastRun.get(Calendar.HOUR_OF_DAY))
+					else if (time.get(Calendar.HOUR_OF_DAY) > lastRun.get(Calendar.HOUR_OF_DAY))
 					{
-						if (time.get(Calendar.MINUTE) > lastRun.get(Calendar.MINUTE))
-						{
-							selectedScheduleTime = time;
+						selectedScheduleTime = time;
+					}
+					else if (time.get(Calendar.HOUR_OF_DAY) == lastRun.get(Calendar.HOUR_OF_DAY)
+							&& time.get(Calendar.MINUTE) > lastRun.get(Calendar.MINUTE))
+					{
 
-						}
+						selectedScheduleTime = time;
 					}
 
 				}
 			}
+		}
+		else
+		{
+			throw new RuntimeException("No valid run time");
 		}
 		return selectedScheduleTime;
 	}

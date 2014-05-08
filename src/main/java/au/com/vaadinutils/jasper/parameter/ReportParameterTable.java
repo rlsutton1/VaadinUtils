@@ -12,7 +12,7 @@ import org.apache.logging.log4j.Logger;
 
 import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.fields.TableCheckBoxSelect;
-import au.com.vaadinutils.jasper.scheduler.DateParameterType;
+import au.com.vaadinutils.jasper.scheduler.entities.DateParameterType;
 
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.JPAContainerFactory;
@@ -195,7 +195,7 @@ public class ReportParameterTable<T> extends ReportParameter<String>
 	}
 
 	@Override
-	public String getValue()
+	public String getValue(String parameterName)
 	{
 
 		try
@@ -312,7 +312,7 @@ public class ReportParameterTable<T> extends ReportParameter<String>
 	}
 
 	@Override
-	public String getDisplayValue()
+	public String getDisplayValue(String parameterName)
 	{
 		try
 		{
@@ -346,24 +346,28 @@ public class ReportParameterTable<T> extends ReportParameter<String>
 		}
 		catch (Exception e)
 		{
-			logger.error("Exception while getting value(s) for " + parameterName);
+			for (String param : parameters)
+			{
+				logger.error("Exception while getting value(s) for " + param);
+			}
 			throw new RuntimeException(e);
 		}
 	}
 
 	@Override
-	public void setValueAsString(String value)
+	public void setValueAsString(String value, String parameterName)
 	{
 		String[] values = value.split(",");
 		List<Long> idList = new LinkedList<Long>();
-		for (String id :values)
+		for (String id : values)
 		{
 			Long intId = Long.parseLong(id);
 			idList.add(intId);
 		}
 		table.setSelectedValue(idList);
-		
+
 	}
+
 	@Override
 	public boolean isDateField()
 	{

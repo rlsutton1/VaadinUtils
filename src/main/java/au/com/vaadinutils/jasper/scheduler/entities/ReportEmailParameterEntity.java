@@ -23,6 +23,8 @@ public class ReportEmailParameterEntity implements ReportEmailParameter
 	@Column(length=8192)
 	private String value;
 
+	private String label;
+
 	@Override
 	public String getName()
 	{
@@ -47,5 +49,14 @@ public class ReportEmailParameterEntity implements ReportEmailParameter
 		this.value = value;
 		
 	}
+
+
+	public void setLabel(String label)
+	{
+		this.label =label;
+		
+	}
+
+
 
 }

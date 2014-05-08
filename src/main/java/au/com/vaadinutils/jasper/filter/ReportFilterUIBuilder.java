@@ -8,7 +8,7 @@ import java.util.List;
 import org.joda.time.DateTime;
 
 import au.com.vaadinutils.jasper.parameter.ReportParameter;
-import au.com.vaadinutils.jasper.parameter.ReportParameterDate;
+import au.com.vaadinutils.jasper.parameter.ReportParameterDateTimeRange;
 import au.com.vaadinutils.jasper.parameter.ReportParameterEnum;
 import au.com.vaadinutils.jasper.parameter.ReportParameterString;
 
@@ -45,9 +45,9 @@ public class ReportFilterUIBuilder implements ReportFilterFieldBuilder, ReportFi
 	}
 
 	@Override
-	public ReportFilterDateFieldBuilder addDateField(String label, String parameterName)
+	public ReportFilterDateFieldBuilder addDateField(String label, String startParameterName,String endParameterName)
 	{
-		ReportParameterDate param = new ReportParameterDate(label, parameterName);
+		ReportParameterDateTimeRange param = new ReportParameterDateTimeRange(label, startParameterName,endParameterName);
 		addField(param);
 
 		return this;
@@ -67,50 +67,20 @@ public class ReportFilterUIBuilder implements ReportFilterFieldBuilder, ReportFi
 	@Override
 	public ReportFilterFieldBuilder addField(ReportParameter<?> param)
 	{
-		String parameterName = param.getParameterName();
-
-		// specific work around for prefixed report parameters
-		if (parameterName.startsWith("ReportParameter"))
-		{
-			parameterName = parameterName.substring("ReportParameter".length(), parameterName.length());
-		}
-		// ReportChooser is not actually a report parameter
-		// if (!(param instanceof ReportChooser))
-		// {
-		// Preconditions.checkArgument(this.manager.paramExists(parameterName),
-		// "The passed Jasper Report parameter: "
-		// + parameterName + " does not exist in the Report " +
-		// manager.getReportFilename()
-		// + ", valid parameters are " + getParameterList());
-		// JRParameter jrParam = manager.getParameter(parameterName);
-		//
-		// String expectedClass = param.getExpectedParameterClassName();
-		// Preconditions.checkArgument(expectedClass == null ||
-		// jrParam.getValueClassName().equals(expectedClass),
-		// "Expected " + expectedClass + " but the ReportParameter type is " +
-		// jrParam.getValueClassName());
-		// }
 		rparams.add(param);
 
 		return this;
 	}
 
-	// private String getParameterList()
-	// {
-	// String params = "\n";
-	// for (JRParameter param : manager.getParameters())
-	// {
-	// params += param.getName() + "(" + param.getNestedTypeName() + ") \n";
-	// }
-	// return params;
-	// }
+	
 
 	@Override
-	public ReportFilterDateFieldBuilder setDate(DateTime date)
+	public ReportFilterDateFieldBuilder setDateRange(DateTime startDate,DateTime endDate)
 	{
 		@SuppressWarnings("unchecked")
 		ReportParameter<Date> param = (ReportParameter<Date>) rparams.getLast();
-		param.setDefaultValue(date.toDate());
+		param.setStartDate(startDate.toDate());
+		param.setEndDate(endDate.toDate());
 		return this;
 
 	}

@@ -568,6 +568,10 @@ public class TimePicker extends HorizontalLayout implements Field
 	public boolean isModified()
 	{
 		Date value = (Date) getValue();
+		if (datasource == null)
+		{
+			return false;
+		}
 		Date dsValue = datasource.getValue();
 		if (dsValue == null && value == null)
 		{
@@ -652,7 +656,7 @@ public class TimePicker extends HorizontalLayout implements Field
 	@Override
 	public Object getValue()
 	{
-		SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+		SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a");
 		try
 		{
 			if (getValueAsString() == null)

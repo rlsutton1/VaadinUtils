@@ -408,48 +408,52 @@ public class JasperManager implements Runnable
 		{
 			if (param.displayInreport())
 			{
-				JRDesignStaticText labelElement = new JRDesignStaticText();
-
-				String strippedLabel = param.getLabel().replaceAll("ReportParameter", "");
-
-				labelElement.setText(strippedLabel);
-				labelElement.setWidth(125);
-				labelElement.setHeight(20);
-				labelElement.setBackcolor(new Color(208, 208, 208));
-				labelElement.setMode(ModeEnum.OPAQUE);
-				labelElement.setVerticalAlignment(VerticalAlignEnum.MIDDLE);
-
-				labelElement.setX(0);
-				labelElement.setY(maxY);
-				labelElement.setFontName("SansSerif");
-				labelElement.setFontSize(12);
-				targetBand.addElement(labelElement);
-
-				JRDesignTextField valueElement = new JRDesignTextField();
-				valueElement.setExpression(new JRDesignExpression("$P{ParamDisplay-" + param.getParameterName() + "}"));
-				valueElement.setWidth(400);
-				valueElement.setHeight(20);
-				valueElement.setBackcolor(new Color(208, 208, 208));
-				valueElement.setMode(ModeEnum.OPAQUE);
-
-				valueElement.setX(125);
-				valueElement.setY(maxY);
-				valueElement.setFontName("SansSerif");
-				valueElement.setFontSize(12);
-				valueElement.setVerticalAlignment(VerticalAlignEnum.MIDDLE);
-
-				targetBand.addElement(valueElement);
-				maxY = valueElement.getY() + valueElement.getHeight();
-
-				if (!designFile.getParametersMap().containsKey("ParamDisplay-" + param.getParameterName()))
+				for (String parameterName : param.getParameterNames())
 				{
-					JRDesignParameter parameter = new JRDesignParameter();
-					parameter.setName("ParamDisplay-" + param.getParameterName());
-					parameter.setValueClass(String.class);
+					JRDesignStaticText labelElement = new JRDesignStaticText();
 
-					parameter.setForPrompting(false);
+					String strippedLabel = param.getLabel().replaceAll("ReportParameter", "");
 
-					designFile.addParameter(parameter);
+					labelElement.setText(strippedLabel);
+					labelElement.setWidth(125);
+					labelElement.setHeight(20);
+					labelElement.setBackcolor(new Color(208, 208, 208));
+					labelElement.setMode(ModeEnum.OPAQUE);
+					labelElement.setVerticalAlignment(VerticalAlignEnum.MIDDLE);
+
+					labelElement.setX(0);
+					labelElement.setY(maxY);
+					labelElement.setFontName("SansSerif");
+					labelElement.setFontSize(12);
+					targetBand.addElement(labelElement);
+
+					JRDesignTextField valueElement = new JRDesignTextField();
+					valueElement.setExpression(new JRDesignExpression("$P{ParamDisplay-" + parameterName
+							+ "}"));
+					valueElement.setWidth(400);
+					valueElement.setHeight(20);
+					valueElement.setBackcolor(new Color(208, 208, 208));
+					valueElement.setMode(ModeEnum.OPAQUE);
+
+					valueElement.setX(125);
+					valueElement.setY(maxY);
+					valueElement.setFontName("SansSerif");
+					valueElement.setFontSize(12);
+					valueElement.setVerticalAlignment(VerticalAlignEnum.MIDDLE);
+
+					targetBand.addElement(valueElement);
+					maxY = valueElement.getY() + valueElement.getHeight();
+
+					if (!designFile.getParametersMap().containsKey("ParamDisplay-" + parameterName))
+					{
+						JRDesignParameter parameter = new JRDesignParameter();
+						parameter.setName("ParamDisplay-" + parameterName);
+						parameter.setValueClass(String.class);
+
+						parameter.setForPrompting(false);
+
+						designFile.addParameter(parameter);
+					}
 				}
 			}
 		}
@@ -499,28 +503,32 @@ public class JasperManager implements Runnable
 	 * filter the report or display on the report. This method allows you to set
 	 * the parameters value at runtime.
 	 * 
+	 * @param parameterName2
+	 * 
 	 * @param parameterName
 	 * @param parameterValue
 	 */
-	public void bindParameter(ReportParameter<?> param)
+	public void bindParameter(ReportParameter<?> param, final String parameterName)
 	{
 		// ReportChooser is not actually a report parameter
 		if (!(param instanceof ReportChooser))
 		{
-			String tmpParam = param.getParameterName();
+
 			// specific work around for prefixed report parameters
-			if (tmpParam.startsWith("ReportParameter"))
+			String strippedParameterName = parameterName;
+			if (strippedParameterName.startsWith("ReportParameter"))
 			{
-				tmpParam = tmpParam.substring("ReportParameter".length(), tmpParam.length());
+				strippedParameterName = strippedParameterName.substring("ReportParameter".length(), strippedParameterName.length());
 			}
 
-			if (!paramExists(tmpParam))
+			if (!paramExists(strippedParameterName))
 			{
-				logger.warn("The passed Jasper Report parameter: " + param.getParameterName()
+				logger.warn("The passed Jasper Report parameter: " + param.getParameterNames()
 						+ " does not exist in the Report");
 			}
 
-			boundParams.put(tmpParam, param.getValue());
+			boundParams.put(strippedParameterName, param.getValue(parameterName));
+
 		}
 	}
 
@@ -641,7 +649,7 @@ public class JasperManager implements Runnable
 
 		exportAsync(exportMethod, params, null);
 		InputStream stream = getStream();
-		//completeBarrier.await();
+		// completeBarrier.await();
 		return new RenderedReport(stream, imagesrcs, exportMethod);
 
 	}
@@ -650,7 +658,7 @@ public class JasperManager implements Runnable
 	{
 		return concurrentLimit.getQueueLength();
 	}
-	
+
 	public InputStream getStream() throws InterruptedException
 	{
 		inputStream = new PipedInputStream();
@@ -688,30 +696,32 @@ public class JasperManager implements Runnable
 		completeBarrier = new CountDownLatch(1);
 		readerReady = new CountDownLatch(1);
 		this.progressListener = progressListener;
-		if(progressListener == null)
+		if (progressListener == null)
 		{
-			this.progressListener = new JasperProgressListener(){
+			this.progressListener = new JasperProgressListener()
+			{
 
 				@Override
 				public void failed(String string)
 				{
 					// TODO Auto-generated method stub
-					
+
 				}
 
 				@Override
 				public void completed()
 				{
 					// TODO Auto-generated method stub
-					
+
 				}
 
 				@Override
 				public void outputStreamReady()
 				{
 					// TODO Auto-generated method stub
-					
-				}};
+
+				}
+			};
 		}
 		inputStream = null;
 		outputStream = null;
@@ -750,14 +760,17 @@ public class JasperManager implements Runnable
 			logger.warn("Running report " + reportProperties.getReportFileName());
 			for (ReportParameter<?> param : params)
 			{
-				bindParameter(param);
-				if (param.displayInreport())
+				for (String parameterName : param.getParameterNames())
 				{
-					// populate dynamically added parameters to display user
-					// friendly parameters on the report
-					boundParams.put("ParamDisplay-" + param.getParameterName(), param.getDisplayValue());
+					bindParameter(param, parameterName);
+					if (param.displayInreport())
+					{
+						// populate dynamically added parameters to display user
+						// friendly parameters on the report
+						boundParams.put("ParamDisplay-" + parameterName, param.getDisplayValue(parameterName));
+					}
+					logger.warn(parameterName + " " + param.getValue(parameterName));
 				}
-				logger.warn(param.getParameterName() + " " + param.getValue());
 			}
 
 			reportProperties.prepareForOutputFormat(exportMethod);
@@ -804,7 +817,8 @@ public class JasperManager implements Runnable
 					String imageUrl = baseurl + "VaadinJasperPrintServlet?image=";
 
 					exporter.setParameter(JRHtmlExporterParameter.IMAGES_URI, imageUrl);
-				}else
+				}
+				else
 				{
 					logger.warn("Vaadin Servlet doens't have a current context");
 				}

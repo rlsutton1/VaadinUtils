@@ -1,6 +1,8 @@
 package au.com.vaadinutils.jasper.scheduler.entities;
 
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -150,12 +152,12 @@ public class ReportEmailScheduleEntity implements Serializable, CrudEntity, Repo
 	}
 
 	@Override
-	public List<ReportEmailParameter> getReportParameters()
+	public Collection<ReportEmailParameter> getReportParameters()
 	{
 		List<ReportEmailParameter> tmp = new LinkedList<ReportEmailParameter>();
 		tmp.addAll(reportParameters);
 
-		return tmp;
+		return Collections.unmodifiableCollection(tmp);
 	}
 
 	@Override
@@ -301,5 +303,22 @@ public class ReportEmailScheduleEntity implements Serializable, CrudEntity, Repo
 	public String getSendersUsername()
 	{
 		return sender.username;
+	}
+
+	public void setRecipients(List<ReportEmailRecipient> recips)
+	{
+		recipients = recips;
+		
+	}
+
+	public ReportEmailSender getSender()
+	{
+		return sender;
+	}
+
+	public void addReportParameter(ReportEmailParameterEntity reportEmailParameterEntity)
+	{
+		reportParameters.add(reportEmailParameterEntity);
+		
 	}
 }
