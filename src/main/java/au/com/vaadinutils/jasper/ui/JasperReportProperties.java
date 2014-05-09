@@ -153,13 +153,24 @@ public interface JasperReportProperties
 	public abstract boolean isDevMode();
 
 	/**
-	 * the name of the class that knows how to render the filter builder and prepare data
-	 * and provide a jasperreportprovider
+	 * the name of the class that knows how to render the filter builder and
+	 * prepare data and provide a jasperreportprovider
 	 * 
 	 * @return
 	 */
 	public abstract Class<? extends JasperReportProperties> getReportClass();
 
 	public abstract String getUserEmailAddress();
+
+	/**
+	 * Multiple reports can be accessed from a single ReportView via the ReportChooserReportParameter, so it is 
+	 * necessary to be able to identify a report as belonging to a ReportView
+	 * 
+	 * An enum that identifies a report based on the vaadin view that is used to configure it.
+	 * this will be used to group the report in the schedules view.
+	 * 
+	 * @return
+	 */
+	public abstract Enum<?> getReportIdentifier();
 
 }

@@ -186,5 +186,11 @@ public class JasperReportPopUp extends Window implements JasperReportProperties
 	{
 		return reportPropertiesTemplate.getUserEmailAddress();
 	}
+	
+	@Override
+	public Enum<?> getReportIdentifier()
+	{
+		return reportPropertiesTemplate.getReportIdentifier();
+	}
 
 }

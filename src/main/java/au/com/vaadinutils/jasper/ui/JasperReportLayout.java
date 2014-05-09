@@ -282,11 +282,11 @@ class JasperReportLayout extends VerticalLayout
 		buttonBar.setWidth("100%");
 		buttonBar.setHeight(buttonHeight);
 
-		buttonBar.setMargin(new MarginInfo(false, true, false, true));
+		buttonBar.setMargin(new MarginInfo(false, false, false, false));
 
 		HorizontalLayout buttonContainer = new HorizontalLayout();
 		buttonContainer.setSizeFull();
-		buttonContainer.setWidth("145");
+		buttonContainer.setWidth("230");
 
 		showButton = new NativeButton();
 		showButton.setIcon(new ExternalResource("images/seanau/Preview_32.png"));
@@ -316,8 +316,8 @@ class JasperReportLayout extends VerticalLayout
 		addButtonListener(exportButton, OutputFormat.CSV);
 		buttonContainer.addComponent(exportButton);
 
-		createScheduleButton(buttonHeight, buttonContainer);
 		createEmailButton(buttonHeight, buttonContainer);
+		createScheduleButton(buttonHeight, buttonContainer);
 
 		buttonBar.addComponent(buttonContainer);
 		layout.addComponent(buttonBar);
@@ -359,9 +359,9 @@ class JasperReportLayout extends VerticalLayout
 
 	private void createEmailButton(String buttonHeight, HorizontalLayout buttonContainer)
 	{
-		scheduleButton = new NativeButton("Email");
-		// scheduleButton.setIcon(new
-		// ExternalResource("images/seanau/Preview_32.png"));
+		scheduleButton = new NativeButton();
+		scheduleButton.setIcon(new
+		 ExternalResource("images/seanau/Email_32.png"));
 		scheduleButton.setDescription("Email");
 		scheduleButton.setWidth("50");
 		scheduleButton.setHeight(buttonHeight);
@@ -381,9 +381,9 @@ class JasperReportLayout extends VerticalLayout
 
 	private void createScheduleButton(String buttonHeight, HorizontalLayout buttonContainer)
 	{
-		scheduleButton = new NativeButton("Schedule");
-		// scheduleButton.setIcon(new
-		// ExternalResource("images/seanau/Preview_32.png"));
+		scheduleButton = new NativeButton();
+		scheduleButton.setIcon(new
+		ExternalResource("images/seanau/Schedule_32.png"));
 		scheduleButton.setDescription("Schedule");
 		scheduleButton.setWidth("50");
 		scheduleButton.setHeight(buttonHeight);

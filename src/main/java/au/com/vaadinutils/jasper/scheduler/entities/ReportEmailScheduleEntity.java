@@ -100,6 +100,8 @@ public class ReportEmailScheduleEntity implements Serializable, CrudEntity, Repo
 
 	private String reportTitle;
 
+	private String reportIdentifier;
+
 	@Override
 	public Long getId()
 	{
@@ -319,6 +321,12 @@ public class ReportEmailScheduleEntity implements Serializable, CrudEntity, Repo
 	public void addReportParameter(ReportEmailParameterEntity reportEmailParameterEntity)
 	{
 		reportParameters.add(reportEmailParameterEntity);
+		
+	}
+
+	public void setReportTemplateIdentifier(Enum<?> reportIdentifier)
+	{
+		this.reportIdentifier = reportIdentifier.toString();
 		
 	}
 }

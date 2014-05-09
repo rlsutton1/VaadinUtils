@@ -24,7 +24,7 @@ import com.vaadin.ui.themes.Reindeer;
 public class EmailTargetLayout extends VerticalLayout
 {
 	// Logger logger = LogManager.getLogger();
-	List<TargetLine> lines = new LinkedList<TargetLine>();
+	List<EmailTargetLine> lines = new LinkedList<EmailTargetLine>();
 
 	EmailTargetLayout()
 	{
@@ -34,7 +34,7 @@ public class EmailTargetLayout extends VerticalLayout
 
 	}
 
-	private TargetLine insertTargetLine(final int row, ReportEmailRecipient recip)
+	private EmailTargetLine insertTargetLine(final int row, ReportEmailRecipient recip)
 	{
 
 		final HorizontalLayout recipientHolder = new HorizontalLayout();
@@ -47,7 +47,7 @@ public class EmailTargetLayout extends VerticalLayout
 			targetTypes.add(rerv);
 		}
 
-		final TargetLine line = new TargetLine();
+		final EmailTargetLine line = new EmailTargetLine();
 		line.row = row;
 
 		line.targetTypeCombo = new ComboBox(null, targetTypes);
@@ -198,7 +198,7 @@ public class EmailTargetLayout extends VerticalLayout
 
 	}
 
-	public List<TargetLine> getTargets()
+	public List<EmailTargetLine> getTargets()
 	{
 		return lines;
 	}

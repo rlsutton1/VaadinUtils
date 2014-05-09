@@ -9,6 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import au.com.vaadinutils.crud.BaseCrudView;
+import au.com.vaadinutils.crud.EntityTable;
 import au.com.vaadinutils.crud.FormHelper;
 import au.com.vaadinutils.crud.HeadingPropertySet;
 import au.com.vaadinutils.crud.ValidatingFieldGroup;
@@ -98,7 +99,26 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 				.addColumn("Last Run", ReportEmailScheduleEntity_.lastRuntime).build();
 
 		init(ReportEmailScheduleEntity.class, container, headings);
+		resetFilters();
+		if (container.size() > 0)
+		{
+			entityTable.select(container.getIdByIndex(1));
+		}
+		else
+		{
+			entityTable.select(null);
+		}
 
+	}
+
+	protected void resetFilters()
+	{
+		container.removeAllContainerFilters();
+		if (scheduleCreater != null)
+		{
+			scheduleCreater.addContainerFilter(container);
+		}
+		((EntityTable<ReportEmailScheduleEntity>) this.entityTable).refreshRowCache();
 	}
 
 	protected ReportEmailScheduleEntity preNew() throws InstantiationException, IllegalAccessException
@@ -471,7 +491,7 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 	{
 		ReportEmailScheduleEntity entity = entityItem.getEntity();
 		List<ReportEmailRecipient> recips = entity.getRecipients();
-		for (TargetLine line : emailTargetLayout.getTargets())
+		for (EmailTargetLine line : emailTargetLayout.getTargets())
 		{
 			// check if the recipient exists
 			String email = (String) line.targetAddress.getValue();
@@ -556,7 +576,7 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 		for (ReportEmailRecipient recip : entityItem.getRecipients())
 		{
 			boolean found = false;
-			for (TargetLine line : emailTargetLayout.getTargets())
+			for (EmailTargetLine line : emailTargetLayout.getTargets())
 			{
 				String email = (String) line.targetAddress.getValue();
 

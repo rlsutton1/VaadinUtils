@@ -3,7 +3,7 @@ package au.com.vaadinutils.jasper.scheduler;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 
-class TargetLine
+class EmailTargetLine
 {
 	ComboBox targetTypeCombo;
 	ComboBox targetAddress;

@@ -9,11 +9,15 @@ import au.com.vaadinutils.jasper.parameter.ReportParameter;
 import au.com.vaadinutils.jasper.scheduler.entities.DateParameterOffsetType;
 import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailParameterEntity;
 import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailScheduleEntity;
+import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailScheduleEntity_;
 import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailScheduledDateParameter;
 import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailSender;
 import au.com.vaadinutils.jasper.scheduler.entities.ScheduleMode;
 import au.com.vaadinutils.jasper.ui.JasperReportProperties;
 
+import com.vaadin.addon.jpacontainer.JPAContainer;
+import com.vaadin.data.Container.Filter;
+import com.vaadin.data.util.filter.Compare;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 
@@ -43,6 +47,7 @@ public class JasperReportSchedulerWindow extends Window
 				schedule.setScheduleMode(ScheduleMode.ONE_TIME);
 				schedule.setOneTimeRunTime(new Date());
 				schedule.setEnabled(false);
+				schedule.setReportTemplateIdentifier(reportProperties.getReportIdentifier());
 
 				List<ReportEmailParameterEntity> rparams = new LinkedList<ReportEmailParameterEntity>();
 				List<ReportEmailScheduledDateParameter> dparams = new LinkedList<ReportEmailScheduledDateParameter>();
@@ -77,6 +82,15 @@ public class JasperReportSchedulerWindow extends Window
 				schedule.setSender(reportEmailSender);
 
 				return schedule;
+			}
+
+			@Override
+			public void addContainerFilter(JPAContainer<ReportEmailScheduleEntity> container)
+			{
+				Filter filter = new Compare.Equal(ReportEmailScheduleEntity_.reportIdentifier.getName(), reportProperties
+						.getReportIdentifier().toString());
+				container.addContainerFilter(filter);
+
 			}
 		}));
 		setModal(true);

@@ -7,18 +7,19 @@ package au.com.vaadinutils.jasper.scheduler.entities;
 import java.lang.Long;
 import java.lang.String;
 import java.util.Date;
-
 import javax.persistence.metamodel.SingularAttribute;
 
 @javax.persistence.metamodel.StaticMetamodel
 (value=au.com.vaadinutils.jasper.scheduler.entities.ReportEmailScheduledDateParameter.class)
 @javax.annotation.Generated
-(value="org.apache.openjpa.persistence.meta.AnnotationProcessor6",date="Wed May 07 10:05:14 EST 2014")
+(value="org.apache.openjpa.persistence.meta.AnnotationProcessor6",date="Fri May 09 11:28:42 EST 2014")
 public class ReportEmailScheduledDateParameter_ {
-    public static volatile SingularAttribute<ReportEmailScheduledDateParameter,Date> date;
+    public static volatile SingularAttribute<ReportEmailScheduledDateParameter,Date> endDate;
+    public static volatile SingularAttribute<ReportEmailScheduledDateParameter,String> endName;
     public static volatile SingularAttribute<ReportEmailScheduledDateParameter,Long> iID;
     public static volatile SingularAttribute<ReportEmailScheduledDateParameter,String> label;
-    public static volatile SingularAttribute<ReportEmailScheduledDateParameter,String> name;
     public static volatile SingularAttribute<ReportEmailScheduledDateParameter,DateParameterOffsetType> offsetType;
+    public static volatile SingularAttribute<ReportEmailScheduledDateParameter,Date> startDate;
+    public static volatile SingularAttribute<ReportEmailScheduledDateParameter,String> startName;
     public static volatile SingularAttribute<ReportEmailScheduledDateParameter,DateParameterType> type;
 }

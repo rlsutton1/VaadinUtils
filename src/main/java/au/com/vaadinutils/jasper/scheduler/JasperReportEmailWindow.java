@@ -169,7 +169,7 @@ public class JasperReportEmailWindow extends Window
 		entityManager.persist(reportEmailSender);
 
 		List<ReportEmailRecipient> recips = new LinkedList<ReportEmailRecipient>();
-		for (TargetLine target : emailTargetLayout.getTargets())
+		for (EmailTargetLine target : emailTargetLayout.getTargets())
 		{
 			ReportEmailRecipient recipient = new ReportEmailRecipient();
 			recipient.setEmail((String) target.targetAddress.getValue());

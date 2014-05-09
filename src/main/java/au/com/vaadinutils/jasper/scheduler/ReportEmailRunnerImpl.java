@@ -212,4 +212,10 @@ public class ReportEmailRunnerImpl implements ReportEmailRunner, JasperReportPro
 			throw new RuntimeException(e);
 		}
 	}
+
+	@Override
+	public Enum<?> getReportIdentifier()
+	{
+		return jasperReportProperties.getReportIdentifier();
+	}
 }

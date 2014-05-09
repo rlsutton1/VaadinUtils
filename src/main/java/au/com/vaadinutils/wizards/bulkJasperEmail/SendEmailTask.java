@@ -273,4 +273,11 @@ public class SendEmailTask extends ProgressBarTask<JasperTransmission> implement
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public Enum<?> getReportIdentifier()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

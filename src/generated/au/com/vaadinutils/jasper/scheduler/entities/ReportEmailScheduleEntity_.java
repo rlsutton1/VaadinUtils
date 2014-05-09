@@ -15,7 +15,7 @@ import javax.persistence.metamodel.SingularAttribute;
 @javax.persistence.metamodel.StaticMetamodel
 (value=au.com.vaadinutils.jasper.scheduler.entities.ReportEmailScheduleEntity.class)
 @javax.annotation.Generated
-(value="org.apache.openjpa.persistence.meta.AnnotationProcessor6",date="Wed May 07 10:05:14 EST 2014")
+(value="org.apache.openjpa.persistence.meta.AnnotationProcessor6",date="Fri May 09 11:28:42 EST 2014")
 public class ReportEmailScheduleEntity_ {
     public static volatile SingularAttribute<ReportEmailScheduleEntity,String> JasperReportPropertiesClassName;
     public static volatile ListAttribute<ReportEmailScheduleEntity,ReportEmailScheduledDateParameter> dateParameters;
@@ -26,6 +26,7 @@ public class ReportEmailScheduleEntity_ {
     public static volatile SingularAttribute<ReportEmailScheduleEntity,Date> oneTimeRunDateTime;
     public static volatile ListAttribute<ReportEmailScheduleEntity,ReportEmailRecipient> recipients;
     public static volatile SingularAttribute<ReportEmailScheduleEntity,String> reportFileName;
+    public static volatile SingularAttribute<ReportEmailScheduleEntity,String> reportIdentifier;
     public static volatile SingularAttribute<ReportEmailScheduleEntity,String> reportLog;
     public static volatile ListAttribute<ReportEmailScheduleEntity,ReportEmailParameterEntity> reportParameters;
     public static volatile SingularAttribute<ReportEmailScheduleEntity,String> reportTitle;

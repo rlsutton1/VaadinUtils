@@ -11,7 +11,6 @@ import au.com.vaadinutils.jasper.parameter.ReportParameter;
 
 public class JasperReportPropertiesAlternateFile implements JasperReportProperties
 {
-	
 
 	private String title;
 	private String reportFileName;
@@ -19,11 +18,11 @@ public class JasperReportPropertiesAlternateFile implements JasperReportProperti
 
 	public JasperReportPropertiesAlternateFile(String title, String reportFileName, JasperReportProperties properties)
 	{
-	this.title = title;
-	this.reportFileName = reportFileName;
-	this.reportPropertiesTemplate = properties;
+		this.title = title;
+		this.reportFileName = reportFileName;
+		this.reportPropertiesTemplate = properties;
 	}
-	
+
 	@Override
 	public String getReportFileName()
 	{
@@ -39,13 +38,11 @@ public class JasperReportPropertiesAlternateFile implements JasperReportProperti
 	}
 
 	@Override
-	public List<ReportParameter<?>> prepareData(Collection<ReportParameter<?>> params, String reportFileName, CleanupCallback cleanupCallback)
-			throws Exception
+	public List<ReportParameter<?>> prepareData(Collection<ReportParameter<?>> params, String reportFileName,
+			CleanupCallback cleanupCallback) throws Exception
 	{
 		return reportPropertiesTemplate.prepareData(params, reportFileName, cleanupCallback);
 	}
-
-	
 
 	@Override
 	public void prepareForOutputFormat(OutputFormat outputFormat)
@@ -92,7 +89,6 @@ public class JasperReportPropertiesAlternateFile implements JasperReportProperti
 		return reportPropertiesTemplate.isDevMode();
 	}
 
-	
 	@Override
 	public String getHeaderFooterTemplateName()
 	{
@@ -128,11 +124,17 @@ public class JasperReportPropertiesAlternateFile implements JasperReportProperti
 	{
 		return reportPropertiesTemplate.getReportClass();
 	}
+
 	@Override
 	public String getUserEmailAddress()
 	{
 		return reportPropertiesTemplate.getUserEmailAddress();
 	}
 
+	@Override
+	public Enum<?> getReportIdentifier()
+	{
+		return reportPropertiesTemplate.getReportIdentifier();
+	}
 
 }
