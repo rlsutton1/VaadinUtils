@@ -18,7 +18,7 @@ import au.com.vaadinutils.jasper.scheduler.ScheduleTriState;
 public enum ScheduleMode
 {
 
-	ONE_TIME
+	ONE_TIME("Run once only")
 	{
 		@Override
 		public void checkDateAndRunScheduledReport(ReportEmailSchedule schedule, DateTime now,
@@ -47,7 +47,7 @@ public enum ScheduleMode
 
 		}
 	},
-	DAY_OF_WEEK
+	DAY_OF_WEEK("Week days")
 	{
 		@Override
 		public void checkDateAndRunScheduledReport(ReportEmailSchedule schedule, DateTime now,
@@ -80,7 +80,7 @@ public enum ScheduleMode
 
 		}
 	},
-	DAY_OF_MONTH
+	DAY_OF_MONTH("Monthly")
 	{
 		@Override
 		public void checkDateAndRunScheduledReport(ReportEmailSchedule schedule, DateTime now,
@@ -113,7 +113,7 @@ public enum ScheduleMode
 
 		}
 	},
-	EVERY_DAY
+	EVERY_DAY("Daily")
 	{
 		@Override
 		public void checkDateAndRunScheduledReport(ReportEmailSchedule schedule, DateTime now,
@@ -216,6 +216,19 @@ public enum ScheduleMode
 			throw new RuntimeException("No valid run time");
 		}
 		return selectedScheduleTime;
+	}
+
+	String name;
+
+	ScheduleMode(String name)
+	{
+		this.name = name;
+	}
+	
+	@Override
+	public String toString()
+	{
+		return name;
 	}
 
 	abstract public void checkDateAndRunScheduledReport(ReportEmailSchedule schedule, DateTime now,

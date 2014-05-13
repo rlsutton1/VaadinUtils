@@ -17,10 +17,7 @@ public class ReportEmailRecipient
 	private long iID;
 	
 	String emailAddress;
-	
-	
-	ReportEmailScheduleEntity owner;
-	
+
 	@Enumerated(EnumType.STRING)
 	ReportEmailRecipientVisibility visibility;
 
@@ -35,9 +32,17 @@ public class ReportEmailRecipient
 		
 	}
 
-	public void setOwner(ReportEmailScheduleEntity owner)
+	
+	public void setVisibility(ReportEmailRecipientVisibility value)
 	{
-		this.owner = owner;
+		visibility = value;
 		
 	}
+	
+	public ReportEmailRecipientVisibility getVisibility()
+	{
+		return visibility;
+	}
+
+	
 }

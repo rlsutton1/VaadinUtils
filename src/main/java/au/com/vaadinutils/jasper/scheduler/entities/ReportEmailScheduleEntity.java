@@ -17,6 +17,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -57,12 +58,12 @@ public class ReportEmailScheduleEntity implements Serializable, CrudEntity, Repo
 
 	private String JasperReportPropertiesClassName;
 
-	@OneToMany(cascade=CascadeType.REMOVE)
+	@OneToMany(cascade={CascadeType.REMOVE, CascadeType.PERSIST})
 	private List<ReportEmailScheduledDateParameter> dateParameters;
 
 	boolean enabled = true;
 	
-	@OneToOne(cascade=CascadeType.REMOVE)
+	@OneToOne(cascade={CascadeType.REMOVE, CascadeType.PERSIST})
 	private ReportEmailSender sender;
 
 	@Temporal(TemporalType.TIMESTAMP)
@@ -81,7 +82,7 @@ public class ReportEmailScheduleEntity implements Serializable, CrudEntity, Repo
 
 	private String scheduledDaysOfWeek = "";
 
-	@OneToMany(cascade=CascadeType.REMOVE)
+	@OneToMany(cascade={CascadeType.REMOVE, CascadeType.PERSIST})
 	private List<ReportEmailParameterEntity> reportParameters;
 
 	private String message;
@@ -93,7 +94,7 @@ public class ReportEmailScheduleEntity implements Serializable, CrudEntity, Repo
 	 */
 	private String reportLog;
 
-	@OneToMany(mappedBy = "owner",cascade=CascadeType.REMOVE)
+	@ManyToMany( cascade={ CascadeType.PERSIST})
 	private List<ReportEmailRecipient> recipients = new LinkedList<ReportEmailRecipient>();
 
 	private String reportFileName;

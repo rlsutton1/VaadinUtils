@@ -38,7 +38,7 @@ public class ValidatingFieldGroup<E> extends FieldGroup
 
 	private boolean groupIsDirty;
 	private DirtyListener dirtyListener;
-	
+
 	public void setDirtyListener(DirtyListener listener)
 	{
 		dirtyListener = listener;
@@ -129,6 +129,23 @@ public class ValidatingFieldGroup<E> extends FieldGroup
 	{
 
 		return container;
+	}
+
+	// when finished testing delete this method, it's in the super type anyway
+	@Override
+	public boolean isModified()
+	{
+		for (Field<?> field : getFields())
+		{
+			if (field.isModified())
+			{
+				System.out.println("8234873: Dirty: " + field.getCaption());
+				System.out.println("Dirty value: " + field.getValue());
+
+				return true;
+			}
+		}
+		return false;
 	}
 
 }

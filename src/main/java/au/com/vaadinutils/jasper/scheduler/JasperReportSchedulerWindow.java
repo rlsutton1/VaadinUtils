@@ -5,6 +5,9 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import au.com.vaadinutils.help.HelpProvider;
+import au.com.vaadinutils.help.HelpSplitPanel;
+import au.com.vaadinutils.help.VaadinUtilsHelpEnum;
 import au.com.vaadinutils.jasper.parameter.ReportParameter;
 import au.com.vaadinutils.jasper.scheduler.entities.DateParameterOffsetType;
 import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailParameterEntity;
@@ -21,7 +24,7 @@ import com.vaadin.data.util.filter.Compare;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 
-public class JasperReportSchedulerWindow extends Window
+public class JasperReportSchedulerWindow extends Window 
 {
 	private static final long serialVersionUID = 1L;
 
@@ -30,9 +33,9 @@ public class JasperReportSchedulerWindow extends Window
 	{
 
 		this.setWidth("90%");
-		this.setHeight("80%");
-
-		this.setContent(new JasperReportScheduleLayout(new ScheduleCreater()
+		this.setHeight("98%");
+		
+		HelpSplitPanel wrapper = new HelpSplitPanel(new JasperReportScheduleLayout(new ScheduleCreater()
 		{
 
 			@Override
@@ -93,9 +96,13 @@ public class JasperReportSchedulerWindow extends Window
 
 			}
 		}));
+		
+		this.setContent(wrapper);
 		setModal(true);
 		// center();
 		UI.getCurrent().addWindow(this);
 
 	}
+
+
 }

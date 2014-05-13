@@ -158,15 +158,5 @@ public class ReportFilterUIBuilder implements ReportFilterFieldBuilder, ReportFi
 		return ret;
 	}
 
-	public void setMinWidth(int i)
-	{
-		minWidth = i;
-	}
-
-	public Integer getMinWidth()
-	{
-
-		return minWidth;
-	}
 
 }

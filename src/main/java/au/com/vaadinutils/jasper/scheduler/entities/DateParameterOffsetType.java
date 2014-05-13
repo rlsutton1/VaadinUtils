@@ -7,7 +7,7 @@ import org.joda.time.DateTime;
 
 public enum DateParameterOffsetType
 {
-	CONSTANT
+	CONSTANT("Select date")
 	{
 		@Override
 		public String convertStartDate(Date parameterTime, Date scheduledDate, DateParameterType formatType)
@@ -24,7 +24,7 @@ public enum DateParameterOffsetType
 		}
 	},
 
-	TODAY
+	TODAY("Current day")
 	{
 		@Override
 		public String convertStartDate(Date parameterTime, Date scheduledDate, DateParameterType formatType)
@@ -65,7 +65,7 @@ public enum DateParameterOffsetType
 			return formatter.format(result);
 		}
 	},
-	YESTERDAY
+	YESTERDAY("Previous day")
 	{
 		@Override
 		public String convertStartDate(Date parameterTime, Date scheduledDate, DateParameterType formatType)
@@ -105,7 +105,7 @@ public enum DateParameterOffsetType
 			return formatter.format(result);
 		}
 	},
-	THIS_WEEK
+	THIS_WEEK("Current week")
 	{
 		@Override
 		public String convertStartDate(Date parameterTime, Date scheduledDate, DateParameterType formatType)
@@ -131,7 +131,7 @@ public enum DateParameterOffsetType
 			return formatter.format(result);
 		}
 	},
-	LAST_WEEK
+	LAST_WEEK("Previous week")
 	{
 		@Override
 		public String convertStartDate(Date parameterTime, Date scheduledDate, DateParameterType formatType)
@@ -157,7 +157,7 @@ public enum DateParameterOffsetType
 			return formatter.format(result);
 		}
 	},
-	THIS_MONTH
+	THIS_MONTH("Current month")
 	{
 		@Override
 		public String convertStartDate(Date parameterTime, Date scheduledDate, DateParameterType formatType)
@@ -183,7 +183,7 @@ public enum DateParameterOffsetType
 			return formatter.format(result);
 		}
 	},
-	LAST_MONTH
+	LAST_MONTH("Previous month")
 	{
 		@Override
 		public String convertStartDate(Date parameterTime, Date scheduledDate, DateParameterType formatType)
@@ -210,6 +210,19 @@ public enum DateParameterOffsetType
 		}
 	};
 
+	String name;
+	
+	DateParameterOffsetType(String name)
+	{
+		this.name = name;
+	}
+	
+	@Override
+	public String toString()
+	{
+		return name;
+	}
+	
 	abstract public String convertStartDate(Date parameterTime, Date scheduledDate, DateParameterType formatType);
 
 	abstract public String convertEndDate(Date parameterTime, Date scheduledDate, DateParameterType formatType);

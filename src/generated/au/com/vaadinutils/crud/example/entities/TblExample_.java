@@ -11,7 +11,7 @@ import javax.persistence.metamodel.SingularAttribute;
 @javax.persistence.metamodel.StaticMetamodel
 (value=au.com.vaadinutils.crud.example.entities.TblExample.class)
 @javax.annotation.Generated
-(value="org.apache.openjpa.persistence.meta.AnnotationProcessor6",date="Fri May 09 11:28:42 EST 2014")
+(value="org.apache.openjpa.persistence.meta.AnnotationProcessor6",date="Mon May 12 18:22:45 EST 2014")
 public class TblExample_ {
     public static volatile SingularAttribute<TblExample,String> JDBCDriverClass;
     public static volatile SingularAttribute<TblExample,String> host;

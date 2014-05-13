@@ -3,34 +3,39 @@ package au.com.vaadinutils.jasper.scheduler;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import au.com.vaadinutils.dao.JpaBaseDao;
 import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailRecipient;
 import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailRecipientVisibility;
 import au.com.vaadinutils.validator.EmailValidator;
 
 import com.vaadin.data.Item;
-import com.vaadin.data.util.AbstractInMemoryContainer;
 import com.vaadin.data.util.IndexedContainer;
-import com.vaadin.shared.ui.MarginInfo;
+import com.vaadin.ui.AbstractSelect.NewItemHandler;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.AbstractSelect.NewItemHandler;
-import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.themes.Reindeer;
 
 public class EmailTargetLayout extends VerticalLayout
 {
-	// Logger logger = LogManager.getLogger();
+	private static final long serialVersionUID = -6108970593368681878L;
+
+	Logger logger = LogManager.getLogger();
 	List<EmailTargetLine> lines = new LinkedList<EmailTargetLine>();
+
+	private final static int lineHeight = 30;
 
 	EmailTargetLayout()
 	{
 		setSizeFull();
+		setHeight("" + lineHeight);
 		setSpacing(true);
-		setMargin(new MarginInfo(true, true, false, true));
 
 	}
 
@@ -40,6 +45,7 @@ public class EmailTargetLayout extends VerticalLayout
 		final HorizontalLayout recipientHolder = new HorizontalLayout();
 		recipientHolder.setSizeFull();
 		recipientHolder.setSpacing(true);
+		recipientHolder.setHeight("30");
 
 		final List<ReportEmailRecipientVisibility> targetTypes = new LinkedList<ReportEmailRecipientVisibility>();
 		for (ReportEmailRecipientVisibility rerv : ReportEmailRecipientVisibility.values())
@@ -61,12 +67,14 @@ public class EmailTargetLayout extends VerticalLayout
 		line.targetAddress.setWidth("100%");
 		line.targetAddress.addValidator(new EmailValidator("Please enter a valid email address."));
 
-		line.targetAddress.setContainerDataSource(getValidEmailContacts());
+		getValidEmailContacts(line.targetAddress);
 		line.targetAddress.setItemCaptionPropertyId("namedemail");
 		line.targetAddress.setNewItemsAllowed(true);
+
 		if (recip != null && recip.getEmail() != null)
 		{
 			line.targetAddress.setValue(recip.getEmail());
+			line.targetTypeCombo.setValue(recip.getVisibility());
 		}
 
 		line.targetAddress.setNewItemHandler(new NewItemHandler()
@@ -84,6 +92,7 @@ public class EmailTargetLayout extends VerticalLayout
 					line.targetAddress.addItem(item.getItemProperty("id").getValue());
 					line.targetAddress.setValue(item.getItemProperty("id").getValue());
 				}
+				setHeight(calculateHeight());
 			}
 		});
 
@@ -106,6 +115,7 @@ public class EmailTargetLayout extends VerticalLayout
 				public void buttonClick(ClickEvent event)
 				{
 					lines.add(insertTargetLine(lines.size(), null));
+					setHeight(calculateHeight());
 				}
 			});
 		}
@@ -124,6 +134,7 @@ public class EmailTargetLayout extends VerticalLayout
 				{
 					removeComponent(recipientHolder);
 					lines.remove(line);
+					setHeight(calculateHeight());
 
 				}
 			});
@@ -139,24 +150,30 @@ public class EmailTargetLayout extends VerticalLayout
 		return line;
 	}
 
-	private IndexedContainer getValidEmailContacts()
+	private void getValidEmailContacts(ComboBox targetAddress)
 	{
-		final IndexedContainer container = new IndexedContainer();
 
 		JpaBaseDao<ReportEmailRecipient, Long> reportEmailRecipient = getGenericDao(ReportEmailRecipient.class);
 
-		container.addContainerProperty("id", String.class, null);
-		container.addContainerProperty("email", String.class, null);
-		container.addContainerProperty("namedemail", String.class, null);
+		targetAddress.addContainerProperty("id", String.class, null);
+		targetAddress.addContainerProperty("email", String.class, null);
+		targetAddress.addContainerProperty("namedemail", String.class, null);
 
 		for (final ReportEmailRecipient contact : reportEmailRecipient.findAll())
 		{
 			if (contact.getEmail() != null)
 			{
-				addItem(container, null, contact.getEmail());
+				Item item = targetAddress.addItem(contact.getEmail());
+				if (item != null)
+				{
+					item.getItemProperty("email").setValue(contact.getEmail());
+					item.getItemProperty("id").setValue(contact.getEmail());
+					item.getItemProperty("namedemail").setValue(contact.getEmail());
+				}
+
 			}
 		}
-		return container;
+
 	}
 
 	@SuppressWarnings("unchecked")
@@ -172,8 +189,11 @@ public class EmailTargetLayout extends VerticalLayout
 		{
 			email = email.substring(0, email.length() - 1);
 		}
-
-		final Item item = container.addItem(email);
+		Item item = container.getItem(email);
+		if (item == null)
+		{
+			item = container.addItem(email);
+		}
 		if (item != null)
 		{
 			item.getItemProperty("id").setValue(email);
@@ -188,6 +208,10 @@ public class EmailTargetLayout extends VerticalLayout
 				namedEmail = "<" + email + ">";
 			}
 			item.getItemProperty("namedemail").setValue(namedEmail);
+		}
+		else
+		{
+			logger.error("Failed to find or create the recipient");
 		}
 		return item;
 	}
@@ -206,14 +230,19 @@ public class EmailTargetLayout extends VerticalLayout
 	public void add(ReportEmailRecipient target)
 	{
 		lines.add(insertTargetLine(lines.size(), target));
-		
+		setHeight(calculateHeight());
+	}
+
+	private String calculateHeight()
+	{
+		return "" + ((lineHeight * lines.size()));
 	}
 
 	public void clear()
 	{
 		lines.clear();
 		removeAllComponents();
-		
+
 	}
 
 }

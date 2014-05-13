@@ -15,13 +15,18 @@ import au.com.vaadinutils.crud.HeadingPropertySet;
 import au.com.vaadinutils.crud.ValidatingFieldGroup;
 import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.dao.JpaBaseDao;
+import au.com.vaadinutils.fields.CKEditorEmailField;
+import au.com.vaadinutils.help.HelpProvider;
+import au.com.vaadinutils.help.VaadinUtilsHelpEnum;
 import au.com.vaadinutils.jasper.filter.ExpanderComponent;
 import au.com.vaadinutils.jasper.filter.ReportFilterUIBuilder;
+import au.com.vaadinutils.jasper.parameter.ReportChooser;
 import au.com.vaadinutils.jasper.parameter.ReportParameter;
 import au.com.vaadinutils.jasper.scheduler.entities.DateParameterOffsetType;
 import au.com.vaadinutils.jasper.scheduler.entities.DateParameterType;
 import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailParameterEntity;
 import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailRecipient;
+import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailRecipientVisibility;
 import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailScheduleEntity;
 import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailScheduleEntity_;
 import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailSender;
@@ -38,8 +43,11 @@ import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
+import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.util.filter.Or;
 import com.vaadin.data.util.filter.SimpleStringFilter;
+import com.vaadin.navigator.View;
+import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.shared.ui.datefield.Resolution;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.DateField;
@@ -49,10 +57,11 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TabSheet.Tab;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
 /** A start view for navigating to the main view */
-public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailScheduleEntity>
+public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailScheduleEntity> implements View, HelpProvider
 {
 
 	Logger logger = LogManager.getLogger();
@@ -68,6 +77,8 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 	private ScheduleCreater scheduleCreater;
 
 	private ComboBox sender;
+
+	private TextField reportTitle;
 
 	public JasperReportScheduleLayout()
 	{
@@ -167,46 +178,51 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 	@SuppressWarnings("deprecation")
 	public TabSheet buildEditor(ValidatingFieldGroup<ReportEmailScheduleEntity> validatingFieldGroup)
 	{
-		TopVerticalLayout wrapper = new TopVerticalLayout();
-		wrapper.setSizeFull();
 
 		TabSheet tabsheet = new TabSheet();
-		Tab emailTab = tabsheet.addTab(wrapper, "Email");
+		tabsheet.setSizeFull();
 
-		FormLayout main = new FormLayout();
+		VerticalLayout main = new VerticalLayout();
+		main.setSpacing(true);
 		main.setMargin(true);
 		main.setSizeFull();
+		Tab emailTab = tabsheet.addTab(main, "Email");
 
 		main.addComponent(emailTargetLayout);
 
 		FormHelper<ReportEmailScheduleEntity> helper = new FormHelper<ReportEmailScheduleEntity>(main, fieldGroup);
 
-		wrapper.addComponent(main);
-
-		helper.bindTextField("Report", ReportEmailScheduleEntity_.reportTitle).setReadOnly(true);
+		reportTitle = helper.bindTextField("Report", ReportEmailScheduleEntity_.reportTitle);
+		reportTitle.setReadOnly(true);
 
 		sender = helper.bindEntityField("From", ReportEmailScheduleEntity_.sender, ReportEmailSender.class,
 				ReportEmailSender_.username);
 		sender.setReadOnly(true);
 
 		helper.bindTextField("Subject", ReportEmailScheduleEntity_.subject);
+		CKEditorEmailField message = helper.bindEditorField("Message", ReportEmailScheduleEntity_.message, false);
 
 		helper.bindTextField("Report Log", ReportEmailScheduleEntity_.reportLog.getName()).setReadOnly(true);
+
+		main.setExpandRatio(message, 1);
 
 		TopVerticalLayout scheduleWrapper = new TopVerticalLayout();
 		scheduleWrapper.setSizeFull();
 		tabsheet.addTab(scheduleWrapper, "Schedule");
 		FormLayout scheduleForm = new FormLayout();
 		scheduleForm.setSizeFull();
+		scheduleForm.setMargin(true);
 		scheduleWrapper.addComponent(scheduleForm);
 
 		buildScheduleTab(validatingFieldGroup, scheduleForm, helper);
 
-		TopVerticalLayout paramWrapper = new TopVerticalLayout();
+		VerticalLayout paramWrapper = new VerticalLayout();
 		paramWrapper.setSizeFull();
-		tabsheet.addTab(paramWrapper, "Params");
+		tabsheet.addTab(paramWrapper, "Parameters");
 		paramForm = new VerticalLayout();
 		paramForm.setSizeFull();
+		paramForm.setMargin(true);
+
 		paramWrapper.addComponent(paramForm);
 
 		return tabsheet;
@@ -222,10 +238,10 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 		helper.bindDateField(main, validatingFieldGroup, "Last Run Time", ReportEmailScheduleEntity_.lastRuntime,
 				"yyyy/MM/dd HH:mm", Resolution.MINUTE).setReadOnly(true);
 
-		ComboBox modeCombo = helper.bindEnumField(main, validatingFieldGroup, "Mode",
+		ComboBox modeCombo = helper.bindEnumField(main, validatingFieldGroup, "Frequency",
 				ReportEmailScheduleEntity_.scheduleMode, ScheduleMode.class);
 
-		final DateField oneTime = helper.bindDateField(main, validatingFieldGroup, "Scheduled at",
+		final DateField oneTime = helper.bindDateField(main, validatingFieldGroup, "Start time",
 				ReportEmailScheduleEntity_.oneTimeRunDateTime, "yyyy/MM/dd HH:mm", Resolution.MINUTE);
 
 		final TimePicker timeOfDay = new TimePicker("Start time");
@@ -363,12 +379,14 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 				HorizontalLayout dateLayout = new HorizontalLayout();
 				dateLayout.setSizeFull();
 				dateLayout.setSpacing(true);
+				dateLayout.setHeight("40");
 
 				final ComboBox offsetType = new ComboBox(dateParam.getLabel(), offsetTypes);
 				offsetType.setImmediate(true);
 				offsetType.setNullSelectionAllowed(false);
+				offsetType.setWidth("140");
 
-				final DateField startDateField = new DateField("", dateParam.getStartDate());
+				final DateField startDateField = new DateField("From", dateParam.getStartDate());
 				startDateField.setResolution(Resolution.DAY);
 				startDateField.setDateFormat("yyyy/MM/dd");
 
@@ -378,7 +396,7 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 				startTimePicker.setValues(dateParam.getStartDate());
 				startTimePicker.setVisible(dateParam.getType() == DateParameterType.DATE_TIME);
 
-				final DateField endDateField = new DateField("", dateParam.getEndDate());
+				final DateField endDateField = new DateField("To", dateParam.getEndDate());
 				endDateField.setResolution(Resolution.DAY);
 				endDateField.setDateFormat("yyyy/MM/dd");
 
@@ -426,38 +444,39 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 		{
 			builder = null;
 			reportProperties = null;
-			ReportEmailScheduleEntity entity = item.getEntity();
-			reportProperties = entity.getJasperReportPropertiesClass().newInstance();
-			builder = reportProperties.getFilterBuilder();
-			List<ExpanderComponent> paramComponents = builder.buildLayout(true);
-			for (ExpanderComponent componet : paramComponents)
+			if (item != null)
 			{
-				paramForm.addComponent(componet.getComponent());
-				if (componet.shouldExpand())
+				ReportEmailScheduleEntity entity = item.getEntity();
+				reportProperties = entity.getJasperReportPropertiesClass().newInstance();
+				builder = reportProperties.getFilterBuilder();
+				List<ExpanderComponent> paramComponents = builder.buildLayout(true);
+				for (ExpanderComponent componet : paramComponents)
 				{
-					paramForm.setExpandRatio(componet.getComponent(), 1);
-				}
-			}
-			for (ReportParameter<?> builtParam : builder.getReportParameters())
-			{
-				for (ReportEmailParameter schedParam : entity.getReportParameters())
-				{
-					for (String parameterName : builtParam.getParameterNames())
+					paramForm.addComponent(componet.getComponent());
+					if (componet.shouldExpand())
 					{
-						if (schedParam.getName().equalsIgnoreCase(parameterName))
-						{
-							builtParam.setValueAsString(schedParam.getValue(), parameterName);
-							break;
-						}
+						paramForm.setExpandRatio(componet.getComponent(), 1);
 					}
 				}
+				for (ReportParameter<?> builtParam : builder.getReportParameters())
+				{
+					for (ReportEmailParameter schedParam : entity.getReportParameters())
+					{
+						for (String parameterName : builtParam.getParameterNames())
+						{
+							if (schedParam.getName().equalsIgnoreCase(parameterName))
+							{
+								builtParam.setValueAsString(schedParam.getValue(), parameterName);
+								break;
+							}
+						}
+					}
 
+				}
 			}
-
 		}
 		catch (Exception e)
 		{
-			// TODO Auto-generated catch block
 			logger.error(e, e);
 		}
 
@@ -502,6 +521,8 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 				if (recip.getEmail() != null && recip.getEmail().equalsIgnoreCase(email))
 				{
 					found = true;
+					recip.setVisibility((ReportEmailRecipientVisibility) line.targetTypeCombo.getValue());
+
 					break;
 				}
 			}
@@ -510,10 +531,13 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 			{
 				ReportEmailRecipient reportEmailRecipient = new ReportEmailRecipient();
 				reportEmailRecipient.setEmail(email);
+				reportEmailRecipient.setVisibility((ReportEmailRecipientVisibility) line.targetTypeCombo.getValue());
+
 				recips.add(reportEmailRecipient);
-				reportEmailRecipient.setOwner(entity);
 			}
 		}
+
+		saveChangesToReportParameters(entity);
 
 	}
 
@@ -567,6 +591,8 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 				}
 			}
 		}
+		
+		EntityManagerProvider.merge(entityItem);
 
 	}
 
@@ -593,10 +619,7 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 		}
 
 		entityItem.getRecipients().removeAll(toRemove);
-		for (ReportEmailRecipient recip : toRemove)
-		{
-			recip.setOwner(null);
-		}
+
 	}
 
 	private void saveChangesToReportParameters(ReportEmailScheduleEntity entityItem)
@@ -612,6 +635,9 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 					{
 						eParam.setValue((String) bParam.getValue(parameterName));
 						set = true;
+
+						changedReportProperties(entityItem, bParam);
+
 						break;
 					}
 				}
@@ -627,9 +653,36 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 				reportEmailParameterEntity.setName(names[0]);
 				reportEmailParameterEntity.setValue((String) bParam.getValue(names[0]));
 
+				changedReportProperties(entityItem, bParam);
+
 				EntityManagerProvider.getEntityManager().persist(reportEmailParameterEntity);
 				entityItem.addReportParameter(reportEmailParameterEntity);
 			}
+		}
+	}
+
+	private void changedReportProperties(ReportEmailScheduleEntity entityItem, ReportParameter<?> bParam)
+
+	{
+		try
+		{
+			if (bParam instanceof ReportChooser)
+			{
+				ReportChooser chooser = (ReportChooser) bParam;
+				JasperReportProperties props = entityItem.getJasperReportPropertiesClass().newInstance();
+				JasperReportProperties newProps = chooser.getReportProperties(props);
+		
+				entityItem.setReportFilename(newProps.getReportFileName());
+				entityItem.setTitle(newProps.getReportTitle());
+				reportTitle.setReadOnly(false);
+				reportTitle.setValue(newProps.getReportTitle());
+				reportTitle.setReadOnly(true);
+			}
+		}
+		catch (Exception e)
+		{
+			logger.error(e, e);
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -654,6 +707,39 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 	protected String getTitleText()
 	{
 		return "Report email schedule";
+	}
+
+	/**
+	 * Overload this method to provide cross-field (form level) validation.
+	 * 
+	 * @return
+	 */
+	protected void formValidate() throws InvalidValueException
+	{
+		if (builder != null)
+		{
+			for (ReportParameter<?> builtParam : builder.getReportParameters())
+			{
+				if (!builtParam.validate())
+
+				{
+					throw new InvalidValueException(builtParam.getLabel() + " is invalid");
+				}
+			}
+		}
+	}
+
+	@Override
+	public void enter(ViewChangeEvent event)
+	{
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public Enum<?> getHelpId()
+	{
+		return VaadinUtilsHelpEnum.VAADIN_UTILS_HELP_REPORT_SCHEDULER;
 	}
 
 }

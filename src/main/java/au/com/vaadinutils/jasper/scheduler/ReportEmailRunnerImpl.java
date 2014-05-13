@@ -12,6 +12,9 @@ import javax.mail.internet.AddressException;
 
 import org.apache.commons.mail.EmailException;
 
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Notification.Type;
+
 import au.com.vaadinutils.jasper.AttachmentType;
 import au.com.vaadinutils.jasper.JasperEmailBuilder;
 import au.com.vaadinutils.jasper.JasperEmailSettings;
@@ -22,6 +25,7 @@ import au.com.vaadinutils.jasper.filter.ReportFilterUIBuilder;
 import au.com.vaadinutils.jasper.parameter.ReportParameter;
 import au.com.vaadinutils.jasper.parameter.ReportParameterConstant;
 import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailRecipient;
+import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailRecipientVisibility;
 import au.com.vaadinutils.jasper.ui.CleanupCallback;
 import au.com.vaadinutils.jasper.ui.JasperReportProperties;
 
@@ -56,12 +60,24 @@ public class ReportEmailRunnerImpl implements ReportEmailRunner, JasperReportPro
 		{
 			builder.setFrom(schedule.getSendersEmailAddress().toString()).setSubject(schedule.subject())
 
-			.setHtmlBody("See attached")
+			.setHtmlBody(schedule.message())
 					.addAttachement(export.getBodyAsDataSource(schedule.getReportTitle(), AttachmentType.PDF));
 
 			for (ReportEmailRecipient address : schedule.getRecipients())
 			{
-				builder.addTo(address.getEmail());
+				switch (address.getVisibility())
+				{
+				case TO:
+					builder.addTo(address.getEmail());
+					break;
+				case CC:
+					builder.addCC(address.getEmail());
+					break;
+				case BCC:
+					builder.addBCC(address.getEmail());
+					break;
+				}
+				
 			}
 
 			builder.send();

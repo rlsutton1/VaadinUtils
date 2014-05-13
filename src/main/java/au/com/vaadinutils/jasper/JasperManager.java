@@ -20,6 +20,7 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 import javax.activation.DataSource;
+import javax.lang.model.SourceVersion;
 
 import net.sf.jasperreports.engine.JRAbstractExporter;
 import net.sf.jasperreports.engine.JRBand;
@@ -160,6 +161,7 @@ public class JasperManager implements Runnable
 	 */
 	public JasperManager(JasperReportProperties reportProperties)
 	{
+		
 		this.reportProperties = reportProperties;
 		try
 		{
@@ -680,6 +682,8 @@ public class JasperManager implements Runnable
 		}
 		this.params = params;
 
+		images = new ConcurrentHashMap<String, byte[]>();
+
 		if (UI.getCurrent() != null)
 		{
 			WrappedSession session = UI.getCurrent().getSession().getSession();
@@ -689,7 +693,6 @@ public class JasperManager implements Runnable
 		{
 			logger.warn("No vaadin UI present");
 		}
-		images = new ConcurrentHashMap<String, byte[]>();
 
 		stop = false;
 		writerReady = new CountDownLatch(1);

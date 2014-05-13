@@ -138,7 +138,8 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 		// empty. so reset the parent filter and refresh the container
 		createParentFilter(parentCrud.getContainer().getItem(newParentId.getId()));
 		resetFilters();
-
+		
+		//container.discard();
 		container.refresh();
 		associateChildren(newParentId);
 		dirty = false;
@@ -702,6 +703,8 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 		// that records haven't been added or removed
 		ret = super.isDirty() || dirty;
 
+		System.out.println(ret);
+		
 		return ret;
 
 	}

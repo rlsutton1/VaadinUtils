@@ -11,6 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import au.com.vaadinutils.dao.EntityManagerProvider;
+import au.com.vaadinutils.fields.SelectionListener;
 import au.com.vaadinutils.fields.TableCheckBoxSelect;
 import au.com.vaadinutils.jasper.scheduler.entities.DateParameterType;
 
@@ -28,8 +29,11 @@ import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
 import com.vaadin.server.ErrorMessage;
 import com.vaadin.ui.AbstractField;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Table.ColumnHeaderMode;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
@@ -134,13 +138,32 @@ public class ReportParameterTable<T> extends ReportParameter<String>
 			}
 		});
 
+		final Label selectionCount = new Label("0 selected");
+
 		// removed for concertina
 		// layout.addComponent(new Label(caption));
 		layout.addComponent(searchText);
 		layout.addComponent(table);
 		if (multiSelect)
 		{
-			layout.addComponent(selectAll);
+			HorizontalLayout selectionLayout = new HorizontalLayout();
+			selectionLayout.setHeight("30");
+			selectionLayout.setWidth("100%");
+			selectionLayout.addComponent(selectAll);
+			selectionLayout.addComponent(selectionCount);
+			selectionLayout.setComponentAlignment(selectAll, Alignment.MIDDLE_LEFT);
+			selectionLayout.setComponentAlignment(selectionCount, Alignment.MIDDLE_RIGHT);
+			layout.addComponent(selectionLayout);
+			table.addSelectionListener(new SelectionListener()
+			{
+
+				@Override
+				public void selectedItems(int count)
+				{
+					selectionCount.setValue("" + count + " selected");
+
+				}
+			});
 		}
 		layout.setExpandRatio(table, 1);
 		// layout.setComponentAlignment(selectAll, Alignment.BOTTOM_RIGHT);
@@ -359,12 +382,22 @@ public class ReportParameterTable<T> extends ReportParameter<String>
 	{
 		String[] values = value.split(",");
 		List<Long> idList = new LinkedList<Long>();
+
 		for (String id : values)
 		{
-			Long intId = Long.parseLong(id);
-			idList.add(intId);
+			if (id.length() > 0)
+			{
+				Long intId = Long.parseLong(id);
+				if (intId != -1)
+				{
+					idList.add(intId);
+				}
+			}
 		}
-		table.setSelectedValue(idList);
+		if (idList.size() > 0)
+		{
+			table.setSelectedValue(idList);
+		}
 
 	}
 
