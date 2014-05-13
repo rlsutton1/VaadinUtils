@@ -113,7 +113,11 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 		{
 			EntityItem<E> item = container.getItem(id);
 			EntityItemProperty reference = item.getItemProperty(childKey);
-			if (reference.getValue() == null)
+			if (reference == null)
+			{
+				logger.error("Child key "+childKey+" doesn't exist in the container "+container.getEntityClass());
+			}
+			if (reference == null || reference.getValue() == null)
 			{
 				try
 				{
@@ -132,6 +136,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 
 		}
 		// container.commit();
+		logger.warn("Committing for "+this.getClass());
 		commitContainerWithHooks();
 
 		// on a new parent, the parent id changes and the container becomes
@@ -703,8 +708,6 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 		// that records haven't been added or removed
 		ret = super.isDirty() || dirty;
 
-		System.out.println(ret);
-		
 		return ret;
 
 	}
