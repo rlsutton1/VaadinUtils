@@ -7,6 +7,10 @@ public interface ReportEmailParameter
 
 	String getValue();
 
-	void setValue(String value);
+	public void setValue(String value,String displayValue);
+
+	String getLabel();
+
+	String getDisplayValue();
 
 }

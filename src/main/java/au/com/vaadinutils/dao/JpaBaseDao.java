@@ -24,6 +24,14 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 	protected EntityManager entityManager;
 
+	
+	static public <E> JpaBaseDao<E, Long> getGenericDao(Class<E> class1)
+	{
+		return new JpaBaseDao<E, Long>(class1);
+
+	}
+
+	
 	@SuppressWarnings("unchecked")
 	public JpaBaseDao()
 	{

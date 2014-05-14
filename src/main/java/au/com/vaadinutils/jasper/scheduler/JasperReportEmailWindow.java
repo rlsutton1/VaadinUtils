@@ -202,7 +202,7 @@ public class JasperReportEmailWindow extends Window
 					// add non date fields
 					ReportEmailParameterEntity rparam = new ReportEmailParameterEntity();
 					rparam.setName(names[0]);
-					rparam.setValue(param.getValue(names[0]).toString());
+					rparam.setValue(param.getValue(names[0]).toString(),param.getDisplayValue(names[0]));
 					rparams.add(rparam);
 					entityManager.persist(rparam);
 				}

@@ -197,7 +197,7 @@ public class JasperManager implements Runnable
 				}
 				setCSVOptions(design);
 
-				jasperReportCompiler.compileReport(design, sourcePath, sourcePath, reportDesignName);
+				jasperReportCompiler.compileReport(design, sourcePath, sourcePath, suppliedFileName);
 			}
 			this.jasperReport = (JasperReport) JRLoader.loadObject(new File(reportProperties.getReportFolder(),
 					reportFileName));

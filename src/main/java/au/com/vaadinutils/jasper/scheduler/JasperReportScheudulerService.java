@@ -36,17 +36,13 @@ public enum JasperReportScheudulerService implements ReportEmailScheduleProvider
 	@Override
 	public List<ReportEmailSchedule> getSchedules()
 	{
-		JpaBaseDao<ReportEmailScheduleEntity, Long> dao = getGenericDao(ReportEmailScheduleEntity.class);
+		JpaBaseDao<ReportEmailScheduleEntity, Long> dao = JpaBaseDao.getGenericDao(ReportEmailScheduleEntity.class);
 		List<ReportEmailSchedule> schedules = new LinkedList<ReportEmailSchedule>();
 		schedules.addAll(dao.findAll());
 		return schedules;
 	}
 
-	private <E> JpaBaseDao<E, Long> getGenericDao(Class<E> class1)
-	{
-		return new JpaBaseDao<E, Long>(class1);
 
-	}
 
 //	@Override
 //	public void commitDbTransaction()

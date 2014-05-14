@@ -25,6 +25,8 @@ public class ReportEmailParameterEntity implements ReportEmailParameter
 
 	private String label;
 
+	private String displayValue;
+
 	@Override
 	public String getName()
 	{
@@ -44,9 +46,10 @@ public class ReportEmailParameterEntity implements ReportEmailParameter
 		
 	}
 
-	public void setValue(String value)
+	public void setValue(String value,String displayValue)
 	{
 		this.value = value;
+		this.displayValue = displayValue;
 		
 	}
 
@@ -57,6 +60,22 @@ public class ReportEmailParameterEntity implements ReportEmailParameter
 		
 	}
 
+
+	@Override
+	public String getLabel()
+	{
+		return label;
+	}
+
+
+	@Override
+	public String getDisplayValue()
+	{
+		return displayValue;
+	}
+
+
+	
 
 
 }

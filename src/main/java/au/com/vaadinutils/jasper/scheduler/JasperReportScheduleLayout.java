@@ -163,15 +163,11 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 
 	public JPAContainer<ReportEmailScheduleEntity> makeJPAContainer()
 	{
-		return getGenericDao(ReportEmailScheduleEntity.class).createVaadinContainer();
+		return JpaBaseDao.getGenericDao(ReportEmailScheduleEntity.class).createVaadinContainer();
 
 	}
 
-	private <E> JpaBaseDao<E, Long> getGenericDao(Class<E> class1)
-	{
-		return new JpaBaseDao<E, Long>(class1);
-
-	}
+	
 
 	private static final long serialVersionUID = 1L;
 
@@ -633,7 +629,7 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 				{
 					if (parameterName.equalsIgnoreCase(eParam.getName()))
 					{
-						eParam.setValue((String) bParam.getValue(parameterName));
+						eParam.setValue((String) bParam.getValue(parameterName),bParam.getDisplayValue(parameterName));
 						set = true;
 
 						changedReportProperties(entityItem, bParam);
@@ -651,7 +647,7 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 
 				String[] names = bParam.getParameterNames().toArray(new String[] {});
 				reportEmailParameterEntity.setName(names[0]);
-				reportEmailParameterEntity.setValue((String) bParam.getValue(names[0]));
+				reportEmailParameterEntity.setValue((String) bParam.getValue(names[0]),bParam.getDisplayValue(names[0]));
 
 				changedReportProperties(entityItem, bParam);
 

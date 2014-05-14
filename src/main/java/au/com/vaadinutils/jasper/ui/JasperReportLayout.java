@@ -1,5 +1,6 @@
 package au.com.vaadinutils.jasper.ui;
 
+import java.io.File;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
@@ -14,6 +15,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import au.com.vaadinutils.dao.JpaBaseDao;
 import au.com.vaadinutils.jasper.JasperManager;
 import au.com.vaadinutils.jasper.JasperManager.OutputFormat;
 import au.com.vaadinutils.jasper.JasperProgressListener;
@@ -26,11 +28,15 @@ import au.com.vaadinutils.jasper.parameter.ReportParameter;
 import au.com.vaadinutils.jasper.parameter.ReportParameterConstant;
 import au.com.vaadinutils.jasper.scheduler.JasperReportEmailWindow;
 import au.com.vaadinutils.jasper.scheduler.JasperReportSchedulerWindow;
+import au.com.vaadinutils.jasper.scheduler.ScheduleIconBuilder;
+import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailScheduleEntity;
+import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailScheduleEntity_;
 import au.com.vaadinutils.listener.CancelListener;
 import au.com.vaadinutils.listener.ClickEventLogged;
 import au.com.vaadinutils.ui.UIUpdater;
 import au.com.vaadinutils.ui.WorkingDialog;
 
+import com.fasterxml.jackson.databind.node.BaseJsonNode;
 import com.github.wolfie.refresher.Refresher;
 import com.github.wolfie.refresher.Refresher.RefreshListener;
 import com.google.common.base.Preconditions;
@@ -38,6 +44,7 @@ import com.vaadin.data.Item;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.StreamResource;
 import com.vaadin.server.StreamResource.StreamSource;
+import com.vaadin.server.VaadinServlet;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.AbstractComponent;
@@ -275,7 +282,7 @@ class JasperReportLayout extends VerticalLayout
 		buttonContainer.setWidth("230");
 
 		showButton = new NativeButton();
-		showButton.setIcon(new ExternalResource("images/seanau/Preview_32.png"));
+		showButton.setIcon(new ExternalResource("images/seanau/Print preview.png"));
 		showButton.setDescription("Preview");
 		showButton.setWidth("50");
 		showButton.setHeight(buttonHeight);
@@ -307,7 +314,8 @@ class JasperReportLayout extends VerticalLayout
 		if (reportProperties instanceof JasperReportPopUp)
 		{
 			// This is disabled because there are serious problems with
-			// transient (JasperReportProperties is not aware of them) parameters in drill
+			// transient (JasperReportProperties is not aware of them)
+			// parameters in drill
 			// downs, these can not currently be save or represented in the
 			// ReportEmailSchedule
 			emailButton.setEnabled(false);
@@ -355,7 +363,7 @@ class JasperReportLayout extends VerticalLayout
 	private void createEmailButton(String buttonHeight, HorizontalLayout buttonContainer)
 	{
 		emailButton = new NativeButton();
-		emailButton.setIcon(new ExternalResource("images/seanau/Email_32.png"));
+		emailButton.setIcon(new ExternalResource("images/seanau/Send Email_32.png"));
 		emailButton.setDescription("Email");
 		emailButton.setWidth("50");
 		emailButton.setHeight(buttonHeight);
@@ -376,7 +384,19 @@ class JasperReportLayout extends VerticalLayout
 	private void createScheduleButton(String buttonHeight, HorizontalLayout buttonContainer)
 	{
 		scheduleButton = new NativeButton();
-		scheduleButton.setIcon(new ExternalResource("images/seanau/Schedule_32.png"));
+
+		JpaBaseDao<ReportEmailScheduleEntity, Long> dao = JpaBaseDao.getGenericDao(ReportEmailScheduleEntity.class);
+		Long count = dao.getCount(ReportEmailScheduleEntity_.JasperReportPropertiesClassName, reportProperties.getReportClass()
+				.getCanonicalName());
+
+		ScheduleIconBuilder iconBuilder = new ScheduleIconBuilder();
+
+		String baseIconFileName = "Call Calendar_32";
+		String path = VaadinServlet.getCurrent().getServletContext().getRealPath("templates/images/seanau/");
+		String targetFileName = baseIconFileName+"-"+count+".png";
+		iconBuilder.buildLogo(count.intValue(), new File(path), baseIconFileName+".png", targetFileName);
+
+		scheduleButton.setIcon(new ExternalResource("images/seanau/"+targetFileName));
 		scheduleButton.setDescription("Schedule");
 		scheduleButton.setWidth("50");
 		scheduleButton.setHeight(buttonHeight);

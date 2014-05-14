@@ -12,9 +12,6 @@ import javax.mail.internet.AddressException;
 
 import org.apache.commons.mail.EmailException;
 
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.Notification.Type;
-
 import au.com.vaadinutils.jasper.AttachmentType;
 import au.com.vaadinutils.jasper.JasperEmailBuilder;
 import au.com.vaadinutils.jasper.JasperEmailSettings;
@@ -25,7 +22,6 @@ import au.com.vaadinutils.jasper.filter.ReportFilterUIBuilder;
 import au.com.vaadinutils.jasper.parameter.ReportParameter;
 import au.com.vaadinutils.jasper.parameter.ReportParameterConstant;
 import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailRecipient;
-import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailRecipientVisibility;
 import au.com.vaadinutils.jasper.ui.CleanupCallback;
 import au.com.vaadinutils.jasper.ui.JasperReportProperties;
 
@@ -77,7 +73,7 @@ public class ReportEmailRunnerImpl implements ReportEmailRunner, JasperReportPro
 					builder.addBCC(address.getEmail());
 					break;
 				}
-				
+
 			}
 
 			builder.send();
@@ -99,17 +95,20 @@ public class ReportEmailRunnerImpl implements ReportEmailRunner, JasperReportPro
 
 		for (ReportEmailParameter param : schedule.getReportParameters())
 		{
-			params.add(new ReportParameterConstant<String>(param.getName(), param.getValue()));
+			ReportParameterConstant<String> parameter = new ReportParameterConstant<String>(param.getName(),
+					param.getValue(), param.getLabel(), param.getDisplayValue());
+
+			params.add(parameter);
 		}
 
 		// set modified date params
 		for (ScheduledDateParameter param : schedule.getDateParameters())
 		{
-
-			params.add(new ReportParameterConstant<String>(param.getStartName(), param.getOffsetType()
-					.convertStartDate(param.getStartDate(), scheduledTime, param.getType())));
-			params.add(new ReportParameterConstant<String>(param.getEndName(), param.getOffsetType().convertEndDate(
-					param.getEndDate(), scheduledTime, param.getType())));
+			String start = param.getOffsetType().convertStartDate(param.getStartDate(), scheduledTime, param.getType());
+			params.add(new ReportParameterConstant<String>(param.getStartName(), start, param.getLabel()+" From", start));
+			
+			String end = param.getOffsetType().convertEndDate(param.getEndDate(), scheduledTime, param.getType());
+			params.add(new ReportParameterConstant<String>(param.getEndName(), end,param.getLabel()+" To",end));
 
 		}
 

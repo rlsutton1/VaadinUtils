@@ -124,4 +124,6 @@ public class ReportParameterConstant<T> extends ReportParameter<T>
 	{
 		throw new RuntimeException("Not implemented");
 	}
+
+
 }

@@ -153,7 +153,7 @@ public class EmailTargetLayout extends VerticalLayout
 	private void getValidEmailContacts(ComboBox targetAddress)
 	{
 
-		JpaBaseDao<ReportEmailRecipient, Long> reportEmailRecipient = getGenericDao(ReportEmailRecipient.class);
+		JpaBaseDao<ReportEmailRecipient, Long> reportEmailRecipient = JpaBaseDao.getGenericDao(ReportEmailRecipient.class);
 
 		targetAddress.addContainerProperty("id", String.class, null);
 		targetAddress.addContainerProperty("email", String.class, null);
@@ -216,11 +216,6 @@ public class EmailTargetLayout extends VerticalLayout
 		return item;
 	}
 
-	private <E> JpaBaseDao<E, Long> getGenericDao(Class<E> class1)
-	{
-		return new JpaBaseDao<E, Long>(class1);
-
-	}
 
 	public List<EmailTargetLine> getTargets()
 	{
