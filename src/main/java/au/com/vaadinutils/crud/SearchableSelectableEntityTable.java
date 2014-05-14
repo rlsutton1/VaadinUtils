@@ -5,6 +5,7 @@ import java.util.Collection;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import au.com.vaadinutils.fields.SelectionListener;
 import au.com.vaadinutils.listener.ClickEventLogged;
 
 import com.vaadin.data.Container;
@@ -13,6 +14,7 @@ import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
+import com.vaadin.event.ItemClickEvent.ItemClickListener;
 import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.AbstractTextField.TextChangeEventMode;
 import com.vaadin.ui.Alignment;
@@ -50,6 +52,7 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 		this.addComponent(searchBar);
 		this.addComponent(selectableTable);
 		this.setExpandRatio(selectableTable, 1);
+		triggerFilter();
 	}
 
 	public void addGeneratedColumn(Object id, ColumnGenerator generatedColumn)
@@ -220,6 +223,19 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 	public Collection<Long> getSelectedIds()
 	{
 		return selectableTable.getSelectedIds();
+	}
+
+	public void addSelectionListener(SelectionListener listener)
+	{
+		selectableTable.addSelectionListener(listener);
+		
+		
+	}
+
+	public void addItemClickListener(ItemClickListener object)
+	{
+		selectableTable.addItemClickListener( object);
+		
 	}
 
 }

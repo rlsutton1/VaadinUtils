@@ -28,6 +28,7 @@ public class TableCheckBoxSelect extends Table
 		initCheckboxMultiSelect();
 		setImmediate(true);
 		
+		
 	}
 
 	/**
