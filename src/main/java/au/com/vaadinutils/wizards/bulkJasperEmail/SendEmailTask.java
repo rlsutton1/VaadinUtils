@@ -163,7 +163,7 @@ public class SendEmailTask extends ProgressBarTask<JasperTransmission> implement
 	}
 
 	@Override
-	public List<ReportParameter<?>> prepareData(Collection<ReportParameter<?>> params, String reportFileName,
+	public List<ReportParameter<?>> prepareData(Collection<ReportParameter<?>> params,
 			CleanupCallback cleanupCallback) throws Exception
 	{
 		// TODO Auto-generated method stub
