@@ -135,4 +135,22 @@ public class ChildJasperReportProperties implements JasperReportProperties
 		return this.parentReportProperties.isDevMode();
 	}
 
+	@Override
+	public Class<? extends JasperReportProperties> getReportClass() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getUserEmailAddress() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Enum<?> getReportIdentifier() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
