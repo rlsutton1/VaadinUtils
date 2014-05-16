@@ -263,8 +263,8 @@ class JasperReportLayout extends VerticalLayout
 	{
 		VerticalLayout layout = new VerticalLayout();
 		layout.setId("OptionsPanel");
-		layout.setMargin(new MarginInfo(false, false, false, false));
-		layout.setSpacing(true);
+		//layout.setMargin(new MarginInfo(false, false, false, false));
+		//layout.setSpacing(true);
 		layout.setSizeFull();
 		// layout.setHeight("100%");
 
@@ -329,7 +329,7 @@ class JasperReportLayout extends VerticalLayout
 		if (components.size() > 0)
 		{
 			VerticalLayout filterPanel = new VerticalLayout();
-			filterPanel.setMargin(new MarginInfo(false, true, false, true));
+			filterPanel.setMargin(new MarginInfo(false, false, true, false));
 			filterPanel.setSpacing(true);
 			filterPanel.setSizeFull();
 			Label filterLabel = new Label("<b>Filters</b>");
