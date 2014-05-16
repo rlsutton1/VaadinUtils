@@ -2,6 +2,8 @@ package au.com.vaadinutils.jasper.parameter;
 
 import java.lang.reflect.ParameterizedType;
 
+import au.com.vaadinutils.jasper.scheduler.entities.DateParameterType;
+
 import com.vaadin.ui.Component;
 
 public class ReportParameterConstant<T> extends ReportParameter<T>
@@ -55,7 +57,7 @@ public class ReportParameterConstant<T> extends ReportParameter<T>
 	}
 
 	@Override
-	public T getValue()
+	public T getValue(String parameterName)
 	{
 		return value;
 	}
@@ -92,7 +94,7 @@ public class ReportParameterConstant<T> extends ReportParameter<T>
 	}
 
 	@Override
-	public String getDisplayValue()
+	public String getDisplayValue(String parameterName)
 	{
 		return displayValue;
 	}
@@ -102,4 +104,26 @@ public class ReportParameterConstant<T> extends ReportParameter<T>
 	{
 		return true;
 	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public void setValueAsString(String value, String parameterName)
+	{
+		this.value = (T) value;
+		
+	}
+	
+	@Override
+	public boolean isDateField()
+	{
+		return false;
+	}
+
+	@Override
+	public DateParameterType getDateParameterType()
+	{
+		throw new RuntimeException("Not implemented");
+	}
+
+
 }

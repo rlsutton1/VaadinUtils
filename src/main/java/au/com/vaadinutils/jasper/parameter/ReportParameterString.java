@@ -1,5 +1,7 @@
 package au.com.vaadinutils.jasper.parameter;
 
+import au.com.vaadinutils.jasper.scheduler.entities.DateParameterType;
+
 import com.vaadin.data.Validator;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.TextField;
@@ -17,7 +19,7 @@ public class ReportParameterString extends ReportParameter<String>
 	}
 
 	@Override
-	public String getValue()
+	public String getValue(String parameterName)
 	{
 		return field.getValue();
 	}
@@ -48,9 +50,9 @@ public class ReportParameterString extends ReportParameter<String>
 	}
 
 	@Override
-	public String getDisplayValue()
+	public String getDisplayValue(String parameterName)
 	{
-		return getValue();
+		return getValue(null);
 	}
 
 	@Override
@@ -76,6 +78,24 @@ public class ReportParameterString extends ReportParameter<String>
 			}};
 			field.addValidator(validator);
 		return this;
+	}
+
+	@Override
+	public void setValueAsString(String value, String parameterName)
+	{
+		field.setValue(value);
+		
+	}
+	@Override
+	public boolean isDateField()
+	{
+		return false;
+	}
+
+	@Override
+	public DateParameterType getDateParameterType()
+	{
+		throw new RuntimeException("Not implemented");
 	}
 
 

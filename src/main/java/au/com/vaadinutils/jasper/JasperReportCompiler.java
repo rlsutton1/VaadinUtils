@@ -97,7 +97,7 @@ public class JasperReportCompiler
 		File outputReport = new File(outputPath.getAbsolutePath() + "/" + reportName + ".jasper");
 		jasperReport = JasperCompileManager.compileReport(jasperDesign);
 		JRSaver.saveObject(jasperReport, outputReport);
-		logger.warn("Saving compiled report : " + outputReport.getName());
+		logger.warn("Saving compiled report : " + outputReport.getAbsolutePath());
 
 		// Compile sub reports
 		JRElementsVisitor.visitReport(jasperReport, createVisitor(sourcePath, outputPath));

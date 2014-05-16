@@ -1,10 +1,9 @@
 package au.com.vaadinutils.wizards.bulkJasperEmail;
 
-
 public class JasperTransmission
 {
 	private Recipient recipient;
-	
+
 	// If an exception is thrown during transmission it is stored here.
 	private Exception exception;
 
@@ -34,14 +33,13 @@ public class JasperTransmission
 	{
 		if (exception != null)
 			return exception.getClass().getSimpleName() + ": " + exception.getMessage();
-		else
-			return "Success";
+
+		return "Success";
 	}
 
 	public String getDescription()
 	{
 		return recipient.getDescription();
 	}
-
 
 }

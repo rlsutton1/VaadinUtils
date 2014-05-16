@@ -2,32 +2,48 @@ package au.com.vaadinutils.jasper.parameter;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.text.ParseException;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import au.com.vaadinutils.jasper.filter.ValidateListener;
+import au.com.vaadinutils.jasper.scheduler.entities.DateParameterType;
 
+import com.vaadin.data.Property.ReadOnlyException;
 import com.vaadin.data.Validator.InvalidValueException;
+import com.vaadin.data.util.converter.Converter.ConversionException;
 import com.vaadin.server.ErrorMessage;
 import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.Component;
 
 public abstract class ReportParameter<T>
 {
-	final String parameterName;
+	final Set<String> parameters = new HashSet<String>();
 	final protected String label;
 	protected ValidateListener validateListener;
 
 	public ReportParameter(String label, String parameterName)
 	{
-		this.parameterName = parameterName;
+		parameters.add(parameterName);
 		this.label = label;
 	}
 
-	public String getUrlEncodedKeyAndParameter() throws UnsupportedEncodingException
+	public ReportParameter(String label, String parameterNames[])
 	{
-		return parameterName + "=" + URLEncoder.encode(getValue().toString(), "UTF-8");
+		for (String param : parameterNames)
+		{
+			parameters.add(param);
+		}
+		this.label = label;
 	}
 
-	public abstract Object getValue();
+	public String getUrlEncodedKeyAndParameter(String parameterName) throws UnsupportedEncodingException
+	{
+		return parameterName + "=" + URLEncoder.encode(getValue(parameterName).toString(), "UTF-8");
+	}
+
+	public abstract Object getValue(String parameterName);
 
 	public abstract Component getComponent();
 
@@ -35,9 +51,9 @@ public abstract class ReportParameter<T>
 
 	public abstract void setDefaultValue(T defaultValue);
 
-	public String getParameterName()
+	public Set<String> getParameterNames()
 	{
-		return parameterName;
+		return parameters;
 	}
 
 	public abstract String getExpectedParameterClassName();
@@ -52,7 +68,7 @@ public abstract class ReportParameter<T>
 		return true;
 	}
 
-	abstract public String getDisplayValue();
+	abstract public String getDisplayValue(String parameterName);
 
 	abstract public boolean validate();
 
@@ -108,6 +124,38 @@ public abstract class ReportParameter<T>
 	public boolean displayInreport()
 	{
 		return true;
+	}
+
+	abstract public void setValueAsString(String value,String paramterName) throws ReadOnlyException, ConversionException, ParseException;
+
+	abstract public boolean isDateField();
+
+	abstract public DateParameterType getDateParameterType();
+
+	public Date getStartDate()
+	{
+		throw new RuntimeException("Date Parameters must overide and implement this method: "
+				+ this.getClass().getCanonicalName());
+	}
+
+	public Date getEndDate()
+	{
+		throw new RuntimeException("Date Parameters must overide and implement this method: "
+				+ this.getClass().getCanonicalName());
+	}
+
+	public void setStartDate(Date date)
+	{
+		throw new RuntimeException("Date Parameters must overide and implement this method: "
+				+ this.getClass().getCanonicalName());
+		
+	}
+
+	public void setEndDate(Date date)
+	{
+		throw new RuntimeException("Date Parameters must overide and implement this method: "
+				+ this.getClass().getCanonicalName());
+		
 	}
 
 }

@@ -1,5 +1,6 @@
 package au.com.vaadinutils.fields;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -16,16 +17,18 @@ public class TableCheckBoxSelect extends Table
 
 	private static final String TABLE_CHECK_BOX_SELECT = "TableCheckBoxSelect";
 	private static final long serialVersionUID = -7559267854874304189L;
-	Set<Object> markedIds = new TreeSet<Object>();
-	boolean trackingSelected = true;
+	MarkedIds markedIds = new MarkedIds();
 	private boolean multiselect;
 	private boolean selectable = true;
 	private Set<ValueChangeListener> valueChangeListeners = new HashSet<ValueChangeListener>();
+	private int containerSize=0;
 
 	public TableCheckBoxSelect()
 	{
 		initCheckboxMultiSelect();
 		setImmediate(true);
+		
+		
 	}
 
 	/**
@@ -47,8 +50,9 @@ public class TableCheckBoxSelect extends Table
 
 	public void selectAll()
 	{
-		markedIds.clear();
-		trackingSelected = false;
+		containerSize = getItemIds().size();
+		markedIds.clear(false, containerSize);
+
 		refreshRenderedCells();
 		refreshRowCache();
 		notifyValueChange();
@@ -57,8 +61,8 @@ public class TableCheckBoxSelect extends Table
 
 	public void deselectAll()
 	{
-		markedIds.clear();
-		trackingSelected = true;
+		markedIds.clear(true, containerSize);
+
 		refreshRenderedCells();
 		refreshRowCache();
 		notifyValueChange();
@@ -82,7 +86,6 @@ public class TableCheckBoxSelect extends Table
 				return new Property()
 				{
 
-					
 					private static final long serialVersionUID = 8430716281101427107L;
 
 					@Override
@@ -160,6 +163,27 @@ public class TableCheckBoxSelect extends Table
 
 	}
 
+	/**
+	 * use setSelectedValue instead, this method gets called before
+	 * initialization
+	 */
+	@Deprecated
+	public void setValue(Object value)
+	{
+		super.setValue(value);
+	}
+
+	@SuppressWarnings("unchecked")
+	public void setSelectedValue(Object value)
+	{
+		// super.setValue(newValue);
+		markedIds.clear(true, containerSize);
+		markedIds.addAll((Collection<Long>) value);
+
+		this.refreshRowCache();
+
+	}
+
 	@Override
 	public boolean isMultiSelect()
 	{
@@ -190,13 +214,14 @@ public class TableCheckBoxSelect extends Table
 
 	public Object getSelectedItems()
 	{
-		if (trackingSelected)
+		if (markedIds.trackingSelected)
 		{
-			return markedIds;
+			return markedIds.getIds();
 		}
+		
 		TreeSet<Object> result = new TreeSet<Object>();
 		result.addAll(getContainerDataSource().getItemIds());
-		result.removeAll(markedIds);
+		result.removeAll(markedIds.getIds());
 		return result;
 	}
 
@@ -248,8 +273,8 @@ public class TableCheckBoxSelect extends Table
 					{
 						if (!multiselect)
 						{
-							markedIds.clear();
-							if ((Boolean) event.getProperty().getValue() == trackingSelected)
+							markedIds.clear(markedIds.trackingSelected, containerSize);
+							if ((Boolean) event.getProperty().getValue() == markedIds.trackingSelected)
 							{
 								markedIds.add(itemId);
 								if (lastChecked != null)
@@ -267,7 +292,7 @@ public class TableCheckBoxSelect extends Table
 						}
 						else
 						{
-							if ((Boolean) event.getProperty().getValue() == trackingSelected)
+							if ((Boolean) event.getProperty().getValue() == markedIds.trackingSelected)
 							{
 								markedIds.add(itemId);
 							}
@@ -283,7 +308,7 @@ public class TableCheckBoxSelect extends Table
 				});
 				boolean inList = markedIds.contains(itemId);
 				checkbox.setValue(inList);
-				if (!trackingSelected)
+				if (!markedIds.trackingSelected)
 				{
 					checkbox.setValue(!inList);
 				}
@@ -297,14 +322,14 @@ public class TableCheckBoxSelect extends Table
 
 	private void notifyValueChange()
 	{
-		for (ValueChangeListener listener:valueChangeListeners)
+		for (ValueChangeListener listener : valueChangeListeners)
 		{
 			listener.valueChange(getValueChangeEvent());
 		}
 		this.validateField();
-		
+
 	}
-	
+
 	private boolean validateField()
 	{
 		boolean valid = false;
@@ -338,5 +363,9 @@ public class TableCheckBoxSelect extends Table
 
 	}
 
-
+	public void addSelectionListener(SelectionListener listener)
+	{
+		markedIds .addSelectionListener(listener);
+		
+	}
 }

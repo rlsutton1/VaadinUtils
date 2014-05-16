@@ -12,6 +12,7 @@ import org.apache.logging.log4j.Logger;
 
 import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.dao.Transaction;
+import au.com.vaadinutils.jasper.AttachmentType;
 import au.com.vaadinutils.jasper.JasperEmailBuilder;
 import au.com.vaadinutils.jasper.JasperManager;
 import au.com.vaadinutils.jasper.JasperManager.OutputFormat;
@@ -81,7 +82,7 @@ public class SendEmailTask extends ProgressBarTask<JasperTransmission> implement
 					builder.setFrom(proxy.getSenderEmailAddress()).setSubject(proxy.getSubject())
 							// .setHtmlBody("<html><body></body></html>")
 							.setHtmlBody(renderedHtml).addTo(transmission.getRecipientEmailAddress())
-							.addAttachement(renderedPDF.getBodyAsDataSource());
+							.addAttachement(renderedPDF.getBodyAsDataSource("report.pdf", AttachmentType.PDF));
 
 					builder.send();
 				}
@@ -256,6 +257,27 @@ public class SendEmailTask extends ProgressBarTask<JasperTransmission> implement
 
 	@Override
 	public File getReportFolder()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Class<? extends JasperReportProperties> getReportClass()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getUserEmailAddress()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Enum<?> getReportIdentifier()
 	{
 		// TODO Auto-generated method stub
 		return null;

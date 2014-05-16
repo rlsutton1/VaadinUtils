@@ -113,7 +113,11 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 		{
 			EntityItem<E> item = container.getItem(id);
 			EntityItemProperty reference = item.getItemProperty(childKey);
-			if (reference.getValue() == null)
+			if (reference == null)
+			{
+				logger.error("Child key "+childKey+" doesn't exist in the container "+container.getEntityClass());
+			}
+			if (reference == null || reference.getValue() == null)
 			{
 				try
 				{
@@ -132,13 +136,15 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 
 		}
 		// container.commit();
+		logger.warn("Committing for "+this.getClass());
 		commitContainerWithHooks();
 
 		// on a new parent, the parent id changes and the container becomes
 		// empty. so reset the parent filter and refresh the container
 		createParentFilter(parentCrud.getContainer().getItem(newParentId.getId()));
 		resetFilters();
-
+		
+		//container.discard();
 		container.refresh();
 		associateChildren(newParentId);
 		dirty = false;

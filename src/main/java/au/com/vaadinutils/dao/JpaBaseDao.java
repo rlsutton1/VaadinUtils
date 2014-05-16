@@ -24,6 +24,14 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 	protected EntityManager entityManager;
 
+	
+	static public <E> JpaBaseDao<E, Long> getGenericDao(Class<E> class1)
+	{
+		return new JpaBaseDao<E, Long>(class1);
+
+	}
+
+	
 	@SuppressWarnings("unchecked")
 	public JpaBaseDao()
 	{
@@ -236,6 +244,23 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 		return results;
 
+	}
+	
+	/**
+	 * get count of entity with a simple criteria
+	 * @param vKey
+	 * @param value
+	 * @return
+	 */
+	public <V> Long getCount(SingularAttribute<E, V> vKey, V value)
+	{
+		CriteriaBuilder qb = entityManager.getCriteriaBuilder();
+		CriteriaQuery<Long> cq = qb.createQuery(Long.class);
+		Root<E> root = cq.from(entityClass);
+		cq.select(qb.count(root));
+		cq.where(qb.equal(root.get(vKey), value));
+
+		return entityManager.createQuery(cq).getSingleResult();
 	}
 
 	public JPAContainer<E> createVaadinContainer()
