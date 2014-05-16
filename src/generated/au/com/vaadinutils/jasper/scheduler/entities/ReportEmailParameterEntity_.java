@@ -11,7 +11,7 @@ import javax.persistence.metamodel.SingularAttribute;
 @javax.persistence.metamodel.StaticMetamodel
 (value=au.com.vaadinutils.jasper.scheduler.entities.ReportEmailParameterEntity.class)
 @javax.annotation.Generated
-(value="org.apache.openjpa.persistence.meta.AnnotationProcessor6",date="Wed May 14 14:35:02 EST 2014")
+(value="org.apache.openjpa.persistence.meta.AnnotationProcessor6",date="Fri May 16 12:25:36 EST 2014")
 public class ReportEmailParameterEntity_ {
     public static volatile SingularAttribute<ReportEmailParameterEntity,String> displayValue;
     public static volatile SingularAttribute<ReportEmailParameterEntity,Long> iID;

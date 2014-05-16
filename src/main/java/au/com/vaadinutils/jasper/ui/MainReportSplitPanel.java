@@ -4,6 +4,7 @@ import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.HorizontalSplitPanel;
+import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Reindeer;
 
@@ -16,19 +17,29 @@ public class MainReportSplitPanel extends HorizontalLayout implements SplitPanel
 	private static final long serialVersionUID = -470983852015042137L;
 	private VerticalLayout panela;
 	private VerticalLayout panelb;
+	private Panel wrapper;
 
 	MainReportSplitPanel(int width)
 	{
 		this.setSizeFull();
+		
+		 wrapper = new Panel();
+		 wrapper.setHeight("100%");
+		 
+		
 		panela =  new VerticalLayout();
 		panela.setSizeFull();
+		wrapper.setContent(panela);
+		wrapper.setId("Wrapper panel");
+		panela.setId("PanelA");
 		
 		setSplitPosition(width);
 		panelb =  new VerticalLayout();
 		panelb.setSizeFull();
-		this.addComponent(panela);
+		this.addComponent(wrapper);
 		this.addComponent(panelb);
 		this.setExpandRatio(panelb, 1);
+		this.setSizeFull();
 		
 	}
 	
@@ -41,7 +52,7 @@ public class MainReportSplitPanel extends HorizontalLayout implements SplitPanel
 	@Override
 	public void setSplitPosition(int i)
 	{
-		panela.setWidth(""+i);
+		wrapper.setWidth(""+(i+5));
 		
 	}
 

@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>au.com.vaadinutils</groupId>
 	<artifactId>VaadinUtils</artifactId>
-	<version>0.1.1</version>
+	<version>3.3.x.x</version>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
