@@ -36,7 +36,6 @@ import au.com.vaadinutils.listener.ClickEventLogged;
 import au.com.vaadinutils.ui.UIUpdater;
 import au.com.vaadinutils.ui.WorkingDialog;
 
-import com.fasterxml.jackson.databind.node.BaseJsonNode;
 import com.github.wolfie.refresher.Refresher;
 import com.github.wolfie.refresher.Refresher.RefreshListener;
 import com.google.common.base.Preconditions;
@@ -242,7 +241,7 @@ class JasperReportLayout extends VerticalLayout
 
 					if (!insitue)
 					{
-						new JasperReportPopUp(new ChildJasperReportProperties(reportProperties,	subTitle, subReportFileName, subFilters), subFilters);
+						new JasperReportPopUp(new ChildJasperReportProperties(reportProperties,	subTitle, subReportFileName, subFilters));
 					}
 					else
 					{

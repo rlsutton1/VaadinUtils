@@ -5,9 +5,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import au.com.vaadinutils.help.HelpProvider;
 import au.com.vaadinutils.help.HelpSplitPanel;
-import au.com.vaadinutils.help.VaadinUtilsHelpEnum;
 import au.com.vaadinutils.jasper.parameter.ReportParameter;
 import au.com.vaadinutils.jasper.scheduler.entities.DateParameterOffsetType;
 import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailParameterEntity;

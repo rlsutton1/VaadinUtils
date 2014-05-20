@@ -1,9 +1,8 @@
 package au.com.vaadinutils.crud;
 
 
-import com.vaadin.event.dd.DropHandler;
-
 import com.vaadin.addon.jpacontainer.EntityItem;
+import com.vaadin.event.dd.DropHandler;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Table.ColumnGenerator;
 import com.vaadin.ui.Table.TableDragMode;

@@ -33,9 +33,9 @@ import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.domain.iColor;
 import au.com.vaadinutils.domain.iColorFactory;
 import au.com.vaadinutils.fields.CKEditorEmailField;
+import au.com.vaadinutils.fields.CKEditorEmailField.ConfigModifier;
 import au.com.vaadinutils.fields.ColorPickerField;
 import au.com.vaadinutils.fields.DataBoundButton;
-import au.com.vaadinutils.fields.CKEditorEmailField.ConfigModifier;
 import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailScheduleEntity;
 
 import com.google.common.base.Preconditions;

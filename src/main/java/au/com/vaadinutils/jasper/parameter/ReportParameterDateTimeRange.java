@@ -9,14 +9,13 @@ import org.joda.time.DateTime;
 import au.com.vaadinutils.jasper.scheduler.entities.DateParameterType;
 
 import com.google.common.base.Preconditions;
-import com.vaadin.data.Validator;
 import com.vaadin.data.Property.ReadOnlyException;
 import com.vaadin.data.Property.ValueChangeListener;
+import com.vaadin.data.Validator;
 import com.vaadin.data.util.converter.Converter.ConversionException;
 import com.vaadin.shared.ui.datefield.Resolution;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.DateField;
-import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.VerticalLayout;
 
 public class ReportParameterDateTimeRange extends ReportParameter<String>

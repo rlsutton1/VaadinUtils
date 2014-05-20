@@ -3,10 +3,8 @@ package au.com.vaadinutils.jasper.ui;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.HorizontalSplitPanel;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.Reindeer;
 
 public class MainReportSplitPanel extends HorizontalLayout implements SplitPanel
 {

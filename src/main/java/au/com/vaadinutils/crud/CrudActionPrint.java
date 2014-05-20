@@ -23,7 +23,7 @@ public abstract class CrudActionPrint<E extends CrudEntity> implements CrudActio
 		try
 		{
 			List<ReportParameter<?>> filters = new LinkedList<ReportParameter<?>>();
-			new JasperReportPopUp(prepareReport(entity), filters);
+			new JasperReportPopUp(prepareReport(entity));
 		}
 		catch (JRException e)
 		{
