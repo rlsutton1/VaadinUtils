@@ -26,7 +26,11 @@ public abstract class JasperReportView extends HorizontalLayout implements View
 	protected JasperReportView()
 	{
 	}
+<<<<<<< HEAD
 
+=======
+	
+>>>>>>> branch 'master' of ssh://git@github.com/rlsutton1/VaadinUtils.git
 	protected void setReport(JasperReportProperties reportProperties)
 	{
 		report = new JasperReportLayout(reportProperties);
