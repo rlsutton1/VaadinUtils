@@ -38,10 +38,10 @@ public class JasperReportPropertiesAlternateFile implements JasperReportProperti
 	}
 
 	@Override
-	public List<ReportParameter<?>> prepareData(Collection<ReportParameter<?>> params, CleanupCallback cleanupCallback)
+	public List<ReportParameter<?>> prepareData(Collection<ReportParameter<?>> params, String reportFilename, CleanupCallback cleanupCallback)
 			throws Exception
 	{
-		return reportPropertiesTemplate.prepareData(params, cleanupCallback);
+		return reportPropertiesTemplate.prepareData(params,  reportFilename, cleanupCallback);
 	}
 
 	@Override

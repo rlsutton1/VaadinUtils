@@ -13,7 +13,7 @@ import au.com.vaadinutils.jasper.parameter.ReportParameter;
  * This class is used to allow a 'Popup' drill down report to inherit its
  * parents report properties with the ability to over-ride the :
  * 
- * ReportTitle, ReportFileName and  ReportParams.
+ * ReportTitle, ReportFileName and ReportParams.
  * 
  * @author bsutton
  *
@@ -26,8 +26,8 @@ public class ChildJasperReportProperties implements JasperReportProperties
 	private String reportFilename;
 	private List<ReportParameter<?>> childParams;
 
-	public ChildJasperReportProperties(JasperReportProperties parentReportProperties, String childTitle, String childReportFileName
-			, List<ReportParameter<?>> childParams)
+	public ChildJasperReportProperties(JasperReportProperties parentReportProperties, String childTitle,
+			String childReportFileName, List<ReportParameter<?>> childParams)
 	{
 		this.parentReportProperties = parentReportProperties;
 		this.reportTitle = childTitle;
@@ -79,10 +79,10 @@ public class ChildJasperReportProperties implements JasperReportProperties
 	}
 
 	@Override
-	public List<ReportParameter<?>> prepareData(Collection<ReportParameter<?>> params, CleanupCallback cleanupCallback)
+	public List<ReportParameter<?>> prepareData(Collection<ReportParameter<?>> params,String reportFilename, CleanupCallback cleanupCallback)
 			throws Exception
 	{
-		return parentReportProperties.prepareData(params, cleanupCallback);
+		return parentReportProperties.prepareData(params,reportFilename, cleanupCallback);
 	}
 
 	@Override
@@ -136,21 +136,22 @@ public class ChildJasperReportProperties implements JasperReportProperties
 	}
 
 	@Override
-	public Class<? extends JasperReportProperties> getReportClass() {
-		// TODO Auto-generated method stub
-		return null;
+	public Class<? extends JasperReportProperties> getReportClass()
+	{
+		return this.parentReportProperties.getReportClass();
 	}
 
 	@Override
-	public String getUserEmailAddress() {
-		// TODO Auto-generated method stub
-		return null;
+	public String getUserEmailAddress()
+	{
+
+		return this.parentReportProperties.getUserEmailAddress();
 	}
 
 	@Override
-	public Enum<?> getReportIdentifier() {
-		// TODO Auto-generated method stub
-		return null;
+	public Enum<?> getReportIdentifier()
+	{
+		return this.parentReportProperties.getReportIdentifier();
 	}
 
 }

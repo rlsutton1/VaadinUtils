@@ -106,7 +106,7 @@ public interface JasperReportProperties
 	 * additional parameters added to the collection.
 	 * @throws Exception
 	 */
-	public abstract List<ReportParameter<?>> prepareData(Collection<ReportParameter<?>> params,
+	public abstract List<ReportParameter<?>> prepareData(Collection<ReportParameter<?>> params, String reportFileName,
 			CleanupCallback cleanupCallback) throws Exception;
 
 	/**

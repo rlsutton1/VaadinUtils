@@ -242,7 +242,7 @@ class JasperReportLayout extends VerticalLayout
 
 					if (!insitue)
 					{
-						new JasperReportPopUp(new ChildJasperReportProperties(reportProperties,	subTitle, subReportFileName, subFilters));
+						new JasperReportPopUp(new ChildJasperReportProperties(reportProperties,	subTitle, subReportFileName, subFilters), subFilters);
 					}
 					else
 					{
