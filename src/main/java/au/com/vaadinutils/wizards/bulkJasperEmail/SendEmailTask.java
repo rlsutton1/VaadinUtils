@@ -142,8 +142,8 @@ public class SendEmailTask extends ProgressBarTask<JasperTransmission> implement
 		}
 		finally
 		{
-			if (t != null)
-				t.close();
+
+			t.close();
 			super.taskComplete(sent);
 		}
 	}
@@ -231,8 +231,6 @@ public class SendEmailTask extends ProgressBarTask<JasperTransmission> implement
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-	
 
 	@Override
 	public String getHeaderFooterTemplateName()

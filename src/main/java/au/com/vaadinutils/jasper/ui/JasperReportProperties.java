@@ -44,8 +44,14 @@ public interface JasperReportProperties
 	public abstract String getReportFileName();
 
 	/**
+<<<<<<< HEAD
 	 * the folder where the jasper report (.jrxml) can be found and the .jasper 
 	 * file will be written (if the jrxml needs to be compiled).
+=======
+	 * the folder where the jasper report (.jrxml) can be found and the .jasper
+	 * file will be written.
+	 * 
+>>>>>>> branch 'master' of https://github.com/rlsutton1/VaadinUtils.git
 	 * @return
 	 */
 	public abstract File getReportFolder();

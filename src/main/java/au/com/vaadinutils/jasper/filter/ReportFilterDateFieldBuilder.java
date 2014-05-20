@@ -7,8 +7,6 @@ import org.joda.time.DateTime;
 public interface ReportFilterDateFieldBuilder extends ReportFilterFieldBuilder
 {
 
-	ReportFilterDateFieldBuilder setDate(DateTime date);
-
 	ReportFilterDateFieldBuilder setDateRange(DateTime startDate, DateTime endDate);
 
 	List<ExpanderComponent> buildLayout(Boolean hideDateFields);

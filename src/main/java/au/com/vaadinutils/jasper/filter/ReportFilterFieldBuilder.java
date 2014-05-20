@@ -19,9 +19,9 @@ public interface ReportFilterFieldBuilder
 	 */
 	ReportFilterFieldBuilder addField(ReportParameter<?> param);
 	ReportFilterFieldBuilder addTextField(String label, String paramName);
-	ReportFilterDateFieldBuilder addDateField(String label, String startParamName, String endParamName) ;
-	<T extends Enum<?>> ReportFilterFieldBuilder addEnumField(String label, String paramName, Class<T> class1, T day);
+	public ReportFilterDateFieldBuilder addDateField(String label, String startParameterName,String endParameterName);
+		<T extends Enum<?>> ReportFilterFieldBuilder addEnumField(String label, String paramName, Class<T> class1, T day);
 	
-	List<ExpanderComponent> buildLayout();
+	List<ExpanderComponent> buildLayout(Boolean hideDateFields);
 
 }

@@ -158,19 +158,5 @@ public class ReportFilterUIBuilder implements ReportFilterFieldBuilder, ReportFi
 		return ret;
 	}
 
-	@Override
-	public ReportFilterDateFieldBuilder setDate(DateTime date)
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<ExpanderComponent> buildLayout()
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
+	
 }
