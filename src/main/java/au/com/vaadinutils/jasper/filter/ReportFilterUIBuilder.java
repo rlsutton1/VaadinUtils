@@ -158,5 +158,5 @@ public class ReportFilterUIBuilder implements ReportFilterFieldBuilder, ReportFi
 		return ret;
 	}
 
-
+	
 }
