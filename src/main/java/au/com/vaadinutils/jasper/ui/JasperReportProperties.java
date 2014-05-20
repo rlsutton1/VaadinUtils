@@ -9,6 +9,24 @@ import au.com.vaadinutils.jasper.JasperManager.OutputFormat;
 import au.com.vaadinutils.jasper.filter.ReportFilterUIBuilder;
 import au.com.vaadinutils.jasper.parameter.ReportParameter;
 
+/**
+ * Provides an interface between Jasper Reports and you application specific settings
+ * and the settings of a particular report.
+ * 
+ * Normally you would implement a base abstract class that implemented each of the method with the 
+ * exception of:
+ * 
+ * public abstract String getReportTitle();
+ * 
+ * public abstract String getReportFileName();
+ * 
+ * public abstract ReportFilterUIBuilder getFilterBuilder();
+ * 
+ * Each of the above methods are then implemented in a concrete class for each report.
+ * 
+ * @author bsutton
+ *
+ */
 public interface JasperReportProperties
 {
 
@@ -26,14 +44,26 @@ public interface JasperReportProperties
 	public abstract String getReportFileName();
 
 	/**
-	 * the folder where the jasper report (.jrxml) can be found and the .jasper
-	 * file will be written.
+	 * the folder where the jasper report (.jrxml) can be found and the .jasper 
+	 * file will be written (if the jrxml needs to be compiled).
 	 * 
 	 * @return
 	 */
 	public abstract File getReportFolder();
 
 	/**
+	 * The library supports the concept of a standardized header and footer which is dynamically 
+	 * added to each report. This provides a nice means of ensuring that every report has a consistent
+	 * header and footer.
+	 * The template is just a standard jasper report which contains just three bands:
+	 * Page Header
+	 * Page Footer
+	 * No Details section.
+	 * 
+	 * When creating a report you should leave each of the above bands empty so they can be dynamically
+	 * rendered.
+	 * 
+	 * The band may contain parameters such as the report name.
 	 * 
 	 * @return the name of the template jasper file (something like
 	 *         "HeaderFooter") or null if your not using a template
@@ -41,7 +71,9 @@ public interface JasperReportProperties
 	public abstract String getHeaderFooterTemplateName();
 
 	/**
-	 * displayed in the list of queued reports
+	 * This should return the current logged in users name.
+	 * It is displayed in the list of queued reports so that other users can know who is
+	 * holding the queue up.
 	 * 
 	 * @return
 	 */
@@ -52,22 +84,27 @@ public interface JasperReportProperties
 	/**
 	 * ***MUST BE THREAD SAFE***
 	 * <p>
+	 * Some more complex reports may need some preprocessing of data before the 
+	 * report is run. A classic example is using java code to create a temporary table
+	 * which is then passed to the report as its primary data source (via a parameter).
+	 * The prepareData method is called before the jasper report is rendered.
 	 * 
-	 * because report parameters live through multiple runs of a report and the
-	 * agent may cancel a report, which leaves the report still running.
-	 * prepareData must be thread safe.
-	 * <p>
-	 * create any temporary data that may be needed for the jasper report and
+	 * Create any temporary data that may be needed for the jasper report and
 	 * return any extra params, typically the temporary table
 	 * <p>
-	 * if cleanup is required it should be associated with the CleanupCallback
+	 * Because report parameters live through multiple runs of a report and the
+	 * agent may cancel a report, which leaves the report still running in a background thread.
+	 * 
+	 * prepareData must be thread safe.
+	 * <p>
+	 * if cleanup is required it should be done via the CleanupCallback
 	 * Object which will be invoked after the report is finished rendering.
 	 * 
-	 * @param params
-	 * @param reportFileName
-	 * @param cleanupCallback
-	 *            TODO
-	 * @return
+	 * @param params the collection of parameters that will be sent to the report.
+	 * @param cleanupCallback - a interface to an object that will be called once the report has completed.
+	 * 
+	 * @return The list or parameters that are to be passed to the report. This is normally 'params' with any 
+	 * additional parameters added to the collection.
 	 * @throws Exception
 	 */
 	public abstract List<ReportParameter<?>> prepareData(Collection<ReportParameter<?>> params, String reportFileName,
