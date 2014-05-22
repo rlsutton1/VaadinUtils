@@ -41,7 +41,7 @@ public class UniqueFieldValidator<E extends CrudEntity, F> implements Validator
 		List<E> matches = dao.findAllByAttribute(matchField, (F) value, null);
 		for (E message : matches)
 		{
-			if (message.getId().equals(crud.getCurrent().getId()))
+			if (!message.getId().equals(crud.getCurrent().getId()))
 			{
 
 				String message2 = "'" + matchField.getName() + "' must be unique";
