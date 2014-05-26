@@ -44,6 +44,7 @@ public enum EntityManagerProvider
 
 	/**
 	 * Get the entity manager attached to this thread.
+	 * 
 	 * @return
 	 */
 	public static EntityManager getEntityManager()
@@ -53,6 +54,7 @@ public enum EntityManagerProvider
 
 	/**
 	 * Set an entity manager for this thread.
+	 * 
 	 * @param em
 	 */
 	public static void setCurrentEntityManager(EntityManager em)
@@ -110,10 +112,17 @@ public enum EntityManagerProvider
 	}
 
 	/**
+	 * 
+	 * 
 	 * If you have a worker thread then it won't have access to a thread local
 	 * entity manager (as they are injected by the servlet request filters
-	 * mentioned above. For worker threads you need to call this method to get
-	 * an entity manager. You will also need to call close when done
+	 * mentioned above. <br>
+	 * <br>
+	 * <b>For worker threads preferably use setThreadLocalEntityManager</b> <br>
+	 * <br>
+	 * Otherwise you need to call this method to get an entity manager. You will
+	 * also need to call close when done
+	 * 
 	 * 
 	 * @return
 	 */
