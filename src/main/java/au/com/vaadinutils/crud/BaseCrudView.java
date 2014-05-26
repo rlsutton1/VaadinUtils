@@ -834,12 +834,17 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			EntityManagerProvider.getEntityManager().flush();
 			postSaveAction(newEntity);
 
+			// children may have been added to the parent, evict the parent from
+			// the JPA cache so it will get updated
+			EntityManagerProvider.getEntityManager().getEntityManagerFactory().getCache()
+					.evict(entityClass, newEntity.getId());
+
 			// select has been moved to here because when it happens earlier,
 			// child cruds are caused to discard their data before saving it for
 			// a new record
 
-			entityTable.select(newEntity.getId());
 			container.refreshItem(newEntity.getId());
+			entityTable.select(newEntity.getId());
 
 			splitPanel.showFirstComponet();
 			Notification.show("Changes Saved", "Any changes you have made have been saved.", Type.TRAY_NOTIFICATION);
@@ -1274,7 +1279,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	public void addChildCrudListener(ChildCrudListener<E> listener)
 	{
 		childCrudListeners.add(listener);
-		logger.info(getClass() + " " + childCrudListeners);
 	}
 
 	protected void newClicked()
