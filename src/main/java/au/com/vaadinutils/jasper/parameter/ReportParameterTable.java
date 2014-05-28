@@ -278,7 +278,8 @@ public class ReportParameterTable<T> extends ReportParameter<String>
 			{
 				validateListener.setComponentError(null);
 				table.setComponentError(null);
-
+				validateListener.setComponentError(null);
+				table.setComponentError(null);
 				Collection<Long> ids = (Collection<Long>) table.getSelectedItems();
 				if (ids.size() == 0)
 				{
@@ -302,6 +303,8 @@ public class ReportParameterTable<T> extends ReportParameter<String>
 					validateListener.setComponentError(error);
 					throw new Validator.EmptyValueException("You must select at least one " + caption);
 				}
+					
+				
 
 			}
 		};

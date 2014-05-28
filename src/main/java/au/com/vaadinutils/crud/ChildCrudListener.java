@@ -19,7 +19,7 @@ public interface ChildCrudListener<E>
 	 * 
 	 * @param item
 	 */
-	public void selectedRowChanged(EntityItem<E> parent);
+	public void selectedParentRowChanged(EntityItem<E> parent);
 
 	/**
 	 * the parent crud calls this method to check if the child has changes

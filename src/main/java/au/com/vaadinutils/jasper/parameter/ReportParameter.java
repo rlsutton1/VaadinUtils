@@ -77,6 +77,7 @@ public abstract class ReportParameter<T>
 		boolean valid = false;
 		try
 		{
+			
 			field.setComponentError(null);
 			if (validateListener != null)
 			{

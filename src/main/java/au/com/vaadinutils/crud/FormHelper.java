@@ -63,6 +63,7 @@ import com.vaadin.ui.TextField;
 public class FormHelper<E> implements Serializable
 {
 	private static final long serialVersionUID = 1L;
+	private static final String STANDARD_COMBO_WIDTH = "200";
 
 	ArrayList<AbstractComponent> fieldList = new ArrayList<AbstractComponent>();
 	private AbstractLayout form;
@@ -272,7 +273,7 @@ public class FormHelper<E> implements Serializable
 		field.setNewItemsAllowed(false);
 		field.setNullSelectionAllowed(false);
 		field.setTextInputAllowed(false);
-		field.setWidth("100%");
+		field.setWidth(STANDARD_COMBO_WIDTH);
 		field.setImmediate(true);
 		doBinding(group, fieldName, field);
 
@@ -345,7 +346,7 @@ public class FormHelper<E> implements Serializable
 		field.setNewItemsAllowed(false);
 		field.setNullSelectionAllowed(false);
 		field.setTextInputAllowed(false);
-		field.setWidth("100%");
+		field.setWidth(STANDARD_COMBO_WIDTH);
 		field.setImmediate(true);
 		form.addComponent(field);
 		doBinding(group,fieldName,field);
@@ -525,7 +526,7 @@ public class FormHelper<E> implements Serializable
 			component.setNewItemsAllowed(false);
 			component.setNullSelectionAllowed(false);
 			component.setTextInputAllowed(false);
-			component.setWidth("100%");
+			component.setWidth(STANDARD_COMBO_WIDTH);
 			component.setImmediate(true);
 			if (group != null)
 			{
