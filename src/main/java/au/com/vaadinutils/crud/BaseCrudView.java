@@ -310,10 +310,16 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		actionLayout.setComponentAlignment(actionArea, Alignment.MIDDLE_LEFT);
 		actionLayout.setExpandRatio(actionArea, 1.0f);
 
+		newButton.setCaption(getNewButtonLabel());
 		actionLayout.addComponent(newButton);
 		actionLayout.setComponentAlignment(newButton, Alignment.MIDDLE_RIGHT);
 
 		actionLayout.setHeight("35");
+	}
+
+	protected String getNewButtonLabel()
+	{
+		return "New";
 	}
 
 	@SuppressWarnings("null")
@@ -829,7 +835,12 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 			for (ChildCrudListener<E> commitListener : childCrudListeners)
 			{
-				commitListener.committed(newEntity);
+				// only commit dirty children, saves time for a crud with lots
+				// of children
+				if (commitListener.isDirty())
+				{
+					commitListener.committed(newEntity);
+				}
 			}
 			EntityManagerProvider.getEntityManager().flush();
 			postSaveAction(newEntity);
@@ -1145,7 +1156,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		// notifiy ChildCrudView's taht we've changed row.
 		for (ChildCrudListener<E> commitListener : childCrudListeners)
 		{
-			commitListener.selectedRowChanged(item);
+			commitListener.selectedParentRowChanged(item);
 		}
 
 		if (item != null || newEntity != null)
@@ -1299,7 +1310,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 					resetFilters();
 
-					newEntity = container.createEntityItem(preNew());
+					createNewEntity();
 
 					rowChanged(newEntity);
 					// Can't delete when you are adding a new record.
@@ -1326,6 +1337,18 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			}
 
 		});
+	}
+
+	/**
+	 * you might want to implement this method in a child crud that needs to
+	 * load some sort of list when a new entity is created based on the parent
+	 * 
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 */
+	protected void createNewEntity() throws InstantiationException, IllegalAccessException
+	{
+		newEntity = container.createEntityItem(preNew());
 	}
 
 	/**

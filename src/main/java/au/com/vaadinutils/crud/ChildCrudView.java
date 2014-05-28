@@ -115,7 +115,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 			EntityItemProperty reference = item.getItemProperty(childKey);
 			if (reference == null)
 			{
-				logger.error("Child key "+childKey+" doesn't exist in the container "+container.getEntityClass());
+				logger.error("Child key " + childKey + " doesn't exist in the container " + container.getEntityClass());
 			}
 			if (reference == null || reference.getValue() == null)
 			{
@@ -136,15 +136,15 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 
 		}
 		// container.commit();
-		logger.warn("Committing for "+this.getClass());
+		logger.warn("Committing for " + this.getClass());
 		commitContainerWithHooks();
 
 		// on a new parent, the parent id changes and the container becomes
 		// empty. so reset the parent filter and refresh the container
 		createParentFilter(parentCrud.getContainer().getItem(newParentId.getId()));
 		resetFilters();
-		
-		//container.discard();
+
+		// container.discard();
 		container.refresh();
 		associateChildren(newParentId);
 		dirty = false;
@@ -431,7 +431,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 					saveEditsToTemp();
 					resetFilters();
 
-					newEntity = container.createEntityItem(entityClass.newInstance());
+					createNewEntity();
 
 					// if we call the overridden version we loop indefinitely
 					ChildCrudView.super.rowChanged(newEntity);
@@ -614,7 +614,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	 * so that this child only displays the associated rows
 	 */
 	@Override
-	public void selectedRowChanged(EntityItem<P> item)
+	public void selectedParentRowChanged(EntityItem<P> item)
 	{
 		try
 		{
@@ -637,6 +637,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 				}
 				catch (Exception e)
 				{
+					logger.warn(e, e);
 					// ignore this. if we don't do this the child continues to
 					// show data from the previously selected row
 
@@ -742,6 +743,11 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 
 	}
 
+	/**
+	 * noop event handler
+	 * 
+	 * @return
+	 */
 	private ChildCrudEventHandler<E> getNullEventHandler()
 	{
 		return new ChildCrudEventHandler<E>()
@@ -752,4 +758,17 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 			}
 		};
 	}
+
+	protected String getNewButtonLabel()
+	{
+		return getNewButtonActionLabel();
+	}
+
+	/**
+	 * it gets confusing with multiple new buttons that appear when using nested
+	 * cruds, so provide a label like "New Goal" to ease the confusion
+	 * 
+	 * @return
+	 */
+	public abstract String getNewButtonActionLabel();
 }
