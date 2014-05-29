@@ -52,20 +52,21 @@ public class SchedulerTest
 	}
 
 	@Test
-	public void testDayOfWeekCorrectDay()
+	public void testDayOfWeekCorrectDay() throws InterruptedException
 	{
 
-		Calendar scheduledTime = Calendar.getInstance();
+		DateTime scheduledTime = new DateTime();
 		// scheduledTime.add(Calendar.SECOND, 3);
 
-		int day = scheduledTime.get(Calendar.DAY_OF_WEEK);
+		int day = scheduledTime.getDayOfWeek();
 
 		ReportRunner reportRunner = new ReportRunner();
 		String daysOfWeek = "1," + day + ",5";
-		ReportEmailSchedule schedule = new DayOfWeekSchedule(scheduledTime.getTime(), daysOfWeek);
+		ReportEmailSchedule schedule = new DayOfWeekSchedule(scheduledTime.plusSeconds(2).toDate(), daysOfWeek);
 		ScheduleProvider scheduleProvider = new ScheduleProvider(new ReportEmailSchedule[] { schedule });
 		Scheduler scheduler = new Scheduler(scheduleProvider, reportRunner, null, new DBmanagerprovider());
 
+		Thread.sleep(2000);
 		for (int i = 0; i < 5; i++)
 		{
 			scheduler.run();
@@ -170,18 +171,19 @@ public class SchedulerTest
 	}
 
 	@Test
-	public void testEveryDayCorrectDaySecondRun()
+	public void testEveryDayCorrectDaySecondRun() throws InterruptedException
 	{
 
 		DateTime time = new DateTime();
 
 		ReportRunner reportRunner = new ReportRunner();
 
-		ReportEmailSchedule schedule = new EveryDaySchedule(time.toDate());
+		ReportEmailSchedule schedule = new EveryDaySchedule(time.plusSeconds(1).toDate());
 		schedule.setLastRuntime(time.minusDays(1).toDate(), "");
 		ScheduleProvider scheduleProvider = new ScheduleProvider(new ReportEmailSchedule[] { schedule });
 		Scheduler scheduler = new Scheduler(scheduleProvider, reportRunner, null, new DBmanagerprovider());
 
+		Thread.sleep(2000);
 		for (int i = 0; i < 5; i++)
 		{
 			scheduler.run();

@@ -89,8 +89,10 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 		.addColumn("Report", ReportEmailScheduleEntity_.reportTitle)
 				.addColumn("Subject", ReportEmailScheduleEntity_.subject)
 				.addColumn("Owner", ReportEmailScheduleEntity_.sender)
+				.addColumn("Next Run",ReportEmailScheduleEntity_.nextScheduledTime)
 				.addColumn("Enabled", ReportEmailScheduleEntity_.enabled)
-				.addColumn("Last Run", ReportEmailScheduleEntity_.lastRuntime).build();
+				.addColumn("Last Run", ReportEmailScheduleEntity_.lastRuntime)
+				.build();
 
 		init(ReportEmailScheduleEntity.class, container, headings);
 		this.disallowNew(true);
@@ -106,9 +108,10 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 		.addColumn("Report", ReportEmailScheduleEntity_.reportTitle)
 				.addColumn("Subject", ReportEmailScheduleEntity_.subject)
 				.addColumn("Owner", ReportEmailScheduleEntity_.sender)
+				.addColumn("Next Run",ReportEmailScheduleEntity_.nextScheduledTime)
 				.addColumn("Enabled", ReportEmailScheduleEntity_.enabled)
-				.addColumn("Last Run", ReportEmailScheduleEntity_.lastRuntime).build();
-
+				.addColumn("Last Run", ReportEmailScheduleEntity_.lastRuntime)
+				.build();
 		init(ReportEmailScheduleEntity.class, container, headings);
 		resetFilters();
 		if (container.size() > 0)
@@ -166,8 +169,6 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 		return JpaBaseDao.getGenericDao(ReportEmailScheduleEntity.class).createVaadinContainer();
 
 	}
-
-	
 
 	private static final long serialVersionUID = 1L;
 
@@ -232,6 +233,8 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 		helper.bindBooleanField(main, validatingFieldGroup, "Enabled", ReportEmailScheduleEntity_.enabled);
 
 		helper.bindDateField(main, validatingFieldGroup, "Last Run Time", ReportEmailScheduleEntity_.lastRuntime,
+				"yyyy/MM/dd HH:mm", Resolution.MINUTE).setReadOnly(true);
+		helper.bindDateField(main, validatingFieldGroup, "Next Run Time", ReportEmailScheduleEntity_.nextScheduledTime,
 				"yyyy/MM/dd HH:mm", Resolution.MINUTE).setReadOnly(true);
 
 		ComboBox modeCombo = helper.bindEnumField(main, validatingFieldGroup, "Frequency",
@@ -505,6 +508,9 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 	protected void interceptSaveValues(EntityItem<ReportEmailScheduleEntity> entityItem)
 	{
 		ReportEmailScheduleEntity entity = entityItem.getEntity();
+		entity.setNextScheduledRunTime(entity.getScheduleMode().getNextRuntime(entity, new Date()));
+
+		
 		List<ReportEmailRecipient> recips = entity.getRecipients();
 		for (EmailTargetLine line : emailTargetLayout.getTargets())
 		{
@@ -587,7 +593,7 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 				}
 			}
 		}
-		
+
 		EntityManagerProvider.merge(entityItem);
 
 	}
@@ -629,7 +635,7 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 				{
 					if (parameterName.equalsIgnoreCase(eParam.getName()))
 					{
-						eParam.setValue((String) bParam.getValue(parameterName),bParam.getDisplayValue(parameterName));
+						eParam.setValue((String) bParam.getValue(parameterName), bParam.getDisplayValue(parameterName));
 						set = true;
 
 						changedReportProperties(entityItem, bParam);
@@ -647,7 +653,8 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 
 				String[] names = bParam.getParameterNames().toArray(new String[] {});
 				reportEmailParameterEntity.setName(names[0]);
-				reportEmailParameterEntity.setValue((String) bParam.getValue(names[0]),bParam.getDisplayValue(names[0]));
+				reportEmailParameterEntity.setValue((String) bParam.getValue(names[0]),
+						bParam.getDisplayValue(names[0]));
 
 				changedReportProperties(entityItem, bParam);
 
@@ -667,7 +674,7 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 				ReportChooser chooser = (ReportChooser) bParam;
 				JasperReportProperties props = entityItem.getJasperReportPropertiesClass().newInstance();
 				JasperReportProperties newProps = chooser.getReportProperties(props);
-		
+
 				entityItem.setReportFilename(newProps.getReportFileName());
 				entityItem.setTitle(newProps.getReportTitle());
 				reportTitle.setReadOnly(false);

@@ -12,11 +12,13 @@ public class DayOfMonthSchedule extends ReportEmailScheduleTestAdaptor
 	private Date lastRuntime = null;
 	final DateTime scheduledTime ;
 	private int dayOfMonth;
+	private Date nextScheduledTime;
 
 	DayOfMonthSchedule(Date date,int dayOfMonth)
 	{
 		scheduledTime = new DateTime(date);
 		this.dayOfMonth = dayOfMonth;
+		nextScheduledTime = getScheduleMode().getNextRuntime(this, new Date());
 	}
 	
 	@Override
@@ -86,6 +88,19 @@ public class DayOfMonthSchedule extends ReportEmailScheduleTestAdaptor
 	{
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public Date getNextScheduledTime()
+	{
+		return nextScheduledTime;
+	}
+
+	@Override
+	public void setNextScheduledRunTime(Date nextRuntime)
+	{
+		// TODO Auto-generated method stub
+		
 	}
 
 }

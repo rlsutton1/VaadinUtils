@@ -12,11 +12,14 @@ public class DayOfWeekSchedule extends ReportEmailScheduleTestAdaptor
 	private Date lastRuntime = null;
 	final DateTime scheduledTime ;
 	private String daysOfWeek;
+	private Date nextScheduledTime;
 
 	DayOfWeekSchedule(Date date,String daysOfWeek)
 	{
 		scheduledTime = new DateTime(date);
 		this.daysOfWeek = daysOfWeek;
+		nextScheduledTime = getScheduleMode().getNextRuntime(this, new Date());
+
 	}
 	
 	@Override
@@ -86,6 +89,19 @@ public class DayOfWeekSchedule extends ReportEmailScheduleTestAdaptor
 	{
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public Date getNextScheduledTime()
+	{
+		return nextScheduledTime;
+	}
+
+	@Override
+	public void setNextScheduledRunTime(Date nextRuntime)
+	{
+		// TODO Auto-generated method stub
+		
 	}
 
 }

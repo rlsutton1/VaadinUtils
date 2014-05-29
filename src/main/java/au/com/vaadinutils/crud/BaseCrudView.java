@@ -97,7 +97,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	private AbstractLayout advancedSearchLayout;
 	private VerticalLayout searchLayout;
 	private CheckBox advancedSearchCheckbox;
-	private Set<ChildCrudListener<E>> childCrudListeners = new HashSet<ChildCrudListener<E>>();
+	protected Set<ChildCrudListener<E>> childCrudListeners = new HashSet<ChildCrudListener<E>>();
 	private CrudDisplayMode displayMode = CrudDisplayMode.HORIZONTAL;
 	protected HorizontalLayout actionLayout;
 	protected ComboBox actionCombo;
@@ -1104,6 +1104,12 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 										 * Properties in our entity at once.
 										 */
 										fieldGroup.discard();
+										
+										for (ChildCrudListener<E> child : childCrudListeners)
+										{
+											child.discard();
+										}
+
 										if (restoreDelete)
 										{
 											activateEditMode(false);

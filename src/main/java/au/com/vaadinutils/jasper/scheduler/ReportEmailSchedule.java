@@ -66,6 +66,11 @@ Collection<ReportEmailParameter> getReportParameters();
 
 	String getSendersUsername();
 
+	// returns the time that this report should run next
+	Date getNextScheduledTime();
+
+	void setNextScheduledRunTime(Date nextRuntime);
+
 	
 	
 }
