@@ -10,13 +10,16 @@ public class EveryDaySchedule extends ReportEmailScheduleTestAdaptor
 {
 
 	private Date lastRuntime = null;
-	final DateTime scheduledTime ;
+	final DateTime scheduledTime;
+	private Date nextScheduledTime;
 
 	EveryDaySchedule(Date date)
 	{
 		scheduledTime = new DateTime(date);
+		nextScheduledTime = getScheduleMode().getNextRuntime(this, new Date());
+
 	}
-	
+
 	@Override
 	public String getScheduledDaysOfWeek()
 	{
@@ -84,6 +87,19 @@ public class EveryDaySchedule extends ReportEmailScheduleTestAdaptor
 	{
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public Date getNextScheduledTime()
+	{
+		return nextScheduledTime;
+	}
+
+	@Override
+	public void setNextScheduledRunTime(Date nextRuntime)
+	{
+		// TODO Auto-generated method stub
+		
 	}
 
 }

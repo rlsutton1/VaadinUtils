@@ -12,6 +12,7 @@ import org.apache.logging.log4j.Logger;
 import org.joda.time.DateTime;
 
 import au.com.vaadinutils.jasper.JasperEmailSettings;
+import au.com.vaadinutils.jasper.scheduler.entities.ScheduleMode;
 
 public class Scheduler implements Runnable
 {
@@ -67,9 +68,40 @@ public class Scheduler implements Runnable
 					try
 					{
 						DateTime now = new DateTime();
-						DateTime selectedScheduleTime = null;
-						schedule.getScheduleMode().checkDateAndRunScheduledReport(schedule,now,reportRunner, emailSettings, scheduleProvider);
-						
+
+						Date nextScheduledTime = schedule.getNextScheduledTime();
+						if (nextScheduledTime == null)
+						{
+							// upgrate existing schedules that dont have a next
+							// runtime
+							nextScheduledTime = schedule.getScheduleMode().getNextRuntime(schedule, now.toDate());
+							schedule.setNextScheduledRunTime(nextScheduledTime);
+						}
+
+						Date lastRuntime = schedule.getLastRuntime();
+						if ((lastRuntime == null || lastRuntime.before(nextScheduledTime))
+								&& nextScheduledTime.before(now.toDate()))
+						{
+							if (reportRunner.runReport(schedule, nextScheduledTime, emailSettings))
+							{
+								schedule.setLastRuntime(now.toDate(), "Report successfully run");
+								if (schedule.getScheduleMode() == ScheduleMode.ONE_TIME)
+								{
+									scheduleProvider.delete(schedule);
+								}
+								else
+								{
+									schedule.setNextScheduledRunTime(schedule.getScheduleMode().getNextRuntime(
+											schedule, now.toDate()));
+								}
+							}
+							else
+							{
+								logger.warn("Report queue is not empty, will try scheduled report again later "
+										+ schedule);
+							}
+						}
+
 					}
 					catch (Exception e)
 					{
@@ -89,7 +121,6 @@ public class Scheduler implements Runnable
 		}
 
 	}
-
 
 	public void stop()
 	{

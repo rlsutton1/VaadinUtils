@@ -326,61 +326,6 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 		newButton.setEnabled(showNew);
 	}
 
-	public void allowRowChange(final RowChangeCallback callback)
-	{
-		try
-		{
-			if (isDirty() && !fieldGroup.isValid())
-			{
-
-				throw new InvalidValueException("Fields are invalid");
-
-			}
-		}
-		catch (InvalidValueException e)
-		{
-			ConfirmDialog.show(UI.getCurrent(), "Field Errors", e.getMessage()
-					+ ". Continuing will result in those changes being discarded. ", "Continue", "Cancel",
-					new ConfirmDialog.Listener()
-					{
-						private static final long serialVersionUID = 1L;
-
-						public void onClose(ConfirmDialog dialog)
-						{
-							if (dialog.isConfirmed())
-							{
-								/*
-								 * When an entity is selected from the list, we
-								 * want to show that in our editor on the right.
-								 * This is nicely done by the FieldGroup that
-								 * binds all the fields to the corresponding
-								 * Properties in our entity at once.
-								 */
-								fieldGroup.discard();
-								if (restoreDelete)
-								{
-									activateEditMode(false);
-									restoreDelete = false;
-								}
-
-								newEntity = null;
-
-								callback.allowRowChange();
-
-							}
-							else
-							{
-								// User did not confirm so don't allow
-								// the change.
-
-							}
-						}
-					});
-			return;
-		}
-		callback.allowRowChange();
-
-	}
 
 	/**
 	 * used to prevent cascading saves when new is clicked
@@ -740,6 +685,10 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	{
 		fieldGroup.discard();
 		container.discard();
+		for (ChildCrudListener<E> child : childCrudListeners)
+		{
+			child.discard();
+		}
 
 	}
 

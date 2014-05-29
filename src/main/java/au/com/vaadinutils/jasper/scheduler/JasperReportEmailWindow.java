@@ -246,6 +246,8 @@ public class JasperReportEmailWindow extends Window
 			recips.add(recipient);
 		}
 		schedule.setRecipients(recips);
+		schedule.setNextScheduledRunTime(schedule.getScheduleMode().getNextRuntime(schedule, new Date()));
+
 
 		entityManager.persist(schedule);
 

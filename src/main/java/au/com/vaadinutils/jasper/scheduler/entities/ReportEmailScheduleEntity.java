@@ -103,6 +103,9 @@ public class ReportEmailScheduleEntity implements Serializable, CrudEntity, Repo
 
 	private String reportIdentifier;
 
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date nextScheduledTime;
+
 	@Override
 	public Long getId()
 	{
@@ -328,6 +331,19 @@ public class ReportEmailScheduleEntity implements Serializable, CrudEntity, Repo
 	public void setReportTemplateIdentifier(Enum<?> reportIdentifier)
 	{
 		this.reportIdentifier = reportIdentifier.toString();
+		
+	}
+
+	@Override
+	public Date getNextScheduledTime()
+	{
+		return nextScheduledTime;
+	}
+
+	@Override
+	public void setNextScheduledRunTime(Date nextRuntime)
+	{
+		nextScheduledTime = nextRuntime;
 		
 	}
 }

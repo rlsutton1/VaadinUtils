@@ -1,222 +1,96 @@
 package au.com.vaadinutils.jasper.scheduler.entities;
 
-import java.io.IOException;
+import java.util.Collections;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
-import javax.mail.internet.AddressException;
-
-import org.apache.commons.mail.EmailException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.joda.time.DateTime;
 
-import au.com.vaadinutils.jasper.JasperEmailSettings;
-import au.com.vaadinutils.jasper.scheduler.ReportEmailRunner;
 import au.com.vaadinutils.jasper.scheduler.ReportEmailSchedule;
-import au.com.vaadinutils.jasper.scheduler.ReportEmailScheduleProvider;
-import au.com.vaadinutils.jasper.scheduler.ScheduleTriState;
+
+import com.google.common.base.Preconditions;
 
 public enum ScheduleMode
 {
 
 	ONE_TIME("Run once only")
 	{
+
 		@Override
-		public void checkDateAndRunScheduledReport(ReportEmailSchedule schedule, DateTime now,
-				ReportEmailRunner reportRunner, JasperEmailSettings emailSettings,
-				ReportEmailScheduleProvider scheduleProvider) throws AddressException, InterruptedException,
-				IOException, EmailException, InstantiationException, IllegalAccessException, ClassNotFoundException
+		public Date getNextRuntime(ReportEmailSchedule schedule, Date now)
 		{
-			if (schedule.getOneTimeRunDateTime() == null)
-			{
-				schedule.setLastRuntime(now.toDate(), "Doesn't have a OneTimeRunDateTime set");
-				schedule.setEnabled(false);
-			}
-			else if (schedule.getOneTimeRunDateTime().before(now.toDate()))
-			{
-				if (reportRunner.runReport(schedule, schedule.getOneTimeRunDateTime(), emailSettings))
-				{
-					schedule.setLastRuntime(now.toDate(), "Report successfully run");
-
-					scheduleProvider.delete(schedule);
-				}
-				else
-				{
-					logger.warn("Report queue is not empty, will try scheduled report again later " + schedule);
-				}
-			}
-
+			return schedule.getOneTimeRunDateTime();
 		}
 	},
 	DAY_OF_WEEK("Week days")
 	{
-		@Override
-		public void checkDateAndRunScheduledReport(ReportEmailSchedule schedule, DateTime now,
-				ReportEmailRunner reportRunner, JasperEmailSettings emailSettings,
-				ReportEmailScheduleProvider scheduleProvider) throws AddressException, InterruptedException,
-				IOException, EmailException, InstantiationException, IllegalAccessException, ClassNotFoundException
-		{
-			DateTime selectedScheduleTime = checkScheduleForTimeOfDay(schedule, now);
-			if (selectedScheduleTime != null)
-			{
-				ScheduleTriState checkDayOfWeekSchedule = checkDayOfWeekSchedule(schedule, now);
-				if (checkDayOfWeekSchedule == ScheduleTriState.FOUND)
-				{
-					if (reportRunner.runReport(schedule, selectedScheduleTime.toDate(), emailSettings))
-					{
-						schedule.setLastRuntime(now.toDate(), "Report successfully run");
-					}
-					else
-					{
-						logger.warn("Report queue is not empty, will try scheduled report again later " + schedule);
-					}
 
-				}
-				else if (checkDayOfWeekSchedule == ScheduleTriState.NONE_EXIST)
-				{
-					schedule.setLastRuntime(now.toDate(), "No valid schedule");
-					schedule.setEnabled(false);
-				}
+		@Override
+		public Date getNextRuntime(ReportEmailSchedule schedule, Date now)
+		{
+			String[] days = schedule.getScheduledDaysOfWeek().split(",");
+			Preconditions.checkArgument(days.length > 0);
+			List<Integer> intDays = new LinkedList<Integer>();
+			for (String day : days)
+			{
+				int iDay = Integer.parseInt(day);
+				Preconditions.checkArgument(iDay > 0 && iDay < 8);
+				intDays.add(iDay);
+			}
+			Collections.sort(intDays);
+
+			DateTime result = getFirstPossibleTime(schedule, now);
+
+			while (!intDays.contains(result.getDayOfWeek()))
+			{
+				result = result.plusDays(1);
 			}
 
+			return result.toDate();
+
 		}
+
 	},
 	DAY_OF_MONTH("Monthly")
 	{
-		@Override
-		public void checkDateAndRunScheduledReport(ReportEmailSchedule schedule, DateTime now,
-				ReportEmailRunner reportRunner, JasperEmailSettings emailSettings,
-				ReportEmailScheduleProvider scheduleProvider) throws AddressException, InterruptedException,
-				IOException, EmailException, InstantiationException, IllegalAccessException, ClassNotFoundException
-		{
-			DateTime selectedScheduleTime = checkScheduleForTimeOfDay(schedule, now);
 
-			if (selectedScheduleTime != null)
+		@Override
+		public Date getNextRuntime(ReportEmailSchedule schedule, Date now)
+		{
+			Integer day = schedule.getScheduledDayOfMonth();
+			Preconditions.checkArgument(day > 0 && day < 32);
+			DateTime result = getFirstPossibleTime(schedule, now);
+
+			if (result.getDayOfMonth() > day)
 			{
-				ScheduleTriState checkDayOfMonthSchedule = checkDayOfMonthSchedule(schedule, now);
-				if (checkDayOfMonthSchedule == ScheduleTriState.FOUND)
-				{
-					if (reportRunner.runReport(schedule, selectedScheduleTime.toDate(), emailSettings))
-					{
-						schedule.setLastRuntime(now.toDate(), "Report successfully run");
-					}
-					else
-					{
-						logger.warn("Report queue is not empty, will try scheduled report again later " + schedule);
-					}
-				}
-				else if (checkDayOfMonthSchedule == ScheduleTriState.NONE_EXIST)
-				{
-					schedule.setLastRuntime(now.toDate(), "No valid schedule");
-					schedule.setEnabled(false);
-				}
+				// move to next month
+				result = result.withDayOfMonth(1).plusMonths(1);
+			}
+			if (result.getDayOfMonth() < day)
+			{
+				// move to correct day
+				int lastDayOfMonth = result.withDayOfMonth(1).plusMonths(1).minusDays(1).getDayOfMonth();
+				result = result.withDayOfMonth(Math.min(day, lastDayOfMonth));
 			}
 
+			return result.toDate();
 		}
 	},
 	EVERY_DAY("Daily")
 	{
+
 		@Override
-		public void checkDateAndRunScheduledReport(ReportEmailSchedule schedule, DateTime now,
-				ReportEmailRunner reportRunner, JasperEmailSettings emailSettings,
-				ReportEmailScheduleProvider scheduleProvider) throws AddressException, InterruptedException,
-				IOException, EmailException, InstantiationException, IllegalAccessException, ClassNotFoundException
+		public Date getNextRuntime(ReportEmailSchedule schedule, Date now)
 		{
-			DateTime selectedScheduleTime = checkScheduleForTimeOfDay(schedule, now);
-			if (selectedScheduleTime != null)
-			{
-				if (reportRunner.runReport(schedule, selectedScheduleTime.toDate(), emailSettings))
-				{
-					schedule.setLastRuntime(now.toDate(), "Report successfully run");
-				}
-				else
-				{
-					logger.warn("Report queue is not empty, will try scheduled report again later " + schedule);
-				}
-			}
+			return getFirstPossibleTime(schedule, now).toDate();
 
 		}
 	};
 
 	Logger logger = LogManager.getLogger();
-
-	ScheduleTriState checkDayOfWeekSchedule(ReportEmailSchedule schedule, DateTime now)
-	{
-		ScheduleTriState dayOfWeekSchedule = ScheduleTriState.NONE_EXIST;
-		String scheduledDaysOfWeek = schedule.getScheduledDaysOfWeek();
-		if (scheduledDaysOfWeek.length() > 0)
-		{
-			String[] days = scheduledDaysOfWeek.split(",");
-			dayOfWeekSchedule = ScheduleTriState.NOT_SCHEDULED_NOW;
-			for (String day : days)
-			{
-				if (day.equals("" + now.getDayOfWeek()))
-				{
-					dayOfWeekSchedule = ScheduleTriState.FOUND;
-					break;
-				}
-			}
-		}
-		return dayOfWeekSchedule;
-	}
-
-	ScheduleTriState checkDayOfMonthSchedule(ReportEmailSchedule schedule, DateTime now)
-	{
-		ScheduleTriState dayOfMonthSchedule = ScheduleTriState.NONE_EXIST;
-
-		if (schedule.getScheduledDayOfMonth() != null)
-		{
-			dayOfMonthSchedule = ScheduleTriState.NOT_SCHEDULED_NOW;
-			if (schedule.getScheduledDayOfMonth() == now.getDayOfMonth())
-			{
-				dayOfMonthSchedule = ScheduleTriState.FOUND;
-			}
-		}
-		return dayOfMonthSchedule;
-	}
-
-	DateTime checkScheduleForTimeOfDay(ReportEmailSchedule schedule, DateTime now)
-	{
-		boolean foundTimeSchedule = false;
-		DateTime lastRun = null;
-		if (schedule.getLastRuntime() != null)
-		{
-			lastRun = new DateTime(schedule.getLastRuntime());
-		}
-		DateTime selectedScheduleTime = null;
-
-		DateTime scheduledDateTime = new DateTime(schedule.getTimeOfDayToRun());
-		int scheduledMinute = scheduledDateTime.getMinuteOfHour();
-		int scheduledHour = scheduledDateTime.getHourOfDay();
-
-		DateTime scheduledTime = now.withMinuteOfHour(scheduledMinute).withHourOfDay(scheduledHour)
-				.withSecondOfMinute(0).withMillisOfSecond(0);
-
-		if (scheduledTime != null)
-		{
-
-			if (scheduledTime.isBefore(now))
-			{
-				// check the schedule is after the last run time
-				if (lastRun == null || lastRun.isBefore(scheduledTime))
-				{
-					selectedScheduleTime = scheduledTime;
-				}
-				else
-				{
-					logger.debug("lastRun " + lastRun + " not before now:" + scheduledTime);
-				}
-			}
-			else
-			{
-				logger.debug("scheduledTime " + scheduledTime + " not before now:" + now);
-			}
-		}
-		else
-		{
-			throw new RuntimeException("No valid run time");
-		}
-		return selectedScheduleTime;
-	}
 
 	String name;
 
@@ -224,16 +98,27 @@ public enum ScheduleMode
 	{
 		this.name = name;
 	}
-	
+
 	@Override
 	public String toString()
 	{
 		return name;
 	}
 
-	abstract public void checkDateAndRunScheduledReport(ReportEmailSchedule schedule, DateTime now,
-			ReportEmailRunner reportRunner, JasperEmailSettings emailSettings,
-			ReportEmailScheduleProvider scheduleProvider) throws AddressException, InterruptedException, IOException,
-			EmailException, InstantiationException, IllegalAccessException, ClassNotFoundException;
+	static private DateTime getFirstPossibleTime(ReportEmailSchedule schedule, Date now)
+	{
+		DateTime scheduleTime = new DateTime(schedule.getTimeOfDayToRun());
+		DateTime result = new DateTime(now);
+		scheduleTime = scheduleTime.withDate(result.getYear(), result.getMonthOfYear(), result.getDayOfMonth());
 
+		if (scheduleTime.isBefore(result))
+		{
+			result = result.plusDays(1);
+		}
+		result = result.withTime(scheduleTime.getHourOfDay(), scheduleTime.getMinuteOfHour(),
+				scheduleTime.getSecondOfMinute(), 0);
+		return result;
+	}
+
+	abstract public Date getNextRuntime(ReportEmailSchedule schedule, Date now);
 }
