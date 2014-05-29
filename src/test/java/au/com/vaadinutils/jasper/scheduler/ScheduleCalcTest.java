@@ -26,7 +26,7 @@ public class ScheduleCalcTest
 
 		ReportEmailSchedule schedule = new DayOfWeekSchedule(scheduledTime, daysOfWeek);
 
-		Map<Date, Date> testTimes = new HashMap<>();
+		Map<Date, Date> testTimes = new HashMap<Date, Date>();
 		testTimes.put(sdf.parse("14/05/29 10:00:00"), sdf.parse("14/05/30 09:30:00")); // Thurs/Fri
 		testTimes.put(sdf.parse("14/05/30 10:00:00"), sdf.parse("14/06/02 09:30:00")); // Fri/Mon
 		testTimes.put(sdf.parse("14/05/31 10:00:00"), sdf.parse("14/06/02 09:30:00")); // Sat/Mon
@@ -56,7 +56,7 @@ public class ScheduleCalcTest
 
 		ReportEmailSchedule schedule = new DayOfMonthSchedule(scheduledTime, 29);
 
-		Map<Date, Date> testTimes = new HashMap<>();
+		Map<Date, Date> testTimes = new HashMap<Date, Date>();
 		testTimes.put(sdf.parse("14/01/28 10:00:00"), sdf.parse("14/01/29 09:30:00")); // Thurs/Fri
 		testTimes.put(sdf.parse("14/02/25 10:00:00"), sdf.parse("14/02/28 09:30:00")); // Fri/Mon
 		testTimes.put(sdf.parse("14/12/31 10:00:00"), sdf.parse("15/01/29 09:30:00")); // Sat/Mon
@@ -81,7 +81,7 @@ public class ScheduleCalcTest
 	
 		ReportEmailSchedule schedule = new EveryDaySchedule(scheduledTime);
 
-		Map<Date, Date> testTimes = new HashMap<>();
+		Map<Date, Date> testTimes = new HashMap<Date, Date>();
 		testTimes.put(sdf.parse("14/05/29 10:00:00"), sdf.parse("14/05/30 09:30:00")); 
 		testTimes.put(sdf.parse("14/05/30 10:00:00"), sdf.parse("14/05/31 09:30:00")); 
 		testTimes.put(sdf.parse("14/05/31 10:00:00"), sdf.parse("14/06/01 09:30:00")); 
