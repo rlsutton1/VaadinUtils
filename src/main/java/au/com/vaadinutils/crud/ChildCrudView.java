@@ -326,7 +326,6 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 		newButton.setEnabled(showNew);
 	}
 
-
 	/**
 	 * used to prevent cascading saves when new is clicked
 	 */
@@ -601,6 +600,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	private void createParentFilter(EntityItem<P> item) throws InstantiationException, IllegalAccessException
 	{
 		parentFilter = new Compare.Equal(childKey, translateParentId(-1l));
+
 		if (item != null)
 
 		{
@@ -629,8 +629,16 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	 */
 	protected Object translateParentId(Object parentId2) throws InstantiationException, IllegalAccessException
 	{
+
+		Preconditions.checkNotNull(parentId2,
+				"attempt to translate null parent id in " + entityClass.getCanonicalName());
 		P tmp = parentType.newInstance();
+		Preconditions.checkNotNull(tmp, "failed to create instance of " + entityClass.getCanonicalName());
 		tmp.setId((Long) parentId2);
+		Preconditions.checkArgument(tmp.getId() != null, "setId or getId has not been implemented correctly by "
+				+ entityClass.getCanonicalName());
+		Preconditions.checkArgument(tmp.getId().equals(parentId2),
+				"setId or getId has not been implemented correctly by " + entityClass.getCanonicalName());
 		return tmp;
 	}
 

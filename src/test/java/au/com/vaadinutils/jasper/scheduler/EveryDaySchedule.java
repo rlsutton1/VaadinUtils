@@ -4,6 +4,7 @@ import java.util.Date;
 
 import org.joda.time.DateTime;
 
+import au.com.vaadinutils.jasper.JasperManager.OutputFormat;
 import au.com.vaadinutils.jasper.scheduler.entities.ScheduleMode;
 
 public class EveryDaySchedule extends ReportEmailScheduleTestAdaptor
@@ -101,5 +102,10 @@ public class EveryDaySchedule extends ReportEmailScheduleTestAdaptor
 		// TODO Auto-generated method stub
 		
 	}
-
+	@Override
+	public OutputFormat getOutputFormat()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

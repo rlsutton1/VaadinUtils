@@ -54,7 +54,7 @@ public class Scheduler implements Runnable
 		}
 	}
 
-	public void protectedRun()
+	private void protectedRun()
 	{
 		try
 		{

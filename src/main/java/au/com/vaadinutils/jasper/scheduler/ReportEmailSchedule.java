@@ -8,6 +8,7 @@ import java.util.List;
 import javax.mail.Address;
 import javax.mail.internet.AddressException;
 
+import au.com.vaadinutils.jasper.JasperManager.OutputFormat;
 import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailRecipient;
 import au.com.vaadinutils.jasper.scheduler.entities.ScheduleMode;
 import au.com.vaadinutils.jasper.ui.JasperReportProperties;
@@ -70,6 +71,8 @@ Collection<ReportEmailParameter> getReportParameters();
 	Date getNextScheduledTime();
 
 	void setNextScheduledRunTime(Date nextRuntime);
+
+	OutputFormat getOutputFormat();
 
 	
 	

@@ -2,6 +2,7 @@ package au.com.vaadinutils.jasper.scheduler;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -18,6 +19,7 @@ import au.com.vaadinutils.dao.JpaBaseDao;
 import au.com.vaadinutils.fields.CKEditorEmailField;
 import au.com.vaadinutils.help.HelpProvider;
 import au.com.vaadinutils.help.VaadinUtilsHelpEnum;
+import au.com.vaadinutils.jasper.JasperManager.OutputFormat;
 import au.com.vaadinutils.jasper.filter.ExpanderComponent;
 import au.com.vaadinutils.jasper.filter.ReportFilterUIBuilder;
 import au.com.vaadinutils.jasper.parameter.ReportChooser;
@@ -80,6 +82,8 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 
 	private TextField reportTitle;
 
+	private ComboBox outputFormat;
+
 	public JasperReportScheduleLayout()
 	{
 		JPAContainer<ReportEmailScheduleEntity> container = makeJPAContainer();
@@ -89,10 +93,9 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 		.addColumn("Report", ReportEmailScheduleEntity_.reportTitle)
 				.addColumn("Subject", ReportEmailScheduleEntity_.subject)
 				.addColumn("Owner", ReportEmailScheduleEntity_.sender)
-				.addColumn("Next Run",ReportEmailScheduleEntity_.nextScheduledTime)
+				.addColumn("Next Run", ReportEmailScheduleEntity_.nextScheduledTime)
 				.addColumn("Enabled", ReportEmailScheduleEntity_.enabled)
-				.addColumn("Last Run", ReportEmailScheduleEntity_.lastRuntime)
-				.build();
+				.addColumn("Last Run", ReportEmailScheduleEntity_.lastRuntime).build();
 
 		init(ReportEmailScheduleEntity.class, container, headings);
 		this.disallowNew(true);
@@ -108,10 +111,9 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 		.addColumn("Report", ReportEmailScheduleEntity_.reportTitle)
 				.addColumn("Subject", ReportEmailScheduleEntity_.subject)
 				.addColumn("Owner", ReportEmailScheduleEntity_.sender)
-				.addColumn("Next Run",ReportEmailScheduleEntity_.nextScheduledTime)
+				.addColumn("Next Run", ReportEmailScheduleEntity_.nextScheduledTime)
 				.addColumn("Enabled", ReportEmailScheduleEntity_.enabled)
-				.addColumn("Last Run", ReportEmailScheduleEntity_.lastRuntime)
-				.build();
+				.addColumn("Last Run", ReportEmailScheduleEntity_.lastRuntime).build();
 		init(ReportEmailScheduleEntity.class, container, headings);
 		resetFilters();
 		if (container.size() > 0)
@@ -156,6 +158,7 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 			sender.setReadOnly(false);
 			sender.select(id);
 			sender.setReadOnly(true);
+			outputFormat.setValue(OutputFormat.PDF);
 		}
 		catch (Exception e)
 		{
@@ -196,6 +199,11 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 				ReportEmailSender_.username);
 		sender.setReadOnly(true);
 
+		
+		outputFormat =helper.bindEnumField("Output format", ReportEmailScheduleEntity_.outputFormat.getName(), OutputFormat.class);
+		
+		outputFormat.removeItem(OutputFormat.HTML);
+		
 		helper.bindTextField("Subject", ReportEmailScheduleEntity_.subject);
 		CKEditorEmailField message = helper.bindEditorField("Message", ReportEmailScheduleEntity_.message, false);
 
@@ -510,7 +518,6 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 		ReportEmailScheduleEntity entity = entityItem.getEntity();
 		entity.setNextScheduledRunTime(entity.getScheduleMode().getNextRuntime(entity, new Date()));
 
-		
 		List<ReportEmailRecipient> recips = entity.getRecipients();
 		for (EmailTargetLine line : emailTargetLayout.getTargets())
 		{

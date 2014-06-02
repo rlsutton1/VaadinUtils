@@ -110,6 +110,12 @@ public class JasperManager implements Runnable
 			{
 				return ".pdf";
 			}
+
+			@Override
+			public AttachmentType getAttachementType()
+			{
+				return AttachmentType.PDF;
+			}
 		},
 		HTML
 		{
@@ -123,6 +129,12 @@ public class JasperManager implements Runnable
 			public String getFileExtension()
 			{
 				return ".html";
+			}
+
+			@Override
+			public AttachmentType getAttachementType()
+			{
+				return AttachmentType.HTML;
 			}
 		},
 		CSV
@@ -138,11 +150,19 @@ public class JasperManager implements Runnable
 			{
 				return ".csv";
 			}
+
+			@Override
+			public AttachmentType getAttachementType()
+			{
+				return AttachmentType.CSV;
+			}
 		};
 
 		abstract public String getMimeType();
 
 		abstract public String getFileExtension();
+
+		abstract public AttachmentType getAttachementType();
 
 	}
 

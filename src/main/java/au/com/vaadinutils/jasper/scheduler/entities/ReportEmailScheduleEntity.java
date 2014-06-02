@@ -23,8 +23,10 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.NotNull;
 
 import au.com.vaadinutils.crud.CrudEntity;
+import au.com.vaadinutils.jasper.JasperManager.OutputFormat;
 import au.com.vaadinutils.jasper.scheduler.ReportEmailParameter;
 import au.com.vaadinutils.jasper.scheduler.ReportEmailSchedule;
 import au.com.vaadinutils.jasper.scheduler.ScheduledDateParameter;
@@ -58,12 +60,12 @@ public class ReportEmailScheduleEntity implements Serializable, CrudEntity, Repo
 
 	private String JasperReportPropertiesClassName;
 
-	@OneToMany(cascade={CascadeType.REMOVE, CascadeType.PERSIST})
+	@OneToMany(cascade = { CascadeType.REMOVE, CascadeType.PERSIST })
 	private List<ReportEmailScheduledDateParameter> dateParameters;
 
 	boolean enabled = true;
-	
-	@OneToOne(cascade={CascadeType.REMOVE, CascadeType.PERSIST})
+
+	@OneToOne(cascade = { CascadeType.REMOVE, CascadeType.PERSIST })
 	private ReportEmailSender sender;
 
 	@Temporal(TemporalType.TIMESTAMP)
@@ -82,8 +84,12 @@ public class ReportEmailScheduleEntity implements Serializable, CrudEntity, Repo
 
 	private String scheduledDaysOfWeek = "";
 
-	@OneToMany(cascade={CascadeType.REMOVE, CascadeType.PERSIST})
+	@OneToMany(cascade = { CascadeType.REMOVE, CascadeType.PERSIST })
 	private List<ReportEmailParameterEntity> reportParameters;
+
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	private OutputFormat outputFormat;
 
 	private String message;
 
@@ -94,7 +100,7 @@ public class ReportEmailScheduleEntity implements Serializable, CrudEntity, Repo
 	 */
 	private String reportLog;
 
-	@ManyToMany( cascade={ CascadeType.PERSIST})
+	@ManyToMany(cascade = { CascadeType.PERSIST })
 	private List<ReportEmailRecipient> recipients = new LinkedList<ReportEmailRecipient>();
 
 	private String reportFileName;
@@ -314,7 +320,7 @@ public class ReportEmailScheduleEntity implements Serializable, CrudEntity, Repo
 	public void setRecipients(List<ReportEmailRecipient> recips)
 	{
 		recipients = recips;
-		
+
 	}
 
 	public ReportEmailSender getSender()
@@ -325,13 +331,13 @@ public class ReportEmailScheduleEntity implements Serializable, CrudEntity, Repo
 	public void addReportParameter(ReportEmailParameterEntity reportEmailParameterEntity)
 	{
 		reportParameters.add(reportEmailParameterEntity);
-		
+
 	}
 
 	public void setReportTemplateIdentifier(Enum<?> reportIdentifier)
 	{
 		this.reportIdentifier = reportIdentifier.toString();
-		
+
 	}
 
 	@Override
@@ -344,6 +350,18 @@ public class ReportEmailScheduleEntity implements Serializable, CrudEntity, Repo
 	public void setNextScheduledRunTime(Date nextRuntime)
 	{
 		nextScheduledTime = nextRuntime;
+
+	}
+
+	public OutputFormat getOutputFormat()
+	{
+		return outputFormat;
+	}
+
+	public void setOutputFormat(OutputFormat format)
+	{
+		outputFormat = format;
 		
 	}
+
 }

@@ -10,6 +10,7 @@ import javax.persistence.EntityManager;
 import org.vaadin.dialogs.ConfirmDialog;
 
 import au.com.vaadinutils.dao.EntityManagerProvider;
+import au.com.vaadinutils.jasper.JasperManager.OutputFormat;
 import au.com.vaadinutils.jasper.parameter.ReportChooser;
 import au.com.vaadinutils.jasper.parameter.ReportParameter;
 import au.com.vaadinutils.jasper.scheduler.entities.DateParameterOffsetType;
@@ -247,6 +248,7 @@ public class JasperReportEmailWindow extends Window
 		}
 		schedule.setRecipients(recips);
 		schedule.setNextScheduledRunTime(schedule.getScheduleMode().getNextRuntime(schedule, new Date()));
+		schedule.setOutputFormat(OutputFormat.PDF);
 
 
 		entityManager.persist(schedule);

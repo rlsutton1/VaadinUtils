@@ -51,13 +51,15 @@ public class ReportEmailRunnerImpl implements ReportEmailRunner, JasperReportPro
 		}
 
 		JasperEmailBuilder builder = new JasperEmailBuilder(emailSettings);
-		RenderedReport export = manager.export(OutputFormat.PDF, params);
+		OutputFormat outputFormat = schedule.getOutputFormat();
+		RenderedReport export = manager.export(outputFormat, params);
 		try
 		{
+			AttachmentType attachementType = outputFormat.getAttachementType();
 			builder.setFrom(schedule.getSendersEmailAddress().toString()).setSubject(schedule.subject())
 
 			.setHtmlBody(schedule.message())
-					.addAttachement(export.getBodyAsDataSource(schedule.getReportTitle(), AttachmentType.PDF));
+					.addAttachement(export.getBodyAsDataSource(schedule.getReportTitle()+attachementType.getFileExtension(), attachementType));
 
 			for (ReportEmailRecipient address : schedule.getRecipients())
 			{
