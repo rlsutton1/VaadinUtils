@@ -1,9 +1,12 @@
 package au.com.vaadinutils.jasper.filter;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.joda.time.DateTime;
 
@@ -28,7 +31,8 @@ import com.vaadin.ui.TabSheet.Tab;
  */
 public class ReportFilterUIBuilder implements ReportFilterFieldBuilder, ReportFilterDateFieldBuilder
 {
-	private LinkedList<ReportParameter<?>> rparams = new LinkedList<ReportParameter<?>>();
+	private Set<ReportParameter<?>> rparams = new LinkedHashSet<ReportParameter<?>>();
+	ReportParameter<?> lastAdded = null;
 	private Integer minWidth;
 
 	public ReportFilterUIBuilder()
@@ -68,6 +72,7 @@ public class ReportFilterUIBuilder implements ReportFilterFieldBuilder, ReportFi
 	public ReportFilterFieldBuilder addField(ReportParameter<?> param)
 	{
 		rparams.add(param);
+		lastAdded = param;
 
 		return this;
 	}
@@ -78,7 +83,7 @@ public class ReportFilterUIBuilder implements ReportFilterFieldBuilder, ReportFi
 	public ReportFilterDateFieldBuilder setDateRange(DateTime startDate,DateTime endDate)
 	{
 		@SuppressWarnings("unchecked")
-		ReportParameter<Date> param = (ReportParameter<Date>) rparams.getLast();
+		ReportParameter<Date> param = (ReportParameter<Date>) lastAdded;
 		param.setStartDate(startDate.toDate());
 		param.setEndDate(endDate.toDate());
 		return this;

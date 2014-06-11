@@ -10,6 +10,7 @@ import java.util.Set;
 import au.com.vaadinutils.jasper.filter.ValidateListener;
 import au.com.vaadinutils.jasper.scheduler.entities.DateParameterType;
 
+import com.google.common.base.Preconditions;
 import com.vaadin.data.Property.ReadOnlyException;
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.util.converter.Converter.ConversionException;
@@ -25,12 +26,14 @@ public abstract class ReportParameter<T>
 
 	public ReportParameter(String label, String parameterName)
 	{
+		Preconditions.checkNotNull(label,"Label may not be null, as it is used for hashcode/equals");
 		parameters.add(parameterName);
 		this.label = label;
 	}
 
 	public ReportParameter(String label, String parameterNames[])
 	{
+		Preconditions.checkNotNull(label,"Label may not be null, as it is used for hashcode/equals");
 		for (String param : parameterNames)
 		{
 			parameters.add(param);
@@ -157,6 +160,51 @@ public abstract class ReportParameter<T>
 		throw new RuntimeException("Date Parameters must overide and implement this method: "
 				+ this.getClass().getCanonicalName());
 		
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode()
+	{
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((label == null) ? 0 : label.hashCode());
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (this == obj)
+		{
+			return true;
+		}
+		if (obj == null)
+		{
+			return false;
+		}
+		if (!(obj instanceof ReportParameter))
+		{
+			return false;
+		}
+		ReportParameter other = (ReportParameter) obj;
+		if (label == null)
+		{
+			if (other.label != null)
+			{
+				return false;
+			}
+		}
+		else if (!label.equals(other.label))
+		{
+			return false;
+		}
+		return true;
 	}
 
 }

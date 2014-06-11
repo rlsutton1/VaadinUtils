@@ -11,6 +11,7 @@ import java.sql.Connection;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
@@ -777,7 +778,10 @@ public class JasperManager implements Runnable
 			reportProperties.initDBConnection();
 
 			cleanupCallback = reportProperties.getCleanupCallback();
-			params.addAll(reportProperties.prepareData(params, reportProperties.getReportFileName(), cleanupCallback));
+			List<ReportParameter<?>> extraParams = reportProperties.prepareData(params, reportProperties.getReportFileName(), cleanupCallback);
+			
+			params.removeAll(extraParams);
+			params.addAll(extraParams);
 
 			logger.warn("Running report " + reportProperties.getReportFileName());
 			for (ReportParameter<?> param : params)
