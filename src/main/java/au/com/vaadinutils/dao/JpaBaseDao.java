@@ -3,6 +3,7 @@ package au.com.vaadinutils.dao;
 import java.lang.reflect.ParameterizedType;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -11,6 +12,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Order;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.SingularAttribute;
 
@@ -24,14 +26,12 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 	protected EntityManager entityManager;
 
-	
 	static public <E> JpaBaseDao<E, Long> getGenericDao(Class<E> class1)
 	{
 		return new JpaBaseDao<E, Long>(class1);
 
 	}
 
-	
 	@SuppressWarnings("unchecked")
 	public JpaBaseDao()
 	{
@@ -245,9 +245,120 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		return results;
 
 	}
-	
+
+	/**
+	 * Find a single record by multiple attributes.
+	 * Searches using AND.
+	 *
+	 * @param attributes AttributeHashMap of SingularAttributes and values
+	 * @return first matching entity
+	 */
+	public E findOneByAttributes(AttributesHashMap<E> attributes)
+	{
+		E ret = null;
+		List<E> results = findAllByAttributes(attributes, null);
+		if (results.size() > 0)
+		{
+			ret = results.get(0);
+		}
+
+		return ret;
+	}
+
+	/**
+	 * Find multiple records by multiple attributes.
+	 * Searches using AND.
+	 *
+	 * @param <SK> attribute
+	 * @param attributes AttributeHashMap of SingularAttributes and values
+	 * @param order SingularAttribute to order by 
+	 * @return a list of matching entities
+	 */
+	public <SK> List<E> findAllByAttributes(AttributesHashMap<E> attributes,
+			SingularAttribute<E, SK> order)
+	{
+
+		final CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+
+		final CriteriaQuery<E> criteria = builder.createQuery(entityClass);
+
+		final Root<E> root = criteria.from(entityClass);
+		criteria.select(root);
+
+		Predicate where = builder.conjunction();
+		for (Entry<SingularAttribute<E, Object>, Object> attr : attributes.entrySet())
+		{
+			where = builder.and(where, builder.equal(root.get(attr.getKey()), attr.getValue()));
+		}
+		criteria.where(where);
+
+		if (order != null)
+		{
+			criteria.orderBy(builder.asc(root.get(order)));
+		}
+		List<E> results = entityManager.createQuery(criteria).getResultList();
+
+		return results;
+	}
+
+	/**
+	 * Find a single record by multiple attributes.
+	 * Searches using OR.
+	 *
+	 * @param attributes AttributeHashMap of SingularAttributes and values
+	 * @return first matching entity
+	 */
+	public E findOneByAnyAttributes(AttributesHashMap<E> attributes)
+	{
+		E ret = null;
+		List<E> results = findAllByAnyAttributes(attributes, null);
+		if (results.size() > 0)
+		{
+			ret = results.get(0);
+		}
+
+		return ret;
+	}
+
+	/**
+	 * Find multiple records by multiple attributes.
+	 * Searches using OR.
+	 *
+	 * @param <SK> attribute
+	 * @param attributes AttributeHashMap of SingularAttributes and values
+	 * @param order SingularAttribute to order by 
+	 * @return a list of matching entities
+	 */
+	public <SK> List<E> findAllByAnyAttributes(AttributesHashMap<E> attributes,
+			SingularAttribute<E, SK> order)
+	{
+
+		final CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+
+		final CriteriaQuery<E> criteria = builder.createQuery(entityClass);
+
+		final Root<E> root = criteria.from(entityClass);
+		criteria.select(root);
+
+		Predicate where = builder.conjunction();
+		for (Entry<SingularAttribute<E, Object>, Object> attr : attributes.entrySet())
+		{
+			where = builder.or(where, builder.equal(root.get(attr.getKey()), attr.getValue()));
+		}
+		criteria.where(where);
+
+		if (order != null)
+		{
+			criteria.orderBy(builder.asc(root.get(order)));
+		}
+		List<E> results = entityManager.createQuery(criteria).getResultList();
+
+		return results;
+	}
+
 	/**
 	 * get count of entity with a simple criteria
+	 * 
 	 * @param vKey
 	 * @param value
 	 * @return
@@ -276,7 +387,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		entityManager.getEntityManagerFactory().getCache().evict(entityClass);
 
 	}
-	
+
 	public JPAContainer<E> createVaadinContainerAndFlushCache()
 	{
 		entityManager.getEntityManagerFactory().getCache().evict(entityClass);
