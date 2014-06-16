@@ -1,7 +1,6 @@
 package au.com.vaadinutils.jasper.filter;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -18,6 +17,7 @@ import au.com.vaadinutils.jasper.parameter.ReportParameterString;
 import com.vaadin.server.ErrorMessage;
 import com.vaadin.ui.Accordion;
 import com.vaadin.ui.TabSheet.Tab;
+import com.vaadin.ui.VerticalLayout;
 
 /**
  * This class is used to build report filter UI by defining how report
@@ -33,7 +33,6 @@ public class ReportFilterUIBuilder implements ReportFilterFieldBuilder, ReportFi
 {
 	private Set<ReportParameter<?>> rparams = new LinkedHashSet<ReportParameter<?>>();
 	ReportParameter<?> lastAdded = null;
-	private Integer minWidth;
 
 	public ReportFilterUIBuilder()
 	{
@@ -49,9 +48,10 @@ public class ReportFilterUIBuilder implements ReportFilterFieldBuilder, ReportFi
 	}
 
 	@Override
-	public ReportFilterDateFieldBuilder addDateField(String label, String startParameterName,String endParameterName)
+	public ReportFilterDateFieldBuilder addDateField(String label, String startParameterName, String endParameterName)
 	{
-		ReportParameterDateTimeRange param = new ReportParameterDateTimeRange(label, startParameterName,endParameterName);
+		ReportParameterDateTimeRange param = new ReportParameterDateTimeRange(label, startParameterName,
+				endParameterName);
 		addField(param);
 
 		return this;
@@ -77,10 +77,8 @@ public class ReportFilterUIBuilder implements ReportFilterFieldBuilder, ReportFi
 		return this;
 	}
 
-	
-
 	@Override
-	public ReportFilterDateFieldBuilder setDateRange(DateTime startDate,DateTime endDate)
+	public ReportFilterDateFieldBuilder setDateRange(DateTime startDate, DateTime endDate)
 	{
 		@SuppressWarnings("unchecked")
 		ReportParameter<Date> param = (ReportParameter<Date>) lastAdded;
@@ -95,6 +93,7 @@ public class ReportFilterUIBuilder implements ReportFilterFieldBuilder, ReportFi
 	{
 		List<ExpanderComponent> components = new LinkedList<ExpanderComponent>();
 
+		boolean hasExpandingComponents = false;
 		Accordion accordian = null;
 		if (hasFilters())
 		{
@@ -103,7 +102,8 @@ public class ReportFilterUIBuilder implements ReportFilterFieldBuilder, ReportFi
 			{
 				if (rparam.showFilter())
 				{
-					// check if we should hide date fields, used for the scheduler
+					// check if we should hide date fields, used for the
+					// scheduler
 					if (!hideDateFields || !rparam.isDateField())
 					{
 						if (rparam.shouldExpand())
@@ -136,8 +136,23 @@ public class ReportFilterUIBuilder implements ReportFilterFieldBuilder, ReportFi
 		}
 		if (accordian != null)
 		{
+			hasExpandingComponents = true;
 			components.add(new ExpanderComponent(accordian, true));
 		}
+
+		if (!hasExpandingComponents)
+		{
+			// there are no expanding components, so add an empty expanding
+			// component so the fields will group together at the top
+			components.add(new ExpanderComponent(new VerticalLayout(), true));
+		}
+		
+		// add 15px high layout to pack up the bottom of the layout, otherwise on
+		// some sets of filters the last component is hidden
+		VerticalLayout spacer = new VerticalLayout();
+		spacer.setHeight("15");
+		components.add(new ExpanderComponent(spacer,false));
+
 		return components;
 	}
 
@@ -163,5 +178,4 @@ public class ReportFilterUIBuilder implements ReportFilterFieldBuilder, ReportFi
 		return ret;
 	}
 
-	
 }

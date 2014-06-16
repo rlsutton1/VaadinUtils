@@ -241,7 +241,8 @@ class JasperReportLayout extends VerticalLayout
 
 					if (!insitue)
 					{
-						new JasperReportPopUp(new ChildJasperReportProperties(reportProperties,	subTitle, subReportFileName, subFilters));
+						new JasperReportPopUp(new ChildJasperReportProperties(reportProperties, subTitle,
+								subReportFileName, subFilters));
 					}
 					else
 					{
@@ -262,10 +263,9 @@ class JasperReportLayout extends VerticalLayout
 	{
 		VerticalLayout layout = new VerticalLayout();
 		layout.setId("OptionsPanel");
-		//layout.setMargin(new MarginInfo(false, false, false, false));
-		//layout.setSpacing(true);
+		// layout.setMargin(new MarginInfo(false, false, false, false));
+		// layout.setSpacing(true);
 		layout.setSizeFull();
-		// layout.setHeight("100%");
 
 		String buttonHeight = "" + 40;
 		HorizontalLayout buttonBar = new HorizontalLayout();
@@ -385,17 +385,17 @@ class JasperReportLayout extends VerticalLayout
 		scheduleButton = new NativeButton();
 
 		JpaBaseDao<ReportEmailScheduleEntity, Long> dao = JpaBaseDao.getGenericDao(ReportEmailScheduleEntity.class);
-		Long count = dao.getCount(ReportEmailScheduleEntity_.JasperReportPropertiesClassName, reportProperties.getReportClass()
-				.getCanonicalName());
+		Long count = dao.getCount(ReportEmailScheduleEntity_.JasperReportPropertiesClassName, reportProperties
+				.getReportClass().getCanonicalName());
 
 		ScheduleIconBuilder iconBuilder = new ScheduleIconBuilder();
 
 		String baseIconFileName = "Call Calendar_32";
 		String path = VaadinServlet.getCurrent().getServletContext().getRealPath("templates/images/seanau/");
-		String targetFileName = baseIconFileName+"-"+count+".png";
-		iconBuilder.buildLogo(count.intValue(), new File(path), baseIconFileName+".png", targetFileName);
+		String targetFileName = baseIconFileName + "-" + count + ".png";
+		iconBuilder.buildLogo(count.intValue(), new File(path), baseIconFileName + ".png", targetFileName);
 
-		scheduleButton.setIcon(new ExternalResource("images/seanau/"+targetFileName));
+		scheduleButton.setIcon(new ExternalResource("images/seanau/" + targetFileName));
 		scheduleButton.setDescription("Schedule");
 		scheduleButton.setWidth("50");
 		scheduleButton.setHeight(buttonHeight);

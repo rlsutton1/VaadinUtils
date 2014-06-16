@@ -24,6 +24,7 @@ import au.com.vaadinutils.jasper.parameter.ReportParameterConstant;
 import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailRecipient;
 import au.com.vaadinutils.jasper.ui.CleanupCallback;
 import au.com.vaadinutils.jasper.ui.JasperReportProperties;
+import au.com.vaadinutils.jasper.ui.JasperReportPropertiesAlternateFile;
 
 public class ReportEmailRunnerImpl implements ReportEmailRunner, JasperReportProperties
 {
@@ -42,6 +43,7 @@ public class ReportEmailRunnerImpl implements ReportEmailRunner, JasperReportPro
 		jasperReportProperties = jrpClass.newInstance();
 		this.schedule = schedule;
 
+		jasperReportProperties = new JasperReportPropertiesAlternateFile(schedule.getReportTitle(),schedule.getReportFileName(), jasperReportProperties);
 		Collection<ReportParameter<?>> params = buildParams(schedule, scheduledTime, this);
 
 		JasperManager manager = new JasperManager(this);

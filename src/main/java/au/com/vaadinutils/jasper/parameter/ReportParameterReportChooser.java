@@ -1,5 +1,8 @@
 package au.com.vaadinutils.jasper.parameter;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import au.com.vaadinutils.crud.FormHelper;
 import au.com.vaadinutils.jasper.scheduler.entities.DateParameterType;
 import au.com.vaadinutils.jasper.ui.JasperReportProperties;
@@ -7,11 +10,13 @@ import au.com.vaadinutils.jasper.ui.JasperReportProperties;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 
-public class ReportParameterReportChooser<T extends Enum<T> & ReportChooser> extends ReportParameter<Enum<T>> implements ReportChooser
+public class ReportParameterReportChooser<T extends Enum<T> & ReportChooser> extends ReportParameter<Enum<T>> implements
+		ReportChooser
 {
 
 	private ComboBox field;
 	private Class<T> enumClass;
+	Logger logger = LogManager.getLogger();
 
 	/**
 	 * 
@@ -20,9 +25,9 @@ public class ReportParameterReportChooser<T extends Enum<T> & ReportChooser> ext
 	 * @param parameterName
 	 * @param enumClass
 	 */
-	public ReportParameterReportChooser(String caption, T defaultValue,String parameterName, Class<T> enumClass)
+	public ReportParameterReportChooser(String caption, T defaultValue, String parameterName, Class<T> enumClass)
 	{
-		super(caption,parameterName);
+		super(caption, parameterName);
 		field = new ComboBox(caption);
 		this.enumClass = enumClass;
 		field.setContainerDataSource(FormHelper.createContainerFromEnumClass("value", enumClass));
@@ -54,7 +59,7 @@ public class ReportParameterReportChooser<T extends Enum<T> & ReportChooser> ext
 	public void setDefaultValue(Enum<T> defaultValue)
 	{
 		field.setValue(defaultValue);
-		
+
 	}
 
 	@Override
@@ -67,7 +72,7 @@ public class ReportParameterReportChooser<T extends Enum<T> & ReportChooser> ext
 	public JasperReportProperties getReportProperties(JasperReportProperties reportProperties)
 	{
 		@SuppressWarnings("unchecked")
-		T e = (T)field.getValue();
+		T e = (T) field.getValue();
 		return e.getReportProperties(reportProperties);
 	}
 
@@ -82,12 +87,35 @@ public class ReportParameterReportChooser<T extends Enum<T> & ReportChooser> ext
 	{
 		return true;
 	}
-	
+
 	@Override
 	public void setValueAsString(String value, String parameterName)
 	{
 
-		field.setValue(Enum.valueOf(enumClass, value));
+		boolean set = false;
+		try
+		{
+			field.setValue(Enum.valueOf(enumClass, value));
+			set = true;
+		}
+		catch (IllegalArgumentException e)
+		{
+			// we may have a toString method on the enum which will mean the
+			// value that arrives here is the user friendly string
+			for (T enumValue : enumClass.getEnumConstants())
+			{
+				if (enumValue.toString().equalsIgnoreCase(value))
+				{
+					field.setValue(enumValue);
+					set = true;
+					break;
+				}
+			}
+			if (set == false)
+			{
+				logger.error(e, e);
+			}
+		}
 
 	}
 
