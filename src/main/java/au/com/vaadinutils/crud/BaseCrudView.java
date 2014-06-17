@@ -1417,4 +1417,10 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	{
 		return Collections.unmodifiableSet(childCrudListeners);
 	}
+	
+	
+	protected DeleteVetoResponseData canDelete(E entity)
+	{
+		return new DeleteVetoResponseData(true);
+	}
 }

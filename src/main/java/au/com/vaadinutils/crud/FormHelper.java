@@ -69,7 +69,7 @@ public class FormHelper<E> implements Serializable
 	private AbstractLayout form;
 	private ValidatingFieldGroup<E> group;
 
-	static  transient Logger logger   =  LogManager.getLogger(FormHelper.class);
+	static transient Logger logger = LogManager.getLogger(FormHelper.class);
 
 	public FormHelper(AbstractLayout form, ValidatingFieldGroup<E> group)
 	{
@@ -124,7 +124,7 @@ public class FormHelper<E> implements Serializable
 		else
 
 		{
-			logger.warn("field {}  was not bound", fieldName );
+			logger.warn("field {}  was not bound", fieldName);
 		}
 	}
 
@@ -182,9 +182,9 @@ public class FormHelper<E> implements Serializable
 		this.fieldList.add(field);
 		return field;
 	}
-	
-	public DateField bindDateField(String label,
-			SingularAttribute<ReportEmailScheduleEntity, Date> member, String dateFormat, Resolution resolution)
+
+	public DateField bindDateField(String label, SingularAttribute<ReportEmailScheduleEntity, Date> member,
+			String dateFormat, Resolution resolution)
 	{
 		DateField field = bindDateField(form, group, label, member.getName(), dateFormat, resolution);
 		this.fieldList.add(field);
@@ -339,8 +339,8 @@ public class FormHelper<E> implements Serializable
 		return field;
 	}
 
-	public <L> ComboBox bindComboBox(AbstractLayout form, ValidatingFieldGroup<E> fieldGroup,String fieldName, String fieldLabel,
-			Collection<?> options)
+	public <L> ComboBox bindComboBox(AbstractLayout form, ValidatingFieldGroup<E> fieldGroup, String fieldName,
+			String fieldLabel, Collection<?> options)
 	{
 		ComboBox field = new SplitComboBox(fieldLabel, options);
 		field.setNewItemsAllowed(false);
@@ -349,8 +349,17 @@ public class FormHelper<E> implements Serializable
 		field.setWidth(STANDARD_COMBO_WIDTH);
 		field.setImmediate(true);
 		form.addComponent(field);
-		doBinding(group,fieldName,field);
+		doBinding(group, fieldName, field);
 		return field;
+	}
+
+	
+	public <L> ComboBox bindEntityField(String fieldLabel, SingularAttribute<E, L> fieldName,
+			SingularAttribute<L, String> listFieldName)
+	{
+		return new EntityFieldBuilder<L>().setLabel(fieldLabel).setField(fieldName).setListFieldName(listFieldName)
+				.build();
+
 	}
 
 	/**
@@ -360,8 +369,8 @@ public class FormHelper<E> implements Serializable
 	public <L> ComboBox bindEntityField(String fieldLabel, SingularAttribute<E, L> fieldName, Class<L> listClazz,
 			SingularAttribute<L, ?> listFieldName)
 	{
-		return new EntityFieldBuilder<L>().setLabel(fieldLabel).setField(fieldName)
-				.setListFieldName(listFieldName).build();
+		return new EntityFieldBuilder<L>().setLabel(fieldLabel).setField(fieldName).setListFieldName(listFieldName)
+				.build();
 
 	}
 
@@ -461,7 +470,8 @@ public class FormHelper<E> implements Serializable
 	 * for example<br>
 	 * <br>
 	 * 
-	 * FormHelper&lt;RaffleBook&gt; helper = new FormHelper&lt;RaffleBook&gt;(...);<br>
+	 * FormHelper&lt;RaffleBook&gt; helper = new
+	 * FormHelper&lt;RaffleBook&gt;(...);<br>
 	 * <br>
 	 * ComboBox field = helper.new EntityFieldBuilder&lt;RaffleAllocation&gt;()<br>
 	 * .setLabel("Action")<br>
@@ -515,9 +525,7 @@ public class FormHelper<E> implements Serializable
 					+ " is not valid, valid listFieldNames are " + container.getContainerPropertyIds().toString());
 
 			if (container.getSortableContainerPropertyIds().contains(listField))
-				container.sort(new String[]
-				{ listField }, new boolean[]
-				{ true });
+				container.sort(new String[] { listField }, new boolean[] { true });
 
 			component.setItemCaptionPropertyId(listField);
 			component.setContainerDataSource(container);
@@ -530,18 +538,18 @@ public class FormHelper<E> implements Serializable
 			component.setImmediate(true);
 			if (group != null)
 			{
-				Collection<?  extends Object> ids = null;
+				Collection<? extends Object> ids = null;
 				if (group.getContainer() != null)
-					
+
 					ids = group.getContainer().getContainerPropertyIds();
 				else if (group.getItemDataSource() != null)
 					ids = group.getItemDataSource().getItemPropertyIds();
-				
-				Preconditions.checkArgument(ids != null, "The group must have either a Container or an ItemDataSource attached.");
-					
-				Preconditions.checkState(ids.contains(field), field
-						+ " is not valid, valid listFieldNames are "
-						+ ids.toString());
+
+				Preconditions.checkArgument(ids != null,
+						"The group must have either a Container or an ItemDataSource attached.");
+
+				Preconditions.checkState(ids.contains(field),
+						field + " is not valid, valid listFieldNames are " + ids.toString());
 
 				doBinding(group, field, component);
 			}
@@ -586,7 +594,7 @@ public class FormHelper<E> implements Serializable
 			this.listClazz = listClazz;
 			return this;
 		}
-		
+
 		public EntityFieldBuilder<L> setListFieldName(SingularAttribute<L, ?> listField)
 		{
 			this.listField = listField.getName();
@@ -607,8 +615,10 @@ public class FormHelper<E> implements Serializable
 
 		public EntityFieldBuilder<L> setListClass(Class<L> listClazz)
 		{
-			Preconditions.checkState(this.listClazz == null,
-					"As you have set the field as a singularAttribute, the listClass is set automatically so there is no need to call setListClass.");
+			Preconditions
+					.checkState(
+							this.listClazz == null,
+							"As you have set the field as a singularAttribute, the listClass is set automatically so there is no need to call setListClass.");
 			this.listClazz = listClazz;
 			return this;
 		}
@@ -648,8 +658,7 @@ public class FormHelper<E> implements Serializable
 		private AbstractLayout builderForm;
 		private boolean multiSelect = false;
 
-		@SuppressWarnings(
-		{ "unchecked", "rawtypes" })
+		@SuppressWarnings({ "unchecked", "rawtypes" })
 		public SplitListSelect build()
 		{
 			Preconditions.checkNotNull(label, "label may not be null");
@@ -680,9 +689,7 @@ public class FormHelper<E> implements Serializable
 					+ " is not valid, valid listFields are " + container.getContainerPropertyIds().toString());
 
 			if (container.getSortableContainerPropertyIds().contains(listField))
-				container.sort(new String[]
-				{ listField }, new boolean[]
-				{ true });
+				container.sort(new String[] { listField }, new boolean[] { true });
 
 			component.setContainerDataSource(container);
 
@@ -788,13 +795,14 @@ public class FormHelper<E> implements Serializable
 
 	/**
 	 * use this syntax to instance the builder:<br>
-	 * The formhelper must be an Entity with an attribute containing a Set of 
+	 * The formhelper must be an Entity with an attribute containing a Set of
 	 * items that will be selected.
 	 * 
-	 * formHelper.new EntityFieldBuilder<{class name of the items in the list}>(); <br>
+	 * formHelper.new EntityFieldBuilder<{class name of the items in the
+	 * list}>(); <br>
 	 * <br>
-	 * If you need to filter the set of available items then you must
-	 * explicity set the list container and filter it.
+	 * If you need to filter the set of available items then you must explicity
+	 * set the list container and filter it.
 	 * 
 	 * for example<br>
 	 * <br>
@@ -826,8 +834,7 @@ public class FormHelper<E> implements Serializable
 		private String leftColumnCaption;
 		private String rightColumnCaption;
 
-		@SuppressWarnings(
-		{ "unchecked", "rawtypes" })
+		@SuppressWarnings({ "unchecked", "rawtypes" })
 		public SplitTwinColSelect build()
 		{
 			Preconditions.checkNotNull(label, "label may not be null");
@@ -860,9 +867,7 @@ public class FormHelper<E> implements Serializable
 					+ " is not valid, valid listFields are " + container.getContainerPropertyIds().toString());
 
 			if (container.getSortableContainerPropertyIds().contains(listField))
-				container.sort(new String[]
-				{ listField }, new boolean[]
-				{ true });
+				container.sort(new String[] { listField }, new boolean[] { true });
 
 			component.setContainerDataSource(container);
 			component.setConverter(new MultiSelectConverter(component, Set.class));
@@ -886,6 +891,7 @@ public class FormHelper<E> implements Serializable
 
 		/**
 		 * label that will appear next to the component on the screen
+		 * 
 		 * @param label
 		 * @return
 		 */
@@ -909,6 +915,7 @@ public class FormHelper<E> implements Serializable
 
 		/**
 		 * the set in the parent table that holds the set of children
+		 * 
 		 * @param field
 		 * @return
 		 */
@@ -932,11 +939,10 @@ public class FormHelper<E> implements Serializable
 		}
 
 		/**
-		 * Set the list container of available items.
-		 * A container will normally be generated automatically based on the 
-		 * List class <L>. 
-		 * However if you need to filter the list of available items you will
-		 * need to provide your own container which is filtered.
+		 * Set the list container of available items. A container will normally
+		 * be generated automatically based on the List class <L>. However if
+		 * you need to filter the list of available items you will need to
+		 * provide your own container which is filtered.
 		 * 
 		 * @param container
 		 * @return
@@ -1117,9 +1123,9 @@ public class FormHelper<E> implements Serializable
 	}
 
 	public CKEditorEmailField bindEditorField(AbstractLayout form, ValidatingFieldGroup<E> group, String fieldName,
-			boolean readonly,  ConfigModifier configModifier)
+			boolean readonly, ConfigModifier configModifier)
 	{
-		SplitEditorField field = new SplitEditorField(readonly,configModifier);
+		SplitEditorField field = new SplitEditorField(readonly, configModifier);
 		field.setWidth("100%");
 		field.setImmediate(true);
 		doBinding(group, fieldName, field);
@@ -1127,6 +1133,10 @@ public class FormHelper<E> implements Serializable
 		return field;
 	}
 
-	
+	public <EN> ComboBox bindEnumField(String fieldLabel, SingularAttribute<E, EN> fieldName)
+	{
+		return bindEnumField(fieldLabel, fieldName.getName(), fieldName.getBindableJavaType());
+
+	}
 
 }
