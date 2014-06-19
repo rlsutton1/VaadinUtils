@@ -51,6 +51,7 @@ import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.AbstractSelect.ItemCaptionMode;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.CustomField;
 import com.vaadin.ui.DateField;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.Label;
@@ -103,6 +104,17 @@ public class FormHelper<E> implements Serializable
 		this.fieldList.add(field);
 		return field;
 	}
+	
+	public <T extends CustomField<?>> T doBinding(String fieldLabel,SingularAttribute<?, ?> field,T customField)
+	{
+		
+		doBinding(group, field.getName(), customField);
+		this.fieldList.add(customField);
+		form.addComponent(customField);
+		return customField;
+		
+	}
+	
 
 	public TextField bindTextField(AbstractLayout form, ValidatingFieldGroup<E> group, String fieldLabel,
 			String fieldName)
@@ -117,7 +129,7 @@ public class FormHelper<E> implements Serializable
 		return field;
 	}
 
-	private void doBinding(FieldGroup group, String fieldName, @SuppressWarnings("rawtypes") Field field)
+	public void doBinding(FieldGroup group, String fieldName, @SuppressWarnings("rawtypes") Field field)
 	{
 		if (group != null)
 			group.bind(field, fieldName);
@@ -875,6 +887,7 @@ public class FormHelper<E> implements Serializable
 			component.setWidth("100%");
 			component.setImmediate(true);
 			component.setNullSelectionAllowed(true);
+			component.setBuffered(true);
 
 			if (group != null)
 			{
