@@ -121,6 +121,13 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 	protected void init(Class<E> entityClass, JPAContainer<E> container, HeadingPropertySet<E> headings)
 	{
+		if (!getSecurityManager().canUseView())
+		{
+			this.setSizeFull();
+			this.addComponent(new Label("Sorry, you do not have permission to access "+getTitleText()));
+			return; 
+		}
+		
 		this.entityClass = entityClass;
 		this.container = container;
 		try
@@ -155,6 +162,11 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		showNoSelectionMessage();
 		entityTable.select(entityTable.firstItemId());
 
+	}
+
+	protected CrudSecurityManager getSecurityManager()
+	{
+		return new NullCrudSecurityManager();
 	}
 
 	public void addGeneratedColumn(Object id, ColumnGenerator generator)

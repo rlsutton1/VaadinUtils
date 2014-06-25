@@ -300,6 +300,8 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 		return results;
 	}
+	
+	
 
 	/**
 	 * Find a single record by multiple attributes.

@@ -276,9 +276,9 @@ public class ReportParameterTable<T> extends ReportParameter<String>
 			@Override
 			public void validate(Object value) throws InvalidValueException
 			{
-				validateListener.setComponentError(null);
+				setValidateListenerComponentError(null);
 				table.setComponentError(null);
-				validateListener.setComponentError(null);
+				setValidateListenerComponentError(null);
 				table.setComponentError(null);
 				Collection<Long> ids = (Collection<Long>) table.getSelectedItems();
 				if (ids.size() == 0)
@@ -300,12 +300,18 @@ public class ReportParameterTable<T> extends ReportParameter<String>
 							return "You must select at least one " + caption;
 						}
 					};
-					validateListener.setComponentError(error);
+					setValidateListenerComponentError(error);
 					throw new Validator.EmptyValueException("You must select at least one " + caption);
 				}
-					
-				
 
+			}
+
+			private void setValidateListenerComponentError(ErrorMessage error)
+			{
+				if (validateListener != null)
+				{
+					validateListener.setComponentError(error);
+				}
 			}
 		};
 		table.addValidator(validator);

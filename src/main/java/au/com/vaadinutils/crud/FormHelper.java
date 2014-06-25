@@ -36,7 +36,6 @@ import au.com.vaadinutils.fields.CKEditorEmailField;
 import au.com.vaadinutils.fields.CKEditorEmailField.ConfigModifier;
 import au.com.vaadinutils.fields.ColorPickerField;
 import au.com.vaadinutils.fields.DataBoundButton;
-import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailScheduleEntity;
 
 import com.google.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.JPAContainer;
@@ -195,10 +194,11 @@ public class FormHelper<E> implements Serializable
 		return field;
 	}
 
-	public DateField bindDateField(String label, SingularAttribute<ReportEmailScheduleEntity, Date> member,
+	public DateField bindDateField(String label, SingularAttribute<E, Date> member,
 			String dateFormat, Resolution resolution)
 	{
 		DateField field = bindDateField(form, group, label, member.getName(), dateFormat, resolution);
+		field.setWidth(STANDARD_COMBO_WIDTH);
 		this.fieldList.add(field);
 		return field;
 	}

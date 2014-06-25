@@ -192,12 +192,24 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 		boolean advancedSearchActive = advancedSearchCheckbox != null && advancedSearchCheckbox.getValue();
 		Filter filter = getContainerFilter(searchText, advancedSearchActive);
 		if (filter == null)
-			selectableTable.resetFilters();
+			resetFilters();
 		else
-			selectableTable.applyFilter(filter);
+			applyFilter(filter);
 
 	}
 
+	protected void resetFilters()
+	{
+		container.removeAllContainerFilters();
+	}
+	
+	protected void applyFilter(Filter filter)
+	{		/* Reset the filter for the Entity Container. */
+		resetFilters();
+		container.addContainerFilter(filter);
+
+	}
+	
 	protected String getSearchFieldText()
 	{
 		return searchField.getValue();
