@@ -97,8 +97,8 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 				.addColumn("Enabled", ReportEmailScheduleEntity_.enabled)
 				.addColumn("Last Run", ReportEmailScheduleEntity_.lastRuntime).build();
 
-		init(ReportEmailScheduleEntity.class, container, headings);
 		this.disallowNew(true);
+		init(ReportEmailScheduleEntity.class, container, headings);
 	}
 
 	public JasperReportScheduleLayout(ScheduleCreater creater)

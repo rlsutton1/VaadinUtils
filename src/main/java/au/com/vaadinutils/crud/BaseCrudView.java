@@ -785,6 +785,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		BaseCrudView.this.entityTable.select(previousItemId);
 		container.commit();
 
+		EntityManagerProvider.getEntityManager().flush();
+		
 		postDelete(entityId);
 	}
 
