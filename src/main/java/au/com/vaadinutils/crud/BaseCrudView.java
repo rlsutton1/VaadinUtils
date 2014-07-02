@@ -6,8 +6,10 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javax.persistence.RollbackException;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
@@ -15,6 +17,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.vaadin.dialogs.ConfirmDialog;
 
+import au.com.vaadinutils.crud.security.SecurityManagerFactoryProxy;
 import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.listener.ClickEventLogged;
 
@@ -121,13 +124,28 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 	protected void init(Class<E> entityClass, JPAContainer<E> container, HeadingPropertySet<E> headings)
 	{
-		if (!getSecurityManager().canUseView())
+
+		try
+		{
+			if (!getSecurityManager().canUseView())
+			{
+				this.setSizeFull();
+				Label sorryMessage = new Label("Sorry, you do not have permission to access " + getTitleText());
+				sorryMessage.setStyleName(Reindeer.LABEL_H1);
+				this.addComponent(sorryMessage);
+				return;
+			}
+		}
+		catch (ExecutionException e1)
 		{
 			this.setSizeFull();
-			this.addComponent(new Label("Sorry, you do not have permission to access "+getTitleText()));
-			return; 
+			Label sorryMessage = new Label("Sorry, you do not have permission to access " + getTitleText());
+			sorryMessage.setStyleName(Reindeer.LABEL_H1);
+			this.addComponent(sorryMessage);
+			return;
+
 		}
-		
+
 		this.entityClass = entityClass;
 		this.container = container;
 		try
@@ -164,9 +182,17 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 	}
 
-	protected CrudSecurityManager getSecurityManager()
+	/**
+	 * if you need to provide a security manager, call
+	 * SecurityManagerFactoryProxy.setFactory(...) at application initialisation
+	 * time
+	 * 
+	 * @return
+	 * @throws ExecutionException
+	 */
+	private CrudSecurityManager getSecurityManager() throws ExecutionException
 	{
-		return new NullCrudSecurityManager();
+		return SecurityManagerFactoryProxy.getSecurityManager(this);
 	}
 
 	public void addGeneratedColumn(Object id, ColumnGenerator generator)
@@ -786,7 +812,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		container.commit();
 
 		EntityManagerProvider.getEntityManager().flush();
-		
+
 		postDelete(entityId);
 	}
 
@@ -875,6 +901,27 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			Notification.show("Changes Saved", "Any changes you have made have been saved.", Type.TRAY_NOTIFICATION);
 
 		}
+		catch (RollbackException e)
+		{
+			Throwable cause = e.getCause();
+			if (cause instanceof ConstraintViolationException)
+			{
+				ConstraintViolationException constraint = (ConstraintViolationException) cause;
+				String groupedViolationMessage = "";
+				for (ConstraintViolation<?> violation : ((ConstraintViolationException) cause)
+						.getConstraintViolations())
+				{
+					logger.error(violation.getLeafBean().getClass().getCanonicalName() + " " + violation.getLeafBean());
+					String violationMessage = violation.getLeafBean().getClass().getSimpleName() + " "
+							+ violation.getPropertyPath() + " " + violation.getMessage() + ", the value was "
+							+ violation.getInvalidValue();
+					logger.error(violationMessage);
+					groupedViolationMessage += violationMessage + "\n";
+				}
+				Notification.show(groupedViolationMessage, Type.ERROR_MESSAGE);
+			}
+		}
+
 		catch (Exception e)
 		{
 			if (e instanceof InvalidValueException || e.getCause() instanceof InvalidValueException)
@@ -1118,7 +1165,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 										 * Properties in our entity at once.
 										 */
 										fieldGroup.discard();
-										
+
 										for (ChildCrudListener<E> child : childCrudListeners)
 										{
 											child.discard();
@@ -1431,8 +1478,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	{
 		return Collections.unmodifiableSet(childCrudListeners);
 	}
-	
-	
+
 	protected DeleteVetoResponseData canDelete(E entity)
 	{
 		return new DeleteVetoResponseData(true);
