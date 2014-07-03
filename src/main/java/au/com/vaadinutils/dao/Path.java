@@ -6,7 +6,6 @@ import java.util.List;
 import javax.persistence.metamodel.SingularAttribute;
 
 import au.com.vaadinutils.crud.CrudEntity;
-import au.com.vaadinutils.dao.EntityManagerProvider;
 
 public class Path
 {

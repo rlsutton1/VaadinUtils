@@ -4,7 +4,6 @@ import javax.servlet.http.Cookie;
 
 import com.vaadin.server.VaadinService;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickEvent;
 
 public class CookieButton extends Button
 {

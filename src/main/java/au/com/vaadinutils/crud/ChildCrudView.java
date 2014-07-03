@@ -8,7 +8,6 @@ import javax.validation.ConstraintViolationException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.vaadin.dialogs.ConfirmDialog;
 
 import au.com.vaadinutils.dao.EntityManagerProvider;
 
@@ -28,7 +27,6 @@ import com.vaadin.data.util.filter.Compare;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
-import com.vaadin.ui.UI;
 
 /**
  * child crud does not support nesting.
