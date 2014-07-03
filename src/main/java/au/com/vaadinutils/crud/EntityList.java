@@ -38,4 +38,6 @@ public interface EntityList<E> extends Component
 	public void setDragMode(TableDragMode row);
 
 	public void setDropHandler(DropHandler dropHandler);
+
+	public void setVisibleColumns(Object... visibleColumns);
 }
