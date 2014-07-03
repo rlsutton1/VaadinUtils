@@ -54,7 +54,7 @@ public abstract class SingleEntityWizardStep<E extends CrudEntity> implements Wi
 		return "Group Details";
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "null" })
 	@Override
 	public Component getContent()
 	{

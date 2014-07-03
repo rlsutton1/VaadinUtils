@@ -100,6 +100,8 @@ public class ReportParameterDateTimeRange extends ReportParameter<String>
 		startfield.addValidator(new Validator()
 		{
 
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public void validate(Object value) throws InvalidValueException
 			{
@@ -112,6 +114,8 @@ public class ReportParameterDateTimeRange extends ReportParameter<String>
 		});
 		endfield.addValidator(new Validator()
 		{
+
+			private static final long serialVersionUID = 1L;
 
 			@Override
 			public void validate(Object value) throws InvalidValueException

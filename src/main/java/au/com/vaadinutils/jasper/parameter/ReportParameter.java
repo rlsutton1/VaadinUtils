@@ -192,6 +192,7 @@ public abstract class ReportParameter<T>
 		{
 			return false;
 		}
+		@SuppressWarnings("rawtypes")
 		ReportParameter other = (ReportParameter) obj;
 		if (label == null)
 		{

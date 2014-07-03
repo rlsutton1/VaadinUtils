@@ -150,6 +150,7 @@ public class EmailTargetLayout extends VerticalLayout
 		return line;
 	}
 
+	@SuppressWarnings("unchecked")
 	private void getValidEmailContacts(ComboBox targetAddress)
 	{
 

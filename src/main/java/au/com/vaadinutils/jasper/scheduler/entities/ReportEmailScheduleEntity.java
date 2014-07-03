@@ -107,6 +107,7 @@ public class ReportEmailScheduleEntity implements Serializable, CrudEntity, Repo
 
 	private String reportTitle;
 
+	@SuppressWarnings("unused")
 	private String reportIdentifier;
 
 	@Temporal(TemporalType.TIMESTAMP)

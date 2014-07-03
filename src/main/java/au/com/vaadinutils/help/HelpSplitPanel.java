@@ -133,6 +133,7 @@ public class HelpSplitPanel extends HorizontalSplitPanel implements View, HelpPa
 		return hidden;
 	}
 
+	@SuppressWarnings("null")
 	private void adjustHelpSize(Enum<?> helpId, Boolean hidden)
 	{
 

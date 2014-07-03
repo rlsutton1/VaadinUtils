@@ -9,6 +9,7 @@ public class CookieButton extends Button
 {
 	// Logger logger = LogManager.getLogger();
 
+	private static final long serialVersionUID = 2052581680067745511L;
 	private String cookiePath;
 	private CookieButtonCallback callback;
 	private String onText;
