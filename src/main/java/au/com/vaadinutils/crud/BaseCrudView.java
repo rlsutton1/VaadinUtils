@@ -125,27 +125,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	protected void init(Class<E> entityClass, JPAContainer<E> container, HeadingPropertySet<E> headings)
 	{
 
-		try
-		{
-			if (!getSecurityManager().canUseView())
-			{
-				this.setSizeFull();
-				Label sorryMessage = new Label("Sorry, you do not have permission to access " + getTitleText());
-				sorryMessage.setStyleName(Reindeer.LABEL_H1);
-				this.addComponent(sorryMessage);
-				return;
-			}
-		}
-		catch (ExecutionException e1)
-		{
-			this.setSizeFull();
-			Label sorryMessage = new Label("Sorry, you do not have permission to access " + getTitleText());
-			sorryMessage.setStyleName(Reindeer.LABEL_H1);
-			this.addComponent(sorryMessage);
-			return;
-
-		}
-
 		this.entityClass = entityClass;
 		this.container = container;
 		try
@@ -180,6 +159,37 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		showNoSelectionMessage();
 		entityTable.select(entityTable.firstItemId());
 
+		// do the security check after all the other setup, so extending classes
+		// don't throw npe's due to
+		// uninitialised components
+		if (!getSecurityManager().canUserView())
+		{
+			this.setSizeFull();
+			Label sorryMessage = new Label("Sorry, you do not have permission to access " + getTitleText());
+			sorryMessage.setStyleName(Reindeer.LABEL_H1);
+			this.removeAllComponents();
+			this.addComponent(sorryMessage);
+			return;
+		}
+
+		if (!getSecurityManager().canUserDelete())
+		{
+			// disable delete as the user doesn't have permission to delete
+			disallowDelete(true);
+		}
+
+		if (!getSecurityManager().canUserEdit())
+		{
+			// disable save as the user doesn't have permission to edit
+			buttonLayout.removeComponent(saveButton);
+			saveButton.setVisible(false);
+		}
+		
+		if (!getSecurityManager().canUserCreate())
+		{
+			disallowNew(true);
+		}
+
 	}
 
 	/**
@@ -190,7 +200,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 * @return
 	 * @throws ExecutionException
 	 */
-	private CrudSecurityManager getSecurityManager() throws ExecutionException
+	protected CrudSecurityManager getSecurityManager()
 	{
 		return SecurityManagerFactoryProxy.getSecurityManager(this);
 	}
@@ -577,7 +587,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	{
 		this.disallowDelete = disallow;
 
-		if (disallow)
+		if (disallow || !getSecurityManager().canUserDelete())
 		{
 			// find and remove the delete action
 			for (Object id : this.actionCombo.getItemIds())
@@ -1043,8 +1053,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 * is unreliable
 	 * 
 	 * @param item
+	 * @throws Exception
 	 */
-	protected void interceptSaveValues(EntityItem<E> entityItem)
+	protected void interceptSaveValues(EntityItem<E> entityItem) throws Exception
 	{
 	}
 

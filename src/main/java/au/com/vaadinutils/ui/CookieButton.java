@@ -9,6 +9,8 @@ public class CookieButton extends Button
 {
 	// Logger logger = LogManager.getLogger();
 
+	private static final String OFF_STATE = "CookieButton-Off";
+	private static final String ON_STATE = "CookieButton-On";
 	private static final long serialVersionUID = 2052581680067745511L;
 	private String cookiePath;
 	private CookieButtonCallback callback;
@@ -30,10 +32,11 @@ public class CookieButton extends Button
 			@Override
 			public void buttonClick(ClickEvent event)
 			{
-				setMode(getCaption().equals("Off"));
+				setMode(getCaption().equals(onText));
 			}
 
 		});
+		
 	}
 
 	private void setMode(boolean on)
@@ -41,7 +44,7 @@ public class CookieButton extends Button
 		if (on)
 		{
 			setCaption(offText);
-			Cookie myCookie = new Cookie("HandsetView", "On");
+			Cookie myCookie = new Cookie(cookiePath, ON_STATE);
 			myCookie.setPath(VaadinService.getCurrentRequest().getContextPath());
 			VaadinService.getCurrentResponse().addCookie(myCookie);
 			callback.on();
@@ -50,7 +53,7 @@ public class CookieButton extends Button
 		else
 		{
 			setCaption(onText);
-			Cookie myCookie = new Cookie("HandsetView", "Off");
+			Cookie myCookie = new Cookie(cookiePath, OFF_STATE);
 			myCookie.setPath(VaadinService.getCurrentRequest().getContextPath());
 			VaadinService.getCurrentResponse().addCookie(myCookie);
 			callback.off();
@@ -58,15 +61,14 @@ public class CookieButton extends Button
 		}
 	}
 
-	void init()
+	public void restoreStateFromCookie()
 	{
 		boolean mode = false;
 		for (Cookie cookie : VaadinService.getCurrentRequest().getCookies())
 		{
-			System.out.println(cookie.getName());
 			if (cookie.getName().equals(cookiePath))
 			{
-				mode = cookie.getValue().equalsIgnoreCase("On");
+				mode = cookie.getValue().equalsIgnoreCase(ON_STATE);
 				break;
 			}
 		}

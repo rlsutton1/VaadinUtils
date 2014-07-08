@@ -402,6 +402,11 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 					logger.error(e, e);
 					throw new RuntimeException(e);
 				}
+				catch (Exception e)
+				{
+					logger.error(e,e);
+					throw new RuntimeException(e);
+				}
 				finally
 				{
 					inNew = false;
@@ -434,7 +439,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	 */
 	boolean saving = false;
 
-	public void saveEditsToTemp()
+	public void saveEditsToTemp() 
 	{
 		if (saving == false)
 			try
@@ -507,6 +512,11 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 					logger.error(e, e);
 					Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
 				}
+			}
+			catch (Exception e)
+			{
+				logger.error(e,e);
+				Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
 			}
 
 			finally
