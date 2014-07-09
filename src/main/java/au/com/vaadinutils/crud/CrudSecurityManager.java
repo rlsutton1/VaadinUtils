@@ -17,4 +17,6 @@ public interface CrudSecurityManager
 
 	Long getAccountId();
 
+	boolean isUserSuperUser();
+
 }

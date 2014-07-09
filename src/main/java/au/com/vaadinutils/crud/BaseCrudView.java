@@ -19,6 +19,7 @@ import org.vaadin.dialogs.ConfirmDialog;
 
 import au.com.vaadinutils.crud.security.SecurityManagerFactoryProxy;
 import au.com.vaadinutils.dao.EntityManagerProvider;
+import au.com.vaadinutils.dao.containers.ContainerAdapter;
 import au.com.vaadinutils.listener.ClickEventLogged;
 
 import com.google.common.base.Preconditions;
@@ -189,6 +190,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		{
 			disallowNew(true);
 		}
+		resetFilters();
 
 	}
 
@@ -713,53 +715,10 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			@Override
 			public void clicked(ClickEvent event)
 			{
-				fieldGroup.discard();
-				for (ChildCrudListener<E> child : childCrudListeners)
-				{
-					child.discard();
-				}
-
-				if (newEntity != null)
-				{
-					if (restoreDelete)
-					{
-						activateEditMode(false);
-						restoreDelete = false;
-					}
-					newEntity = null;
-
-					// set the selection to the first item on the page.
-					// We need to set it to null first as if the first item was
-					// already selected
-					// then we won't get a row change which is need to update
-					// the rhs.
-					// CONSIDER: On the other hand I'm concerned that we might
-					// confuse people as they
-					// get two row changes events.
-					BaseCrudView.this.entityTable.select(null);
-					BaseCrudView.this.entityTable.select(entityTable.getCurrentPageFirstItemId());
-
-				}
-				else
-				{
-					// Force the row to be reselected so that derived
-					// classes get a rowChange when we cancel.
-					// CONSIDER: is there a better way of doing this?
-					// Could we not just fire an 'onCancel' event or similar?
-					Long id = entityTable.getCurrent().getEntity().getId();
-					BaseCrudView.this.entityTable.select(null);
-					BaseCrudView.this.entityTable.select(id);
-
-				}
-				splitPanel.showFirstComponet();
-				if (entityTable.getCurrent() == null)
-				{
-					showNoSelectionMessage();
-				}
-
-				Notification.show("Changes discarded.", "Any changes you have made to this record been discarded.",
-						Type.TRAY_NOTIFICATION);
+				cancelClicked();
 			}
+
+			
 		});
 
 		saveButton.addClickListener(new ClickEventLogged.ClickListener()
@@ -776,6 +735,56 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		});
 		saveButton.setStyleName(Reindeer.BUTTON_DEFAULT);
 
+	}
+	
+	protected void cancelClicked()
+	{
+		fieldGroup.discard();
+		for (ChildCrudListener<E> child : childCrudListeners)
+		{
+			child.discard();
+		}
+
+		if (newEntity != null)
+		{
+			if (restoreDelete)
+			{
+				activateEditMode(false);
+				restoreDelete = false;
+			}
+			newEntity = null;
+
+			// set the selection to the first item on the page.
+			// We need to set it to null first as if the first item was
+			// already selected
+			// then we won't get a row change which is need to update
+			// the rhs.
+			// CONSIDER: On the other hand I'm concerned that we might
+			// confuse people as they
+			// get two row changes events.
+			BaseCrudView.this.entityTable.select(null);
+			BaseCrudView.this.entityTable.select(entityTable.getCurrentPageFirstItemId());
+
+		}
+		else
+		{
+			// Force the row to be reselected so that derived
+			// classes get a rowChange when we cancel.
+			// CONSIDER: is there a better way of doing this?
+			// Could we not just fire an 'onCancel' event or similar?
+			Long id = entityTable.getCurrent().getEntity().getId();
+			BaseCrudView.this.entityTable.select(null);
+			BaseCrudView.this.entityTable.select(id);
+
+		}
+		splitPanel.showFirstComponet();
+		if (entityTable.getCurrent() == null)
+		{
+			showNoSelectionMessage();
+		}
+
+		Notification.show("Changes discarded.", "Any changes you have made to this record been discarded.",
+				Type.TRAY_NOTIFICATION);
 	}
 
 	/**

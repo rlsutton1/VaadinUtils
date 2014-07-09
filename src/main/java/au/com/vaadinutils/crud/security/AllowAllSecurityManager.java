@@ -2,6 +2,12 @@ package au.com.vaadinutils.crud.security;
 
 import au.com.vaadinutils.crud.CrudSecurityManager;
 
+/**
+ * allow all execept super user
+ * 
+ * @author rsutton
+ * 
+ */
 public class AllowAllSecurityManager implements CrudSecurityManager
 {
 
@@ -15,7 +21,7 @@ public class AllowAllSecurityManager implements CrudSecurityManager
 	@Override
 	public boolean canUser(Enum<?> changeAccountGroups)
 	{
-		
+
 		return true;
 	}
 
@@ -41,5 +47,11 @@ public class AllowAllSecurityManager implements CrudSecurityManager
 	public Long getAccountId()
 	{
 		return -1l;
+	}
+
+	@Override
+	public boolean isUserSuperUser()
+	{
+		return false;
 	}
 }

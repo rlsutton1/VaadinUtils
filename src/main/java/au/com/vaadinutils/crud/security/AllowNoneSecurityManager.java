@@ -41,4 +41,10 @@ public class AllowNoneSecurityManager implements CrudSecurityManager
 	{
 		return -1l;
 	}
+
+	@Override
+	public boolean isUserSuperUser()
+	{
+		return false;
+	}
 }
