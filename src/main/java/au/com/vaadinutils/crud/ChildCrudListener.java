@@ -32,6 +32,6 @@ public interface ChildCrudListener<E>
 
 	public void discard();
 
-	public void saveEditsToTemp();
+	public void saveEditsToTemp() throws Exception;
 
 }

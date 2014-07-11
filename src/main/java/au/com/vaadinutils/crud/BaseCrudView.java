@@ -19,7 +19,6 @@ import org.vaadin.dialogs.ConfirmDialog;
 
 import au.com.vaadinutils.crud.security.SecurityManagerFactoryProxy;
 import au.com.vaadinutils.dao.EntityManagerProvider;
-import au.com.vaadinutils.dao.containers.ContainerAdapter;
 import au.com.vaadinutils.listener.ClickEventLogged;
 
 import com.google.common.base.Preconditions;
@@ -372,7 +371,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		return "New";
 	}
 
-	@SuppressWarnings("null")
 	private void addCrudActions()
 	{
 		/**
@@ -925,7 +923,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			Throwable cause = e.getCause();
 			if (cause instanceof ConstraintViolationException)
 			{
-				ConstraintViolationException constraint = (ConstraintViolationException) cause;
 				String groupedViolationMessage = "";
 				for (ConstraintViolation<?> violation : ((ConstraintViolationException) cause)
 						.getConstraintViolations())
