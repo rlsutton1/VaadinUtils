@@ -6,8 +6,10 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javax.persistence.RollbackException;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
@@ -15,7 +17,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.vaadin.dialogs.ConfirmDialog;
 
+import au.com.vaadinutils.crud.security.SecurityManagerFactoryProxy;
 import au.com.vaadinutils.dao.EntityManagerProvider;
+import au.com.vaadinutils.dao.containers.ContainerAdapter;
 import au.com.vaadinutils.listener.ClickEventLogged;
 
 import com.google.common.base.Preconditions;
@@ -121,13 +125,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 	protected void init(Class<E> entityClass, JPAContainer<E> container, HeadingPropertySet<E> headings)
 	{
-		if (!getSecurityManager().canUseView())
-		{
-			this.setSizeFull();
-			this.addComponent(new Label("Sorry, you do not have permission to access "+getTitleText()));
-			return; 
-		}
-		
+
 		this.entityClass = entityClass;
 		this.container = container;
 		try
@@ -162,11 +160,51 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		showNoSelectionMessage();
 		entityTable.select(entityTable.firstItemId());
 
+		// do the security check after all the other setup, so extending classes
+		// don't throw npe's due to
+		// uninitialised components
+		if (!getSecurityManager().canUserView())
+		{
+			this.setSizeFull();
+			Label sorryMessage = new Label("Sorry, you do not have permission to access " + getTitleText());
+			sorryMessage.setStyleName(Reindeer.LABEL_H1);
+			this.removeAllComponents();
+			this.addComponent(sorryMessage);
+			return;
+		}
+
+		if (!getSecurityManager().canUserDelete())
+		{
+			// disable delete as the user doesn't have permission to delete
+			disallowDelete(true);
+		}
+
+		if (!getSecurityManager().canUserEdit())
+		{
+			// disable save as the user doesn't have permission to edit
+			buttonLayout.removeComponent(saveButton);
+			saveButton.setVisible(false);
+		}
+		
+		if (!getSecurityManager().canUserCreate())
+		{
+			disallowNew(true);
+		}
+		resetFilters();
+
 	}
 
+	/**
+	 * if you need to provide a security manager, call
+	 * SecurityManagerFactoryProxy.setFactory(...) at application initialisation
+	 * time
+	 * 
+	 * @return
+	 * @throws ExecutionException
+	 */
 	protected CrudSecurityManager getSecurityManager()
 	{
-		return new NullCrudSecurityManager();
+		return SecurityManagerFactoryProxy.getSecurityManager(this);
 	}
 
 	public void addGeneratedColumn(Object id, ColumnGenerator generator)
@@ -551,7 +589,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	{
 		this.disallowDelete = disallow;
 
-		if (disallow)
+		if (disallow || !getSecurityManager().canUserDelete())
 		{
 			// find and remove the delete action
 			for (Object id : this.actionCombo.getItemIds())
@@ -677,53 +715,10 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			@Override
 			public void clicked(ClickEvent event)
 			{
-				fieldGroup.discard();
-				for (ChildCrudListener<E> child : childCrudListeners)
-				{
-					child.discard();
-				}
-
-				if (newEntity != null)
-				{
-					if (restoreDelete)
-					{
-						activateEditMode(false);
-						restoreDelete = false;
-					}
-					newEntity = null;
-
-					// set the selection to the first item on the page.
-					// We need to set it to null first as if the first item was
-					// already selected
-					// then we won't get a row change which is need to update
-					// the rhs.
-					// CONSIDER: On the other hand I'm concerned that we might
-					// confuse people as they
-					// get two row changes events.
-					BaseCrudView.this.entityTable.select(null);
-					BaseCrudView.this.entityTable.select(entityTable.getCurrentPageFirstItemId());
-
-				}
-				else
-				{
-					// Force the row to be reselected so that derived
-					// classes get a rowChange when we cancel.
-					// CONSIDER: is there a better way of doing this?
-					// Could we not just fire an 'onCancel' event or similar?
-					Long id = entityTable.getCurrent().getEntity().getId();
-					BaseCrudView.this.entityTable.select(null);
-					BaseCrudView.this.entityTable.select(id);
-
-				}
-				splitPanel.showFirstComponet();
-				if (entityTable.getCurrent() == null)
-				{
-					showNoSelectionMessage();
-				}
-
-				Notification.show("Changes discarded.", "Any changes you have made to this record been discarded.",
-						Type.TRAY_NOTIFICATION);
+				cancelClicked();
 			}
+
+			
 		});
 
 		saveButton.addClickListener(new ClickEventLogged.ClickListener()
@@ -740,6 +735,56 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		});
 		saveButton.setStyleName(Reindeer.BUTTON_DEFAULT);
 
+	}
+	
+	protected void cancelClicked()
+	{
+		fieldGroup.discard();
+		for (ChildCrudListener<E> child : childCrudListeners)
+		{
+			child.discard();
+		}
+
+		if (newEntity != null)
+		{
+			if (restoreDelete)
+			{
+				activateEditMode(false);
+				restoreDelete = false;
+			}
+			newEntity = null;
+
+			// set the selection to the first item on the page.
+			// We need to set it to null first as if the first item was
+			// already selected
+			// then we won't get a row change which is need to update
+			// the rhs.
+			// CONSIDER: On the other hand I'm concerned that we might
+			// confuse people as they
+			// get two row changes events.
+			BaseCrudView.this.entityTable.select(null);
+			BaseCrudView.this.entityTable.select(entityTable.getCurrentPageFirstItemId());
+
+		}
+		else
+		{
+			// Force the row to be reselected so that derived
+			// classes get a rowChange when we cancel.
+			// CONSIDER: is there a better way of doing this?
+			// Could we not just fire an 'onCancel' event or similar?
+			Long id = entityTable.getCurrent().getEntity().getId();
+			BaseCrudView.this.entityTable.select(null);
+			BaseCrudView.this.entityTable.select(id);
+
+		}
+		splitPanel.showFirstComponet();
+		if (entityTable.getCurrent() == null)
+		{
+			showNoSelectionMessage();
+		}
+
+		Notification.show("Changes discarded.", "Any changes you have made to this record been discarded.",
+				Type.TRAY_NOTIFICATION);
 	}
 
 	/**
@@ -784,6 +829,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 		BaseCrudView.this.entityTable.select(previousItemId);
 		container.commit();
+
+		EntityManagerProvider.getEntityManager().flush();
 
 		postDelete(entityId);
 	}
@@ -873,6 +920,27 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			Notification.show("Changes Saved", "Any changes you have made have been saved.", Type.TRAY_NOTIFICATION);
 
 		}
+		catch (RollbackException e)
+		{
+			Throwable cause = e.getCause();
+			if (cause instanceof ConstraintViolationException)
+			{
+				ConstraintViolationException constraint = (ConstraintViolationException) cause;
+				String groupedViolationMessage = "";
+				for (ConstraintViolation<?> violation : ((ConstraintViolationException) cause)
+						.getConstraintViolations())
+				{
+					logger.error(violation.getLeafBean().getClass().getCanonicalName() + " " + violation.getLeafBean());
+					String violationMessage = violation.getLeafBean().getClass().getSimpleName() + " "
+							+ violation.getPropertyPath() + " " + violation.getMessage() + ", the value was "
+							+ violation.getInvalidValue();
+					logger.error(violationMessage);
+					groupedViolationMessage += violationMessage + "\n";
+				}
+				Notification.show(groupedViolationMessage, Type.ERROR_MESSAGE);
+			}
+		}
+
 		catch (Exception e)
 		{
 			if (e instanceof InvalidValueException || e.getCause() instanceof InvalidValueException)
@@ -994,8 +1062,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 * is unreliable
 	 * 
 	 * @param item
+	 * @throws Exception
 	 */
-	protected void interceptSaveValues(EntityItem<E> entityItem)
+	protected void interceptSaveValues(EntityItem<E> entityItem) throws Exception
 	{
 	}
 
@@ -1116,7 +1185,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 										 * Properties in our entity at once.
 										 */
 										fieldGroup.discard();
-										
+
 										for (ChildCrudListener<E> child : childCrudListeners)
 										{
 											child.discard();
@@ -1429,8 +1498,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	{
 		return Collections.unmodifiableSet(childCrudListeners);
 	}
-	
-	
+
 	protected DeleteVetoResponseData canDelete(E entity)
 	{
 		return new DeleteVetoResponseData(true);

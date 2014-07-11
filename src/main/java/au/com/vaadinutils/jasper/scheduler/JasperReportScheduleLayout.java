@@ -2,7 +2,6 @@ package au.com.vaadinutils.jasper.scheduler;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -97,8 +96,8 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 				.addColumn("Enabled", ReportEmailScheduleEntity_.enabled)
 				.addColumn("Last Run", ReportEmailScheduleEntity_.lastRuntime).build();
 
-		init(ReportEmailScheduleEntity.class, container, headings);
 		this.disallowNew(true);
+		init(ReportEmailScheduleEntity.class, container, headings);
 	}
 
 	public JasperReportScheduleLayout(ScheduleCreater creater)
@@ -186,6 +185,7 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 		main.setSpacing(true);
 		main.setMargin(true);
 		main.setSizeFull();
+		@SuppressWarnings("unused")
 		Tab emailTab = tabsheet.addTab(main, "Email");
 
 		main.addComponent(emailTargetLayout);

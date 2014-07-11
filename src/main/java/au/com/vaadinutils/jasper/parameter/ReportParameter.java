@@ -192,7 +192,7 @@ public abstract class ReportParameter<T>
 		{
 			return false;
 		}
-		ReportParameter other = (ReportParameter) obj;
+		ReportParameter<?> other = (ReportParameter<?>) obj;
 		if (label == null)
 		{
 			if (other.label != null)

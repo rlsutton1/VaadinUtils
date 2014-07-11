@@ -41,7 +41,7 @@ public class TimePicker extends HorizontalLayout implements Field
 	private String title;
 	private TextField field;
 	private Property<Date> datasource;
-	private boolean isRequired;
+//	private boolean isRequired;
 	private String requiredErrorMessage;
 	private int tabIndex;
 	private boolean isBuffered;
@@ -573,18 +573,15 @@ public class TimePicker extends HorizontalLayout implements Field
 			return false;
 		}
 		Date dsValue = datasource.getValue();
-		if (dsValue == null && value == null)
+		if (dsValue == null)
 		{
-			return false;
+			return value != null;
 		}
-		if (dsValue != null && value == null)
-		{
-			return true;
-		}
-		if (dsValue == null && value != null)
+		if (value == null)
 		{
 			return true;
 		}
+		
 		return !dsValue.equals(value);
 	}
 
@@ -762,7 +759,7 @@ public class TimePicker extends HorizontalLayout implements Field
 	@Override
 	public void setRequired(boolean required)
 	{
-		isRequired = required;
+		//isRequired = required;
 
 	}
 

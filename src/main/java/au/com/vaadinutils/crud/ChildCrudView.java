@@ -8,7 +8,6 @@ import javax.validation.ConstraintViolationException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.vaadin.dialogs.ConfirmDialog;
 
 import au.com.vaadinutils.dao.EntityManagerProvider;
 
@@ -28,7 +27,6 @@ import com.vaadin.data.util.filter.Compare;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
-import com.vaadin.ui.UI;
 
 /**
  * child crud does not support nesting.
@@ -404,6 +402,11 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 					logger.error(e, e);
 					throw new RuntimeException(e);
 				}
+				catch (Exception e)
+				{
+					logger.error(e,e);
+					throw new RuntimeException(e);
+				}
 				finally
 				{
 					inNew = false;
@@ -436,7 +439,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	 */
 	boolean saving = false;
 
-	public void saveEditsToTemp()
+	public void saveEditsToTemp() 
 	{
 		if (saving == false)
 			try
@@ -509,6 +512,11 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 					logger.error(e, e);
 					Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
 				}
+			}
+			catch (Exception e)
+			{
+				logger.error(e,e);
+				Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
 			}
 
 			finally

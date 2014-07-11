@@ -189,6 +189,13 @@ public class EntityTreeTable<E> extends Tree implements EntityList<E>
 		
 	}
 
+	@Override
+	public void setVisibleColumns(Object... visibleColumns)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
 	/**
 	 * This nasty piece of work exists to stop the following exception being
 	 * 

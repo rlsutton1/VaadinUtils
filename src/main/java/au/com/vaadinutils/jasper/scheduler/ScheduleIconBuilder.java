@@ -48,8 +48,6 @@ public class ScheduleIconBuilder
 			// create transulcent graphics object
 			BufferedImage bImg = ImageIO.read(new File(imagePath, templateFileName));
 			Graphics2D graphics = bImg.createGraphics();
-			int height = bImg.getHeight();
-			int width = bImg.getWidth();
 
 			// create shaded background rectangle
 
@@ -65,7 +63,6 @@ public class ScheduleIconBuilder
 
 			// position "Noojee Telephony Solutions"
 			String nts = "" + number;
-			int noojeeWidth = metrics.stringWidth(nts);
 			
 			graphics.drawString(nts,  2, (metrics.getHeight()/2) + 6);
 

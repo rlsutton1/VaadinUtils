@@ -245,6 +245,27 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		return results;
 
 	}
+	
+	public <SK> List<E> findAllByAttributeLike(SingularAttribute<E, String> vKey, String value, SingularAttribute<E, SK> order)
+	{
+
+		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+
+		CriteriaQuery<E> criteria = builder.createQuery(entityClass);
+
+		Root<E> root = criteria.from(entityClass);
+		criteria.select(root);
+		criteria.where(builder.like(root.<String>get(vKey), value));
+		if (order != null)
+		{
+			criteria.orderBy(builder.asc(root.get(order)));
+		}
+		List<E> results = entityManager.createQuery(criteria).getResultList();
+
+		return results;
+
+	}
+
 
 	/**
 	 * Find a single record by multiple attributes.

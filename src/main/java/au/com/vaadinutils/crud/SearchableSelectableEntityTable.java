@@ -1,10 +1,12 @@
 package au.com.vaadinutils.crud;
 
 import java.util.Collection;
+import java.util.concurrent.ExecutionException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import au.com.vaadinutils.crud.security.SecurityManagerFactoryProxy;
 import au.com.vaadinutils.fields.SelectionListener;
 import au.com.vaadinutils.listener.ClickEventLogged;
 
@@ -22,6 +24,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Table.ColumnGenerator;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
@@ -31,7 +34,6 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 {
 	private static final long serialVersionUID = 1L;
 
-	@SuppressWarnings("unused")
 	private static Logger logger = LogManager.getLogger();
 
 	protected TextField searchField = new TextField();
@@ -41,26 +43,55 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 	private SelectableEntityTable<E> selectableTable;
 	final protected Container.Filterable container;
 
-	public SearchableSelectableEntityTable(Container.Filterable entityContainer, HeadingPropertySet<E> headingPropertySet)
+	public SearchableSelectableEntityTable(Container.Filterable entityContainer,
+			HeadingPropertySet<E> headingPropertySet)
 	{
-		
 		selectableTable = new SelectableEntityTable<E>(entityContainer, headingPropertySet);
 		selectableTable.setSizeFull();
 		container = entityContainer;
+
+		try
+		{
+			if (!getSecurityManager().canUserView())
+			{
+				this.setSizeFull();
+				this.addComponent(new Label("Sorry, you do not have permission to access " + getTitle()));
+				return;
+			}
+		}
+
+		catch (ExecutionException e1)
+		{
+			this.setSizeFull();
+			this.addComponent(new Label("Sorry, there was a problem determining security settings for " + getTitle()));
+			logger.error(e1, e1);
+			return;
+
+		}
+
 		AbstractLayout searchBar = buildSearchBar();
 
+		Label title = new Label(getTitle());
+		title.setStyleName(Reindeer.LABEL_H1);
+		this.addComponent(title);
 		this.addComponent(searchBar);
 		this.addComponent(selectableTable);
 		this.setExpandRatio(selectableTable, 1);
 		triggerFilter();
 	}
 
+	abstract public String getTitle();
+
+	private CrudSecurityManager getSecurityManager() throws ExecutionException
+	{
+		return SecurityManagerFactoryProxy.getSecurityManager(this);
+	}
+
 	public void addGeneratedColumn(Object id, ColumnGenerator generatedColumn)
 	{
 		selectableTable.addGeneratedColumn(id, generatedColumn);
 	}
-	
-	
+
 	private AbstractLayout buildSearchBar()
 	{
 		searchBar = new VerticalLayout();
@@ -111,7 +142,7 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 	{
 		selectableTable.disableSelectable();
 	}
-	
+
 	/**
 	 * Filtering
 	 * 
@@ -202,14 +233,14 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 	{
 		container.removeAllContainerFilters();
 	}
-	
+
 	protected void applyFilter(Filter filter)
-	{		/* Reset the filter for the Entity Container. */
+	{ /* Reset the filter for the Entity Container. */
 		resetFilters();
 		container.addContainerFilter(filter);
 
 	}
-	
+
 	protected String getSearchFieldText()
 	{
 		return searchField.getValue();
@@ -240,14 +271,13 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 	public void addSelectionListener(SelectionListener listener)
 	{
 		selectableTable.addSelectionListener(listener);
-		
-		
+
 	}
 
 	public void addItemClickListener(ItemClickListener object)
 	{
-		selectableTable.addItemClickListener( object);
-		
+		selectableTable.addItemClickListener(object);
+
 	}
 
 }

@@ -1,6 +1,5 @@
 package au.com.vaadinutils.jasper.scheduler;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 

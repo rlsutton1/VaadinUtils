@@ -5,6 +5,9 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+
 import au.com.vaadinutils.help.HelpSplitPanel;
 import au.com.vaadinutils.jasper.parameter.ReportParameter;
 import au.com.vaadinutils.jasper.scheduler.entities.DateParameterOffsetType;
@@ -19,10 +22,12 @@ import au.com.vaadinutils.jasper.ui.JasperReportProperties;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.util.filter.Compare;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 
-public class JasperReportSchedulerWindow extends Window 
+public class JasperReportSchedulerWindow extends Window
 {
 	private static final long serialVersionUID = 1L;
 
@@ -32,7 +37,7 @@ public class JasperReportSchedulerWindow extends Window
 
 		this.setWidth("90%");
 		this.setHeight("98%");
-		
+
 		HelpSplitPanel wrapper = new HelpSplitPanel(new JasperReportScheduleLayout(new ScheduleCreater()
 		{
 
@@ -79,6 +84,19 @@ public class JasperReportSchedulerWindow extends Window
 
 				ReportEmailSender reportEmailSender = new ReportEmailSender();
 				reportEmailSender.setUserName(reportProperties.getUsername());
+
+				try
+				{
+					new InternetAddress(reportProperties.getUserEmailAddress());
+
+				}
+				catch (AddressException e)
+				{
+					Notification.show("Your email address (" + reportProperties.getUserEmailAddress()
+							+ ") is invalid, go to accounts and fix you email address.", Type.ERROR_MESSAGE);
+					return null;
+				}
+
 				reportEmailSender.setEmailAddress(reportProperties.getUserEmailAddress());
 				schedule.setSender(reportEmailSender);
 
@@ -88,19 +106,18 @@ public class JasperReportSchedulerWindow extends Window
 			@Override
 			public void addContainerFilter(JPAContainer<ReportEmailScheduleEntity> container)
 			{
-				Filter filter = new Compare.Equal(ReportEmailScheduleEntity_.reportIdentifier.getName(), reportProperties
-						.getReportIdentifier().toString());
+				Filter filter = new Compare.Equal(ReportEmailScheduleEntity_.reportIdentifier.getName(),
+						reportProperties.getReportIdentifier().toString());
 				container.addContainerFilter(filter);
 
 			}
 		}));
-		
+
 		this.setContent(wrapper);
 		setModal(true);
 		// center();
 		UI.getCurrent().addWindow(this);
 
 	}
-
 
 }

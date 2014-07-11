@@ -545,7 +545,7 @@ public class JasperManager implements Runnable
 
 			if (!paramExists(strippedParameterName))
 			{
-				logger.warn("The passed Jasper Report parameter: " + param.getParameterNames()
+				logger.info("The passed Jasper Report parameter: " + param.getParameterNames()
 						+ " does not exist in the Report");
 			}
 
@@ -783,7 +783,7 @@ public class JasperManager implements Runnable
 			params.removeAll(extraParams);
 			params.addAll(extraParams);
 
-			logger.warn("Running report " + reportProperties.getReportFileName());
+			logger.info("Running report " + reportProperties.getReportFileName());
 			for (ReportParameter<?> param : params)
 			{
 				for (String parameterName : param.getParameterNames())
@@ -795,7 +795,7 @@ public class JasperManager implements Runnable
 						// friendly parameters on the report
 						boundParams.put("ParamDisplay-" + parameterName, param.getDisplayValue(parameterName));
 					}
-					logger.warn(parameterName + " " + param.getValue(parameterName));
+					logger.info(parameterName + " " + param.getValue(parameterName));
 				}
 			}
 
