@@ -7,7 +7,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<vaadin.version>7.2.2</vaadin.version>
+		<vaadin.version>7.2.4</vaadin.version>
 		<vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
 		<jasperreports.version>5.2.0</jasperreports.version>
 	</properties>
@@ -58,8 +58,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>2.0.2</version>
 				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
+					<source>1.7</source>
+					<target>1.7</target>
 				</configuration>
 			</plugin>
 			
@@ -138,6 +138,35 @@
 			</dependency> -->
 
 		<dependency>
+			<groupId>org.vaadin.addons.lazyquerycontainer</groupId>
+			<artifactId>vaadin-lazyquerycontainer</artifactId>
+			<version>2.1.15</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>log4j</artifactId>
+					<groupId>log4j</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>javax.persistence</artifactId>
+					<groupId>org.eclipse.persistence</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>vaadin-themes</artifactId>
+					<groupId>com.vaadin</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>vaadin-server</artifactId>
+					<groupId>com.vaadin</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>vaadin-client-compiled</artifactId>
+					<groupId>com.vaadin</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+
+		<dependency>
 			<groupId>com.vaadin</groupId>
 			<artifactId>vaadin-server</artifactId>
 			<version>${vaadin.version}</version>
@@ -210,7 +239,8 @@
 		<dependency>
 			<groupId>org.vaadin.addons</groupId>
 			<artifactId>wizards-for-vaadin</artifactId>
-			<version>1.1.0</version>
+			<version>1.1.1</version>
+			<!-- currently at https://github.com/rlsutton1/WizardsForVaadin.git -->
 		</dependency>
 
 		<dependency>
