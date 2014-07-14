@@ -61,6 +61,7 @@ import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
+
 /** A start view for navigating to the main view */
 public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailScheduleEntity> implements View, HelpProvider
 {

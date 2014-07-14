@@ -404,7 +404,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 				}
 				catch (Exception e)
 				{
-					logger.error(e,e);
+					logger.error(e, e);
 					throw new RuntimeException(e);
 				}
 				finally
@@ -439,7 +439,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	 */
 	boolean saving = false;
 
-	public void saveEditsToTemp() 
+	public void saveEditsToTemp()
 	{
 		if (saving == false)
 			try
@@ -515,7 +515,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 			}
 			catch (Exception e)
 			{
-				logger.error(e,e);
+				logger.error(e, e);
 				Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
 			}
 
@@ -655,7 +655,10 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	{
 
 		container.removeAllContainerFilters();
-		container.addContainerFilter(parentFilter);
+		if (parentFilter != null)
+		{
+			container.addContainerFilter(parentFilter);
+		}
 	}
 
 	/**
