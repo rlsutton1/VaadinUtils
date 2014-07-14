@@ -12,7 +12,6 @@ import com.vaadin.data.Property.ReadOnlyException;
 import com.vaadin.data.util.converter.Converter.ConversionException;
 import com.vaadin.shared.ui.datefield.Resolution;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.DateField;
 import com.vaadin.ui.VerticalLayout;
 
 public class ReportParameterDateTimeOneDay extends ReportParameterDateTimeRange
@@ -59,7 +58,6 @@ public class ReportParameterDateTimeOneDay extends ReportParameterDateTimeRange
 			ParseException
 	{
 		SimpleDateFormat sdf = new SimpleDateFormat(parameterFormat);
-		DateField field;
 		if (parameterName.equalsIgnoreCase(startParameterName))
 		{
 			startfield.setValue(sdf.parse(value));

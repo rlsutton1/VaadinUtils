@@ -186,6 +186,7 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 		main.setSpacing(true);
 		main.setMargin(true);
 		main.setSizeFull();
+		@SuppressWarnings("unused")
 		Tab emailTab = tabsheet.addTab(main, "Email");
 
 		main.addComponent(emailTargetLayout);

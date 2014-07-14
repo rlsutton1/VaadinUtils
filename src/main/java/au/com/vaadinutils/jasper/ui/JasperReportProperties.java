@@ -207,6 +207,10 @@ public interface JasperReportProperties
 	 */
 	public abstract Class<? extends JasperReportProperties> getReportClass();
 
+	/**
+	 * Email address to use in the 'From' field when sending reports via emails
+	 * @return
+	 */
 	public abstract String getUserEmailAddress();
 
 	/**

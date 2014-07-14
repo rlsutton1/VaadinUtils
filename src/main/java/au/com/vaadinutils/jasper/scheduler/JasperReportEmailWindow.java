@@ -89,7 +89,6 @@ public class JasperReportEmailWindow extends Window
 		buttonLayout.setHeight("10");
 
 		Button send = new Button("Send");
-		ClickListener t = null;
 		send.addClickListener(new ClickListener()
 		{
 
