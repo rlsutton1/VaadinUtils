@@ -217,7 +217,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	}
 
 	/*
-	 * build the button layout aned editor panel
+	 * build the button layout and editor panel
 	 */
 
 	protected abstract Component buildEditor(ValidatingFieldGroup<E> fieldGroup2);
