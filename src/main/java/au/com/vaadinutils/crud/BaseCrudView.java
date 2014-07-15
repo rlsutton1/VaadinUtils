@@ -805,6 +805,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 	public void delete()
 	{
+		E deltedEntity = entityTable.getCurrent().getEntity();
 		Object entityId = entityTable.getValue();
 		Object previousItemId = entityTable.prevItemId(entityId);
 		if (previousItemId == null)
@@ -812,7 +813,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		entityTable.removeItem(entityId);
 		newEntity = null;
 
-		preDelete(entityId);
+		preDelete(deltedEntity);
 		// set the selection to the first item
 		// on the page.
 		// We need to set it to null first as if
@@ -830,7 +831,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 		EntityManagerProvider.getEntityManager().flush();
 
-		postDelete(entityId);
+		postDelete(deltedEntity);
 	}
 
 	/**
@@ -838,7 +839,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 * delete.
 	 * 
 	 */
-	protected void preDelete(Object entityId)
+	protected void preDelete(E entity)
 	{
 
 	}
@@ -848,7 +849,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 * delete.
 	 * 
 	 */
-	protected void postDelete(Object entityId)
+	protected void postDelete(E entity)
 	{
 
 	}

@@ -25,9 +25,9 @@ public class UniqueFieldValidator<E extends CrudEntity, F> implements Validator
 	private BaseCrudView<E> crud;
 	 transient Logger logger   =  LogManager.getLogger(UniqueFieldValidator.class);
 
-	public UniqueFieldValidator(Class<E> table, SingularAttribute<E, F> matchField, BaseCrudView<E> crud)
+	public UniqueFieldValidator(SingularAttribute<E, F> matchField, BaseCrudView<E> crud)
 	{
-		this.table = table;
+		this.table = matchField.getDeclaringType().getJavaType();
 		this.matchField = matchField;
 		this.crud = crud;
 
