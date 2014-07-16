@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>au.com.vaadinutils</groupId>
 	<artifactId>VaadinUtils</artifactId>
-	<version>0.1.2</version>
+	<version>3.4.3.x</version>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -238,7 +238,16 @@
 					<artifactId>commons-collections</artifactId>
 					<groupId>commons-collections</groupId>
 				</exclusion>
+				<exclusion>
+					<groupId>eclipse</groupId>
+					<artifactId>jdtcore</artifactId>
+				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jdt</groupId>
+			<artifactId>core</artifactId>
+			<version>3.1.1</version>
 		</dependency>
 
 		<dependency>
