@@ -654,10 +654,18 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	protected void resetFilters()
 	{
 
-		container.removeAllContainerFilters();
-		if (parentFilter != null)
+		try
 		{
-			container.addContainerFilter(parentFilter);
+			container.removeAllContainerFilters();
+			if (parentFilter != null)
+			{
+				container.addContainerFilter(parentFilter);
+			}
+		}
+		catch (Exception e)
+		{
+			handleConstraintViolationException(e);
+			throw e;
 		}
 	}
 

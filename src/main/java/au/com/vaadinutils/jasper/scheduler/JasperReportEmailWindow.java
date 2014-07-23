@@ -102,6 +102,7 @@ public class JasperReportEmailWindow extends Window
 				if (schedule != null)
 				{
 					JasperReportEmailWindow.this.close();
+					JasperReportScheudulerService.SELF.reschedule();
 					Notification.show("Your email has been scheduled for immediate delivery", Type.WARNING_MESSAGE);
 				}
 

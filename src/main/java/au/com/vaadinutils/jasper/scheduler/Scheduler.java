@@ -6,11 +6,16 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.joda.time.DateTime;
 
+import au.com.vaadinutils.crud.CrudEntity;
+import au.com.vaadinutils.crud.events.CrudEventDistributer;
+import au.com.vaadinutils.crud.events.CrudEventListener;
+import au.com.vaadinutils.crud.events.CrudEventType;
 import au.com.vaadinutils.jasper.JasperEmailSettings;
 import au.com.vaadinutils.jasper.scheduler.entities.ScheduleMode;
 
@@ -29,16 +34,35 @@ public class Scheduler implements Runnable
 
 	private DBmanager dbManager;
 
+	// the soonest time any report needs to be run
+	AtomicReference<DateTime> next = new AtomicReference<DateTime>();
+
 	Scheduler(ReportEmailScheduleProvider scheduleProvider, ReportEmailRunner reportRunner,
 			JasperEmailSettings emailSettings, DBmanager dbManager)
 	{
-
+		next.set(new DateTime());
 		this.scheduleProvider = scheduleProvider;
 		this.reportRunner = reportRunner;
 		this.emailSettings = emailSettings;
 		this.dbManager = dbManager;
 
 		future = schedulerpool.scheduleAtFixedRate(this, 1, 1, TimeUnit.MINUTES);
+		
+		CrudEventDistributer.addListener(JasperReportScheduleLayout.class, new CrudEventListener()
+		{
+
+			@Override
+			public void crudEvent(CrudEventType event, CrudEntity entity)
+			{
+				next.set(new DateTime());
+
+			}
+		});
+	}
+
+	public void reschedule()
+	{
+		next.set(new DateTime());
 	}
 
 	@Override
@@ -46,7 +70,10 @@ public class Scheduler implements Runnable
 	{
 		try
 		{
-			protectedRun();
+			if (next.get().isBeforeNow())
+			{
+				protectedRun();
+			}
 		}
 		catch (Exception e)
 		{
@@ -58,15 +85,20 @@ public class Scheduler implements Runnable
 	{
 		try
 		{
+			DateTime currentNext = next.get();
+			DateTime nextPossible = new DateTime().plusDays(1).withTimeAtStartOfDay();
 			Thread.currentThread().setName("Jasper Report Scheduler");
 			dbManager.beginDbTransaction();
 			List<ReportEmailSchedule> schedules = scheduleProvider.getSchedules();
+			boolean hasSchedules = false;
 			for (ReportEmailSchedule schedule : schedules)
 			{
 				if (schedule.isEnabled())
 				{
+
 					try
 					{
+						boolean deleted = false;
 						DateTime now = new DateTime();
 
 						Date nextScheduledTime = schedule.getNextScheduledTime();
@@ -88,6 +120,7 @@ public class Scheduler implements Runnable
 								if (schedule.getScheduleMode() == ScheduleMode.ONE_TIME)
 								{
 									scheduleProvider.delete(schedule);
+									deleted = true;
 								}
 								else
 								{
@@ -101,6 +134,10 @@ public class Scheduler implements Runnable
 										+ schedule);
 							}
 						}
+						if (deleted == false)
+						{
+							hasSchedules = true;
+						}
 
 					}
 					catch (Exception e)
@@ -110,6 +147,13 @@ public class Scheduler implements Runnable
 						logger.error(e, e);
 					}
 				}
+			}
+
+			if (!next.compareAndSet(currentNext, nextPossible))
+			{
+				// next was updated while we were running, so run again as soon
+				// as possible
+				next.set(new DateTime());
 			}
 
 		}

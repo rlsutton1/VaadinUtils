@@ -1,7 +1,6 @@
 package au.com.vaadinutils.crud;
 
 import java.util.Collection;
-import java.util.concurrent.ExecutionException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -12,6 +11,7 @@ import au.com.vaadinutils.listener.ClickEventLogged;
 
 import com.vaadin.data.Container;
 import com.vaadin.data.Container.Filter;
+import com.vaadin.data.Container.Filterable;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
@@ -40,33 +40,20 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 	private AbstractLayout advancedSearchLayout;
 	private VerticalLayout searchBar;
 	private CheckBox advancedSearchCheckbox;
-	private SelectableEntityTable<E> selectableTable;
-	final protected Container.Filterable container;
+	protected SelectableEntityTable<E> selectableTable;
+	protected Container.Filterable container;
 
-	public SearchableSelectableEntityTable(Container.Filterable entityContainer,
-			HeadingPropertySet<E> headingPropertySet)
+	public SearchableSelectableEntityTable()
 	{
-		selectableTable = new SelectableEntityTable<E>(entityContainer, headingPropertySet);
+		container = getContainer();
+		selectableTable = new SelectableEntityTable<E>(container, getHeadingPropertySet());
 		selectableTable.setSizeFull();
-		container = entityContainer;
 
-		try
-		{
-			if (!getSecurityManager().canUserView())
-			{
-				this.setSizeFull();
-				this.addComponent(new Label("Sorry, you do not have permission to access " + getTitle()));
-				return;
-			}
-		}
-
-		catch (ExecutionException e1)
+		if (!getSecurityManager().canUserView())
 		{
 			this.setSizeFull();
-			this.addComponent(new Label("Sorry, there was a problem determining security settings for " + getTitle()));
-			logger.error(e1, e1);
+			this.addComponent(new Label("Sorry, you do not have permission to access " + getTitle()));
 			return;
-
 		}
 
 		AbstractLayout searchBar = buildSearchBar();
@@ -80,9 +67,13 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 		triggerFilter();
 	}
 
+	abstract public HeadingPropertySet<E> getHeadingPropertySet();
+
+	abstract public Filterable getContainer();
+
 	abstract public String getTitle();
 
-	private CrudSecurityManager getSecurityManager() throws ExecutionException
+	private CrudSecurityManager getSecurityManager()
 	{
 		return SecurityManagerFactoryProxy.getSecurityManager(this);
 	}

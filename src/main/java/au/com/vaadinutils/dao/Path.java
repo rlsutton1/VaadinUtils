@@ -24,14 +24,16 @@ public class Path
 		this.entities.add(rhsField);
 	}
 
-	public Path(SingularAttribute<? extends CrudEntity, ? extends CrudEntity>... entities)
+	@SafeVarargs
+	public Path(SingularAttribute<? extends CrudEntity, ? extends Object>... entities)
 	{
-		for (SingularAttribute<? extends CrudEntity, ? extends CrudEntity> entity : entities)
+		for (SingularAttribute<? extends CrudEntity, ? extends Object> entity : entities)
 		{
 			this.entities.add(entity);
 		}
 	}
 
+	
 	/**
 	 * Invalidates any cached entities of the classes within the
 	 * SingularAttributes. The first class is ignored as this is the parent,

@@ -603,7 +603,7 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 		}
 
 		EntityManagerProvider.merge(entityItem);
-
+		
 	}
 
 	private void removeDeletedRecipients(ReportEmailScheduleEntity entityItem)
