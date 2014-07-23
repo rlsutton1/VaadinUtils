@@ -29,6 +29,11 @@ public enum JasperReportScheudulerService implements ReportEmailScheduleProvider
 	{
 		scheduler.stop();
 	}
+	
+	public void reschedule()
+	{
+		scheduler.reschedule();
+	}
 
 	/**
 	 * return all the scheduled reports

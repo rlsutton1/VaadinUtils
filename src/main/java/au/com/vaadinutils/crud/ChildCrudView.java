@@ -1,6 +1,7 @@
 package au.com.vaadinutils.crud;
 
 import java.util.Collection;
+import java.util.concurrent.ExecutionException;
 
 import javax.persistence.PersistenceException;
 import javax.persistence.metamodel.SingularAttribute;
@@ -87,7 +88,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	}
 
 	@Override
-	protected void init(Class<E> entityClass, JPAContainer<E> container, HeadingPropertySet<E> headings)
+	protected void init(Class<E> entityClass, JPAContainer<E> container, HeadingPropertySet<E> headings) 
 	{
 
 		super.init(entityClass, container, headings);
@@ -646,8 +647,19 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	protected void resetFilters()
 	{
 
-		container.removeAllContainerFilters();
-		container.addContainerFilter(parentFilter);
+		try
+		{
+			container.removeAllContainerFilters();
+			if (parentFilter != null)
+			{
+				container.addContainerFilter(parentFilter);
+			}
+		}
+		catch (Exception e)
+		{
+			handleConstraintViolationException(e);
+			throw e;
+		}
 	}
 
 	/**

@@ -7,7 +7,7 @@ import au.com.vaadinutils.crud.CrudSecurityManager;
 public class SecurityManagerFactoryProxy
 {
 
-	static SecurityManagerFactory smf = new DefaultSecuritymanagerFactory();
+	volatile static SecurityManagerFactory smf = new DefaultSecuritymanagerFactory();
 
 	static public CrudSecurityManager getSecurityManager(Object baseCrudView) throws ExecutionException
 	{
