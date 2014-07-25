@@ -109,7 +109,7 @@ public class TimePicker extends HorizontalLayout implements Field
 
 	public void focus()
 	{
-		this.focus();
+		super.focus();
 	}
 
 	private void showPopupTimePicker()
