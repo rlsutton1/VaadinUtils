@@ -919,13 +919,13 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				}
 			}
 			EntityManagerProvider.getEntityManager().flush();
-			postSaveAction(newEntity);
 
 			// children may have been added to the parent, evict the parent from
 			// the JPA cache so it will get updated
 			EntityManagerProvider.getEntityManager().getEntityManagerFactory().getCache()
 					.evict(entityClass, newEntity.getId());
 
+			postSaveAction(newEntity);
 			CrudEventDistributer.publishEvent(this, eventType, newEntity);
 
 			// select has been moved to here because when it happens earlier,

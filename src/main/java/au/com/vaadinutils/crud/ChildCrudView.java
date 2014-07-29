@@ -28,8 +28,8 @@ import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.data.util.filter.Compare;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.UI;
+import com.vaadin.ui.Notification.Type;
 
 /**
  * child crud does not support nesting.
@@ -149,6 +149,8 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 		container.refresh();
 		associateChildren(newParentId);
 		dirty = false;
+		entityTable.select(null);
+		entityTable.select(entityTable.firstItemId());
 
 	}
 
@@ -357,19 +359,10 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 
 	}
 
+	@Override
 	protected void newClicked()
 	{
 
-		/*
-		 * Rows in the Container data model are called Item. Here we add a new
-		 * row in the beginning of the list.
-		 */
-		allowRowChange(new RowChangeCallback()
-		{
-
-			@Override
-			public void allowRowChange()
-			{
 				try
 				{
 					inNew = true;
@@ -405,12 +398,15 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 					logger.error(e, e);
 					throw new RuntimeException(e);
 				}
+		catch (Exception e)
+		{
+			logger.error(e, e);
+			throw new RuntimeException(e);
+		}
 				finally
 				{
 					inNew = false;
 				}
-			}
-		});
 
 	}
 
@@ -510,6 +506,11 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 					logger.error(e, e);
 					Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
 				}
+			}
+			catch (Exception e)
+			{
+				logger.error(e, e);
+				Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
 			}
 
 			finally
