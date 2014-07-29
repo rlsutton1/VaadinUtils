@@ -8,6 +8,7 @@ import javax.validation.ConstraintViolationException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.vaadin.dialogs.ConfirmDialog;
 
 import au.com.vaadinutils.dao.EntityManagerProvider;
 
@@ -26,6 +27,7 @@ import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.data.util.filter.Compare;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.Notification.Type;
 
 /**
@@ -146,6 +148,8 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 		container.refresh();
 		associateChildren(newParentId);
 		dirty = false;
+		entityTable.select(null);
+		entityTable.select(entityTable.firstItemId());
 
 	}
 
@@ -354,65 +358,56 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 
 	}
 
+	@Override
 	protected void newClicked()
 	{
 
-		/*
-		 * Rows in the Container data model are called Item. Here we add a new
-		 * row in the beginning of the list.
-		 */
-		allowRowChange(new RowChangeCallback()
+		try
 		{
+			inNew = true;
+			saveEditsToTemp();
+			resetFilters();
 
-			@Override
-			public void allowRowChange()
+			createNewEntity();
+
+			// if we call the overridden version we loop indefinitely
+			
+			ChildCrudView.super.rowChanged(newEntity);
+			
+			// Can't delete when you are adding a new record.
+			// Use cancel instead.
+			if (applyButton.isVisible())
 			{
-				try
-				{
-					inNew = true;
-					saveEditsToTemp();
-					resetFilters();
-
-					createNewEntity();
-
-					// if we call the overridden version we loop indefinitely
-					ChildCrudView.super.rowChanged(newEntity);
-					// Can't delete when you are adding a new record.
-					// Use cancel instead.
-					if (applyButton.isVisible())
-					{
-						restoreDelete = true;
-						activateEditMode(true);
-						actionLayout.setVisible(true);
-					}
-
-					rightLayout.setVisible(true);
-				}
-				catch (ConstraintViolationException e)
-				{
-					FormHelper.showConstraintViolation(e);
-				}
-				catch (InstantiationException e)
-				{
-					logger.error(e, e);
-					throw new RuntimeException(e);
-				}
-				catch (IllegalAccessException e)
-				{
-					logger.error(e, e);
-					throw new RuntimeException(e);
-				}
-				catch (Exception e)
-				{
-					logger.error(e, e);
-					throw new RuntimeException(e);
-				}
-				finally
-				{
-					inNew = false;
-				}
+				restoreDelete = true;
+				activateEditMode(true);
+				actionLayout.setVisible(true);
 			}
-		});
+
+			rightLayout.setVisible(true);
+		}
+		catch (ConstraintViolationException e)
+		{
+			FormHelper.showConstraintViolation(e);
+		}
+		catch (InstantiationException e)
+		{
+			logger.error(e, e);
+			throw new RuntimeException(e);
+		}
+		catch (IllegalAccessException e)
+		{
+			logger.error(e, e);
+			throw new RuntimeException(e);
+		}
+		catch (Exception e)
+		{
+			logger.error(e, e);
+			throw new RuntimeException(e);
+		}
+		finally
+		{
+			inNew = false;
+		}
 
 	}
 
