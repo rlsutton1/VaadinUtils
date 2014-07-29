@@ -84,7 +84,7 @@ public class SendEmailTask extends ProgressBarTask<JasperTransmission> implement
 							.setHtmlBody(renderedHtml).addTo(transmission.getRecipientEmailAddress())
 							.addAttachement(renderedPDF.getBodyAsDataSource("report.pdf", AttachmentType.PDF));
 
-					builder.send();
+					builder.send(false);
 				}
 				catch (EmailException e)
 				{
