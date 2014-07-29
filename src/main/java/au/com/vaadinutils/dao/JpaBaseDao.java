@@ -3,6 +3,7 @@ package au.com.vaadinutils.dao;
 import java.lang.reflect.ParameterizedType;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.persistence.EntityManager;
@@ -11,6 +12,8 @@ import javax.persistence.Table;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
@@ -245,8 +248,9 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		return results;
 
 	}
-	
-	public <SK> List<E> findAllByAttributeLike(SingularAttribute<E, String> vKey, String value, SingularAttribute<E, SK> order)
+
+	public <SK> List<E> findAllByAttributeLike(SingularAttribute<E, String> vKey, String value,
+			SingularAttribute<E, SK> order)
 	{
 
 		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
@@ -255,7 +259,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 		Root<E> root = criteria.from(entityClass);
 		criteria.select(root);
-		criteria.where(builder.like(root.<String>get(vKey), value));
+		criteria.where(builder.like(root.<String> get(vKey), value));
 		if (order != null)
 		{
 			criteria.orderBy(builder.asc(root.get(order)));
@@ -266,12 +270,11 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 	}
 
-
 	/**
-	 * Find a single record by multiple attributes.
-	 * Searches using AND.
+	 * Find a single record by multiple attributes. Searches using AND.
 	 *
-	 * @param attributes AttributeHashMap of SingularAttributes and values
+	 * @param attributes
+	 *            AttributeHashMap of SingularAttributes and values
 	 * @return first matching entity
 	 */
 	public E findOneByAttributes(AttributesHashMap<E> attributes)
@@ -287,16 +290,17 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 	}
 
 	/**
-	 * Find multiple records by multiple attributes.
-	 * Searches using AND.
+	 * Find multiple records by multiple attributes. Searches using AND.
 	 *
-	 * @param <SK> attribute
-	 * @param attributes AttributeHashMap of SingularAttributes and values
-	 * @param order SingularAttribute to order by 
+	 * @param <SK>
+	 *            attribute
+	 * @param attributes
+	 *            AttributeHashMap of SingularAttributes and values
+	 * @param order
+	 *            SingularAttribute to order by
 	 * @return a list of matching entities
 	 */
-	public <SK> List<E> findAllByAttributes(AttributesHashMap<E> attributes,
-			SingularAttribute<E, SK> order)
+	public <SK> List<E> findAllByAttributes(AttributesHashMap<E> attributes, SingularAttribute<E, SK> order)
 	{
 
 		final CriteriaBuilder builder = entityManager.getCriteriaBuilder();
@@ -321,14 +325,12 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 		return results;
 	}
-	
-	
 
 	/**
-	 * Find a single record by multiple attributes.
-	 * Searches using OR.
+	 * Find a single record by multiple attributes. Searches using OR.
 	 *
-	 * @param attributes AttributeHashMap of SingularAttributes and values
+	 * @param attributes
+	 *            AttributeHashMap of SingularAttributes and values
 	 * @return first matching entity
 	 */
 	public E findOneByAnyAttributes(AttributesHashMap<E> attributes)
@@ -344,16 +346,17 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 	}
 
 	/**
-	 * Find multiple records by multiple attributes.
-	 * Searches using OR.
+	 * Find multiple records by multiple attributes. Searches using OR.
 	 *
-	 * @param <SK> attribute
-	 * @param attributes AttributeHashMap of SingularAttributes and values
-	 * @param order SingularAttribute to order by 
+	 * @param <SK>
+	 *            attribute
+	 * @param attributes
+	 *            AttributeHashMap of SingularAttributes and values
+	 * @param order
+	 *            SingularAttribute to order by
 	 * @return a list of matching entities
 	 */
-	public <SK> List<E> findAllByAnyAttributes(AttributesHashMap<E> attributes,
-			SingularAttribute<E, SK> order)
+	public <SK> List<E> findAllByAnyAttributes(AttributesHashMap<E> attributes, SingularAttribute<E, SK> order)
 	{
 
 		final CriteriaBuilder builder = entityManager.getCriteriaBuilder();
@@ -440,6 +443,27 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		return result;
 
 	}
+	
+	public <V,J> int deleteAllByAttributeJoin(SingularAttribute<J, V> vKey, V value,SingularAttribute<E,J> joinAttr)
+	{
+
+		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+
+		CriteriaDelete<E> criteria = builder.createCriteriaDelete(entityClass);
+
+		Root<E> root = criteria.from(entityClass);
+		
+		Join<E,J> join = root.join(joinAttr, JoinType.LEFT);
+
+		criteria.where(builder.equal(join.get(vKey), value));
+
+		entityManager.getClass();
+		int result = entityManager.createQuery(criteria).executeUpdate();
+
+		return result;
+
+	}
+
 
 	/**
 	 * @return the number of entities in the table.
