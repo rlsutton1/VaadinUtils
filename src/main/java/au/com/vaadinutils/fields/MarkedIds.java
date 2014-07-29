@@ -8,7 +8,7 @@ import java.util.TreeSet;
 public class MarkedIds
 {
 	final Set<Object> markedIds = new TreeSet<Object>();
-	boolean trackingSelected = true;
+	private boolean trackingSelected = true;
 
 	private Set<SelectionListener> selectionListeners = new HashSet<SelectionListener>();
 	private int containerSize;
@@ -81,4 +81,9 @@ public class MarkedIds
 	}
 
 	// Logger logger = LogManager.getLogger();
+	
+	public boolean isTrackingSelected()
+	{
+		return trackingSelected;
+	}
 }
