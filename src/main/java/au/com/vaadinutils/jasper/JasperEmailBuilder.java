@@ -101,7 +101,7 @@ public class JasperEmailBuilder
 		return this;
 	}
 
-	public void send() throws EmailException
+	public void send(boolean debug) throws EmailException
 	{
 
 		Preconditions.checkNotNull(fromAddress);
@@ -114,7 +114,7 @@ public class JasperEmailBuilder
 		if (this.renderedReportBody != null)
 			email.setDataSourceResolver(new JasperDataSourceResolver(renderedReportBody));
 
-		email.setDebug(true);
+		email.setDebug(debug);
 		email.setHostName(settings.getSmtpFQDN());
 		email.setSmtpPort(settings.getSmtpPort());
 		if (settings.isAuthRequired())
