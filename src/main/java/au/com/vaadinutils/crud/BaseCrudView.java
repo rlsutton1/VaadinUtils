@@ -699,6 +699,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 					CrudAction<E> action = (CrudAction<E>) actionCombo.getValue();
 					if (interceptAction(action, entity))
 						action.exec(BaseCrudView.this, entity);
+					container.commit();
 					container.refreshItem(entity.getItemId());
 					// actionCombo.select(actionCombo.getNullSelectionItemId());
 				}
