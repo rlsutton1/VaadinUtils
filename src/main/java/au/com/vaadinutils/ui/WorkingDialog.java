@@ -170,7 +170,7 @@ public class WorkingDialog extends Window implements ProgressListener<String>
 	{
 		this.completeListener = listener;
 
-		Thread worker = new Thread(new Worker(this, runnable),"WorkingDialog");
+		Thread worker = new Thread(new Worker(this, runnable));
 		worker.start();
 
 	}

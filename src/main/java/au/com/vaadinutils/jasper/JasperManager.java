@@ -754,7 +754,7 @@ public class JasperManager implements Runnable
 		jobQueue.add(queueEntry);
 
 		this.exportMethod = exportMethod;
-		thread = new Thread(this,"JasperManager");
+		thread = new Thread(this);
 		thread.start();
 	}
 
