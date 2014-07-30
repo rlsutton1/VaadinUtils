@@ -714,6 +714,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 					if (interceptAction(action, entity))
 						action.exec(BaseCrudView.this, entity);
 					container.refreshItem(entity.getItemId());
+					
 					// actionCombo.select(actionCombo.getNullSelectionItemId());
 				}
 				else

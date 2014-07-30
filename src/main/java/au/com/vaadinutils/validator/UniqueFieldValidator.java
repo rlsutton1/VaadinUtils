@@ -39,7 +39,6 @@ public class UniqueFieldValidator<E extends CrudEntity, F> implements Validator
 		{
 			for (Object id: crud.getContainer().getItemIds())
 			{
-				System.out.println(id+" " +crud.getContainer().getItem(id).getItemProperty(matchField.getName()).getValue());
 				if (!id.equals(crud.getCurrent().getId()))
 				{
 					Object existingValue = crud.getContainer().getItem(id).getItemProperty(matchField.getName()).getValue();

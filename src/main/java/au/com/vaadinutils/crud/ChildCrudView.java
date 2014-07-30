@@ -268,6 +268,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 
 		entityTable.select(null);
 		entityTable.select(previousItemId);
+		container.commit();
 
 		postChildDelete(entityId);
 
