@@ -41,7 +41,7 @@ public class DayOfWeekCheckBoxes extends HorizontalLayout implements Field<Strin
 
 	public void focus()
 	{
-		super.focus();
+		focus();
 	}
 
 	@Override
