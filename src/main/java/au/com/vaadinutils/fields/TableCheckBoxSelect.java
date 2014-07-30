@@ -17,11 +17,11 @@ public class TableCheckBoxSelect extends Table
 
 	private static final String TABLE_CHECK_BOX_SELECT = "TableCheckBoxSelect";
 	private static final long serialVersionUID = -7559267854874304189L;
-	MarkedIds markedIds = new MarkedIds();
-	private boolean multiselect;
+	protected MarkedIds markedIds = new MarkedIds();
+	protected boolean multiselect;
 	private boolean selectable = true;
 	private Set<ValueChangeListener> valueChangeListeners = new HashSet<ValueChangeListener>();
-	private int containerSize=0;
+	protected int containerSize=0;
 
 	public TableCheckBoxSelect()
 	{
@@ -214,7 +214,7 @@ public class TableCheckBoxSelect extends Table
 
 	public Object getSelectedItems()
 	{
-		if (markedIds.trackingSelected)
+		if (markedIds.isTrackingSelected())
 		{
 			return markedIds.getIds();
 		}
@@ -249,7 +249,7 @@ public class TableCheckBoxSelect extends Table
 
 	private CheckBox lastChecked;
 
-	private ColumnGenerator getGenerator()
+	protected ColumnGenerator getGenerator()
 	{
 		return new ColumnGenerator()
 		{
@@ -273,8 +273,8 @@ public class TableCheckBoxSelect extends Table
 					{
 						if (!multiselect)
 						{
-							markedIds.clear(markedIds.trackingSelected, containerSize);
-							if ((Boolean) event.getProperty().getValue() == markedIds.trackingSelected)
+							markedIds.clear(markedIds.isTrackingSelected(), containerSize);
+							if ((Boolean) event.getProperty().getValue() == markedIds.isTrackingSelected())
 							{
 								markedIds.add(itemId);
 								if (lastChecked != null)
@@ -292,7 +292,7 @@ public class TableCheckBoxSelect extends Table
 						}
 						else
 						{
-							if ((Boolean) event.getProperty().getValue() == markedIds.trackingSelected)
+							if ((Boolean) event.getProperty().getValue() == markedIds.isTrackingSelected())
 							{
 								markedIds.add(itemId);
 							}
@@ -308,7 +308,7 @@ public class TableCheckBoxSelect extends Table
 				});
 				boolean inList = markedIds.contains(itemId);
 				checkbox.setValue(inList);
-				if (!markedIds.trackingSelected)
+				if (!markedIds.isTrackingSelected())
 				{
 					checkbox.setValue(!inList);
 				}
@@ -320,7 +320,7 @@ public class TableCheckBoxSelect extends Table
 		};
 	}
 
-	private void notifyValueChange()
+	protected void notifyValueChange()
 	{
 		for (ValueChangeListener listener : valueChangeListeners)
 		{
