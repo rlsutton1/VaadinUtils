@@ -80,7 +80,7 @@ public class ReportEmailRunnerImpl implements ReportEmailRunner, JasperReportPro
 
 			}
 
-			builder.send(false);
+			builder.send();
 		}
 		finally
 		{
