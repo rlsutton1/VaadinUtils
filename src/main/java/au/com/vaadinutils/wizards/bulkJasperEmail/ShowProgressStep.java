@@ -12,7 +12,6 @@ import org.vaadin.teemu.wizards.WizardStep;
 
 import au.com.vaadinutils.crud.CrudEntity;
 import au.com.vaadinutils.fields.PoJoTable;
-import au.com.vaadinutils.ui.UIUpdater;
 import au.com.vaadinutils.ui.WorkingDialog;
 import au.com.vaadinutils.util.MutableInteger;
 import au.com.vaadinutils.util.ProgressBarWorker;
@@ -30,7 +29,7 @@ import com.vaadin.ui.VerticalLayout;
 
 public class ShowProgressStep<C extends CrudEntity> implements WizardStep, ProgressTaskListener<JasperTransmission>
 {
-	static private  transient Logger logger   =  LogManager.getLogger(ShowProgressStep.class);
+	static private transient Logger logger = LogManager.getLogger(ShowProgressStep.class);
 	JPAContainer<C> entities;
 	private WizardView<?, ?, ?> wizardView;
 	private boolean sendComplete = false;
@@ -58,8 +57,8 @@ public class ShowProgressStep<C extends CrudEntity> implements WizardStep, Progr
 		VerticalLayout layout = new VerticalLayout();
 		layout.setSizeFull();
 
-		progressTable = new PoJoTable<JasperTransmission>(JasperTransmission.class, new String[]
-		{ "Description", "RecipientEmailAddress", "Exception" });
+		progressTable = new PoJoTable<JasperTransmission>(JasperTransmission.class, new String[] { "Description",
+				"RecipientEmailAddress", "Exception" });
 		progressTable.setColumnWidth("Description", 80);
 		progressTable.setColumnWidth("RecipientEmailAddress", 100);
 		progressTable.setColumnExpandRatio("Exception", 1);
@@ -88,7 +87,7 @@ public class ShowProgressStep<C extends CrudEntity> implements WizardStep, Progr
 		}
 		catch (JRException e)
 		{
-			logger.error(e,e);
+			logger.error(e, e);
 			VUNotification.show(e, Type.ERROR_MESSAGE);
 			throw new RuntimeException(e);
 		}
@@ -163,46 +162,53 @@ public class ShowProgressStep<C extends CrudEntity> implements WizardStep, Progr
 		return true;
 	}
 
+	/**
+	 * you better get a lock on the UI before calling this method!
+	 */
 	public final void taskProgress(final int count, final int max, final JasperTransmission status)
 	{
-		new UIUpdater(new Runnable()
+
+		UI ui = UI.getCurrent();
+		if (ui == null)
 		{
-			@Override
-			public void run()
-			{
-				String message = "Sending: " + count + " of " + max + " messages.";
-				progressDescription.setValue(message);
-				indicator.setValue((float) count / max);
-				workDialog.progress(count, max, message);
-				ShowProgressStep.this.progressTable.addRow(status);
-			}
-		});
+			throw new RuntimeException("You appear to be calling from a worker thread, no UI is available");
+		}
+		if (!ui.isAttached())
+		{
+			logger.warn("The UI is nolonger attached, cant deliver message to user");
+		}
+
+		String message = "Sending: " + count + " of " + max + " messages.";
+		progressDescription.setValue(message);
+		indicator.setValue((float) count / max);
+		workDialog.progress(count, max, message);
+		ShowProgressStep.this.progressTable.addRow(status);
+
 	}
 
 	public final void taskComplete(final int sent)
 	{
-		new UIUpdater(new Runnable()
+		UI ui = UI.getCurrent();
+		if (ui == null)
 		{
+			throw new RuntimeException("You appear to be calling from a worker thread, no UI is available");
+		}
+		if (!ui.isAttached())
+		{
+			logger.warn("The UI is nolonger attached, cant deliver message to user");
+		}
+		sendComplete = true;
+		indicator.setValue(1.0f);
 
-			@Override
-			public void run()
-			{
-				sendComplete = true;
-				indicator.setValue(1.0f);
+		if (ShowProgressStep.this.rejected.intValue() == 0 && queued.intValue() == sent)
+			progressDescription.setValue("All Email Messages have been sent successfully.");
 
-				if (ShowProgressStep.this.rejected.intValue() == 0 && queued.intValue() == sent)
-					progressDescription.setValue("All Email Messages have been sent successfully.");
+		else
+			progressDescription.setValue(sent + " Email Message " + (sent == 1 ? "has" : "s have")
+					+ " been sent successfully. Check the list below for the reason why some of the messages failed.");
+		VUNotification.show("Email batch send complete", Type.TRAY_NOTIFICATION);
+		workDialog.complete(sent);
 
-				else
-					progressDescription
-							.setValue(sent
-									+ " Email Message "
-									+ (sent == 1 ? "has" : "s have")
-									+ " been sent successfully. Check the list below for the reason why some of the messages failed.");
-				VUNotification.show("Email batch send complete", Type.TRAY_NOTIFICATION);
-				workDialog.complete(sent);
-			}
-		});
 	}
 
 	@Override

@@ -33,7 +33,6 @@ import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailScheduleEntity;
 import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailScheduleEntity_;
 import au.com.vaadinutils.listener.CancelListener;
 import au.com.vaadinutils.listener.ClickEventLogged;
-import au.com.vaadinutils.ui.UIUpdater;
 import au.com.vaadinutils.ui.WorkingDialog;
 
 import com.github.wolfie.refresher.Refresher;
@@ -554,12 +553,12 @@ class JasperReportLayout extends VerticalLayout
 		RefreshListener streamListener = getStreamConnectorRefreshListener(outputFormat);
 		refresher.addListener(streamListener);
 
-		JasperProgressListener listener = getJasperManagerProgressListener(dialog, refresher, outputFormat);
+		JasperProgressListener listener = getJasperManagerProgressListener(UI.getCurrent(),dialog, refresher, outputFormat);
 		manager.exportAsync(outputFormat, params, listener);
 
 	}
 
-	private JasperProgressListener getJasperManagerProgressListener(final WorkingDialog dialog,
+	private JasperProgressListener getJasperManagerProgressListener(final UI ui,final WorkingDialog dialog,
 			final Refresher refresher, final OutputFormat outputFormat)
 	{
 		JasperProgressListener listener = new JasperProgressListener()
@@ -600,7 +599,7 @@ class JasperReportLayout extends VerticalLayout
 			@Override
 			public void completed()
 			{
-				new UIUpdater(new Runnable()
+				ui.access(new Runnable()
 				{
 					@Override
 					public void run()

@@ -1,24 +1,41 @@
 package au.com.vaadinutils.util;
 
-import au.com.vaadinutils.ui.UIUpdater;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.vaadin.server.Page;
 import com.vaadin.shared.Position;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.UI;
 
 public class VUNotification extends Notification
 {
 	private static final long serialVersionUID = 1L;
+	static Logger logger = LogManager.getLogger();
 
 	public VUNotification(final String caption)
 	{
 		super(caption);
 	}
 
+	private static UI getUI()
+	{
+		UI ui = UI.getCurrent();
+		if (ui == null)
+		{
+			throw new RuntimeException("You appear to be calling from a worker thread, no UI is available");
+		}
+		if (!ui.isAttached())
+		{
+			logger.warn("The UI is nolonger attached, cant deliver message to user");
+		}
+		return ui;
+	}
+
 	public static void show(final String caption, final Type type)
 	{
 
-		new UIUpdater(new Runnable()
+		getUI().access(new Runnable()
 		{
 			@Override
 			public void run()
@@ -34,7 +51,7 @@ public class VUNotification extends Notification
 
 	public static void show(final String caption, final String description, final Type type)
 	{
-		new UIUpdater(new Runnable()
+		getUI().access(new Runnable()
 		{
 			@Override
 			public void run()
@@ -50,7 +67,7 @@ public class VUNotification extends Notification
 
 	public static void show(final Exception e, final Type type)
 	{
-		new UIUpdater(new Runnable()
+		getUI().access(new Runnable()
 		{
 			@Override
 			public void run()
@@ -66,10 +83,10 @@ public class VUNotification extends Notification
 			}
 		});
 	}
-	
+
 	public static void show(final Throwable e, final Type type)
 	{
-		new UIUpdater(new Runnable()
+		getUI().access(new Runnable()
 		{
 			@Override
 			public void run()
