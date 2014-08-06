@@ -50,7 +50,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	private Filter parentFilter;
 	protected boolean dirty = false;
 	final private Class<P> parentType;
-	protected BaseCrudView<P> parentCrud;
+	public BaseCrudView<P> parentCrud;
 	private ChildCrudEventHandler<E> eventHandler = getNullEventHandler();
 
 	/**

@@ -501,6 +501,8 @@ class JasperReportLayout extends VerticalLayout
 		streamConnected = false;
 		streamReady = false;
 
+		splitPanel.setSecondComponent(splash);
+
 		manager = null;
 		boolean validParams = true;
 		// if there is a report chooser parameter then swap out the report
