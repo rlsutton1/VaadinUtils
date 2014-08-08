@@ -202,7 +202,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 * @return
 	 * @throws ExecutionException
 	 */
-	protected CrudSecurityManager getSecurityManager()
+	public CrudSecurityManager getSecurityManager()
 	{
 		return SecurityManagerFactoryProxy.getSecurityManager(this);
 	}

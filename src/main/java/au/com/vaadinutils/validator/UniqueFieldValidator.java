@@ -11,7 +11,6 @@ import au.com.vaadinutils.crud.BaseCrudView;
 import au.com.vaadinutils.crud.CrudEntity;
 import au.com.vaadinutils.dao.JpaBaseDao;
 
-import com.vaadin.addon.jpacontainer.EntityItemProperty;
 import com.vaadin.data.Validator;
 
 public class UniqueFieldValidator<E extends CrudEntity, F> implements Validator
@@ -39,33 +38,20 @@ public class UniqueFieldValidator<E extends CrudEntity, F> implements Validator
 	{
 		if (value != null)
 		{
-			for (Object id: crud.getContainer().getItemIds())
+
+			JpaBaseDao<E, Long> dao = new JpaBaseDao<E, Long>(table);
+			@SuppressWarnings("unchecked")
+			List<E> matches = dao.findAllByAttribute(matchField, (F) value, null);
+			for (E message : matches)
 			{
-				if (!id.equals(crud.getCurrent().getId()))
+				if (crud == null || !message.getId().equals(crud.getCurrent().getId()))
 				{
-					Object existingValue = crud.getContainer().getItem(id).getItemProperty(matchField.getName()).getValue();
-					
-					if (existingValue != null && existingValue.equals(value))
-					{
-						String message2 = "'" + matchField.getName() + "' must be unique";
-						logger.error(message2);
-						throw new InvalidValueException(message2);
-					}
+
+					String message2 = "'" + matchField.getName() + "' must be unique";
+					logger.error(message2);
+					throw new InvalidValueException(message2);
 				}
 			}
-//			JpaBaseDao<E, Long> dao = new JpaBaseDao<E, Long>(table);
-//			@SuppressWarnings("unchecked")
-//			List<E> matches = dao.findAllByAttribute(matchField, (F) value, null);
-//			for (E message : matches)
-//			{
-//				if (crud == null || !message.getId().equals(crud.getCurrent().getId()))
-//				{
-//
-//					String message2 = "'" + matchField.getName() + "' must be unique";
-//					logger.error(message2);
-//					throw new InvalidValueException(message2);
-//				}
-//			}
 		}
 
 	}
