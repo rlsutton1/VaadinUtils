@@ -900,7 +900,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			{
 				// only commit dirty children, saves time for a crud with lots
 				// of children
-				if (commitListener.isDirty())
+				if (commitListener.isDirty()|| !(commitListener instanceof ChildCrudView))
 				{
 					commitListener.committed(newEntity);
 				}

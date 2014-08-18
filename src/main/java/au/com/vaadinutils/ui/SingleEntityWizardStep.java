@@ -93,7 +93,7 @@ public abstract class SingleEntityWizardStep<E extends CrudEntity> implements Wi
 				// the one we retrieve from the container.
 				entity = entityItem.getEntity();
 			}
-			Preconditions.checkArgument(entityItem != null);
+			Preconditions.checkNotNull(entityItem);
 			Preconditions.checkArgument(entity == entityItem.getEntity());
 			
 			fieldGroup.setItemDataSource(entityItem);
