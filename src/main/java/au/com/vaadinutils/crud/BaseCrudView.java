@@ -733,6 +733,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 		});
 		saveButton.setStyleName(Reindeer.BUTTON_DEFAULT);
+		saveButton.setDisableOnClick(true);
 
 	}
 
@@ -953,11 +954,12 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 					container.removeItem(entityTable.getCurrent());
 				}
 			}
+			saveButton.setEnabled(true);
 		}
 
 	}
 
-	void handleConstraintViolationException(Throwable e)
+	protected void handleConstraintViolationException(Throwable e)
 	{
 		Throwable cause = e.getCause();
 		if (cause instanceof ConstraintViolationException)
@@ -1517,5 +1519,10 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	protected DeleteVetoResponseData canDelete(E entity)
 	{
 		return new DeleteVetoResponseData(true);
+	}
+	
+	protected Button getSaveButton()
+	{
+		return saveButton;
 	}
 }

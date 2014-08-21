@@ -11,6 +11,7 @@ import com.google.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.data.Property;
+import com.vaadin.data.util.converter.Converter;
 import com.vaadin.ui.Table.ColumnGenerator;
 import com.vaadin.ui.Table.TableDragMode;
 import com.vaadin.ui.Tree;
@@ -191,6 +192,27 @@ public class EntityTreeTable<E> extends Tree implements EntityList<E>
 
 	@Override
 	public void setVisibleColumns(Object... visibleColumns)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setConverter(String name, Converter<String, ?> converter)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setColumnCollapsed(String name, boolean b)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void refreshRowCache()
 	{
 		// TODO Auto-generated method stub
 		

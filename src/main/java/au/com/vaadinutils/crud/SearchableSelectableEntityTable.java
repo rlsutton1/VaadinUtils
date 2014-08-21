@@ -14,6 +14,7 @@ import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Container.Filterable;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
+import com.vaadin.data.util.converter.Converter;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
 import com.vaadin.event.ItemClickEvent.ItemClickListener;
@@ -57,7 +58,7 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 		}
 
 		AbstractLayout searchBar = buildSearchBar();
-
+		
 		Label title = new Label(getTitle());
 		title.setStyleName(Reindeer.LABEL_H1);
 		this.addComponent(title);
@@ -269,6 +270,25 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 	{
 		selectableTable.addItemClickListener(object);
 
+	}
+
+	public void removeAllContainerFilters()
+	{
+		container.removeAllContainerFilters();
+		
+	}
+
+	public void addContainerFilter(Filter filter)
+	{
+		container.addContainerFilter(filter);
+		
+	}
+
+	public void setConverter(String propertyId,
+			Converter<String, ?> converter)
+	{
+		selectableTable.setConverter(propertyId,converter);
+		
 	}
 
 }

@@ -13,6 +13,7 @@ import com.google.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.data.Property;
+import com.vaadin.data.util.converter.Converter;
 import com.vaadin.ui.Table;
 
 public class EntityTable<E> extends Table implements EntityList<E>
@@ -241,6 +242,20 @@ public class EntityTable<E> extends Table implements EntityList<E>
 	public void addGeneratedColumn(Object id, ColumnGenerator generatedColumn)
 	{
 		super.addGeneratedColumn(id, generatedColumn);
+		
+	}
+
+	@Override
+	public void setConverter(String name, Converter<String, ?> converter)
+	{
+		super.setConverter(name, converter);
+		
+	}
+
+	@Override
+	public void setColumnCollapsed(String name, boolean collapsed)
+	{
+		super.setColumnCollapsed(name, collapsed);
 		
 	}
 
