@@ -9,11 +9,13 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javax.persistence.PersistenceException;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.persistence.exceptions.DatabaseException;
 import org.vaadin.dialogs.ConfirmDialog;
 
 import au.com.vaadinutils.crud.events.CrudEventDistributer;
@@ -834,7 +836,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		EntityManagerProvider.getEntityManager().flush();
 
 		postDelete(deltedEntity);
-		
+
 		CrudEventDistributer.publishEvent(this, CrudEventType.DELETE, deltedEntity);
 
 	}
@@ -901,7 +903,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			{
 				// only commit dirty children, saves time for a crud with lots
 				// of children
-				if (commitListener.isDirty()|| !(commitListener instanceof ChildCrudView))
+				if (commitListener.isDirty() || !(commitListener instanceof ChildCrudView))
 				{
 					commitListener.committed(newEntity);
 				}
@@ -915,7 +917,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 			postSaveAction(newEntity);
 			CrudEventDistributer.publishEvent(this, eventType, newEntity);
-			
+
 			// select has been moved to here because when it happens earlier,
 			// child cruds are caused to discard their data before saving it for
 			// a new record
@@ -930,7 +932,24 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 		catch (Exception e)
 		{
-			if (e instanceof InvalidValueException || e.getCause() instanceof InvalidValueException)
+			if (e.getCause() instanceof PersistenceException)
+			{
+				String tmp = e.getMessage();
+				PersistenceException pex = (PersistenceException) e.getCause();
+				if (pex.getCause() instanceof DatabaseException)
+				{
+					DatabaseException dex = (DatabaseException) pex.getCause();
+					tmp = dex.getMessage();
+					if (tmp.indexOf("Query being") > 0)
+					{
+						// strip of the query
+						tmp = tmp.substring(0, tmp.indexOf("Query being"));
+					}
+				}
+				logger.error(e, e);
+				throw new RuntimeException(tmp);
+			}
+			else if (e instanceof InvalidValueException || e.getCause() instanceof InvalidValueException)
 			{
 				Notification.show("Please fix the form errors and then try again.", Type.ERROR_MESSAGE);
 			}
@@ -1482,10 +1501,12 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 */
 	protected void resetFilters()
 	{
-		try{
-		container.removeAllContainerFilters();
-		((EntityTable<E>) this.entityTable).refreshRowCache();
-		}catch (Exception e)
+		try
+		{
+			container.removeAllContainerFilters();
+			((EntityTable<E>) this.entityTable).refreshRowCache();
+		}
+		catch (Exception e)
 		{
 			handleConstraintViolationException(e);
 			throw e;
@@ -1520,7 +1541,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	{
 		return new DeleteVetoResponseData(true);
 	}
-	
+
 	protected Button getSaveButton()
 	{
 		return saveButton;
