@@ -2,6 +2,7 @@ package au.com.vaadinutils.validator;
 
 import java.util.List;
 
+import javax.persistence.metamodel.ManagedType;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.apache.logging.log4j.LogManager;
@@ -24,9 +25,11 @@ public class UniqueFieldValidator<E extends CrudEntity, F> implements Validator
 	private SingularAttribute<E, F> matchField;
 	private BaseCrudView<E> crud;
 	transient Logger logger = LogManager.getLogger(UniqueFieldValidator.class);
+	private Class<E> table;
 
 	public UniqueFieldValidator( SingularAttribute<E, F> matchField, BaseCrudView<E> crud)
 	{
+		this.table = matchField.getDeclaringType().getJavaType();
 		this.matchField = matchField;
 		this.crud = crud;
 
@@ -37,6 +40,7 @@ public class UniqueFieldValidator<E extends CrudEntity, F> implements Validator
 	{
 		if (value != null)
 		{
+			if (crud != null){
 			for (Object id: crud.getContainer().getItemIds())
 			{
 				if (!id.equals(crud.getCurrent().getId()))
@@ -50,21 +54,22 @@ public class UniqueFieldValidator<E extends CrudEntity, F> implements Validator
 						throw new InvalidValueException(message2);
 					}
 				}
-			}
-//			JpaBaseDao<E, Long> dao = new JpaBaseDao<E, Long>(table);
-//			@SuppressWarnings("unchecked")
-//			List<E> matches = dao.findAllByAttribute(matchField, (F) value, null);
-//			for (E message : matches)
-//			{
-//				if (crud == null || !message.getId().equals(crud.getCurrent().getId()))
-//				{
-//
-//					String message2 = "'" + matchField.getName() + "' must be unique";
-//					logger.error(message2);
-//					throw new InvalidValueException(message2);
-//				}
-//			}
-		}
+			}}else
+			{
+				JpaBaseDao<E, Long> dao = new JpaBaseDao<E, Long>(table);
+				@SuppressWarnings("unchecked")
+				List<E> matches = dao.findAllByAttribute(matchField, (F) value, null);
+				for (E message : matches)
+				{
+					if (crud == null || !message.getId().equals(crud.getCurrent().getId()))
+					{
+
+						String message2 = "'" + matchField.getName() + "' must be unique";
+						logger.error(message2);
+						throw new InvalidValueException(message2);
+					}
+				}
+		}}
 
 	}
 
