@@ -148,6 +148,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 		dirty = false;
 		entityTable.select(null);
 		entityTable.select(entityTable.firstItemId());
+		triggerFilter();
 
 	}
 
@@ -365,6 +366,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 			inNew = true;
 			saveEditsToTemp();
 			resetFilters();
+			triggerFilter();
 
 			createNewEntity();
 
