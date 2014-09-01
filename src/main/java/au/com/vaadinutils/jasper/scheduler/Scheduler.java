@@ -47,7 +47,7 @@ public class Scheduler implements Runnable
 		this.dbManager = dbManager;
 
 		future = schedulerpool.scheduleAtFixedRate(this, 1, 1, TimeUnit.MINUTES);
-		
+
 		CrudEventDistributer.addListener(JasperReportScheduleLayout.class, new CrudEventListener()
 		{
 
@@ -145,6 +145,10 @@ public class Scheduler implements Runnable
 						schedule.setEnabled(false);
 						schedule.setLastRuntime(new Date(), e.getMessage());
 						logger.error(e, e);
+					}
+					if (nextPossible.isAfter(schedule.getNextScheduledTime().getTime()))
+					{
+						nextPossible = new DateTime(schedule.getNextScheduledTime().getTime());
 					}
 				}
 			}

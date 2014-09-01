@@ -90,7 +90,7 @@ public class JasperReportSchedulerWindow extends Window
 					new InternetAddress(reportProperties.getUserEmailAddress());
 
 				}
-				catch (AddressException e)
+				catch (Exception e)
 				{
 					Notification.show("Your email address (" + reportProperties.getUserEmailAddress()
 							+ ") is invalid, go to accounts and fix you email address.", Type.ERROR_MESSAGE);
