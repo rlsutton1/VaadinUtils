@@ -167,14 +167,25 @@ public class JasperReportEmailWindow extends Window
 			JasperReportProperties reportProperties)
 	{
 		String errorMessage = "";
+		boolean hasValidTargets = false;
 		for (EmailTargetLine target : emailTargetLayout.getTargets())
 		{
-			if (!target.targetAddress.isValid())
+			if (target.targetAddress.getValue() != null)
 			{
-				errorMessage = target.targetAddress.getValue() + " is not a valid email address";
-				Notification.show(errorMessage, Type.ERROR_MESSAGE);
-				return null;
+				if (!target.targetAddress.isValid())
+				{
+					errorMessage = target.targetAddress.getValue() + " is not a valid email address";
+					Notification.show(errorMessage, Type.ERROR_MESSAGE);
+					return null;
+				}
+				hasValidTargets = true;
 			}
+			
+		}
+		if (!hasValidTargets)
+		{
+			Notification.show("Set at least one Recipient.",Type.ERROR_MESSAGE);
+			return null;
 		}
 
 		ReportEmailScheduleEntity schedule = new ReportEmailScheduleEntity();
