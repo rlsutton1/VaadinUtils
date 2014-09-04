@@ -166,14 +166,25 @@ public class JasperReportEmailWindow extends Window
 			JasperReportProperties reportProperties)
 	{
 		String errorMessage = "";
+		boolean hasValidTargets = false;
 		for (EmailTargetLine target : emailTargetLayout.getTargets())
 		{
-			if (!target.targetAddress.isValid())
+			if (target.targetAddress.getValue() != null)
 			{
-				errorMessage = target.targetAddress.getValue() + " is not a valid email address";
-				Notification.show(errorMessage, Type.ERROR_MESSAGE);
-				return null;
+				if (!target.targetAddress.isValid())
+				{
+					errorMessage = target.targetAddress.getValue() + " is not a valid email address";
+					Notification.show(errorMessage, Type.ERROR_MESSAGE);
+					return null;
+				}
+				hasValidTargets = true;
 			}
+			
+		}
+		if (!hasValidTargets)
+		{
+			Notification.show("Set at least one Recipient.",Type.ERROR_MESSAGE);
+			return null;
 		}
 
 		ReportEmailScheduleEntity schedule = new ReportEmailScheduleEntity();
@@ -203,7 +214,7 @@ public class JasperReportEmailWindow extends Window
 					// add non date fields
 					ReportEmailParameterEntity rparam = new ReportEmailParameterEntity();
 					rparam.setName(names[0]);
-					rparam.setValue(param.getValue(names[0]).toString(),param.getDisplayValue(names[0]));
+					rparam.setValue(param.getValue(names[0]).toString(), param.getDisplayValue(names[0]));
 					rparams.add(rparam);
 					entityManager.persist(rparam);
 				}
@@ -249,7 +260,6 @@ public class JasperReportEmailWindow extends Window
 		schedule.setRecipients(recips);
 		schedule.setNextScheduledRunTime(schedule.getScheduleMode().getNextRuntime(schedule, new Date()));
 		schedule.setOutputFormat(OutputFormat.PDF);
-
 
 		entityManager.persist(schedule);
 
