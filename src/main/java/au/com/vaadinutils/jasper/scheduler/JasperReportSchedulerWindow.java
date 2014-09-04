@@ -93,7 +93,7 @@ public class JasperReportSchedulerWindow extends Window
 				catch (Exception e)
 				{
 					Notification.show("Your email address (" + reportProperties.getUserEmailAddress()
-							+ ") is invalid, go to accounts and fix you email address.", Type.ERROR_MESSAGE);
+							+ ") is invalid, go to accounts and fix your email address.", Type.ERROR_MESSAGE);
 					return null;
 				}
 

@@ -963,7 +963,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			}
 			else if (e instanceof InvalidValueException || e.getCause() instanceof InvalidValueException)
 			{
-				Notification.show("Please fix the form errors and then try again.", Type.ERROR_MESSAGE);
+				InvalidValueException m = (InvalidValueException ) e;
+				
+				Notification.show("Please fix the form errors and then try again.\n\n "+e.getMessage(), Type.ERROR_MESSAGE);
 			}
 			else if (e.getCause() instanceof ConstraintViolationException)
 			{

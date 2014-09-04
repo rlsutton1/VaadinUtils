@@ -2,9 +2,10 @@ package au.com.vaadinutils.jasper.scheduler;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.LinkedHashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -62,8 +63,7 @@ import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
-/** A start view for navigating to the main view */
-public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailScheduleEntity> implements View, HelpProvider
+class JasperReportScheduleLayout extends BaseCrudView<ReportEmailScheduleEntity> implements View, HelpProvider
 {
 
 	Logger logger = LogManager.getLogger();
@@ -199,11 +199,11 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 				ReportEmailSender_.username);
 		sender.setReadOnly(true);
 
-		
-		outputFormat =helper.bindEnumField("Output format", ReportEmailScheduleEntity_.outputFormat.getName(), OutputFormat.class);
-		
+		outputFormat = helper.bindEnumField("Output format", ReportEmailScheduleEntity_.outputFormat.getName(),
+				OutputFormat.class);
+
 		outputFormat.removeItem(OutputFormat.HTML);
-		
+
 		helper.bindTextField("Subject", ReportEmailScheduleEntity_.subject);
 		CKEditorEmailField message = helper.bindEditorField("Message", ReportEmailScheduleEntity_.message, false);
 
@@ -519,31 +519,44 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 		entity.setNextScheduledRunTime(entity.getScheduleMode().getNextRuntime(entity, new Date()));
 
 		List<ReportEmailRecipient> recips = entity.getRecipients();
+		Set<ReportEmailRecipient> matchedRecips = new HashSet<ReportEmailRecipient>();
 		for (EmailTargetLine line : emailTargetLayout.getTargets())
 		{
 			// check if the recipient exists
 			String email = (String) line.targetAddress.getValue();
-			// String email = (String) item.getItemProperty("id").getValue();
-			boolean found = false;
-			for (ReportEmailRecipient recip : recips)
+			if (email != null && email.length() > 0)
 			{
-				if (recip.getEmail() != null && recip.getEmail().equalsIgnoreCase(email))
+				// String email = (String)
+				// item.getItemProperty("id").getValue();
+				boolean found = false;
+				for (ReportEmailRecipient recip : recips)
 				{
-					found = true;
-					recip.setVisibility((ReportEmailRecipientVisibility) line.targetTypeCombo.getValue());
+					if (recip.getEmail() != null && recip.getEmail().equalsIgnoreCase(email))
+					{
+						found = true;
+						recip.setVisibility((ReportEmailRecipientVisibility) line.targetTypeCombo.getValue());
+						matchedRecips.add(recip);
+						break;
+					}
+				}
+				// if not then add them
+				if (!found)
+				{
+					ReportEmailRecipient reportEmailRecipient = new ReportEmailRecipient();
+					reportEmailRecipient.setEmail(email);
+					reportEmailRecipient
+							.setVisibility((ReportEmailRecipientVisibility) line.targetTypeCombo.getValue());
 
-					break;
+					recips.add(reportEmailRecipient);
+					matchedRecips.add(reportEmailRecipient);
 				}
 			}
-			// if not then add them
-			if (!found)
-			{
-				ReportEmailRecipient reportEmailRecipient = new ReportEmailRecipient();
-				reportEmailRecipient.setEmail(email);
-				reportEmailRecipient.setVisibility((ReportEmailRecipientVisibility) line.targetTypeCombo.getValue());
-
-				recips.add(reportEmailRecipient);
-			}
+		}
+		recips.clear();
+		recips.addAll(matchedRecips);
+		if (recips.size()==0)
+		{
+			throw new InvalidValueException("Select at least one Recipient");
 		}
 
 		saveChangesToReportParameters(entity);
@@ -602,7 +615,7 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 		}
 
 		EntityManagerProvider.merge(entityItem);
-		
+
 	}
 
 	private void removeDeletedRecipients(ReportEmailScheduleEntity entityItem)
