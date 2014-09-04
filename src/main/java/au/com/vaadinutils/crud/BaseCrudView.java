@@ -1424,6 +1424,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				try
 				{
 
+					searchField.setValue("");
 					resetFilters();
 
 					createNewEntity();
