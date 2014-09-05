@@ -660,7 +660,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 		catch (Exception e)
 		{
 			handleConstraintViolationException(e);
-			throw e;
+
 		}
 	}
 

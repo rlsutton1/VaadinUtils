@@ -16,6 +16,7 @@ import javax.validation.ConstraintViolationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.persistence.exceptions.DatabaseException;
+import org.eclipse.persistence.exceptions.DescriptorException;
 import org.vaadin.dialogs.ConfirmDialog;
 
 import au.com.vaadinutils.crud.events.CrudEventDistributer;
@@ -155,7 +156,17 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		entityTable.setColumnCollapsingAllowed(true);
 
 		initLayout();
-		entityTable.init();
+
+		try
+		{
+			entityTable.init();
+		}
+		catch (Exception e)
+		{
+			handleConstraintViolationException(e);
+
+		}
+
 		initSearch();
 		initButtons();
 		this.setVisible(true);
@@ -374,6 +385,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		return "New";
 	}
 
+	@SuppressWarnings("null")
 	private void addCrudActions()
 	{
 		/**
@@ -949,20 +961,22 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				logger.error(e, e);
 				throw new RuntimeException(tmp);
 			}
-			else if (e instanceof InvalidValueException || e.getCause() instanceof InvalidValueException)
+			else if (e instanceof InvalidValueException )
 			{
-				InvalidValueException m = (InvalidValueException ) e;
-				
-				Notification.show("Please fix the form errors and then try again.\n\n "+e.getMessage(), Type.ERROR_MESSAGE);
+				InvalidValueException m = (InvalidValueException) e;
+
+				Notification.show("Please fix the form errors and then try again.\n\n " + m.getMessage(),
+						Type.ERROR_MESSAGE);
 			}
-			else if (e.getCause() instanceof ConstraintViolationException)
+			else if ( e.getCause() instanceof InvalidValueException)
 			{
-				handleConstraintViolationException(e);
+				InvalidValueException m = (InvalidValueException) e.getCause();
+				Notification.show("Please fix the form errors and then try again.\n\n " + m.getMessage(),
+						Type.ERROR_MESSAGE);
 			}
 			else
 			{
-				logger.error(e, e);
-				Notification.show(e.getClass().getSimpleName() + " " + e.getMessage(), Type.ERROR_MESSAGE);
+				handleConstraintViolationException(e);
 			}
 		}
 		finally
@@ -980,22 +994,56 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 	}
 
-	protected void handleConstraintViolationException(Throwable e)
+	/**
+	 * logs the initial error and calls the recusive version of it'self. always
+	 * throws a runtime exception
+	 * 
+	 * @param e
+	 */
+	public static void handleConstraintViolationException(Throwable e)
 	{
-		Throwable cause = e.getCause();
-		if (cause instanceof ConstraintViolationException)
+		logger.error(e, e);
+		handleConstraintViolationException(e, 5);
+		throw new RuntimeException(e);
+	}
+
+	/**
+	 * digs down looking for a useful exception, it will throw a runtime
+	 * exception if it finds an useful exception
+	 * 
+	 * @param e
+	 * @param nestLimit
+	 */
+	private static void handleConstraintViolationException(Throwable e, int nestLimit)
+	{
+		if (nestLimit > 0 && e != null)
 		{
-			String groupedViolationMessage = e.getClass().getSimpleName() + " ";
-			for (ConstraintViolation<?> violation : ((ConstraintViolationException) cause).getConstraintViolations())
+			nestLimit--;
+			if (e instanceof DescriptorException)
 			{
-				logger.error(violation.getLeafBean().getClass().getCanonicalName() + " " + violation.getLeafBean());
-				String violationMessage = violation.getLeafBean().getClass().getSimpleName() + " "
-						+ violation.getPropertyPath() + " " + violation.getMessage() + ", the value was "
-						+ violation.getInvalidValue();
-				logger.error(violationMessage);
-				groupedViolationMessage += violationMessage + "\n";
+				DescriptorException desc = (DescriptorException) e;
+				Notification.show(desc.getMessage(), Type.ERROR_MESSAGE);
+
+				throw new RuntimeException(desc.getMessage());
 			}
-			Notification.show(groupedViolationMessage, Type.ERROR_MESSAGE);
+			if (e instanceof ConstraintViolationException)
+			{
+				String groupedViolationMessage = e.getClass().getSimpleName() + " ";
+				for (ConstraintViolation<?> violation : ((ConstraintViolationException) e).getConstraintViolations())
+				{
+					logger.error(violation.getLeafBean().getClass().getCanonicalName() + " " + violation.getLeafBean());
+					String violationMessage = violation.getLeafBean().getClass().getSimpleName() + " "
+							+ violation.getPropertyPath() + " " + violation.getMessage() + ", the value was "
+							+ violation.getInvalidValue();
+					logger.error(violationMessage);
+					groupedViolationMessage += violationMessage + "\n";
+				}
+				Notification.show(groupedViolationMessage, Type.ERROR_MESSAGE);
+				throw new RuntimeException(groupedViolationMessage);
+			}
+
+			handleConstraintViolationException(e.getCause(), nestLimit);
+
 		}
 	}
 
@@ -1050,14 +1098,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			container.commit();
 			newEntity.set(EntityManagerProvider.getEntityManager().merge(newEntity.get()));
 		}
-		catch (com.vaadin.data.Buffered.SourceException e)
+		catch (Exception e)
 		{
 			handleConstraintViolationException(e);
-			if (e.getCause() instanceof javax.persistence.PersistenceException)
-			{
-				javax.persistence.PersistenceException cause = (javax.persistence.PersistenceException) e.getCause();
-				Notification.show(cause.getCause().getMessage(), Type.ERROR_MESSAGE);
-			}
 		}
 		finally
 		{
@@ -1152,7 +1195,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		catch (Exception e)
 		{
 			handleConstraintViolationException(e);
-			throw e;
 		}
 
 	}
@@ -1250,8 +1292,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			}
 			catch (Exception e)
 			{
-				logger.error(e, e);
-				Notification.show(e.getClass().getSimpleName() + " " + e.getMessage(), Type.ERROR_MESSAGE);
+				handleConstraintViolationException(e);
 
 			}
 		}
@@ -1443,16 +1484,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 					rightLayout.setVisible(true);
 					postNew(newEntity);
 				}
-				catch (ConstraintViolationException e)
-				{
-					FormHelper.showConstraintViolation(e);
-				}
 				catch (Exception e)
 				{
 					handleConstraintViolationException(e);
-					logger.error(e, e);
-					Notification.show(e.getClass().getSimpleName() + " " + e.getMessage(), Type.ERROR_MESSAGE);
-					throw new RuntimeException(e);
 				}
 			}
 
@@ -1512,7 +1546,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		catch (Exception e)
 		{
 			handleConstraintViolationException(e);
-			throw e;
+
 		}
 	}
 

@@ -114,6 +114,7 @@ public class EntityTable<E> extends Table implements EntityList<E>
 	@Override
 	public void changeVariables(final Object source, final Map<String, Object> variables)
 	{
+		try{
 		if (variables.containsKey("selected"))
 		{
 
@@ -136,6 +137,11 @@ public class EntityTable<E> extends Table implements EntityList<E>
 		}
 		else
 			super.changeVariables(source, variables);
+		}
+		catch (Exception e)
+		{
+			BaseCrudView.handleConstraintViolationException(e);
+		}
 	}
 
 	public EntityItem<E> getCurrent()
