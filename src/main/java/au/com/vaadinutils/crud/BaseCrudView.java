@@ -285,13 +285,15 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				container.refresh();
 				container.sort(new Object[] { ordinalField.getName() }, new boolean[] { true });
 
-				// cause this crud to save, or if its a child cause the parent to save.
-				try{
-				invokeTopLevelCrudSave();
+				// cause this crud to save, or if its a child cause the parent
+				// to save.
+				try
+				{
+					invokeTopLevelCrudSave();
 				}
 				catch (Exception e)
 				{
-					Notification.show(e.getMessage(),Type.ERROR_MESSAGE);
+					Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
 					handleConstraintViolationException(e);
 				}
 
@@ -299,7 +301,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		});
 
 	}
-	
+
 	/**
 	 * the child crud variant of this method calls parent.save();
 	 */
@@ -1634,6 +1636,24 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	protected E preNew() throws InstantiationException, IllegalAccessException
 	{
 		return entityClass.newInstance();
+	}
+
+	/**
+	 * after making changes via JPA, to get the crud to see the changes call
+	 * this method if needed.
+	 * 
+	 * beware it is a costly opperation.
+	 * 
+	 * commit the transaction and flush to db, then refresh the container
+	 * 
+	 * @param primaryKey
+	 */
+	public void reloadDataFromDB(SingularAttribute<E, Long> primaryKey)
+	{
+		EntityManagerProvider.getEntityManager().getTransaction().commit();
+		EntityManagerProvider.getEntityManager().getTransaction().begin();
+		EntityManagerProvider.getEntityManager().flush();
+		container.refresh();
 	}
 
 	/**
