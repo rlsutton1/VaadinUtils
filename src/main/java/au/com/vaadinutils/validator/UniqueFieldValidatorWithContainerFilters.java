@@ -38,7 +38,7 @@ public class UniqueFieldValidatorWithContainerFilters<E extends CrudEntity, F> i
 	@Override
 	public void validate(Object value) throws InvalidValueException
 	{
-		if (value != null)
+		if (value != null && crud.getCurrent()!=null)
 		{
 			for (Object id : crud.getContainer().getItemIds())
 			{
