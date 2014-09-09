@@ -1,5 +1,6 @@
 package au.com.vaadinutils.layout;
 
+import java.text.DateFormatSymbols;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
@@ -23,19 +24,18 @@ import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.Reindeer;
 
 @SuppressWarnings("rawtypes")
-public class TimePicker extends HorizontalLayout implements Field
+public class TimePicker24 extends HorizontalLayout implements Field
 {
 
-	private static final String TIME_FORMAT = "HH:mm a";
+	private static final String PM = "pm";
+	private static final String AM = "am";
 	private static final long serialVersionUID = 1826417125815798837L;
 	private static final String EMPTY = "--:--";
 	String headerColor = "#B2D7FF";
 	final private TextField displayTime = new TextField();
 	String hour = "12";
 	String minute = "00";
-	String amPm = "AM";
 	boolean isSet = false;
-	private Button am;
 	// private Button zeroHourButton;
 	// private Button zeroMinuteButton;
 	private ChangedHandler changedHandler;
@@ -47,13 +47,20 @@ public class TimePicker extends HorizontalLayout implements Field
 	private int tabIndex;
 	private boolean isBuffered;
 	private Validator validator;
+	private SimpleDateFormat sdf;
+	private String amPm;
+	private NativeButton popUpButton;
 
-	public TimePicker(String title)
+	public TimePicker24(String title, String format)
 	{
+		sdf = new SimpleDateFormat(format);
+		DateFormatSymbols symbols = new DateFormatSymbols();
+		symbols.setAmPmStrings(new String[] { AM, PM });
+		sdf.setDateFormatSymbols(symbols);
 
 		setCaption(title);
 		field = new TextField();
-		field.setWidth("125");
+		field.setWidth("100");
 		field.setStyleName("v-datefield-textfield");
 		field.setImmediate(true);
 		displayTime.setImmediate(true);
@@ -65,18 +72,17 @@ public class TimePicker extends HorizontalLayout implements Field
 			@Override
 			public void validate(Object value) throws InvalidValueException
 			{
-				if (value.equals(EMPTY))
+				if (value == null || value.equals(EMPTY))
 				{
 					return;
 				}
-				SimpleDateFormat sdf = new SimpleDateFormat(TIME_FORMAT);
 				try
 				{
 					sdf.parse((String) value);
 				}
 				catch (ParseException e)
 				{
-					throw new InvalidValueException("Time format is " + TIME_FORMAT);
+					throw new InvalidValueException("Invalid time" + value);
 				}
 
 			}
@@ -87,13 +93,14 @@ public class TimePicker extends HorizontalLayout implements Field
 		this.title = title;
 		HorizontalLayout hl = new HorizontalLayout();
 		hl.setStyleName("v-datefield v-datefield-popupcalendar v-datefield-day");
-
-		NativeButton b = new NativeButton();
-		b.setStyleName("v-datefield-button");
+//		hl.setWidth(FormHelper.STANDARD_COMBO_WIDTH);
+		
+		popUpButton = new NativeButton();
+		popUpButton.setStyleName("v-datefield-button");
 
 		hl.addComponent(field);
-		hl.addComponent(b);
-		b.addClickListener(new ClickListener()
+		hl.addComponent(popUpButton);
+		popUpButton.addClickListener(new ClickListener()
 		{
 
 			private static final long serialVersionUID = 1L;
@@ -108,6 +115,12 @@ public class TimePicker extends HorizontalLayout implements Field
 		addComponent(hl);
 	}
 
+	@Override
+	public void setReadOnly(boolean readOnly)
+	{
+		popUpButton.setReadOnly(true);
+	}
+
 	public void focus()
 	{
 		this.focus();
@@ -119,15 +132,11 @@ public class TimePicker extends HorizontalLayout implements Field
 		String value = field.getValue();
 		try
 		{
+
 			String[] parts = value.split(":");
 			hour = parts[0];
 			String[] np = parts[1].split(" ");
 			minute = np[0];
-			amPm = np[1];
-			if (!amPm.equals("AM") && !amPm.equals("PM"))
-			{
-				throw new Exception();
-			}
 			displayTime.setValue(value);
 		}
 		catch (Exception e)
@@ -139,7 +148,7 @@ public class TimePicker extends HorizontalLayout implements Field
 		window.setModal(true);
 		window.setResizable(false);
 		window.setWidth("430");
-		window.setHeight("180");
+		window.setHeight("240");
 		window.setClosable(false);
 
 		HorizontalLayout layout = new HorizontalLayout();
@@ -186,16 +195,9 @@ public class TimePicker extends HorizontalLayout implements Field
 		HorizontalLayout hourPanel = new HorizontalLayout();
 		// hourPanel.setPadding(5);
 
-		HorizontalLayout amPmPanel = new HorizontalLayout();
-		// amPmPanel.setPadding(5);
-
-		VerticalLayout amPmButtonPanel = new VerticalLayout();
-		amPmPanel.addComponent(amPmButtonPanel);
-		addAmPmButtons(amPmButtonPanel);
-
 		HorizontalLayout hourButtonPanel = new HorizontalLayout();
 		hourPanel.addComponent(hourButtonPanel);
-		addHourButtons(hourButtonPanel, 2, 6);
+		addHourButtons(hourButtonPanel, 3, 8);
 
 		HorizontalLayout minutePanel = new HorizontalLayout();
 		// minutePanel.setPadding(5);
@@ -204,7 +206,6 @@ public class TimePicker extends HorizontalLayout implements Field
 		addMinuteButtons(minuteButtonPanel, 2, 4);
 
 		HorizontalLayout amPmHourWrapper = new HorizontalLayout();
-		amPmHourWrapper.addComponent(amPmPanel);
 		amPmHourWrapper.addComponent(hourPanel);
 		hourPanelLabelWrapper.addComponent(amPmHourWrapper);
 
@@ -296,7 +297,7 @@ public class TimePicker extends HorizontalLayout implements Field
 
 	private void addMinuteButtons(HorizontalLayout minuteButtonPanel, int rows, int cols)
 	{
-		String[] numbers = new String[] { "00", "10","15", "20", "30", "40","45", "50" };
+		String[] numbers = new String[] { "00", "10", "15", "20", "30", "40", "45", "50" };
 		for (int col = 0; col < cols; col++)
 		{
 			VerticalLayout rowsLayout = new VerticalLayout();
@@ -346,7 +347,8 @@ public class TimePicker extends HorizontalLayout implements Field
 
 	private void addHourButtons(HorizontalLayout hourButtonPanel, int rows, int cols)
 	{
-		int[] numbers = new int[] { 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
+		int[] numbers = new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
+				23 };
 		for (int col = 0; col < cols; col++)
 		{
 			VerticalLayout rowsLayout = new VerticalLayout();
@@ -380,14 +382,12 @@ public class TimePicker extends HorizontalLayout implements Field
 					{
 						String title = button.getCaption();
 						hour = title;
-						if (displayTime.getValue().compareToIgnoreCase(EMPTY) == 0)
-						{
-							if (Integer.parseInt(hour) == 12 || Integer.parseInt(hour) < 8)
-							{
-								amPm = "PM";
-							}
-						}
 						isSet = true;
+						amPm = AM;
+						if (Integer.parseInt(hour) > 11)
+						{
+							amPm = PM;
+						}
 						setNewValue();
 
 					}
@@ -396,66 +396,6 @@ public class TimePicker extends HorizontalLayout implements Field
 			}
 			hourButtonPanel.addComponent(rowsLayout);
 		}
-	}
-
-	private void addAmPmButtons(VerticalLayout amPmButtonPanel)
-	{
-		am = new NativeButton("AM");
-		final NativeButton pm = new NativeButton("PM");
-		amPmButtonPanel.addComponent(am);
-		amPmButtonPanel.addComponent(pm);
-		// am.setActionType(SelectionType.RADIO);
-		// am.addToRadioGroup("amPmButtons");
-		// pm.setActionType(SelectionType.RADIO);
-		// pm.addToRadioGroup("amPmButtons");
-
-		am.setStyleName(Reindeer.BUTTON_SMALL);
-		am.setWidth("35");
-		// am.setHeight("22");
-		// am.setAutoFit(false);
-
-		am.addClickListener(new ClickListener()
-		{
-
-			/**
-			 * 
-			 */
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void buttonClick(ClickEvent event)
-			{
-				String title = am.getCaption();
-				amPm = title;
-				isSet = true;
-				setNewValue();
-
-			}
-		});
-		pm.setStyleName(Reindeer.BUTTON_SMALL);
-		pm.setWidth("35");
-		// pm.setHeight("22");
-		// pm.setAutoFit(false);
-
-		pm.addClickListener(new ClickListener()
-		{
-
-			/**
-			 * 
-			 */
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void buttonClick(ClickEvent event)
-			{
-				String title = pm.getCaption();
-				amPm = title;
-				isSet = true;
-				displayTime.setValue(getValueAsString());
-
-			}
-		});
-
 	}
 
 	public void addChangedHandler(ChangedHandler pChangedHandler)
@@ -475,7 +415,6 @@ public class TimePicker extends HorizontalLayout implements Field
 		// zeroMinuteButton.setSelected(false);
 		hour = "12";
 		minute = "00";
-		amPm = "AM";
 		isSet = false;
 		displayTime.setValue(EMPTY);
 		field.setValue(EMPTY);
@@ -485,7 +424,20 @@ public class TimePicker extends HorizontalLayout implements Field
 	public final String getValueAsString()
 	{
 		if (isSet)
-			return "" + hour + ":" + minute + " " + amPm;
+		{
+			String tmp = "" + hour + ":" + minute + amPm;
+			Date date;
+			try
+			{
+				date = sdf.parse(tmp);
+				return sdf.format(date);
+			}
+			catch (ParseException e)
+			{
+
+			}
+			return tmp;
+		}
 		return null;
 	}
 
@@ -498,21 +450,12 @@ public class TimePicker extends HorizontalLayout implements Field
 		{
 			minute = "0" + minute;
 		}
+		amPm = AM;
+		if (Integer.parseInt(hour) > 11)
+		{
+			amPm = PM;
+		}
 		isSet = true;
-		amPm = "AM";
-		if (date.getHours() >= 12)
-		{
-			amPm = "PM";
-			if (date.getHours() > 12)
-			{
-				hour = "" + (date.getHours() - 12);
-			}
-
-		}
-		if (date.getHours() == 0)
-		{
-			hour = "12";
-		}
 		displayTime.setValue(getValueAsString());
 		field.setValue(getValueAsString());
 		// logger.info("set to " + getValueAsString());
@@ -647,7 +590,6 @@ public class TimePicker extends HorizontalLayout implements Field
 	@Override
 	public Object getValue()
 	{
-		SimpleDateFormat sdf = new SimpleDateFormat(TIME_FORMAT);
 		try
 		{
 			if (getValueAsString() == null)

@@ -10,6 +10,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.persistence.PersistenceException;
+import javax.persistence.metamodel.SingularAttribute;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
@@ -27,37 +28,44 @@ import au.com.vaadinutils.listener.ClickEventLogged;
 
 import com.google.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.EntityItem;
+import com.vaadin.addon.jpacontainer.EntityItemProperty;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.JPAContainer.ProviderChangedEvent;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Container.ItemSetChangeEvent;
 import com.vaadin.data.Container.ItemSetChangeListener;
-import com.vaadin.data.Property.ValueChangeEvent;
-import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
+import com.vaadin.event.dd.DragAndDropEvent;
+import com.vaadin.event.dd.DropHandler;
+import com.vaadin.event.dd.acceptcriteria.AcceptCriterion;
+import com.vaadin.event.dd.acceptcriteria.SourceIsTarget;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.AbstractLayout;
+import com.vaadin.ui.AbstractSelect.AbstractSelectTargetDetails;
 import com.vaadin.ui.AbstractTextField.TextChangeEventMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.CheckBox;
+import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table.ColumnGenerator;
+import com.vaadin.ui.Table.TableDragMode;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Reindeer;
+import com.vaadin.ui.themes.ValoTheme;
 
 public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout implements RowChangeListener<E>,
 		Selected<E>, DirtyListener
@@ -103,7 +111,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	private HorizontalLayout buttonLayout;
 	private AbstractLayout advancedSearchLayout;
 	private VerticalLayout searchLayout;
-	private CheckBox advancedSearchCheckbox;
 	protected Set<ChildCrudListener<E>> childCrudListeners = new HashSet<ChildCrudListener<E>>();
 	private CrudDisplayMode displayMode = CrudDisplayMode.HORIZONTAL;
 	protected HorizontalLayout actionLayout;
@@ -115,6 +122,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	private boolean disallowDelete = false;
 	private Label actionLabel;
 	private boolean noEditor;
+	private boolean advancedSearchOn = false;
+	private Button advancedSearchCheckbox;
 
 	protected BaseCrudView()
 	{
@@ -180,7 +189,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		{
 			this.setSizeFull();
 			Label sorryMessage = new Label("Sorry, you do not have permission to access " + getTitleText());
-			sorryMessage.setStyleName(Reindeer.LABEL_H1);
+			sorryMessage.setStyleName(ValoTheme.LABEL_H1);
 			this.removeAllComponents();
 			this.addComponent(sorryMessage);
 			return;
@@ -205,6 +214,98 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		}
 		resetFilters();
 
+	}
+
+	/**
+	 * allows the user to sort the items in the list via drag and drop
+	 * 
+	 * @param ordinalField
+	 */
+	public void enableDragAndDropOrdering(final SingularAttribute<E, Long> ordinalField)
+	{
+		container.sort(new Object[] { ordinalField.getName() }, new boolean[] { true });
+
+		this.entityTable.setDragMode(TableDragMode.ROW);
+		this.entityTable.setDropHandler(new DropHandler()
+		{
+			private static final long serialVersionUID = -6024948983201516170L;
+
+			public AcceptCriterion getAcceptCriterion()
+			{
+				return SourceIsTarget.get();
+			}
+
+			@SuppressWarnings("unchecked")
+			@Override
+			public void drop(DragAndDropEvent event)
+			{
+
+				if (isDirty())
+				{
+					Notification.show("You must save first");
+					return;
+				}
+				Object draggedItemId = event.getTransferable().getData("itemId");
+				Object targetId = ((AbstractSelectTargetDetails) event.getTargetDetails()).getItemIdOver();
+
+				EntityItem<E> dragged = container.getItem(draggedItemId);
+				EntityItem<E> target = container.getItem(targetId);
+
+				if (target != null)
+				{
+					EntityItemProperty targetOrdinalProp = target.getItemProperty(ordinalField.getName());
+					Long targetOrdinal = (Long) targetOrdinalProp.getValue();
+				}
+				EntityItemProperty draggedOrdinalProp = dragged.getItemProperty(ordinalField.getName());
+				Long draggedOrdinal = (Long) draggedOrdinalProp.getValue();
+
+				boolean added = false;
+				Long ctr = 1l;
+
+				for (Object id : container.getItemIds())
+				{
+					if (id.equals(targetId))
+					{
+						draggedOrdinalProp.setValue(ctr++);
+						added = true;
+
+					}
+					if (!id.equals(draggedItemId))
+					{
+						container.getItem(id).getItemProperty(ordinalField.getName()).setValue(ctr++);
+					}
+				}
+				if (!added)
+				{
+					draggedOrdinalProp.setValue(ctr++);
+
+				}
+
+				container.commit();
+				container.refresh();
+				container.sort(new Object[] { ordinalField.getName() }, new boolean[] { true });
+
+				// cause this crud to save, or if its a child cause the parent to save.
+				try{
+				invokeTopLevelCrudSave();
+				}
+				catch (Exception e)
+				{
+					Notification.show(e.getMessage(),Type.ERROR_MESSAGE);
+					handleConstraintViolationException(e);
+				}
+
+			}
+		});
+
+	}
+	
+	/**
+	 * the child crud variant of this method calls parent.save();
+	 */
+	protected void invokeTopLevelCrudSave()
+	{
+		save();
 	}
 
 	/**
@@ -339,7 +440,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 		Label titleLabel = new Label(getTitleText());
 
-		titleLabel.setStyleName(Reindeer.LABEL_H1);
+		titleLabel.addStyleName(ValoTheme.LABEL_H2);
+		titleLabel.addStyleName(ValoTheme.LABEL_BOLD);
+
 		holder.addComponent(titleLabel);
 		holder.setComponentAlignment(titleLabel, Alignment.MIDDLE_RIGHT);
 		return holder;
@@ -349,33 +452,33 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	{
 		actionLayout = new HorizontalLayout();
 		actionLayout.setWidth("100%");
-		actionLayout.setMargin(new MarginInfo(false, true, false, true));
+		actionLayout.setMargin(new MarginInfo(false, true, false, false));
 
-		HorizontalLayout actionArea = new HorizontalLayout();
-		actionArea.setSpacing(true);
-		actionLabel = new Label("Action");
-		actionArea.addComponent(actionLabel);
-		actionArea.setComponentAlignment(actionLabel, Alignment.MIDDLE_LEFT);
+		actionLabel = new Label("&nbsp;Action");
+		actionLabel.setContentMode(ContentMode.HTML);
+		actionLabel.setWidth("50");
+		CssLayout group = new CssLayout();
+		group.addStyleName("v-component-group");
+		actionLayout.addComponent(group);
+		group.addComponent(actionLabel);
 
 		actionCombo = new ComboBox(null);
 		actionCombo.setWidth("160");
 		actionCombo.setNullSelectionAllowed(false);
 		actionCombo.setTextInputAllowed(false);
 
-		actionArea.addComponent(actionCombo);
+		group.addComponent(actionCombo);
 
 		addCrudActions();
-		actionArea.addComponent(applyButton);
-
-		// tweak the alignments.
-		actionArea.setComponentAlignment(actionCombo, Alignment.MIDDLE_RIGHT);
-		actionLayout.addComponent(actionArea);
-		actionLayout.setComponentAlignment(actionArea, Alignment.MIDDLE_LEFT);
-		actionLayout.setExpandRatio(actionArea, 1.0f);
+		group.addComponent(applyButton);
 
 		newButton.setCaption(getNewButtonLabel());
 		actionLayout.addComponent(newButton);
+
+		// tweak the alignments.
+		actionLayout.setComponentAlignment(group, Alignment.MIDDLE_LEFT);
 		actionLayout.setComponentAlignment(newButton, Alignment.MIDDLE_RIGHT);
+		actionLayout.setExpandRatio(group, 1.0f);
 
 		actionLayout.setHeight("35");
 	}
@@ -438,32 +541,26 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 	private void buildSearchBar()
 	{
-		HorizontalLayout basicSearchLayout = new HorizontalLayout();
-		basicSearchLayout.setSizeFull();
-		basicSearchLayout.setSpacing(true);
-		searchLayout.addComponent(basicSearchLayout);
+
+		CssLayout group = new CssLayout();
+		group.setSizeFull();
+
+		group.addStyleName("v-component-group");
+
+		searchLayout.addComponent(group);
 
 		AbstractLayout advancedSearch = buildAdvancedSearch();
 		if (advancedSearch != null)
 		{
-			basicSearchLayout.addComponent(advancedSearchCheckbox);
+			group.addComponent(advancedSearchCheckbox);
 		}
 
-		basicSearchLayout.addComponent(searchField);
-		basicSearchLayout.setExpandRatio(searchField, 1.0f);
-
 		Button clear = createClearButton();
-		basicSearchLayout.addComponent(clear);
-		basicSearchLayout.setComponentAlignment(clear, Alignment.MIDDLE_CENTER);
 
-		basicSearchLayout.setSpacing(true);
+		group.addComponent(clear);
 
-		/*
-		 * In the bottomLeftLayout, searchField takes all the width there is
-		 * after adding addNewButton. The height of the layout is defined by the
-		 * tallest component.
-		 */
-		basicSearchLayout.setExpandRatio(searchField, 1);
+		// searchField.setWidth("80%");
+		group.addComponent(searchField);
 
 	}
 
@@ -471,7 +568,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	{
 
 		Button clear = new Button("X");
-		clear.setStyleName(Reindeer.BUTTON_SMALL);
 		clear.setImmediate(true);
 		clear.addClickListener(new ClickEventLogged.ClickListener()
 		{
@@ -495,24 +591,32 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		advancedSearchLayout = getAdvancedSearchLayout();
 		if (advancedSearchLayout != null)
 		{
-			advancedSearchCheckbox = new CheckBox("Advanced");
+
+			advancedSearchCheckbox = new Button("Advanced");
+			advancedSearchOn = false;
 
 			advancedSearchCheckbox.setImmediate(true);
-			advancedSearchCheckbox.addValueChangeListener(new ValueChangeListener()
+			advancedSearchCheckbox.addClickListener(new ClickListener()
 			{
 
-				/**
-				 * 
-				 */
-				private static final long serialVersionUID = -4396098902592906470L;
+				private static final long serialVersionUID = 7777043506655571664L;
 
 				@Override
-				public void valueChange(ValueChangeEvent arg0)
+				public void buttonClick(ClickEvent event)
 				{
-					advancedSearchLayout.setVisible(advancedSearchCheckbox.getValue());
-					if (!advancedSearchCheckbox.getValue())
+					advancedSearchOn = !advancedSearchOn;
+					advancedSearchLayout.setVisible(advancedSearchOn);
+					if (!advancedSearchOn)
 					{
 						triggerFilter();
+					}
+					if (!advancedSearchOn)
+					{
+						advancedSearchCheckbox.removeStyleName(ValoTheme.BUTTON_FRIENDLY);
+					}
+					else
+					{
+						advancedSearchCheckbox.setStyleName(ValoTheme.BUTTON_FRIENDLY);
 					}
 
 				}
@@ -961,14 +1065,14 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				logger.error(e, e);
 				throw new RuntimeException(tmp);
 			}
-			else if (e instanceof InvalidValueException )
+			else if (e instanceof InvalidValueException)
 			{
 				InvalidValueException m = (InvalidValueException) e;
 
 				Notification.show("Please fix the form errors and then try again.\n\n " + m.getMessage(),
 						Type.ERROR_MESSAGE);
 			}
-			else if ( e.getCause() instanceof InvalidValueException)
+			else if (e.getCause() instanceof InvalidValueException)
 			{
 				InvalidValueException m = (InvalidValueException) e.getCause();
 				Notification.show("Please fix the form errors and then try again.\n\n " + m.getMessage(),
@@ -1147,7 +1251,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			{
 				// If advanced search is active then it should be responsible
 				// for triggering the filter.
-				if (advancedSearchCheckbox == null || !advancedSearchCheckbox.getValue())
+				if (!advancedSearchOn)
 				{
 					String filterString = event.getText();
 					triggerFilter(filterString);
@@ -1168,7 +1272,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 	private void triggerFilter(String searchText)
 	{
-		boolean advancedSearchActive = advancedSearchCheckbox != null && advancedSearchCheckbox.getValue();
+		boolean advancedSearchActive = advancedSearchOn;
 		if (advancedSearchActive || searchText.length() > 0)
 		{
 			Filter filter = getContainerFilter(searchText, advancedSearchActive);

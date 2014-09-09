@@ -15,6 +15,7 @@ import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.converter.Converter;
 import com.vaadin.ui.Table;
+import com.vaadin.ui.themes.ValoTheme;
 
 public class EntityTable<E> extends Table implements EntityList<E>
 {
@@ -30,6 +31,7 @@ public class EntityTable<E> extends Table implements EntityList<E>
 	{
 		this.entityContainer = entityContainer;
 		this.visibleColumns = headingPropertySet;
+		addStyleName(ValoTheme.TABLE_COMPACT);
 
 	}
 

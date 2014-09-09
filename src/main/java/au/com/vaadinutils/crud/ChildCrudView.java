@@ -428,6 +428,12 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	{
 
 	}
+	
+	@Override
+	protected void invokeTopLevelCrudSave()
+	{
+		parentCrud.save();
+	}
 
 	/**
 	 * used to prevent cascading save calls
@@ -595,6 +601,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 		}
 		catch (Exception e)
 		{
+			handleConstraintViolationException(e);
 			logger.error(e, e);
 		}
 

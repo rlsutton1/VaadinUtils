@@ -63,7 +63,7 @@ import com.vaadin.ui.TextField;
 public class FormHelper<E> implements Serializable
 {
 	private static final long serialVersionUID = 1L;
-	public static final String STANDARD_COMBO_WIDTH = "200";
+	public static final String STANDARD_COMBO_WIDTH = "220";
 
 	ArrayList<AbstractComponent> fieldList = new ArrayList<AbstractComponent>();
 	private AbstractLayout form;
