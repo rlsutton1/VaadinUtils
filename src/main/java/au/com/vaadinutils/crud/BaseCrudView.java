@@ -1645,10 +1645,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 * beware it is a costly opperation.
 	 * 
 	 * commit the transaction and flush to db, then refresh the container
-	 * 
-	 * @param primaryKey
 	 */
-	public void reloadDataFromDB(SingularAttribute<E, Long> primaryKey)
+	public void reloadDataFromDB()
 	{
 		EntityManagerProvider.getEntityManager().getTransaction().commit();
 		EntityManagerProvider.getEntityManager().getTransaction().begin();
