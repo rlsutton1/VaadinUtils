@@ -10,6 +10,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import au.com.vaadinutils.dao.EntityManagerProvider;
+import au.com.vaadinutils.dao.JpaBaseDao;
 
 import com.google.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.EntityItem;
@@ -36,7 +37,7 @@ import com.vaadin.ui.Notification.Type;
  * @param <P>
  * @param <E>
  */
-public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> extends BaseCrudView<E> implements
+public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEntity> extends BaseCrudView<E> implements
 		ChildCrudListener<P>
 {
 
@@ -50,6 +51,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	final private Class<P> parentType;
 	public BaseCrudView<P> parentCrud;
 	private ChildCrudEventHandler<E> eventHandler = getNullEventHandler();
+	private Class<E> childType;
 
 	/**
 	 * 
@@ -67,6 +69,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 		this.childKey = childKey.getName();
 		this.parentType = parentType;
 		this.parentCrud = parent;
+		this.childType = childType;
 
 		// setMargin(true);
 
@@ -106,6 +109,8 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	@Override
 	public void committed(P newParentId) throws Exception
 	{
+		Long selectedIdBeforeSave = getCurrent().getId();
+		String currentGuid = getCurrent().getGuid();
 		saveEditsToTemp();
 		for (Object id : container.getItemIds())
 		{
@@ -147,10 +152,24 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 		associateChildren(newParentId);
 		dirty = false;
 		entityTable.select(null);
-		entityTable.select(entityTable.firstItemId());
+		if (selectedIdBeforeSave != null)
+		{
+			entityTable.select(selectedIdBeforeSave);
+		}else
+		{
+			
+			E entity = JpaBaseDao.getGenericDao(childType).findOneByAttribute(getGuidAttribute(), currentGuid);
+			entityTable.select(entity.getId());
+		}
 		triggerFilter();
 
 	}
+
+	/**
+	 * return the singluarAttribute for the guid field of the child entity
+	 * @return
+	 */
+	abstract public SingularAttribute<E, String> getGuidAttribute();
 
 	/**
 	 * commits the container and retrieves the new recordid
@@ -371,9 +390,9 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 			createNewEntity();
 
 			// if we call the overridden version we loop indefinitely
-			
+
 			ChildCrudView.super.rowChanged(newEntity);
-			
+
 			// Can't delete when you are adding a new record.
 			// Use cancel instead.
 			if (applyButton.isVisible())
@@ -428,7 +447,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	{
 
 	}
-	
+
 	@Override
 	protected void invokeTopLevelCrudSave()
 	{
