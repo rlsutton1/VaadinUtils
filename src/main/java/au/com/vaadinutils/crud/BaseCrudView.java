@@ -958,6 +958,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		postDelete(deltedEntity);
 
 		CrudEventDistributer.publishEvent(this, CrudEventType.DELETE, deltedEntity);
+		
+		entityTable.select(null);
+		entityTable.select(entityTable.firstItemId());
 
 	}
 
