@@ -54,9 +54,11 @@ import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.Field;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table.ColumnGenerator;
@@ -1437,7 +1439,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 	}
 
-	private void showNoSelectionMessage()
+	protected void showNoSelectionMessage()
 	{
 		String message = "";
 		if (newButton.isVisible())
@@ -1476,6 +1478,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	protected void commitFieldGroup() throws CommitException
 	{
 		formValidate();
+		selectFirstErrorFieldAndShowTab();
 		fieldGroup.commit();
 		for (ChildCrudListener<E> child : childCrudListeners)
 		{
@@ -1588,6 +1591,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 					}
 
 					rightLayout.setVisible(true);
+
+					selectFirstFieldAndShowTab();
+
 					postNew(newEntity);
 				}
 				catch (Exception e)
@@ -1597,6 +1603,57 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			}
 
 		});
+	}
+
+	protected void selectFirstFieldAndShowTab()
+	{
+		for (Field<?> field : fieldGroup.getFields())
+		{
+			Component childField = field;
+
+			for (int i = 0; i < 10; i++)
+			{
+				Component parentField = childField.getParent();
+				if (parentField instanceof TabSheet)
+				{
+					((TabSheet) parentField).setSelectedTab(childField);
+					break;
+				}
+				childField = parentField;
+			}
+			field.focus();
+			break;
+		}
+	}
+
+	protected void selectFirstErrorFieldAndShowTab()
+	{
+		for (Field<?> field : fieldGroup.getFields())
+		{
+
+			try
+			{
+				field.validate();
+			}
+			catch (Exception e)
+			{
+				Component childField = field;
+
+				for (int i = 0; i < 10; i++)
+				{
+					Component parentField = childField.getParent();
+					if (parentField instanceof TabSheet)
+					{
+						((TabSheet) parentField).setSelectedTab(childField);
+						break;
+					}
+					childField = parentField;
+				}
+				field.focus();
+				break;
+			}
+
+		}
 	}
 
 	/**

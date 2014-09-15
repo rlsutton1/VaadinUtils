@@ -26,6 +26,7 @@ import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.data.util.filter.Compare;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.Field;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 
@@ -155,9 +156,10 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 		if (selectedIdBeforeSave != null)
 		{
 			entityTable.select(selectedIdBeforeSave);
-		}else
+		}
+		else
 		{
-			
+
 			E entity = JpaBaseDao.getGenericDao(childType).findOneByAttribute(getGuidAttribute(), currentGuid);
 			entityTable.select(entity.getId());
 		}
@@ -167,6 +169,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 
 	/**
 	 * return the singluarAttribute for the guid field of the child entity
+	 * 
 	 * @return
 	 */
 	abstract public SingularAttribute<E, String> getGuidAttribute();
@@ -402,6 +405,8 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 				actionLayout.setVisible(true);
 			}
 
+			selectFirstFieldAndShowTab();
+			
 			rightLayout.setVisible(true);
 		}
 		catch (ConstraintViolationException e)
@@ -700,7 +705,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 		boolean ret = false;
 		// call the super to see if the fields are dirty and then also check
 		// that records haven't been added or removed
-		ret = super.isDirty() || dirty;
+		ret = super.isDirty() || dirty || inNew;
 
 		return ret;
 
@@ -736,6 +741,21 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 		for (ChildCrudListener<E> child : childCrudListeners)
 		{
 			child.discard();
+		}
+		if (newEntity != null)
+		{
+			if (restoreDelete)
+			{
+				activateEditMode(false);
+				restoreDelete = false;
+			}
+			newEntity = null;
+
+			entityTable.select(null);
+			if (entityTable.getCurrent() == null)
+			{
+				showNoSelectionMessage();
+			}
 		}
 
 	}
