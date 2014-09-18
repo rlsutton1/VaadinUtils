@@ -961,9 +961,15 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				logger.error(e, e);
 				throw new RuntimeException(tmp);
 			}
-			else if (e instanceof InvalidValueException || e.getCause() instanceof InvalidValueException)
+			else if (e instanceof InvalidValueException )
 			{
 				InvalidValueException m = (InvalidValueException ) e;
+				
+				Notification.show("Please fix the form errors and then try again.\n\n "+e.getMessage(), Type.ERROR_MESSAGE);
+			}
+			else if ( e.getCause() instanceof InvalidValueException)
+			{
+				InvalidValueException m = (InvalidValueException ) e.getCause();
 				
 				Notification.show("Please fix the form errors and then try again.\n\n "+e.getMessage(), Type.ERROR_MESSAGE);
 			}
