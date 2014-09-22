@@ -7,7 +7,7 @@ public class SecurityManagerFactoryProxy
 
 	volatile static SecurityManagerFactory smf = new DefaultSecuritymanagerFactory();
 
-	static public CrudSecurityManager getSecurityManager(Object baseCrudView) 
+	static public CrudSecurityManager getSecurityManager(Class<?> baseCrudView) 
 	{
 		return smf.buildSecurityManager(baseCrudView);
 	}

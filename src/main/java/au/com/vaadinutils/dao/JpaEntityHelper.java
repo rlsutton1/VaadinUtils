@@ -10,7 +10,11 @@ public class JpaEntityHelper
 	
 	public static String getGuid(Object clazz)
 	{
-		String className = clazz.getClass().getSimpleName();
+		return getGuid();
+	}
+
+	public static String getGuid()
+	{
 		long stamp = System.currentTimeMillis();
 		long id = seeds.incrementAndGet();
 		

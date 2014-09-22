@@ -76,7 +76,7 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 
 	private CrudSecurityManager getSecurityManager()
 	{
-		return SecurityManagerFactoryProxy.getSecurityManager(this);
+		return SecurityManagerFactoryProxy.getSecurityManager(this.getClass());
 	}
 
 	public void addGeneratedColumn(Object id, ColumnGenerator generatedColumn)

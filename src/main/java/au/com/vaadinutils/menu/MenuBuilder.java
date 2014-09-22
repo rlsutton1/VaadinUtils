@@ -2,86 +2,122 @@ package au.com.vaadinutils.menu;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import au.com.vaadinutils.crud.CrudSecurityManager;
+import au.com.vaadinutils.crud.security.SecurityManagerFactoryProxy;
 
 import com.google.common.base.Preconditions;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.View;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.MenuItem;
-import com.vaadin.ui.UI;
 
 public class MenuBuilder implements Serializable
 {
 	private static final long serialVersionUID = 1L;
-	private ArrayList<ViewMapping> viewMap;
-	private Navigator navigator;
+	private List<ViewMapping> viewMap;
+	
+	Logger logger = LogManager.getLogger();
 
-	public MenuBuilder(Navigator navigator, ArrayList<ViewMapping> viewMap)
+	public MenuBuilder(Navigator navigator, List<ViewMapping> viewMap)
 	{
-		this.navigator = navigator;
 		this.viewMap = viewMap;
 	}
 
 	public MenuBar build()
 	{
+		return build(new LinkedList<String>());
+	}
+
+	/**
+	 * 
+	 * @param topLevelMenuOrder
+	 *            - specify the order of the top level menus
+	 * @return
+	 */
+	public MenuBar build(List<String> topLevelMenuOrder)
+	{
+
 		MenuBar menubar = new MenuBar();
+
+		// used to track top level menus added that have no children attached,
+		// they will be removed at the end.
+		Set<MenuItem> unusedTopLevelMenus = new HashSet<>();
+		for (String menuName : topLevelMenuOrder)
+		{
+			MenuItem item = menubar.addItem(menuName, null);
+			unusedTopLevelMenus.add(item);
+		}
+
 		for (final ViewMapping viewmap : this.viewMap)
 		{
 			// We don't add a menu item from the default view.
 			if (!viewmap.getViewName().equals(""))
 			{
-				Menu menu = getMenuAnnotation(viewmap.getView());
-				if (menu != null)
+				CrudSecurityManager model = SecurityManagerFactoryProxy.getSecurityManager(viewmap.getView());
+				if (model.canUserView())
 				{
-					String path = menu.path();
-
-					// All menus should start with the MENUBAR prefix but we
-					// make it
-					// optional here.
-					if (!path.startsWith(Menu.MENUBAR))
-					{
-						path = Menu.MENUBAR + "." + path;
-					}
-
-					// Append the menu item name to the end of the path
-					path += "." + menu.display();
-
-					final String[] pathElements = path.split("\\.");
-
-					if (pathElements.length == 2)
-					{
-						createLeafItem(menubar, menu.display(), viewmap);
-					}
-					else
-					{
-						MenuItem parentMenuItem = getParentMenuItem(menubar, pathElements[1]);// ,
-																								// pathElements[1],
-																								// pathElements[1],
-																								// true);
-						resursiveAdd(parentMenuItem, viewmap, menu.display(),
-								Arrays.copyOfRange(pathElements, 2, pathElements.length));
-					}
+					
+					addMenuItems(menubar, unusedTopLevelMenus, viewmap);
 				}
 			}
+		}
+
+		// remove unused top level menus
+		for (MenuItem item : unusedTopLevelMenus)
+		{
+			menubar.removeItem(item);
 		}
 		return menubar;
 
 	}
 
-	private void createLeafItem(MenuBar menubar, final String displayName, final ViewMapping viewmap)
+	private void addMenuItems(MenuBar menubar, Set<MenuItem> unusedTopLevelMenus, final ViewMapping viewmap)
 	{
-		menubar.addItem(displayName, new MenuBar.Command()
+		for (Menu menu : getMenuAnnotations(viewmap.getView()))
 		{
-			private static final long serialVersionUID = 1L;
+			String path = createMenuPathString(menu);
 
-			public void menuSelected(MenuItem selectedItem)
+			final String[] pathElements = path.split("\\.");
+
+			if (pathElements.length == 2)
 			{
-				UI.getCurrent().getNavigator().navigateTo(viewmap.getViewName());
+				menu.actionType().createLeafItem(new MenuWrapper(menubar), menu, menu.display(), viewmap,
+						menu.atTop());
 			}
-		});
+			else
+			{
+				MenuItem parentMenuItem = getParentMenuItem(menubar, pathElements[1]);
+				unusedTopLevelMenus.remove(parentMenuItem);
+				recursiveAdd(parentMenuItem, menu, viewmap, menu.display(),
+						Arrays.copyOfRange(pathElements, 2, pathElements.length));
+			}
+		}
+	}
+
+	private String createMenuPathString(Menu menu)
+	{
+		String path = menu.path();
+
+		// All menus should start with the MENUBAR prefix but we
+		// make it
+		// optional here.
+		if (!path.startsWith(Menu.MENUBAR))
+		{
+			path = Menu.MENUBAR + "." + path;
+		}
+
+		// Append the menu item name to the end of the path
+		path += "." + menu.display();
+		return path;
 	}
 
 	/**
@@ -96,7 +132,8 @@ public class MenuBuilder implements Serializable
 	 * @param displayName
 	 * @param pathElements
 	 */
-	private void resursiveAdd(MenuItem menuItem, final ViewMapping viewmap, String displayName, String[] pathElements)
+	private void recursiveAdd(MenuItem menuItem, Menu menu, final ViewMapping viewmap, String displayName,
+			String[] pathElements)
 	{
 		if (pathElements.length > 0)
 		{
@@ -105,7 +142,8 @@ public class MenuBuilder implements Serializable
 				// Time to insert the actual menu item
 
 				// First see if the item is already on the menubar
-				createLeafItem(menuItem, displayName, viewmap);
+				menu.actionType()
+						.createLeafItem(new MenuWrapper(menuItem), menu, menu.display(), viewmap, menu.atTop());
 			}
 			else
 			{
@@ -116,24 +154,12 @@ public class MenuBuilder implements Serializable
 
 				Preconditions.checkNotNull(currentItem);
 
-				resursiveAdd(currentItem, viewmap, displayName, Arrays.copyOfRange(pathElements, 1, pathElements.length));
+				recursiveAdd(currentItem, menu, viewmap, displayName,
+						Arrays.copyOfRange(pathElements, 1, pathElements.length));
 
 			}
 		}
 
-	}
-
-	private void createLeafItem(MenuItem menuItem, String displayName, final ViewMapping viewmap)
-	{
-		menuItem.addItem(displayName, new MenuBar.Command()
-		{
-			private static final long serialVersionUID = 1L;
-
-			public void menuSelected(MenuItem selectedItem)
-			{
-				navigator.navigateTo(viewmap.getViewName());
-			}
-		});
 	}
 
 	/**
@@ -180,8 +206,8 @@ public class MenuBuilder implements Serializable
 	 * @return
 	 */
 	private MenuItem getParentMenuItem(MenuBar parentItem, final String displayName) // ,
-																				// String
-																				// currentPath)
+	// String
+	// currentPath)
 	{
 		MenuItem currentItem = findMenuItem(parentItem.getItems(), displayName);
 		if (currentItem == null)
@@ -217,17 +243,26 @@ public class MenuBuilder implements Serializable
 		return currentItem;
 	}
 
-	private Menu getMenuAnnotation(Class<? extends View> viewClass)
+	private List<Menu> getMenuAnnotations(Class<? extends View> viewClass)
 	{
-		Menu menu = null;
+		List<Menu> menus = new LinkedList<Menu>();
 		Class<? extends View> aClass = viewClass;
 		Annotation annotation = aClass.getAnnotation(Menu.class);
 
 		if (annotation instanceof Menu)
 		{
-			menu = (Menu) annotation;
+			menus.add((Menu) annotation);
 		}
-		return menu;
+		annotation = aClass.getAnnotation(Menus.class);
+
+		if (annotation instanceof Menus)
+		{
+			for (Menu menu : ((Menus) annotation).menus())
+			{
+				menus.add(menu);
+			}
+		}
+		return menus;
 	}
 
 }

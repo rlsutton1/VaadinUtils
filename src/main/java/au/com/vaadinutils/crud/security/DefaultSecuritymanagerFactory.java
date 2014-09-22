@@ -6,7 +6,7 @@ public class DefaultSecuritymanagerFactory implements SecurityManagerFactory
 {
 
 	@Override
-	public CrudSecurityManager buildSecurityManager(Object baseCrudView)
+	public CrudSecurityManager buildSecurityManager(Class<?> baseCrudView)
 	{
 
 		return new AllowAllSecurityManager();

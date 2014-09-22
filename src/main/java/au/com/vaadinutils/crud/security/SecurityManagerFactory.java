@@ -5,6 +5,6 @@ import au.com.vaadinutils.crud.CrudSecurityManager;
 public interface SecurityManagerFactory
 {
 
-	CrudSecurityManager buildSecurityManager(Object baseCrudView) ;
+	CrudSecurityManager buildSecurityManager(Class<?> baseCrudView) ;
 
 }

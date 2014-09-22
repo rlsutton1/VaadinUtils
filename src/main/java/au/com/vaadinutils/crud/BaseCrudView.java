@@ -1,5 +1,6 @@
 package au.com.vaadinutils.crud;
 
+import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -25,6 +26,8 @@ import au.com.vaadinutils.crud.events.CrudEventType;
 import au.com.vaadinutils.crud.security.SecurityManagerFactoryProxy;
 import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.listener.ClickEventLogged;
+import au.com.vaadinutils.menu.Menu;
+import au.com.vaadinutils.menu.Menus;
 
 import com.google.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.EntityItem;
@@ -322,7 +325,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 */
 	public CrudSecurityManager getSecurityManager()
 	{
-		return SecurityManagerFactoryProxy.getSecurityManager(this);
+		return SecurityManagerFactoryProxy.getSecurityManager(this.getClass());
 	}
 
 	public void addGeneratedColumn(Object id, ColumnGenerator generator)
@@ -433,9 +436,26 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 	}
 
+	/**
+	 * get the title for the page from the menu annotation,
+	 * override this menu to provide a custom page title
+	 * @return
+	 */
 	protected String getTitleText()
 	{
-		return "Override getTitleText() to set a title.";
+
+		Annotation annotation = this.getClass().getAnnotation(Menu.class);
+		if (annotation instanceof Menu)
+		{
+			return ((Menu) annotation).display();
+		}
+		 annotation = this.getClass().getAnnotation(Menus.class);
+		if (annotation instanceof Menus)
+		{
+			return ((Menus) annotation).menus()[0].display();
+		}
+
+		return "Override getTitleText() to set a custom title.";
 	}
 
 	protected Component getTitle()
@@ -958,7 +978,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		postDelete(deltedEntity);
 
 		CrudEventDistributer.publishEvent(this, CrudEventType.DELETE, deltedEntity);
-		
+
 		entityTable.select(null);
 		entityTable.select(entityTable.firstItemId());
 
@@ -1652,7 +1672,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 					}
 					childField = parentField;
 				}
-				field.focus();
 				break;
 			}
 
