@@ -497,6 +497,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		group.addComponent(applyButton);
 
 		newButton.setCaption(getNewButtonLabel());
+		newButton.setId("CrudNewButton");
 		actionLayout.addComponent(newButton);
 
 		// tweak the alignments.
@@ -557,6 +558,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		buttonLayout.setWidth("100%");
 		buttonLayout.addComponent(cancelButton);
 		buttonLayout.addComponent(saveButton);
+		saveButton.setId("CrudSaveButton");
 		buttonLayout.setComponentAlignment(saveButton, Alignment.MIDDLE_RIGHT);
 		buttonLayout.setComponentAlignment(cancelButton, Alignment.MIDDLE_LEFT);
 		buttonLayout.setHeight("35");
@@ -584,6 +586,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		group.addComponent(clear);
 
 		// searchField.setWidth("80%");
+		searchField.setId("CrudSearchField");
 		group.addComponent(searchField);
 
 	}

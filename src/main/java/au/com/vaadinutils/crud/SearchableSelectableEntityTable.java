@@ -1,5 +1,6 @@
 package au.com.vaadinutils.crud;
 
+import java.lang.annotation.Annotation;
 import java.util.Collection;
 
 import org.apache.logging.log4j.LogManager;
@@ -8,6 +9,8 @@ import org.apache.logging.log4j.Logger;
 import au.com.vaadinutils.crud.security.SecurityManagerFactoryProxy;
 import au.com.vaadinutils.fields.SelectionListener;
 import au.com.vaadinutils.listener.ClickEventLogged;
+import au.com.vaadinutils.menu.Menu;
+import au.com.vaadinutils.menu.Menus;
 
 import com.vaadin.data.Container;
 import com.vaadin.data.Container.Filter;
@@ -72,8 +75,23 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 
 	abstract public Filterable getContainer();
 
-	abstract public String getTitle();
+	protected String getTitle()
+	{
 
+		Annotation annotation = this.getClass().getAnnotation(Menu.class);
+		if (annotation instanceof Menu)
+		{
+			return ((Menu) annotation).display();
+		}
+		 annotation = this.getClass().getAnnotation(Menus.class);
+		if (annotation instanceof Menus)
+		{
+			return ((Menus) annotation).menus()[0].display();
+		}
+
+		return "Override getTitleText() to set a custom title.";
+	}
+	
 	private CrudSecurityManager getSecurityManager()
 	{
 		return SecurityManagerFactoryProxy.getSecurityManager(this.getClass());

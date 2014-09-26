@@ -1,8 +1,8 @@
 package au.com.vaadinutils.ui;
 
-import javax.servlet.http.Cookie;
+import au.com.vaadinutils.user.UserSettingsStorage;
+import au.com.vaadinutils.user.UserSettingsStorageFactory;
 
-import com.vaadin.server.VaadinService;
 import com.vaadin.ui.Button;
 
 public class CookieButton extends Button
@@ -17,7 +17,9 @@ public class CookieButton extends Button
 	private String onText;
 	private String offText;
 
-	public CookieButton(String cookiePath,  final String onText, final String offText,CookieButtonCallback callback)
+	UserSettingsStorage userSettings = UserSettingsStorageFactory.getUserSettingsStorage();
+
+	public CookieButton(String cookiePath, final String onText, final String offText, CookieButtonCallback callback)
 	{
 		this.callback = callback;
 		this.cookiePath = cookiePath;
@@ -36,7 +38,7 @@ public class CookieButton extends Button
 			}
 
 		});
-		
+
 	}
 
 	private void setMode(boolean on)
@@ -44,18 +46,14 @@ public class CookieButton extends Button
 		if (on)
 		{
 			setCaption(offText);
-			Cookie myCookie = new Cookie(cookiePath, ON_STATE);
-			myCookie.setPath(VaadinService.getCurrentRequest().getContextPath());
-			VaadinService.getCurrentResponse().addCookie(myCookie);
+			userSettings.store(cookiePath, ON_STATE);
 			callback.on();
 
 		}
 		else
 		{
 			setCaption(onText);
-			Cookie myCookie = new Cookie(cookiePath, OFF_STATE);
-			myCookie.setPath(VaadinService.getCurrentRequest().getContextPath());
-			VaadinService.getCurrentResponse().addCookie(myCookie);
+			userSettings.store(cookiePath, OFF_STATE);
 			callback.off();
 
 		}
@@ -64,14 +62,7 @@ public class CookieButton extends Button
 	public void restoreStateFromCookie()
 	{
 		boolean mode = false;
-		for (Cookie cookie : VaadinService.getCurrentRequest().getCookies())
-		{
-			if (cookie.getName().equals(cookiePath))
-			{
-				mode = cookie.getValue().equalsIgnoreCase(ON_STATE);
-				break;
-			}
-		}
+		mode = userSettings.get(cookiePath).equalsIgnoreCase(ON_STATE);
 		setMode(mode);
 
 	}

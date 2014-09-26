@@ -36,9 +36,9 @@ public class InputFormDialog extends Window
 		this.setResizable(false);
 
 		VerticalLayout layout = new VerticalLayout();
-		layout.setMargin(new MarginInfo(false, true, true, false));
+		layout.setMargin(new MarginInfo(true, true, true, false));
 		//layout.setMargin(true);
-		layout.setSizeUndefined();
+		layout.setSizeFull();
 		layout.addComponent(form);
 
 		buttons = new HorizontalLayout();

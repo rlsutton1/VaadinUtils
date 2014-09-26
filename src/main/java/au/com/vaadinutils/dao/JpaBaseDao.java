@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.Table;
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
@@ -219,7 +220,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 	public <V> E findOneByAttribute(SingularAttribute<E, V> vKey, V value)
 	{
 		E ret = null;
-		List<E> results = findAllByAttribute(vKey, value, null);
+		List<E> results = findAllByAttribute(vKey, value, null,1);
 		if (results.size() > 0)
 		{
 			ret = results.get(0);
@@ -229,6 +230,12 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 	}
 
 	public <V, SK> List<E> findAllByAttribute(SingularAttribute<E, V> vKey, V value, SingularAttribute<E, SK> order)
+	{
+		return findAllByAttribute(vKey, value, order, null);
+	}
+
+	public <V, SK> List<E> findAllByAttribute(SingularAttribute<E, V> vKey, V value, SingularAttribute<E, SK> order,
+			Integer limit)
 	{
 
 		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
@@ -242,9 +249,13 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		{
 			criteria.orderBy(builder.asc(root.get(order)));
 		}
-		List<E> results = entityManager.createQuery(criteria).getResultList();
 
-		return results;
+		TypedQuery<E> query = entityManager.createQuery(criteria);
+		if (limit != null)
+		{
+			query = query.setMaxResults(limit);
+		}
+		return query.getResultList();
 
 	}
 
@@ -425,6 +436,17 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		JPAContainerFactory.makeBatchable(entityClass, entityManager);
 	}
 
+	public int deleteAll()
+	{
+		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+
+		CriteriaDelete<E> criteria = builder.createCriteriaDelete(entityClass);
+		int result = entityManager.createQuery(criteria).executeUpdate();
+
+		return result;
+
+	}
+
 	public <V> int deleteAllByAttribute(SingularAttribute<E, V> vKey, V value)
 	{
 
@@ -436,14 +458,13 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 		criteria.where(builder.equal(root.get(vKey), value));
 
-		entityManager.getClass();
 		int result = entityManager.createQuery(criteria).executeUpdate();
 
 		return result;
 
 	}
-	
-	public <V,J> int deleteAllByAttributeJoin(SingularAttribute<J, V> vKey, V value,SingularAttribute<E,J> joinAttr)
+
+	public <V, J> int deleteAllByAttributeJoin(SingularAttribute<J, V> vKey, V value, SingularAttribute<E, J> joinAttr)
 	{
 
 		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
@@ -451,8 +472,8 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		CriteriaDelete<E> criteria = builder.createCriteriaDelete(entityClass);
 
 		Root<E> root = criteria.from(entityClass);
-		
-		Join<E,J> join = root.join(joinAttr, JoinType.LEFT);
+
+		Join<E, J> join = root.join(joinAttr, JoinType.LEFT);
 
 		criteria.where(builder.equal(join.get(vKey), value));
 
@@ -462,7 +483,6 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		return result;
 
 	}
-
 
 	/**
 	 * @return the number of entities in the table.
