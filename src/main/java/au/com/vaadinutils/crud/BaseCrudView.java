@@ -958,8 +958,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		E deltedEntity = entityTable.getCurrent().getEntity();
 		Object entityId = entityTable.getValue();
 		Object previousItemId = entityTable.prevItemId(entityId);
-		if (previousItemId == null)
-			BaseCrudView.this.entityTable.firstItemId();
 		entityTable.removeItem(entityId);
 		newEntity = null;
 
@@ -974,9 +972,16 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		// concerned that we might confuse
 		// developers as they
 		// get two row changes events.
-		BaseCrudView.this.entityTable.select(null);
 
-		BaseCrudView.this.entityTable.select(previousItemId);
+		BaseCrudView.this.entityTable.select(null);
+		if (previousItemId != null)
+		{
+			BaseCrudView.this.entityTable.select(previousItemId);
+		}
+		else
+		{
+			entityTable.select(entityTable.firstItemId());
+		}
 		container.commit();
 
 		EntityManagerProvider.getEntityManager().flush();
@@ -984,9 +989,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		postDelete(deltedEntity);
 
 		CrudEventDistributer.publishEvent(this, CrudEventType.DELETE, deltedEntity);
-
-		entityTable.select(null);
-		entityTable.select(entityTable.firstItemId());
 
 	}
 
