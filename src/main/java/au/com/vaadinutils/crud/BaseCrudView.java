@@ -34,6 +34,8 @@ import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.EntityItemProperty;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.JPAContainer.ProviderChangedEvent;
+import com.vaadin.data.Buffered;
+import com.vaadin.data.Buffered.SourceException;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Container.ItemSetChangeEvent;
 import com.vaadin.data.Container.ItemSetChangeListener;
@@ -437,8 +439,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	}
 
 	/**
-	 * get the title for the page from the menu annotation,
-	 * override this menu to provide a custom page title
+	 * get the title for the page from the menu annotation, override this menu
+	 * to provide a custom page title
+	 * 
 	 * @return
 	 */
 	protected String getTitleText()
@@ -449,7 +452,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		{
 			return ((Menu) annotation).display();
 		}
-		 annotation = this.getClass().getAnnotation(Menus.class);
+		annotation = this.getClass().getAnnotation(Menus.class);
 		if (annotation instanceof Menus)
 		{
 			return ((Menus) annotation).menus()[0].display();
@@ -1080,20 +1083,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		{
 			if (e.getCause() instanceof PersistenceException)
 			{
-				String tmp = e.getMessage();
-				PersistenceException pex = (PersistenceException) e.getCause();
-				if (pex.getCause() instanceof DatabaseException)
-				{
-					DatabaseException dex = (DatabaseException) pex.getCause();
-					tmp = dex.getMessage();
-					if (tmp.indexOf("Query being") > 0)
-					{
-						// strip of the query
-						tmp = tmp.substring(0, tmp.indexOf("Query being"));
-					}
-				}
-				logger.error(e, e);
-				throw new RuntimeException(tmp);
+				handlePersistenceException(e);
 			}
 			else if (e instanceof InvalidValueException)
 			{
@@ -1128,6 +1118,32 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 	}
 
+	static private void handlePersistenceException(Exception e)
+	{
+		if (e.getCause() instanceof PersistenceException)
+		{
+			String tmp = e.getMessage();
+			PersistenceException pex = (PersistenceException) e.getCause();
+			if (pex.getCause() instanceof DatabaseException)
+			{
+				DatabaseException dex = (DatabaseException) pex.getCause();
+				tmp = dex.getMessage();
+				if (tmp.indexOf("Query being") > 0)
+				{
+					// strip of the query
+					tmp = tmp.substring(0, tmp.indexOf("Query being"));
+
+					if (tmp.contains("MySQL"))
+					{
+						tmp = tmp.substring(tmp.indexOf("MySQL") + 5);
+					}
+				}
+			}
+			logger.error(e, e);
+			throw new RuntimeException(tmp);
+		}
+	}
+
 	/**
 	 * logs the initial error and calls the recusive version of it'self. always
 	 * throws a runtime exception
@@ -1136,6 +1152,15 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 */
 	public static void handleConstraintViolationException(Throwable e)
 	{
+		if (e instanceof RuntimeException && e.getCause() instanceof Buffered.SourceException)
+		{
+			SourceException ex = (Buffered.SourceException) e.getCause();
+			if (ex.getCause() instanceof PersistenceException)
+			{
+				handlePersistenceException(ex);
+			}
+
+		}
 		logger.error(e, e);
 		handleConstraintViolationException(e, 5);
 		throw new RuntimeException(e);

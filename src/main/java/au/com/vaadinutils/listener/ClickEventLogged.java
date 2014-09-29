@@ -16,7 +16,7 @@ public class ClickEventLogged
 	{
 		private static final long serialVersionUID = 7420365324169589382L;
 
-		 transient Logger logger   =  LogManager.getLogger(ClickListener.class);
+		transient Logger logger = LogManager.getLogger(ClickListener.class);
 
 		abstract public void clicked(com.vaadin.ui.Button.ClickEvent event);
 
@@ -34,18 +34,26 @@ public class ClickEventLogged
 					FormHelper.showConstraintViolation((ConstraintViolationException) e);
 				}
 				logger.error(e, e);
-				Notification.show(e.getClass().getSimpleName()+" "+e.getMessage(),Type.ERROR_MESSAGE);
+				if (e.getMessage() != null)
+				{
+					Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
+
+				}
+				else
+				{
+					Notification.show(e.getClass().getSimpleName() + " " + e.getMessage(), Type.ERROR_MESSAGE);
+				}
 			}
 
 		}
 
 	}
-	
+
 	static public class ClickAdaptor implements com.vaadin.ui.Button.ClickListener
 	{
 		private static final long serialVersionUID = 1L;
 
-		 transient Logger logger   =  LogManager.getLogger(ClickAdaptor.class);
+		transient Logger logger = LogManager.getLogger(ClickAdaptor.class);
 
 		private com.vaadin.ui.Button.ClickListener listener = null;
 
@@ -53,6 +61,7 @@ public class ClickEventLogged
 		{
 			this.listener = listener;
 		}
+
 		public void buttonClick(com.vaadin.ui.Button.ClickEvent event)
 		{
 			try
