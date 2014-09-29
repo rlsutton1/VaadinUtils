@@ -25,7 +25,7 @@ public class EntityTable<E> extends Table implements EntityList<E>
 	private RowChangeListener<E> rowChangeListener;
 	private HeadingPropertySet<E> visibleColumns;
 
-	 transient Logger logger   =  LogManager.getLogger(EntityTable.class);
+	transient Logger logger = LogManager.getLogger(EntityTable.class);
 
 	public EntityTable(JPAContainer<E> entityContainer, HeadingPropertySet<E> headingPropertySet)
 	{
@@ -49,7 +49,6 @@ public class EntityTable<E> extends Table implements EntityList<E>
 		for (HeadingToPropertyId<E> column : visibleColumns.getColumns())
 		{
 			colsToShow.add(column.getPropertyId());
-
 			if (column.isGenerated())
 			{
 				addGeneratedColumn(column.getPropertyId(), column.getColumnGenerator());
@@ -61,18 +60,23 @@ public class EntityTable<E> extends Table implements EntityList<E>
 						column.getPropertyId() + " is not a valid property id, valid property ids are "
 								+ this.getContainerPropertyIds().toString());
 			}
-		}
-		this.setVisibleColumns(colsToShow.toArray());
-
-		for (HeadingToPropertyId<E> column : visibleColumns.getColumns())
-		{
 			this.setColumnHeader(column.getPropertyId(), column.getHeader());
 			if (column.getWidth() != null)
 			{
 				setColumnWidth(column.getPropertyId(), column.getWidth());
 			}
+			
+			if (column.isHidden())
+			{
+				System.out.println("Collapsed");
+				setColumnCollapsingAllowed(true);
+				setColumnCollapsed(column.getPropertyId(), true);
+				
+			}
 
 		}
+
+		this.setVisibleColumns(colsToShow.toArray());
 
 		this.setSelectable(true);
 		this.setImmediate(true);
@@ -116,29 +120,30 @@ public class EntityTable<E> extends Table implements EntityList<E>
 	@Override
 	public void changeVariables(final Object source, final Map<String, Object> variables)
 	{
-		try{
-		if (variables.containsKey("selected"))
+		try
 		{
-
-			if (EntityTable.this.rowChangeListener != null)
+			if (variables.containsKey("selected"))
 			{
-				EntityTable.this.rowChangeListener.allowRowChange(new RowChangeCallback()
+
+				if (EntityTable.this.rowChangeListener != null)
 				{
-					@Override
-					public void allowRowChange()
+					EntityTable.this.rowChangeListener.allowRowChange(new RowChangeCallback()
 					{
-						EntityTable.super.changeVariables(source, variables);
-					}
-				});
-				markAsDirty();
+						@Override
+						public void allowRowChange()
+						{
+							EntityTable.super.changeVariables(source, variables);
+						}
+					});
+					markAsDirty();
+				}
+				else
+				{
+					EntityTable.super.changeVariables(source, variables);
+				}
 			}
 			else
-			{
-				EntityTable.super.changeVariables(source, variables);
-			}
-		}
-		else
-			super.changeVariables(source, variables);
+				super.changeVariables(source, variables);
 		}
 		catch (Exception e)
 		{
@@ -250,21 +255,21 @@ public class EntityTable<E> extends Table implements EntityList<E>
 	public void addGeneratedColumn(Object id, ColumnGenerator generatedColumn)
 	{
 		super.addGeneratedColumn(id, generatedColumn);
-		
+
 	}
 
 	@Override
 	public void setConverter(String name, Converter<String, ?> converter)
 	{
 		super.setConverter(name, converter);
-		
+
 	}
 
 	@Override
 	public void setColumnCollapsed(String name, boolean collapsed)
 	{
 		super.setColumnCollapsed(name, collapsed);
-		
+
 	}
 
 }

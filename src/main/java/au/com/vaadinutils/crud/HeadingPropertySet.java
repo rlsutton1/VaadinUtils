@@ -64,6 +64,13 @@ public class HeadingPropertySet<E>
 			
 		}
 		
+		public <T extends Object> Builder<E> addHiddenColumn(String heading, SingularAttribute<E, T> headingPropertyId, int width)
+		{
+			cols.add(new HeadingToPropertyId<E>(heading,headingPropertyId,null,true).setWidth(width));
+			return this;
+			
+		}
+		
 		public <T extends Object> Builder<E> addGeneratedColumn(String heading, SingularAttribute<E, T> headingPropertyId,ColumnGenerator columnGenerator)
 		{
 			cols.add(new HeadingToPropertyId<E>(heading,headingPropertyId.getName(),columnGenerator));
