@@ -19,11 +19,15 @@ public class InputDialog extends Window implements InputFormDialogRecipient
 	{
 		this.recipient = recipient;
 		
-		FormLayout form = new FormLayout();
-
+			FormLayout form = new FormLayout();
+		
+		
 		field.setCaption(question);
 		form.addComponent(field);
-		new InputFormDialog(parent, title, field,  form, this);
+		InputFormDialog dialog = new InputFormDialog(parent, title, field,  form, this);
+		dialog.setWidth("500");
+		dialog.setHeight("150");
+
 	}
 
 
