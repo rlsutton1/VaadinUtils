@@ -666,7 +666,8 @@ class JasperReportLayout extends VerticalLayout
 					}
 				}
 
-				return name + outputFormat.getFileExtension();
+				int maxFileNameLength = 120; // any longer and chrome wont save the file
+				return name.substring(0,Math.min(name.length(), maxFileNameLength)) + outputFormat.getFileExtension();
 
 			}
 		};
