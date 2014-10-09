@@ -19,6 +19,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import javax.activation.DataSource;
 
@@ -65,6 +66,7 @@ import au.com.vaadinutils.jasper.parameter.ReportParameter;
 import au.com.vaadinutils.jasper.servlet.VaadinJasperPrintServlet;
 import au.com.vaadinutils.jasper.ui.CleanupCallback;
 import au.com.vaadinutils.jasper.ui.JasperReportProperties;
+import au.com.vaadinutils.util.PipedOutputStreamWrapper;
 
 import com.google.gwt.thirdparty.guava.common.base.Preconditions;
 import com.vaadin.server.Page;
@@ -181,7 +183,7 @@ public class JasperManager implements Runnable
 	 */
 	public JasperManager(JasperReportProperties reportProperties)
 	{
-		
+
 		this.reportProperties = reportProperties;
 		try
 		{
@@ -450,8 +452,7 @@ public class JasperManager implements Runnable
 					targetBand.addElement(labelElement);
 
 					JRDesignTextField valueElement = new JRDesignTextField();
-					valueElement.setExpression(new JRDesignExpression("$P{ParamDisplay-" + parameterName
-							+ "}"));
+					valueElement.setExpression(new JRDesignExpression("$P{ParamDisplay-" + parameterName + "}"));
 					valueElement.setWidth(400);
 					valueElement.setHeight(20);
 					valueElement.setBackcolor(new Color(208, 208, 208));
@@ -540,7 +541,8 @@ public class JasperManager implements Runnable
 			String strippedParameterName = parameterName;
 			if (strippedParameterName.startsWith("ReportParameter"))
 			{
-				strippedParameterName = strippedParameterName.substring("ReportParameter".length(), strippedParameterName.length());
+				strippedParameterName = strippedParameterName.substring("ReportParameter".length(),
+						strippedParameterName.length());
 			}
 
 			if (!paramExists(strippedParameterName))
@@ -640,9 +642,7 @@ public class JasperManager implements Runnable
 
 	}
 
-	private PipedInputStream inputStream;
-
-	private PipedOutputStream outputStream;
+	private PipedOutputStreamWrapper outputStream;
 
 	private OutputFormat exportMethod;
 
@@ -655,10 +655,6 @@ public class JasperManager implements Runnable
 
 	private JasperProgressListener progressListener;
 
-	private CountDownLatch readerReady;
-
-	private CountDownLatch writerReady;
-
 	volatile private QueueEntry queueEntry;
 
 	private Thread thread;
@@ -666,10 +662,11 @@ public class JasperManager implements Runnable
 	volatile private boolean inQueue;
 
 	public RenderedReport export(OutputFormat exportMethod, Collection<ReportParameter<?>> params)
-			throws InterruptedException
+			throws InterruptedException, TimeoutException
 	{
 
 		exportAsync(exportMethod, params, null);
+		outputStream.waitForOutputToBeReady(10,TimeUnit.MINUTES);
 		InputStream stream = getStream();
 		// completeBarrier.await();
 		return new RenderedReport(stream, imagesrcs, exportMethod);
@@ -683,13 +680,7 @@ public class JasperManager implements Runnable
 
 	public InputStream getStream() throws InterruptedException
 	{
-		inputStream = new PipedInputStream();
-		readerReady.countDown();
-		if (!writerReady.await(10, TimeUnit.SECONDS))
-		{
-			throw new RuntimeException("Couldn't attach to writer stream");
-		}
-		return inputStream;
+		return outputStream.getInputStream();
 	}
 
 	public void exportAsync(OutputFormat exportMethod, Collection<ReportParameter<?>> params,
@@ -715,9 +706,7 @@ public class JasperManager implements Runnable
 		}
 
 		stop = false;
-		writerReady = new CountDownLatch(1);
 		completeBarrier = new CountDownLatch(1);
-		readerReady = new CountDownLatch(1);
 		this.progressListener = progressListener;
 		if (progressListener == null)
 		{
@@ -746,15 +735,14 @@ public class JasperManager implements Runnable
 				}
 			};
 		}
-		inputStream = null;
-		outputStream = null;
+		outputStream = new PipedOutputStreamWrapper();
 
 		queueEntry = new QueueEntry(reportProperties.getReportTitle(), reportProperties.getUsername());
 		inQueue = true;
 		jobQueue.add(queueEntry);
 
 		this.exportMethod = exportMethod;
-		thread = new Thread(this,"JasperManager");
+		thread = new Thread(this, "JasperManager");
 		thread.start();
 	}
 
@@ -778,8 +766,9 @@ public class JasperManager implements Runnable
 			reportProperties.initDBConnection();
 
 			cleanupCallback = reportProperties.getCleanupCallback();
-			List<ReportParameter<?>> extraParams = reportProperties.prepareData(params, reportProperties.getReportFileName(), cleanupCallback);
-			
+			List<ReportParameter<?>> extraParams = reportProperties.prepareData(params,
+					reportProperties.getReportFileName(), cleanupCallback);
+
 			params.removeAll(extraParams);
 			params.addAll(extraParams);
 
@@ -896,17 +885,10 @@ public class JasperManager implements Runnable
 
 			queueEntry.setStatus("Waiting for browser to start streaming");
 			progressListener.outputStreamReady();
-			if (readerReady.await(10, TimeUnit.SECONDS))
-			{
-				outputStream = new PipedOutputStream(inputStream);
-				writerReady.countDown();
-				exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, outputStream);
-				exporter.exportReport();
-			}
-			else
-			{
-				logger.error("Couldn't attach to reader stream");
-			}
+
+			exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, outputStream);
+			exporter.exportReport();
+
 			Thread.sleep(750);
 			queueEntry.setStatus("Cleaning up");
 

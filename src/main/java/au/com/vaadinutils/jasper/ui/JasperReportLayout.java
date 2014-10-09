@@ -1,6 +1,7 @@
 package au.com.vaadinutils.jasper.ui;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
@@ -702,7 +703,7 @@ class JasperReportLayout extends VerticalLayout
 				{
 					return manager.getStream();
 				}
-				catch (InterruptedException e)
+				catch (InterruptedException  e)
 				{
 					logger.error(e, e);
 				}

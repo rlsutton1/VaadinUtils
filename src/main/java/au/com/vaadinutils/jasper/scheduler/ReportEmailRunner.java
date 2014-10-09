@@ -2,6 +2,7 @@ package au.com.vaadinutils.jasper.scheduler;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.concurrent.TimeoutException;
 
 import javax.mail.internet.AddressException;
 
@@ -25,8 +26,9 @@ public interface ReportEmailRunner
 	 * @throws IllegalAccessException
 	 * @throws AddressException
 	 * @throws ClassNotFoundException
+	 * @throws TimeoutException 
 	 */
 	public boolean runReport(ReportEmailSchedule schedule, Date scheduleTime, JasperEmailSettings emailSettings)
-			throws InterruptedException, IOException, EmailException, InstantiationException, IllegalAccessException, AddressException, ClassNotFoundException;
+			throws InterruptedException, IOException, EmailException, InstantiationException, IllegalAccessException, AddressException, ClassNotFoundException, TimeoutException;
 
 }

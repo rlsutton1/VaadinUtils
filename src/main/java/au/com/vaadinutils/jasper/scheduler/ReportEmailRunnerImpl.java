@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 
 import javax.mail.internet.AddressException;
 
@@ -36,7 +37,7 @@ public class ReportEmailRunnerImpl implements ReportEmailRunner, JasperReportPro
 	@Override
 	public boolean runReport(ReportEmailSchedule schedule, Date scheduledTime, JasperEmailSettings emailSettings)
 			throws InterruptedException, IOException, EmailException, InstantiationException, IllegalAccessException,
-			AddressException, ClassNotFoundException
+			AddressException, ClassNotFoundException, TimeoutException
 	{
 		Class<? extends JasperReportProperties> jrpClass = schedule.getJasperReportPropertiesClass();
 
