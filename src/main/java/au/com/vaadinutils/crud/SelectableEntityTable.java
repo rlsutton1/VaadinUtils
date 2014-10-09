@@ -61,6 +61,8 @@ public class SelectableEntityTable<E> extends TableCheckBoxSelect
 			}
 
 		}
+		
+		setColumnHeader(TableCheckBoxSelect.TABLE_CHECK_BOX_SELECT, "");
 
 	}
 

@@ -15,7 +15,7 @@ import com.vaadin.ui.Table;
 public class TableCheckBoxSelect extends Table
 {
 
-	private static final String TABLE_CHECK_BOX_SELECT = "TableCheckBoxSelect";
+	public static final String TABLE_CHECK_BOX_SELECT = "TableCheckBoxSelect";
 	private static final long serialVersionUID = -7559267854874304189L;
 	protected MarkedIds markedIds = new MarkedIds();
 	protected boolean multiselect;
