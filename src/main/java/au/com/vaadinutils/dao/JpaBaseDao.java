@@ -3,7 +3,6 @@ package au.com.vaadinutils.dao;
 import java.lang.reflect.ParameterizedType;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.persistence.EntityManager;
@@ -17,6 +16,7 @@ import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.persistence.metamodel.SetAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 
 import com.google.common.base.Preconditions;
@@ -444,6 +444,64 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 	}
 	
+	
+	public <V,J> List<E> findAllByAttributeJoin(SingularAttribute<J, V> vKey, V value,SetAttribute<E,J> joinAttr)
+	{
+
+		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+
+		CriteriaQuery<E> criteria = builder.createQuery(entityClass);
+
+		Root<E> root = criteria.from(entityClass);
+		
+		Join<E,J> join = root.join(joinAttr, JoinType.LEFT);
+
+		criteria.where(builder.equal(join.get(vKey), value));
+
+		return entityManager.createQuery(criteria).getResultList();
+
+		
+
+	} 
+	
+	public <V,J> List<E> findAllByAttributeJoin(SingularAttribute<J, V> vKey, V value,SingularAttribute<E,J> joinAttr)
+	{
+
+		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+
+		CriteriaQuery<E> criteria = builder.createQuery(entityClass);
+
+		Root<E> root = criteria.from(entityClass);
+		
+		Join<E,J> join = root.join(joinAttr, JoinType.LEFT);
+
+		criteria.where(builder.equal(join.get(vKey), value));
+
+		return entityManager.createQuery(criteria).getResultList();
+
+		
+
+	}
+
+	public <V,J> int deleteAllByAttributeJoin(SingularAttribute<J, V> vKey, V value,
+			SetAttribute<E, J> joinAttr)
+	{
+		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+
+		CriteriaDelete<E> criteria = builder.createCriteriaDelete(entityClass);
+
+		Root<E> root = criteria.from(entityClass);
+		
+		Join<E,J> join = root.join(joinAttr, JoinType.LEFT);
+
+		criteria.where(builder.equal(join.get(vKey), value));
+
+		int result = entityManager.createQuery(criteria).executeUpdate();
+
+		return result;
+
+		
+	}
 	public <V,J> int deleteAllByAttributeJoin(SingularAttribute<J, V> vKey, V value,SingularAttribute<E,J> joinAttr)
 	{
 
@@ -457,7 +515,6 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 		criteria.where(builder.equal(join.get(vKey), value));
 
-		entityManager.getClass();
 		int result = entityManager.createQuery(criteria).executeUpdate();
 
 		return result;
@@ -501,5 +558,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		this.entityManager.detach(entity);
 
 	}
+
+	
 
 }
