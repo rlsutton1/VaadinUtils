@@ -366,8 +366,8 @@ public class FormHelper<E> implements Serializable
 	}
 
 	
-	public <L> ComboBox bindEntityField(String fieldLabel, SingularAttribute<E, L> fieldName,
-			SingularAttribute<L, String> listFieldName)
+	public <L,K> ComboBox bindEntityField(String fieldLabel, SingularAttribute<E, L> fieldName,
+			SingularAttribute<L, K> listFieldName)
 	{
 		return new EntityFieldBuilder<L>().setLabel(fieldLabel).setField(fieldName).setListFieldName(listFieldName)
 				.build();
