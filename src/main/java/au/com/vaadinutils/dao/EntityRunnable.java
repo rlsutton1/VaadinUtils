@@ -11,9 +11,11 @@ public abstract class EntityRunnable implements Runnable
 	final private UI ui;
 	Logger logger = LogManager.getLogger();
 
-	public EntityRunnable()
+
+
+	public EntityRunnable(UI ui)
 	{
-		this.ui = UI.getCurrent();
+		this.ui  =ui;
 	}
 
 	@Override

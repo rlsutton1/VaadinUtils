@@ -21,6 +21,7 @@ import com.vaadin.data.util.converter.Converter;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
 import com.vaadin.event.ItemClickEvent.ItemClickListener;
+import com.vaadin.event.dd.DropHandler;
 import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.AbstractTextField.TextChangeEventMode;
 import com.vaadin.ui.Alignment;
@@ -30,6 +31,7 @@ import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table.ColumnGenerator;
+import com.vaadin.ui.Table.TableDragMode;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Reindeer;
@@ -307,6 +309,30 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 	{
 		selectableTable.setConverter(propertyId,converter);
 		
+	}
+
+	public void setSelected(Collection<Long> ids)
+	{
+	    selectableTable.setSelectedValue(ids);
+	    
+	}
+
+	public void setMultiSelect(boolean b)
+	{
+		selectableTable.setMultiSelect(true);
+
+	    
+	}
+
+	public void setDragMode(TableDragMode mode)
+	{
+	    selectableTable.setDragMode(mode);
+	}
+
+	public void setDropHandler(DropHandler dropHandler)
+	{
+	    selectableTable.setDropHandler(dropHandler);
+	    
 	}
 
 }

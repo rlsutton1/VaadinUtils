@@ -464,6 +464,27 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 	}
 
+	public <V, J> List<E> findAllByAttributeJoin(SingularAttribute<J, V> vKey, V value, SingularAttribute<E, J> joinAttr,JoinType joinType)
+	{
+
+		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+
+		CriteriaQuery<E> criteria = builder.createQuery(entityClass);
+
+		Root<E> root = criteria.from(entityClass);
+
+		Join<E, J> join = root.join(joinAttr, joinType);
+
+		criteria.where(builder.equal(join.get(vKey), value));
+
+		
+		return entityManager.createQuery(criteria).getResultList();
+
+		
+
+	}
+
+	
 	public <V, J> int deleteAllByAttributeJoin(SingularAttribute<J, V> vKey, V value, SingularAttribute<E, J> joinAttr)
 	{
 
