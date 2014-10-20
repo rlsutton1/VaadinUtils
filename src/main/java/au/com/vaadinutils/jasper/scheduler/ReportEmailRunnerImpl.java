@@ -13,6 +13,8 @@ import javax.mail.internet.AddressException;
 
 import org.apache.commons.mail.EmailException;
 
+import com.google.common.base.Preconditions;
+
 import au.com.vaadinutils.jasper.AttachmentType;
 import au.com.vaadinutils.jasper.JasperEmailBuilder;
 import au.com.vaadinutils.jasper.JasperEmailSettings;
@@ -39,6 +41,10 @@ public class ReportEmailRunnerImpl implements ReportEmailRunner, JasperReportPro
 			throws InterruptedException, IOException, EmailException, InstantiationException, IllegalAccessException,
 			AddressException, ClassNotFoundException, TimeoutException
 	{
+		Preconditions.checkNotNull(schedule.getSendersEmailAddress(),"Missing senders email address.");
+		Preconditions.checkNotNull(schedule.getRecipients(),"Missing recipient email address");
+		Preconditions.checkArgument(schedule.getRecipients().size()>0,"Missing recipient email address");
+		
 		Class<? extends JasperReportProperties> jrpClass = schedule.getJasperReportPropertiesClass();
 
 		jasperReportProperties = jrpClass.newInstance();

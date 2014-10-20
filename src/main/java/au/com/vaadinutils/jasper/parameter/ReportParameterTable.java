@@ -11,6 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import au.com.vaadinutils.dao.EntityManagerProvider;
+import au.com.vaadinutils.dao.JpaBaseDao;
 import au.com.vaadinutils.fields.SelectionListener;
 import au.com.vaadinutils.fields.TableCheckBoxSelect;
 import au.com.vaadinutils.jasper.scheduler.entities.DateParameterType;
@@ -70,6 +71,7 @@ public class ReportParameterTable<T> extends ReportParameter<String>
 	private void init(String caption, Class<T> tableClass, final SingularAttribute<T, String> displayField,
 			boolean multiSelect)
 	{
+		JpaBaseDao.getGenericDao(tableClass).flushCache();
 		container = createContainer(tableClass, displayField);
 		this.displayField = displayField;
 		layout = new VerticalLayout();

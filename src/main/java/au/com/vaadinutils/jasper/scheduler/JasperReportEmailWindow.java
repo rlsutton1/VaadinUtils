@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.mail.internet.InternetAddress;
 import javax.persistence.EntityManager;
 
 import org.vaadin.dialogs.ConfirmDialog;
@@ -45,6 +46,21 @@ public class JasperReportEmailWindow extends Window
 
 	public JasperReportEmailWindow(final JasperReportProperties props, final Collection<ReportParameter<?>> params)
 	{
+		
+
+		try
+		{
+			new InternetAddress(props.getUserEmailAddress());
+
+		}
+		catch (Exception e)
+		{
+			Notification.show("Your email address (" + props.getUserEmailAddress()
+					+ ") is invalid, go to accounts and fix your email address.", Type.ERROR_MESSAGE);
+			return;
+		}
+
+		
 		JasperReportProperties temp = props;
 		for (ReportParameter<?> p : params)
 		{

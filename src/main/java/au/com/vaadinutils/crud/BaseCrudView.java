@@ -911,6 +911,10 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			// commit the row to the database, and retrieve the possibly new
 			// entity
 			E newEntity = commitContainerAndGetEntityFromDB();
+			if (newEntity == null)
+			{
+				throw new RuntimeException("An error occurred, unable to retrieve updated record. Failed to save changes");
+			}
 
 			for (ChildCrudListener<E> commitListener : childCrudListeners)
 			{

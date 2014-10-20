@@ -7,6 +7,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import javax.mail.internet.InternetAddress;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -86,6 +88,7 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 
 	public JasperReportScheduleLayout()
 	{
+
 		JPAContainer<ReportEmailScheduleEntity> container = makeJPAContainer();
 
 		HeadingPropertySet<ReportEmailScheduleEntity> headings = new HeadingPropertySet.Builder<ReportEmailScheduleEntity>()
@@ -756,6 +759,7 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 	public void enter(ViewChangeEvent event)
 	{
 		// TODO Auto-generated method stub
+		
 
 	}
 
