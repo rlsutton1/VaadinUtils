@@ -35,6 +35,19 @@ public class JasperReportSchedulerWindow extends Window
 			final Collection<ReportParameter<?>> params)
 	{
 
+		
+		try
+		{
+			new InternetAddress(reportProperties.getUserEmailAddress());
+
+		}
+		catch (Exception e)
+		{
+			Notification.show("Your email address (" + reportProperties.getUserEmailAddress()
+					+ ") is invalid, go to accounts and fix your email address.", Type.ERROR_MESSAGE);
+			return;
+		}
+
 		this.setWidth("90%");
 		this.setHeight("98%");
 
