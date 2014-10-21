@@ -54,4 +54,10 @@ public class AllowAllSecurityManager implements CrudSecurityManager
 	{
 		return false;
 	}
+
+	@Override
+	public String getFeatureName()
+	{
+		return "";
+	}
 }

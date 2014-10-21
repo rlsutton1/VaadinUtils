@@ -19,4 +19,6 @@ public interface CrudSecurityManager
 
 	boolean isUserSuperUser();
 
+	String getFeatureName();
+
 }

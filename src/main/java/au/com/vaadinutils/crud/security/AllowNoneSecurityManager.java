@@ -47,4 +47,10 @@ public class AllowNoneSecurityManager implements CrudSecurityManager
 	{
 		return false;
 	}
+
+	@Override
+	public String getFeatureName()
+	{
+		return "";
+	}
 }
