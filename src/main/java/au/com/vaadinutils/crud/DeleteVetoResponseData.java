@@ -7,11 +7,11 @@ public class DeleteVetoResponseData
 	final public String message;
 	final public boolean canDelete;
 
-	public DeleteVetoResponseData(boolean b)
+	public DeleteVetoResponseData(boolean canDelete)
 	{
-		Preconditions.checkArgument(b, "Supply a message if vetoing the delete");
+		Preconditions.checkArgument(canDelete, "Supply a message if vetoing the delete");
 		message = "";
-		canDelete = true;
+		this.canDelete = true;
 	}
 
 	public DeleteVetoResponseData(boolean canDelete, String message2)

@@ -129,8 +129,7 @@ public class ReportEmailScheduleEntity implements Serializable, CrudEntity, Repo
 	@Override
 	public String getName()
 	{
-		// TODO Auto-generated method stub
-		return null;
+		return reportTitle;
 	}
 
 	@Override
