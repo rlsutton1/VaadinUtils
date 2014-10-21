@@ -36,7 +36,14 @@ public class ClickEventLogged
 				logger.error(e, e);
 				if (e.getMessage() != null)
 				{
-					Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
+					String msg = e.getMessage();
+					final String runtimeMessage = "java.lang.RuntimeException: ";
+					if (msg.startsWith(runtimeMessage))
+					{
+						msg = msg.substring(runtimeMessage.length());
+					}
+						
+					Notification.show(msg, Type.ERROR_MESSAGE);
 
 				}
 				else
