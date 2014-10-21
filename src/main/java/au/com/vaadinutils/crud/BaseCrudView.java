@@ -1051,7 +1051,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			E newEntity = commitContainerAndGetEntityFromDB();
 			if (newEntity == null)
 			{
-				throw new RuntimeException("An error occurred, unable to retrieve updated record. Failed to save changes");
+				throw new RuntimeException(
+						"An error occurred, unable to retrieve updated record. Failed to save changes");
 			}
 
 			for (ChildCrudListener<E> commitListener : childCrudListeners)
@@ -1310,12 +1311,21 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 			public void textChange(final TextChangeEvent event)
 			{
-				// If advanced search is active then it should be responsible
-				// for triggering the filter.
-				if (!advancedSearchOn)
+				try
 				{
-					String filterString = event.getText();
-					triggerFilter(filterString);
+					// If advanced search is active then it should be
+					// responsible
+					// for triggering the filter.
+					if (!advancedSearchOn)
+					{
+						String filterString = event.getText();
+						triggerFilter(filterString);
+					}
+				}
+				catch (Exception e)
+				{
+					logger.error(e, e);
+					Notification.show(e.getClass().getSimpleName()+" "+e.getMessage(),Type.ERROR_MESSAGE);
 				}
 			}
 		});

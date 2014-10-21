@@ -113,8 +113,8 @@ public class HelpSplitPanel extends HorizontalSplitPanel implements View, HelpPa
 
 	}
 
-	boolean helpHiding =false;
-	
+	boolean helpHiding = false;
+
 	private boolean isHelpHidden()
 	{
 		boolean hidden = false;
@@ -153,6 +153,7 @@ public class HelpSplitPanel extends HorizontalSplitPanel implements View, HelpPa
 			catch (Exception e)
 			{
 				logger.info(e);
+				userSettings.store("HelpWidth-" + helpId, "" + pos);
 			}
 
 			if (help != null)
