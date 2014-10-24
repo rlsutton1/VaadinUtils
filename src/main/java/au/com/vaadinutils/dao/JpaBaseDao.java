@@ -482,8 +482,8 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
     }
 
-    public <V, J> List<E> findAllByAttributeJoin(SingularAttribute<J, V> vKey, V value,
-	    SingularAttribute<E, J> joinAttr, JoinType joinType)
+    public <V, J> List<E> findAllByAttributeJoin(SingularAttribute<E, J> joinAttr, SingularAttribute<J, V> vKey,
+	    V value, JoinType joinType)
     {
 
 	CriteriaBuilder builder = entityManager.getCriteriaBuilder();
