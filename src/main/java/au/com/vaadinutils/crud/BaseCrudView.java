@@ -701,7 +701,12 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	this.hideSaveCancelLayout = hideSaveCancelLayout;
 	showSaveCancel(!disallow);
 	if (this.hideSaveCancelLayout)
-	    buttonLayout.setVisible(false);
+	{
+	    if (buttonLayout != null)
+	    {
+		buttonLayout.setVisible(false);
+	    }
+	}
     }
 
     /**
