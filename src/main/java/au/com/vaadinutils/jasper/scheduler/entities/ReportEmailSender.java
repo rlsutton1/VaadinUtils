@@ -6,9 +6,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import au.com.vaadinutils.crud.CrudEntity;
 @Entity
 @Table(name = "tblReportEmailSender")
-public class ReportEmailSender
+public class ReportEmailSender implements CrudEntity
 {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,5 +42,24 @@ public class ReportEmailSender
 	{
 		emailAddress = userEmailAddress;
 
+	}
+
+	@Override
+	public Long getId()
+	{
+	    return iID;
+	}
+
+	@Override
+	public void setId(Long id)
+	{
+	   iID=id;
+	    
+	}
+
+	@Override
+	public String getName()
+	{
+	   return username;
 	}
 }

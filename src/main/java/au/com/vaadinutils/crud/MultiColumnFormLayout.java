@@ -412,7 +412,7 @@ public class MultiColumnFormLayout<E> extends GridLayout
 	 * @return
 	 */
 	@Deprecated
-	public <L> ComboBox bindEntityField(String fieldLabel, String fieldName, Class<L> listClazz, String listFieldName)
+	public <L extends CrudEntity> ComboBox bindEntityField(String fieldLabel, String fieldName, Class<L> listClazz, String listFieldName)
 	{
 		ComboBox field = formHelper.bindEntityField(this, fieldGroup, fieldLabel, fieldName, listClazz, listFieldName);
 		this.fieldList.add(field);
@@ -429,7 +429,7 @@ public class MultiColumnFormLayout<E> extends GridLayout
 	 * @return
 	 */
 	@Deprecated
-	public <L> ComboBox bindEntityField(String fieldLabel, SingularAttribute<E, L> fieldName, Class<L> listClazz,
+	public <L extends CrudEntity> ComboBox bindEntityField(String fieldLabel, SingularAttribute<E, L> fieldName, Class<L> listClazz,
 			SingularAttribute<L, ?> listFieldName)
 	{
 		ComboBox field = formHelper.bindEntityField(this, fieldGroup, fieldLabel, fieldName, listClazz, listFieldName);

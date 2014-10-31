@@ -26,18 +26,22 @@ import java.util.Set;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 
+import au.com.vaadinutils.crud.CrudEntity;
+
 import com.google.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.EntityContainer;
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.EntityItemProperty;
+import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.metadata.EntityClassMetadata;
 import com.vaadin.addon.jpacontainer.metadata.MetadataFactory;
 import com.vaadin.addon.jpacontainer.metadata.PropertyMetadata;
+import com.vaadin.data.Property;
 import com.vaadin.data.util.TransactionalPropertyWrapper;
 import com.vaadin.data.util.converter.Converter;
 import com.vaadin.ui.AbstractSelect;
 
-public class MultiSelectConverter<T> implements Converter<Collection<Object>, Collection<T>>
+public class MultiSelectConverter<T extends CrudEntity> implements Converter<Collection<Object>, Collection<T>>
 {
 
 	private static final long serialVersionUID = 1L;
@@ -54,11 +58,11 @@ public class MultiSelectConverter<T> implements Converter<Collection<Object>, Co
 	}
 
 	@SuppressWarnings("unchecked")
-	private EntityContainer<T> getContainer()
+	private ContainerAdaptor<T> getContainer()
 	{
-		return (EntityContainer<T>) select.getContainerDataSource();
+		return ContainerAdaptorFactory.getAdaptor( select.getContainerDataSource());
 	}
-
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	public Collection<Object> convertToPresentation(Collection<T> value,
@@ -86,8 +90,7 @@ public class MultiSelectConverter<T> implements Converter<Collection<Object>, Co
 		HashSet<Object> identifiers = new HashSet<Object>();
 		for (T entity : value)
 		{
-			Object identifier = getContainer().getEntityProvider().getIdentifier(entity);
-			identifiers.add(identifier);
+			identifiers.add(entity.getId());
 		}
 		return identifiers;
 	}
@@ -139,8 +142,8 @@ public class MultiSelectConverter<T> implements Converter<Collection<Object>, Co
 		// orphaned collection
 		for (Object id : idset)
 		{
-			EntityItem<T> item = getContainer().getItem(id);
-			T entity = item.getEntity();
+		    	T entity = getContainer().getEntity(id);
+			 
 			if (!modelValue.contains(entity))
 			{
 				modelValue.add(entity);
@@ -189,7 +192,7 @@ public class MultiSelectConverter<T> implements Converter<Collection<Object>, Co
 	{
 		if (!isOwningSide())
 		{
-			EntityItemProperty itemProperty = getBackReferenceItemProperty(entity);
+			Property itemProperty = getBackReferenceItemProperty(entity);
 			Object property = itemProperty.getValue();
 			if (property instanceof Collection)
 			{
@@ -207,12 +210,9 @@ public class MultiSelectConverter<T> implements Converter<Collection<Object>, Co
 		}
 	}
 
-	private EntityItemProperty getBackReferenceItemProperty(T entity)
+	private Property getBackReferenceItemProperty(T entity)
 	{
-		@SuppressWarnings("rawtypes")
-		EntityItem item = getContainer().getItem(getContainer().getEntityProvider().getIdentifier(entity));
-		EntityItemProperty itemProperty = item.getItemProperty(mappedBy);
-		return itemProperty;
+		return getContainer().getProperty(entity,mappedBy);
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -220,7 +220,7 @@ public class MultiSelectConverter<T> implements Converter<Collection<Object>, Co
 	{
 		if (!isOwningSide())
 		{
-			EntityItemProperty itemProperty = getBackReferenceItemProperty(entity);
+			Property itemProperty = getBackReferenceItemProperty(entity);
 			Object property = itemProperty.getValue();
 			if (property == null || !(property instanceof Collection))
 			{
@@ -231,7 +231,7 @@ public class MultiSelectConverter<T> implements Converter<Collection<Object>, Co
 			{
 				// many to many
 				Preconditions.checkArgument(property instanceof Collection,
-						"Expected a Collection got " + itemProperty.getPropertyId() + " "
+						"Expected a Collection got " + itemProperty.getType() + " "
 								+ property.getClass().getCanonicalName());
 				Collection c = (Collection) property;
 				c.add(getPropertyDataSource().getItem().getEntity());

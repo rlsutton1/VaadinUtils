@@ -46,6 +46,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
     private String parentKey;
     protected String childKey;
     private Object parentId;
+    protected P currentParent;
     private Filter parentFilter;
     protected boolean dirty = false;
     final private Class<P> parentType;
@@ -594,41 +595,43 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
     @Override
     public void selectedParentRowChanged(EntityItem<P> item)
     {
-	try
-	{
-	    saveEditsToTemp();
-	    createParentFilter(item);
-	    fieldGroup.discard();
-	    container.discard();
-	    dirty = false;
-	    resetFilters();
-	    Object id = entityTable.firstItemId();
-	    if (id != null)
+	    try
 	    {
-		entityTable.select(entityTable.firstItemId());
-	    }
-	    else
-	    {
-		try
+		saveEditsToTemp();
+		createParentFilter(item);
+		currentParent = item.getEntity();
+		fieldGroup.discard();
+		container.discard();
+		dirty = false;
+		resetFilters();
+		Object id = entityTable.firstItemId();
+		if (id != null)
 		{
-		    entityTable.select(null);
+		    entityTable.select(entityTable.firstItemId());
 		}
-		catch (Exception e)
+		else
 		{
-		    logger.warn(e, e);
-		    // ignore this. if we don't do this the child continues to
-		    // show data from the previously selected row
+		    try
+		    {
+			entityTable.select(null);
+		    }
+		    catch (Exception e)
+		    {
+			logger.warn(e, e);
+			// ignore this. if we don't do this the child continues
+			// to
+			// show data from the previously selected row
 
-		    // TODO: come up with a better solution
+			// TODO: come up with a better solution
+		    }
 		}
+		searchField.setValue("");
 	    }
-	    searchField.setValue("");
-	}
-	catch (Exception e)
-	{
-	    handleConstraintViolationException(e);
-	    logger.error(e, e);
-	}
+	    catch (Exception e)
+	    {
+		handleConstraintViolationException(e);
+		logger.error(e, e);
+	    }
 
     }
 
