@@ -716,7 +716,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 					if (interceptAction(action, entity))
 						action.exec(BaseCrudView.this, entity);
 					container.refreshItem(entity.getItemId());
-					
+
 					// actionCombo.select(actionCombo.getNullSelectionItemId());
 				}
 				else
@@ -913,7 +913,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			E newEntity = commitContainerAndGetEntityFromDB();
 			if (newEntity == null)
 			{
-				throw new RuntimeException("An error occurred, unable to retrieve updated record. Failed to save changes");
+				throw new RuntimeException(
+						"An error occurred, unable to retrieve updated record. Failed to save changes");
 			}
 
 			for (ChildCrudListener<E> commitListener : childCrudListeners)
@@ -965,17 +966,19 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				logger.error(e, e);
 				throw new RuntimeException(tmp);
 			}
-			else if (e instanceof InvalidValueException )
+			else if (e instanceof InvalidValueException)
 			{
-				InvalidValueException m = (InvalidValueException ) e;
-				
-				Notification.show("Please fix the form errors and then try again.\n\n "+e.getMessage(), Type.ERROR_MESSAGE);
+				InvalidValueException m = (InvalidValueException) e;
+
+				Notification.show("Please fix the form errors and then try again.\n\n " + e.getMessage(),
+						Type.ERROR_MESSAGE);
 			}
-			else if ( e.getCause() instanceof InvalidValueException)
+			else if (e.getCause() instanceof InvalidValueException)
 			{
-				InvalidValueException m = (InvalidValueException ) e.getCause();
-				
-				Notification.show("Please fix the form errors and then try again.\n\n "+e.getMessage(), Type.ERROR_MESSAGE);
+				InvalidValueException m = (InvalidValueException) e.getCause();
+
+				Notification.show("Please fix the form errors and then try again.\n\n " + e.getMessage(),
+						Type.ERROR_MESSAGE);
 			}
 			else if (e.getCause() instanceof ConstraintViolationException)
 			{
@@ -1567,5 +1570,13 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	protected Button getSaveButton()
 	{
 		return saveButton;
+	}
+
+	public void reloadDataFromDB()
+	{
+		EntityManagerProvider.getEntityManager().getTransaction().commit();
+		EntityManagerProvider.getEntityManager().getTransaction().begin();
+		EntityManagerProvider.getEntityManager().flush();
+		container.refresh();
 	}
 }
