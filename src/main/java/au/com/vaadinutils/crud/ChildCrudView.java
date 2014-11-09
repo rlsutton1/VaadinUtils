@@ -47,7 +47,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
     protected String childKey;
     private Object parentId;
     protected P currentParent;
-    private Filter parentFilter;
+    protected Filter parentFilter;
     protected boolean dirty = false;
     final private Class<P> parentType;
     public BaseCrudView<P> parentCrud;
@@ -409,6 +409,8 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 
 	    selectFirstFieldAndShowTab();
 
+	    postNew(newEntity);
+	    
 	    rightLayout.setVisible(true);
 	}
 	catch (ConstraintViolationException e)
