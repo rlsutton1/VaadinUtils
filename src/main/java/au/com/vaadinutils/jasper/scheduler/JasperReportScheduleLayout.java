@@ -759,6 +759,12 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 		
 
 	}
+	
+	@Override 
+	public String getTitleText()
+	{
+		return "Report Scheduler";
+	}
 
 	@Override
 	public Enum<?> getHelpId()
