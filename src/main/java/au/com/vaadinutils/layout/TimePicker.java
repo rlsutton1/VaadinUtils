@@ -137,8 +137,8 @@ public class TimePicker extends HorizontalLayout implements Field
 		final Window window = new Window(title);
 		window.setModal(true);
 		window.setResizable(false);
-		window.setWidth("380");
-		window.setHeight("180");
+		window.setWidth("430");
+		window.setHeight("220");
 		window.setClosable(false);
 
 		HorizontalLayout layout = new HorizontalLayout();
