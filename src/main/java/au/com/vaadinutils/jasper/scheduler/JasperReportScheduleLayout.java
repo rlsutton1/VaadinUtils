@@ -729,12 +729,6 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 		return filter;
 	}
 
-	@Override
-	protected String getTitleText()
-	{
-		return "Report email schedule";
-	}
-
 	/**
 	 * Overload this method to provide cross-field (form level) validation.
 	 * 
