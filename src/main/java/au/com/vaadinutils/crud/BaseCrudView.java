@@ -76,7 +76,7 @@ import com.vaadin.ui.themes.Reindeer;
 import com.vaadin.ui.themes.ValoTheme;
 
 public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout implements RowChangeListener<E>,
-		Selected<E>, DirtyListener
+		Selected<E>, DirtyListener, ButtonListener
 {
 
 	private static transient Logger logger = LogManager.getLogger(BaseCrudView.class);
@@ -94,8 +94,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	protected TextField searchField = new TextField();
 	protected Button newButton = new Button("New");
 	protected Button applyButton = new Button("Apply");
-	private Button saveButton = new Button("Save");
-	private Button cancelButton = new Button("Cancel");
 	protected Class<E> entityClass;
 
 	protected ValidatingFieldGroup<E> fieldGroup;
@@ -116,7 +114,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	protected VerticalLayout rightLayout;
 	private Component editor;
 	protected CrudPanelPair splitPanel;
-	private HorizontalLayout buttonLayout;
+	protected BaseCrudSaveCancelButtonTray buttonLayout;
 	private AbstractLayout advancedSearchLayout;
 	private VerticalLayout searchLayout;
 	protected Set<ChildCrudListener<E>> childCrudListeners = new HashSet<ChildCrudListener<E>>();
@@ -211,17 +209,14 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			disallowDelete(true);
 		}
 
-		if (!getSecurityManager().canUserEdit())
-		{
-			// disable save as the user doesn't have permission to edit
-			buttonLayout.removeComponent(saveButton);
-			saveButton.setVisible(false);
-		}
-
 		if (!getSecurityManager().canUserCreate())
 		{
 			disallowNew(true);
 		}
+		buttonLayout = new BaseCrudSaveCancelButtonTray(!getSecurityManager().canUserEdit()||disallowEditing, !getSecurityManager()
+				.canUserCreate()||disallowNew, this);
+		
+		rightLayout.addComponent(buttonLayout);
 		resetFilters();
 
 	}
@@ -428,7 +423,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 		leftLayout.addComponent(actionLayout);
 
-		addSaveAndCancelButtons();
 
 		rightLayout.setVisible(false);
 	}
@@ -560,20 +554,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		return actions;
 	}
 
-	protected void addSaveAndCancelButtons()
-	{
-		buttonLayout = new HorizontalLayout();
-		buttonLayout.setMargin(new MarginInfo(false, true, false, true));
-		buttonLayout.setWidth("100%");
-		buttonLayout.addComponent(cancelButton);
-		buttonLayout.addComponent(saveButton);
-		saveButton.setId("CrudSaveButton");
-		buttonLayout.setComponentAlignment(saveButton, Alignment.MIDDLE_RIGHT);
-		buttonLayout.setComponentAlignment(cancelButton, Alignment.MIDDLE_LEFT);
-		buttonLayout.setHeight("35");
-		rightLayout.addComponent(buttonLayout);
-	}
-
 	private void buildSearchBar()
 	{
 
@@ -698,19 +678,13 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 * 
 	 * @param disallow
 	 */
-	protected void disallowEdit(boolean disallow, boolean hideSaveCancelLayout)
+	protected void disallowEdit(boolean disallow)
 	{
+		Preconditions.checkArgument(buttonLayout==null,"You must call disallowEdit before init");
 		this.disallowEditing = disallow;
-		this.hideSaveCancelLayout = hideSaveCancelLayout;
-		showSaveCancel(!disallow);
-		if (this.hideSaveCancelLayout)
-		{
-			if (buttonLayout != null)
-			{
-				buttonLayout.setVisible(false);
-			}
-		}
 	}
+
+
 
 	/**
 	 * A child class can call this method to stop a user from being able to add
@@ -724,6 +698,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 */
 	protected void disallowNew(boolean disallow)
 	{
+		Preconditions.checkArgument(buttonLayout==null,"You must call disallowEdit before init");
+
 		this.disallowNew = disallow;
 		showNew(!disallow);
 	}
@@ -790,21 +766,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		newButton.setVisible(show);
 	}
 
-	/**
-	 * Internal method to show/hide the save and cancel buttons when a user
-	 * enters/exit editing. If disallowEditing has been called by a derived
-	 * class then the save/cancel buttons will never be displayed.
-	 * 
-	 * @param show
-	 */
-	private void showSaveCancel(boolean show)
-	{
-		if (disallowEditing)
-			show = false;
 
-		saveButton.setVisible(show);
-		cancelButton.setVisible(show);
-	}
 
 	/**
 	 * Hides the Action layout which contains the 'New' button and 'Action'
@@ -867,36 +829,10 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			}
 		});
 
-		cancelButton.addClickListener(new ClickEventLogged.ClickListener()
-		{
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void clicked(ClickEvent event)
-			{
-				cancelClicked();
-			}
-
-		});
-
-		saveButton.addClickListener(new ClickEventLogged.ClickListener()
-		{
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void clicked(ClickEvent event)
-			{
-				save();
-
-			}
-
-		});
-		saveButton.setStyleName(Reindeer.BUTTON_DEFAULT);
-		saveButton.setDisableOnClick(true);
-
+	
 	}
 
-	protected void cancelClicked()
+	public void cancelClicked()
 	{
 		fieldGroup.discard();
 		for (ChildCrudListener<E> child : childCrudListeners)
@@ -944,6 +880,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 		Notification.show("Changes discarded.", "Any changes you have made to this record been discarded.",
 				Type.TRAY_NOTIFICATION);
+		buttonLayout.setDefaultState();
 	}
 
 	/**
@@ -1095,6 +1032,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			splitPanel.showFirstComponet();
 			Notification.show("Changes Saved", "Any changes you have made have been saved.", Type.TRAY_NOTIFICATION);
 
+			// return save/edit buttons to default settings
+			buttonLayout.setDefaultState();
+
 		}
 
 		catch (Exception e)
@@ -1131,7 +1071,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 					container.removeItem(entityTable.getCurrent());
 				}
 			}
-			saveButton.setEnabled(true);
+			buttonLayout.setDefaultState();
+
 		}
 
 	}
@@ -1697,6 +1638,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 					selectFirstFieldAndShowTab();
 
 					postNew(newEntity);
+
+					buttonLayout.startNewPhase();
+
 				}
 				catch (Exception e)
 				{
@@ -1858,11 +1802,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		return new DeleteVetoResponseData(true);
 	}
 
-	protected Button getSaveButton()
-	{
-		return saveButton;
-	}
-
 	private void notifyRowChangedListeners(E entity)
 	{
 		for (RowChangedListener<E> listener : rowChangedListeners)
@@ -1880,5 +1819,11 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	public void removeRowChangedListener(RowChangedListener<E> listener)
 	{
 		rowChangedListeners.remove(listener);
+	}
+	
+	@Override
+	public void saveClicked()
+	{
+		save();
 	}
 }
