@@ -52,13 +52,13 @@ public class PipedOutputStreamWrapper extends OutputStream
 							+ " you should ensure the writer is ready by calling outputIsReady() or waitForOutputToBeReady() first.");
 			logger.error(e, e);
 		}
-		Preconditions.checkState(writerThreadId != Thread.currentThread().getId(),
-				"The consumer thread(getInputStream) must not be the producer thread(write)");
 
 		if (!writeLatch.await(10, TimeUnit.MINUTES))
 		{
 			throw new RuntimeException("Reader timeout, waiting for writer");
 		}
+		Preconditions.checkState(writerThreadId != Thread.currentThread().getId(),
+				"The consumer thread(getInputStream) must not be the producer thread(write)");
 		readLatch.countDown();
 		return inputStream;
 	}
@@ -69,8 +69,8 @@ public class PipedOutputStreamWrapper extends OutputStream
 		if (writeLatch.getCount() > 0)
 		{
 			writerThreadId = Thread.currentThread().getId();
-			writeLatch.countDown();
 			outputStream = new PipedOutputStream(inputStream);
+			writeLatch.countDown();
 			try
 			{
 				if (!readLatch.await(10, TimeUnit.MINUTES))
