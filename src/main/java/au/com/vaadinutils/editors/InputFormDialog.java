@@ -31,6 +31,7 @@ public class InputFormDialog extends Window
 			final InputFormDialogRecipient recipient)
 	{
 		setCaption(title);
+		
 		setModal(true);
 		this.setClosable(false);
 		this.setResizable(false);
@@ -97,6 +98,10 @@ public class InputFormDialog extends Window
 		parent.addWindow(this);
 
 		primaryFocusField.focus();
+		
+		setWidth("500");
+		setHeight("150");
+
 	}
 
 	public void okOnly()

@@ -17,7 +17,7 @@ public abstract class ProgressBarTask<T>
 
 	protected void taskComplete(final int sent)
 	{
-		ui.access(new Runnable()
+		ui.accessSynchronously(new Runnable()
 		{
 
 			@Override
@@ -32,7 +32,7 @@ public abstract class ProgressBarTask<T>
 
 	public void taskProgress(final int count, final int max, final T status)
 	{
-		ui.access(new Runnable()
+		ui.accessSynchronously(new Runnable()
 		{
 
 			@Override
@@ -47,7 +47,7 @@ public abstract class ProgressBarTask<T>
 
 	public void taskItemError(final T status)
 	{
-		ui.access(new Runnable()
+		ui.accessSynchronously(new Runnable()
 		{
 
 			@Override
@@ -63,7 +63,7 @@ public abstract class ProgressBarTask<T>
 
 	public void taskException(final Exception e)
 	{
-		ui.access(new Runnable()
+		ui.accessSynchronously(new Runnable()
 		{
 
 			@Override
