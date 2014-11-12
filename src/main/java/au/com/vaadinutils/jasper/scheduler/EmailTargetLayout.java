@@ -57,7 +57,7 @@ public class EmailTargetLayout extends VerticalLayout
 		line.row = row;
 
 		line.targetTypeCombo = new ComboBox(null, targetTypes);
-		line.targetTypeCombo.setWidth("60");
+		line.targetTypeCombo.setWidth("80");
 		line.targetTypeCombo.select(targetTypes.get(0));
 
 		line.targetAddress = new ComboBox(null);
