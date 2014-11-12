@@ -126,6 +126,7 @@ public class JasperReportEmailWindow extends Window
 		});
 
 		buttonLayout.addComponent(send);
+		buttonLayout.setHeight("40");
 
 		Button closer = new Button("Close");
 		closer.addClickListener(new ClickListener()
@@ -165,7 +166,7 @@ public class JasperReportEmailWindow extends Window
 		this.setHeight("80%");
 		layout.setMargin(true);
 		layout.setSpacing(true);
-
+		
 		setCaption("Email " + props.getReportTitle());
 
 		layout.setExpandRatio(message, 1);
