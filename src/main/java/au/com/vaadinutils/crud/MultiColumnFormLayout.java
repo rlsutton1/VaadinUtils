@@ -28,7 +28,7 @@ import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 
-public class MultiColumnFormLayout<E> extends GridLayout
+public class MultiColumnFormLayout<E extends CrudEntity> extends GridLayout
 {
 	private static  transient Logger logger   =  LogManager.getLogger(MultiColumnFormLayout.class);
 	private static final long serialVersionUID = 1L;

@@ -65,7 +65,7 @@ import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 
-public class FormHelper<E> implements Serializable
+public class FormHelper<E extends CrudEntity> implements Serializable
 {
     private static final long serialVersionUID = 1L;
     public static final String STANDARD_COMBO_WIDTH = "220";
@@ -550,8 +550,8 @@ public class FormHelper<E> implements Serializable
 
 	    }
 
-	    Preconditions.checkState(container.getContainerPropertyIds().contains(listField), listField
-		    + " is not valid, valid listFieldNames are " + container.getContainerPropertyIds().toString());
+//	    Preconditions.checkState(container.getContainerPropertyIds().contains(listField), listField
+//		    + " is not valid, valid listFieldNames are " + container.getContainerPropertyIds().toString());
 
 	    ContainerAdaptor<L> adaptor = ContainerAdaptorFactory.getAdaptor(container);
 	    if (adaptor.getSortableContainerPropertyIds().contains(listField))
@@ -585,6 +585,12 @@ public class FormHelper<E> implements Serializable
 	    }
 	    builderForm.addComponent(component);
 	    return component;
+	}
+
+	public EntityFieldBuilder<L> useLazyContainer(SingularAttribute<L, Long> idColumn)
+	{
+	    container = new JpaBaseDao<L, Long>(listClazz).createLazyQueryContainer(idColumn);
+	    return this;
 	}
 
 	public EntityFieldBuilder<L> setContainer(JPAContainer<L> container)
@@ -1180,6 +1186,12 @@ public class FormHelper<E> implements Serializable
     public <EN> ComboBox bindEnumField(String fieldLabel, SingularAttribute<E, EN> fieldName)
     {
 	return bindEnumField(fieldLabel, fieldName.getName(), fieldName.getBindableJavaType());
+
+    }
+
+    public <J extends CrudEntity> FormHelper<E>.EntityFieldBuilder<J > getEntityFieldBuilder(Class <J> j)
+    {
+	return new EntityFieldBuilder<J>();
 
     }
 

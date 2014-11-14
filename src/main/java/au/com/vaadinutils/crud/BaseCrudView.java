@@ -329,9 +329,15 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		return SecurityManagerFactoryProxy.getSecurityManager(this.getClass());
 	}
 
-	public void addGeneratedColumn(Object id, ColumnGenerator generator)
+	public void addGeneratedColumn(final Object id, ColumnGenerator generator)
 	{
-		entityTable.addGeneratedColumn(id, generator);
+	    Preconditions.checkState(entityTable!=null,"call BaseCrudView.init() first");
+	    Object idName = id;
+	    if (id instanceof SingularAttribute)
+	    {
+		idName = ((SingularAttribute<?, ?>)id).getName();
+	    }
+		entityTable.addGeneratedColumn(idName, generator);
 	}
 
 	protected EntityList<E> getTable(JPAContainer<E> container, HeadingPropertySet<E> headings)

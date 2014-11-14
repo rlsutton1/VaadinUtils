@@ -335,4 +335,10 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 	    
 	}
 
+	public void deselectAll()
+	{
+	   selectableTable.deselectAll();
+	    
+	}
+
 }
