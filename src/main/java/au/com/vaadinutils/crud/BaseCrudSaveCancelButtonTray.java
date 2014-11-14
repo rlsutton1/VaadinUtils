@@ -35,6 +35,7 @@ public class BaseCrudSaveCancelButtonTray extends HorizontalLayout
 		setSizeFull();
 		setWidth("100%");
 		addComponent(cancelButton);
+		
 		addComponent(saveButton);
 		saveButton.setId("CrudSaveButton");
 		setComponentAlignment(saveButton, Alignment.MIDDLE_RIGHT);
