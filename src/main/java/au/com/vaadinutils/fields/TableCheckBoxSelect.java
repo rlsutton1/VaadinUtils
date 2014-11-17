@@ -214,6 +214,11 @@ public class TableCheckBoxSelect extends Table
 
 	public Object getSelectedItems()
 	{
+	    	if (selectable == false)
+	    	{
+	    	    return super.getValue();
+	    	}
+	    
 		if (markedIds.isTrackingSelected())
 		{
 			return markedIds.getIds();

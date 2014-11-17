@@ -32,7 +32,6 @@ import au.com.vaadinutils.crud.splitFields.SplitPasswordField;
 import au.com.vaadinutils.crud.splitFields.SplitTextArea;
 import au.com.vaadinutils.crud.splitFields.SplitTextField;
 import au.com.vaadinutils.crud.splitFields.SplitTwinColSelect;
-import au.com.vaadinutils.dao.Dao;
 import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.dao.JpaBaseDao;
 import au.com.vaadinutils.domain.iColor;
@@ -110,6 +109,15 @@ public class FormHelper<E extends CrudEntity> implements Serializable
     }
 
     public <T extends CustomField<?>> T doBinding(String fieldLabel, SingularAttribute<?, ?> field, T customField)
+    {
+
+	doBinding(group, field.getName(), customField);
+	this.fieldList.add(customField);
+	form.addComponent(customField);
+	return customField;
+
+    }
+    public <T extends CustomField<?>> T doBinding(String fieldLabel, SetAttribute<?, ?> field, T customField)
     {
 
 	doBinding(group, field.getName(), customField);
@@ -873,8 +881,8 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 	private String listField;
 	private String field;
 	private AbstractLayout builderForm;
-	private String leftColumnCaption;
-	private String rightColumnCaption;
+	private String leftColumnCaption="Available";
+	private String rightColumnCaption="Selected";
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public SplitTwinColSelect build()
@@ -1020,6 +1028,12 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 	    Preconditions.checkState(this.listClazz == null,
 		    "If you set the field as a singularAttribute, the listClass is set automatically.");
 	    this.listClazz = listClazz;
+	    return this;
+	}
+
+	public TwinColSelectBuilder<L> useLazyContainer(SingularAttribute<L, Long> idColumn)
+	{
+	    container = new JpaBaseDao<L, Long>(listClazz).createLazyQueryContainer(idColumn);
 	    return this;
 	}
     }
@@ -1193,6 +1207,11 @@ public class FormHelper<E extends CrudEntity> implements Serializable
     {
 	return new EntityFieldBuilder<J>();
 
+    }
+    
+    public <J extends CrudEntity> FormHelper<E>.TwinColSelectBuilder<J > getTwinColSelectBuilder(Class <J> j)
+    {
+	return new TwinColSelectBuilder<J>();
     }
 
 }

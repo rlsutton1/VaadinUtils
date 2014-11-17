@@ -341,4 +341,9 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 	    
 	}
 
+	public Object getSelectedItems()
+	{
+	   return  selectableTable.getSelectedItems();
+	}
+
 }
