@@ -203,6 +203,7 @@ public class TableCheckBoxSelect extends Table
 	public void disableSelectable()
 	{
 		selectable = false;
+		super.setSelectable(true);
 		removeGeneratedColumn(TABLE_CHECK_BOX_SELECT);
 	}
 

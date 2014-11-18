@@ -386,11 +386,10 @@ public class FormHelper<E extends CrudEntity> implements Serializable
     }
 
     public <L extends CrudEntity, K> ComboBox bindEntityField(String fieldLabel, SingularAttribute<E, L> fieldName,
-	    SingularAttribute<L, K> listFieldName, boolean useLazyContainer, SingularAttribute<L, Long> idColumn)
+	    SingularAttribute<L, K> listFieldName, boolean useLazyContainer)
     {
 
-	EntityContainer<L> container = JpaBaseDao.getGenericDao(fieldName.getJavaType()).createLazyQueryContainer(
-		idColumn);
+	EntityContainer<L> container = JpaBaseDao.getGenericDao(fieldName.getJavaType()).createLazyQueryContainer();
 
 	return new EntityFieldBuilder<L>().setLabel(fieldLabel).setField(fieldName).setListFieldName(listFieldName)
 		.setContainer(container).build();
@@ -595,9 +594,9 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 	    return component;
 	}
 
-	public EntityFieldBuilder<L> useLazyContainer(SingularAttribute<L, Long> idColumn)
+	public EntityFieldBuilder<L> useLazyContainer()
 	{
-	    container = new JpaBaseDao<L, Long>(listClazz).createLazyQueryContainer(idColumn);
+	    container = new JpaBaseDao<L, Long>(listClazz).createLazyQueryContainer();
 	    return this;
 	}
 
@@ -1031,9 +1030,9 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 	    return this;
 	}
 
-	public TwinColSelectBuilder<L> useLazyContainer(SingularAttribute<L, Long> idColumn)
+	public TwinColSelectBuilder<L> useLazyContainer()
 	{
-	    container = new JpaBaseDao<L, Long>(listClazz).createLazyQueryContainer(idColumn);
+	    container = new JpaBaseDao<L, Long>(listClazz).createLazyQueryContainer();
 	    return this;
 	}
     }

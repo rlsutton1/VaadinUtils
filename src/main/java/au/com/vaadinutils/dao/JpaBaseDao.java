@@ -18,6 +18,8 @@ import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.Attribute;
+import javax.persistence.metamodel.EntityType;
+import javax.persistence.metamodel.Metamodel;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.vaadin.addons.lazyquerycontainer.EntityContainer;
@@ -421,23 +423,36 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
     }
 
-    public EntityContainer<E> createLazyQueryContainer(SingularAttribute<E, Long> idColumn)
+    public EntityContainer<E> createLazyQueryContainer()
     {
 	EntityManager em = EntityManagerProvider.getEntityManager();
 	boolean compositeItmes = true;
 
 	boolean detachedEntities = true;
-	String propertyId = idColumn.getName();
+	String propertyId = getIdField().getName();
 	boolean applicationManagedTransactions = true;
 	EntityContainer<E> entityContainer = new EntityContainer<E>(em, entityClass, propertyId, Integer.MAX_VALUE,
 		applicationManagedTransactions, detachedEntities, compositeItmes);
 
-	for (Attribute<? super E, ?> attrib : idColumn.getDeclaringType().getAttributes())
+	for (Attribute<? super E, ?> attrib : getIdField().getDeclaringType().getAttributes())
 	{
 	    entityContainer.addContainerProperty(attrib.getName(), attrib.getJavaType(), null, true, true);
 	}
-	
+
 	return entityContainer;
+
+    }
+
+    static public <T> SingularAttribute<T, Long> getIdField(Class<T> type)
+    {
+	Metamodel metaModel = EntityManagerProvider.getEntityManager().getMetamodel();
+	EntityType<T> entityType = metaModel.entity(type);
+	return entityType.getDeclaredId(Long.class);
+    }
+
+    public SingularAttribute<E, Long> getIdField()
+    {
+	return getIdField(entityClass);
 
     }
 

@@ -1,12 +1,13 @@
 package au.com.vaadinutils.ui;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.metamodel.EntityType;
+import javax.persistence.metamodel.Metamodel;
 import javax.persistence.metamodel.SetAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 
@@ -15,9 +16,9 @@ import org.apache.logging.log4j.Logger;
 
 import au.com.vaadinutils.crud.ChildCrudEntity;
 import au.com.vaadinutils.crud.CrudEntity;
-import au.com.vaadinutils.crud.EntityTable;
 import au.com.vaadinutils.crud.HeadingPropertySet;
 import au.com.vaadinutils.crud.SearchableSelectableEntityTable;
+import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.dao.JpaBaseDao;
 
 import com.vaadin.addon.jpacontainer.JPAContainer;
@@ -50,6 +51,10 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
     private BeanContainer<Long, C> beans;
     private JPAContainer<C> availableContainer;
     private SearchableSelectableEntityTable<C> available;
+    private String fieldName;
+    private SingularAttribute<C, Long> beanIdField;
+    private Button addButton;
+    private Button removeButton;
 
     /**
      * Unfortunately TwinColumnSelect wont work with large sets, it isn't
@@ -58,10 +63,15 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
      * Hopefully I'll address all of these issues here.
      */
 
-    public TwinColumnSearchableSelect(SetAttribute<P, C> relation, SingularAttribute<C, ?> listField)
+    public TwinColumnSearchableSelect(String fieldName, SetAttribute<P, C> relation, SingularAttribute<C, ?> listField)
     {
+
 	this.relation = relation;
 	this.listField = listField;
+	this.fieldName = fieldName;
+	Metamodel metaModel = EntityManagerProvider.getEntityManager().getMetamodel();
+	EntityType<C> type = metaModel.entity(listField.getDeclaringType().getJavaType());
+	beanIdField = type.getDeclaredId(Long.class);
     }
 
     @Override
@@ -69,11 +79,10 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
     {
 	HorizontalLayout mainLayout = new HorizontalLayout();
 	mainLayout.setSizeFull();
-	mainLayout.setSpacing(true);
 	selectedCols = new Table();
 	selectedCols.setContainerDataSource(createBeanContainer());
 	selectedCols.setVisibleColumns(listField.getName());
-	selectedCols.setColumnHeaders("Selected");
+	selectedCols.setColumnHeaders(fieldName);
 	selectedCols.setSizeFull();
 	selectedCols.setHeight("200");
 	selectedCols.setSelectable(true);
@@ -84,8 +93,9 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
 
 	mainLayout.addComponent(buildButtons());
 
-	
 	mainLayout.addComponent(available);
+	mainLayout.setExpandRatio(available, 1);
+	mainLayout.setExpandRatio(selectedCols, 1);
 
 	return mainLayout;
     }
@@ -93,9 +103,15 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
     private void createAvailableTable()
     {
 	availableContainer = JpaBaseDao.getGenericDao(relation.getElementType().getJavaType()).createVaadinContainer();
+	availableContainer.sort(new Object[] { listField.getName() }, new boolean[] { true });
 
-	 available = new SearchableSelectableEntityTable<C>()
+	available = new SearchableSelectableEntityTable<C>()
 	{
+
+	    /**
+	     * 
+	     */
+	    private static final long serialVersionUID = 1L;
 
 	    @Override
 	    public HeadingPropertySet<C> getHeadingPropertySet()
@@ -119,6 +135,7 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
 		}
 		return filter;
 	    }
+
 	    @Override
 	    protected String getTitle()
 	    {
@@ -126,7 +143,6 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
 	    }
 	};
 	available.disableSelectable();
-	// should be a searchableEntityTable
 
 	available.setSizeFull();
 	available.setHeight("200");
@@ -138,9 +154,11 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
 	layout.setSizeFull();
 	layout.setWidth("50");
 	layout.setHeight("100");
-	Button remove = new Button(">>");
-	remove.addClickListener(new ClickListener()
+	removeButton = new Button(">>");
+	removeButton.addClickListener(new ClickListener()
 	{
+
+	    private static final long serialVersionUID = 1L;
 
 	    @Override
 	    public void buttonClick(ClickEvent event)
@@ -148,9 +166,7 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
 		try
 		{
 		    Long id = (Long) selectedCols.getValue();
-		    System.out.println(id);
 		    beans.removeItem(id);
-		    System.out.println(beans.getItemIds());
 		}
 		catch (Exception e)
 		{
@@ -159,10 +175,15 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
 
 	    }
 	});
-	remove.setHeight("50");
-	Button add = new Button("<<");
-	add.addClickListener(new ClickListener()
+	removeButton.setHeight("50");
+	addButton = new Button("<<");
+	addButton.addClickListener(new ClickListener()
 	{
+
+	    /**
+	     * 
+	     */
+	    private static final long serialVersionUID = 1L;
 
 	    @SuppressWarnings("unchecked")
 	    @Override
@@ -184,8 +205,8 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
 
 	    }
 	});
-	layout.addComponent(remove);
-	layout.addComponent(add);
+	layout.addComponent(removeButton);
+	layout.addComponent(addButton);
 
 	return layout;
 
@@ -194,10 +215,7 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
     private BeanContainer<Long, C> createBeanContainer()
     {
 	beans = new BeanContainer<Long, C>(listField.getDeclaringType().getJavaType());
-
-	// Use the name property as the item ID of the bean
-	// listField.getDeclaringType().
-	beans.setBeanIdProperty("customerID");
+	beans.setBeanIdProperty(beanIdField.getName());
 	return beans;
 
     }
@@ -208,10 +226,14 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
     {
 	super.commit();
 	Collection<C> tmp = (Collection<C>) getConvertedValue();
+	
+	// avoid possible npe
 	if (sourceValue == null)
 	{
 	    sourceValue = tmp;
 	}
+	
+	// add missing
 	for (C c : tmp)
 	{
 	    if (!sourceValue.contains(c))
@@ -219,6 +241,8 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
 		sourceValue.add(c);
 	    }
 	}
+	
+	// remove unneeded
 	Set<C> toRemove = new HashSet<>();
 	for (C c : sourceValue)
 	{
@@ -249,6 +273,11 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
     {
 	selectedCols.setReadOnly(b);
 	super.setReadOnly(b);
+
+	// hide the add/remove and available list
+	addButton.setVisible(!b);
+	removeButton.setVisible(!b);
+	available.setVisible(!b);
     }
 
     @SuppressWarnings("unchecked")
@@ -257,11 +286,8 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
     {
 	super.setInternalValue(newValue);
 
-	// render text field
-	selectedCols.setReadOnly(false);
 	beans.removeAllItems();
 	beans.addAll(newValue);
-	selectedCols.setReadOnly(super.isReadOnly());
 
 	sourceValue = (Collection<C>) getConvertedValue();
     }

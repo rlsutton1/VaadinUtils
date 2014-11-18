@@ -335,7 +335,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	}
 	entityTable.addGeneratedColumn(idName, generator);
     }
-
+    
     protected EntityList<E> getTable(JPAContainer<E> container, HeadingPropertySet<E> headings)
     {
 	return new EntityTable<E>(container, headings);
