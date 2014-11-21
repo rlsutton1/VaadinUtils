@@ -68,7 +68,6 @@ public class EntityTable<E> extends Table implements EntityList<E>
 			
 			if (column.isHidden())
 			{
-				System.out.println("Collapsed");
 				setColumnCollapsingAllowed(true);
 				setColumnCollapsed(column.getPropertyId(), true);
 				

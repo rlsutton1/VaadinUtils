@@ -45,12 +45,9 @@ public class PipedOutputStreamWrapper extends OutputStream
 	 */
 	public InputStream getInputStream() throws InterruptedException
 	{
-		if (!isOutputReady())
+		if (!writeLatch.await(10, TimeUnit.SECONDS))
 		{
-			Exception e = new Exception(
-					"Request for InputStream before the writer is ready, "
-							+ " you should ensure the writer is ready by calling outputIsReady() or waitForOutputToBeReady() first.");
-			logger.error(e, e);
+			logger.warn("The writer thread seems to be taking a long time to start, will wait a further 10 minutes.");
 		}
 
 		if (!writeLatch.await(10, TimeUnit.MINUTES))
@@ -63,11 +60,14 @@ public class PipedOutputStreamWrapper extends OutputStream
 		return inputStream;
 	}
 
+	volatile boolean writerStarted = false;
+
 	@Override
 	public void write(int b) throws IOException
 	{
-		if (writeLatch.getCount() > 0)
+		if (!writerStarted)
 		{
+			writerStarted = true;
 			writerThreadId = Thread.currentThread().getId();
 			outputStream = new PipedOutputStream(inputStream);
 			writeLatch.countDown();
@@ -88,11 +88,6 @@ public class PipedOutputStreamWrapper extends OutputStream
 
 		outputStream.write(b);
 
-	}
-
-	public boolean isOutputReady()
-	{
-		return writeLatch.getCount() == 0;
 	}
 
 	public void close() throws IOException
