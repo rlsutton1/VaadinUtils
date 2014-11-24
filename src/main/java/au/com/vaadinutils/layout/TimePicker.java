@@ -136,19 +136,24 @@ public class TimePicker extends HorizontalLayout implements Field
 	private void showPopupTimePicker()
 	{
 
-		String value = field.getValue();
+		Date value = parseDate(field.getValue());
 		try
 		{
-			String[] parts = value.split(":");
-			hour = parts[0];
-			String[] np = parts[1].split(" ");
-			minute = np[0];
-			amPm = np[1];
-			if (!amPm.equals("AM") && !amPm.equals("PM"))
+			int hourNumber = value.getHours()%12;
+			if (hourNumber ==0)
 			{
-				throw new Exception();
+				hourNumber = 12;
 			}
-			displayTime.setValue(value);
+			hour = ""+hourNumber;
+
+			minute = ""+value.getMinutes();
+			amPm = "AM";
+			if (value.getHours()>= 12)
+			{
+				amPm = "PM";
+			}
+			
+			displayTime.setValue(field.getValue());
 		}
 		catch (Exception e)
 		{
