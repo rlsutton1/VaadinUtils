@@ -1,9 +1,5 @@
 package au.com.vaadinutils.crud;
 
-import javax.persistence.Column;
-import javax.validation.constraints.NotNull;
-
-import au.com.vaadinutils.dao.JpaEntityHelper;
 
 public interface ChildCrudEntity extends CrudEntity
 {

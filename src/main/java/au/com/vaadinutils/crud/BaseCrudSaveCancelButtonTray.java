@@ -6,8 +6,8 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
-import com.vaadin.ui.themes.Reindeer;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.themes.Reindeer;
 
 public class BaseCrudSaveCancelButtonTray extends HorizontalLayout
 {

@@ -29,10 +29,7 @@ import javax.persistence.OneToMany;
 import au.com.vaadinutils.crud.CrudEntity;
 
 import com.google.common.base.Preconditions;
-import com.vaadin.addon.jpacontainer.EntityContainer;
-import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.EntityItemProperty;
-import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.metadata.EntityClassMetadata;
 import com.vaadin.addon.jpacontainer.metadata.MetadataFactory;
 import com.vaadin.addon.jpacontainer.metadata.PropertyMetadata;

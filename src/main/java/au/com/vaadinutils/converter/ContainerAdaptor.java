@@ -4,11 +4,9 @@ import java.util.Collection;
 
 import au.com.vaadinutils.crud.CrudEntity;
 
-import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
-import com.vaadin.data.util.filter.Compare.Equal;
 
 public interface ContainerAdaptor<T extends CrudEntity>
 {

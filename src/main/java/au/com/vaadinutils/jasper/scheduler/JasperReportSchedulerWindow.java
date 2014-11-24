@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 
 import au.com.vaadinutils.help.HelpSplitPanel;

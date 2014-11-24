@@ -6,8 +6,8 @@ import org.vaadin.dialogs.ConfirmDialog;
 
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.UI;
 import com.vaadin.ui.Notification.Type;
+import com.vaadin.ui.UI;
 
 public class CrudActionDelete<E extends CrudEntity> implements CrudAction<E>
 {
