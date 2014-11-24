@@ -114,7 +114,11 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 	@Override
 	public void committed(P newParentId) throws Exception
 	{
-		Long selectedIdBeforeSave = getCurrent().getId();
+		Long selectedIdBeforeSave = null;
+		if (getCurrent() != null)
+		{
+			selectedIdBeforeSave = getCurrent().getId();
+		}
 		String currentGuid = getCurrent().getGuid();
 		saveEditsToTemp();
 		for (Object id : container.getItemIds())
@@ -631,7 +635,8 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 			if (item == null)
 			{
 				notifyParentRowChangeListeners(null);
-			}else
+			}
+			else
 			{
 				notifyParentRowChangeListeners(item.getEntity());
 			}
