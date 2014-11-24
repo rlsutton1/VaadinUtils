@@ -160,6 +160,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		fieldGroup = new ValidatingFieldGroup<E>(container, entityClass);
 		fieldGroup.setBuffered(true);
 
+	
 		// disable this, as the disabling of the save/cancel button is buggy
 		// fieldGroup.setDirtyListener(this);
 
@@ -167,6 +168,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		entityTable.setRowChangeListener(this);
 		entityTable.setSortEnabled(true);
 		entityTable.setColumnCollapsingAllowed(true);
+		
+		resetFilters();
+		
 
 		initLayout();
 
