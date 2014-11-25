@@ -54,4 +54,10 @@ public @interface Menu
 	 * @return
 	 */
 	boolean atTop() default false;
+	
+	/** 
+	 * allows URL_NEW_WINDOW to specify a dynamic size for the new window
+	 * @return
+	 */
+	Class<? extends WindowSizer> windowSizer() default WindowSizerNull.class;
 }
