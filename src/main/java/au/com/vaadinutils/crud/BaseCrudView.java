@@ -22,7 +22,9 @@ import org.eclipse.persistence.exceptions.DatabaseException;
 import org.eclipse.persistence.exceptions.DescriptorException;
 import org.vaadin.dialogs.ConfirmDialog;
 
+import au.com.vaadinutils.audit.AuditFactory;
 import au.com.vaadinutils.crud.events.CrudEventDistributer;
+import au.com.vaadinutils.crud.events.CrudEventListener;
 import au.com.vaadinutils.crud.events.CrudEventType;
 import au.com.vaadinutils.crud.security.SecurityManagerFactoryProxy;
 import au.com.vaadinutils.dao.EntityManagerProvider;
@@ -131,7 +133,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 	protected BaseCrudView()
 	{
-
+		
 	}
 
 	BaseCrudView(CrudDisplayMode mode)
@@ -141,7 +143,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 	protected void init(Class<E> entityClass, JPAContainer<E> container, HeadingPropertySet<E> headings)
 	{
-
+		createAuditor();
 		this.entityClass = entityClass;
 		this.container = container;
 		try
@@ -160,7 +162,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		fieldGroup = new ValidatingFieldGroup<E>(container, entityClass);
 		fieldGroup.setBuffered(true);
 
-	
 		// disable this, as the disabling of the save/cancel button is buggy
 		// fieldGroup.setDirtyListener(this);
 
@@ -168,15 +169,14 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		entityTable.setRowChangeListener(this);
 		entityTable.setSortEnabled(true);
 		entityTable.setColumnCollapsingAllowed(true);
-		
+
 		resetFilters();
-		
 
 		initLayout();
 
 		try
 		{
-			entityTable.init();
+			entityTable.init(this.getClass().getSimpleName());
 		}
 		catch (Exception e)
 		{
@@ -219,6 +219,19 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		rightLayout.addComponent(buttonLayout);
 		resetFilters();
 
+	}
+
+	@SuppressWarnings("unchecked")
+	private void createAuditor()
+	{
+		CrudEventDistributer.addListener((Class<? extends BaseCrudView<?>>) this.getClass(), new CrudEventListener(){
+
+			@Override
+			public void crudEvent(CrudEventType event, CrudEntity entity)
+			{
+				AuditFactory.getAuditor().audit(event,entity);
+				
+			}});
 	}
 
 	/**

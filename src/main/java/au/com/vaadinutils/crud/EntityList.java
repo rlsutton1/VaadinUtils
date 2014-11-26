@@ -17,7 +17,7 @@ public interface EntityList<E> extends Component
 
 	public Object firstItemId();
 
-	public void init();
+	public void init(String uniqueTableId);
 
 	public void select(Object firstItemId);
 

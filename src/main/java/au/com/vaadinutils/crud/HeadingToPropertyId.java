@@ -48,6 +48,12 @@ public class HeadingToPropertyId<E>
 		this.columnGenerator = columnGenerator2;
 	}
 	
+	public HeadingToPropertyId<E> setHidden()
+	{
+		hidden = true;
+		return this;
+	}
+	
 	public HeadingToPropertyId<E> setWidth(Integer width)
 	{
 		this.width = width;

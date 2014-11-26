@@ -10,6 +10,10 @@ import javax.validation.ConstraintViolationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import au.com.vaadinutils.audit.AuditFactory;
+import au.com.vaadinutils.crud.events.CrudEventDistributer;
+import au.com.vaadinutils.crud.events.CrudEventListener;
+import au.com.vaadinutils.crud.events.CrudEventType;
 import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.dao.JpaBaseDao;
 
@@ -101,8 +105,24 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 
 		// child cruds dont have save/cancel buttons
 		rightLayout.removeComponent(buttonLayout);
+		
+		createAuditor();
 
 	}
+	
+	@SuppressWarnings("unchecked")
+	private void createAuditor()
+	{
+		CrudEventDistributer.addListener((Class<? extends BaseCrudView<?>>) this.getClass(), new CrudEventListener(){
+
+			@Override
+			public void crudEvent(CrudEventType event, CrudEntity entity)
+			{
+				AuditFactory.getAuditor().audit(event,entity);
+				
+			}});
+	}
+
 
 	/**
 	 * this method is invoked when the parent saves, signalling the children
@@ -115,11 +135,12 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 	public void committed(P newParentId) throws Exception
 	{
 		Long selectedIdBeforeSave = null;
+		String currentGuid = null;
 		if (getCurrent() != null)
 		{
 			selectedIdBeforeSave = getCurrent().getId();
+			currentGuid = getCurrent().getGuid();
 		}
-		String currentGuid = getCurrent().getGuid();
 		saveEditsToTemp();
 		for (Object id : container.getItemIds())
 		{
@@ -167,7 +188,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 		}
 		else
 		{
-			if (getGuidAttribute() != null)
+			if (getGuidAttribute() != null && currentGuid!=null)
 			{
 				E entity = JpaBaseDao.getGenericDao(childType).findOneByAttribute(getGuidAttribute(), currentGuid);
 				entityTable.select(entity.getId());

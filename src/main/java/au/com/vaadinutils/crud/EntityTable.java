@@ -1,7 +1,5 @@
 package au.com.vaadinutils.crud;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -9,7 +7,6 @@ import java.util.UUID;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.google.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.data.Property;
@@ -23,14 +20,14 @@ public class EntityTable<E> extends Table implements EntityList<E>
 	private static final long serialVersionUID = 1L;
 	private JPAContainer<E> entityContainer;
 	private RowChangeListener<E> rowChangeListener;
-	private HeadingPropertySet<E> visibleColumns;
+	private HeadingPropertySet<E> columnConfiguration;
 
 	transient Logger logger = LogManager.getLogger(EntityTable.class);
 
 	public EntityTable(JPAContainer<E> entityContainer, HeadingPropertySet<E> headingPropertySet)
 	{
 		this.entityContainer = entityContainer;
-		this.visibleColumns = headingPropertySet;
+		this.columnConfiguration = headingPropertySet;
 		addStyleName(ValoTheme.TABLE_COMPACT);
 
 	}
@@ -40,42 +37,18 @@ public class EntityTable<E> extends Table implements EntityList<E>
 		this.rowChangeListener = rowChangeListener;
 	}
 
-	public void init()
+	/**
+	 * 
+	 * @param uniqueTableId
+	 *            -an id for this layout/table combination, it is used to
+	 *            identify stored column settings in a key value map
+	 */
+	public void init(String uniqueTableId)
 	{
 
 		this.setContainerDataSource(entityContainer);
 
-		List<String> colsToShow = new LinkedList<String>();
-		for (HeadingToPropertyId<E> column : visibleColumns.getColumns())
-		{
-			colsToShow.add(column.getPropertyId());
-			if (column.isGenerated())
-			{
-				addGeneratedColumn(column.getPropertyId(), column.getColumnGenerator());
-			}
-			else
-			{
-
-				Preconditions.checkArgument(this.getContainerPropertyIds().contains(column.getPropertyId()),
-						column.getPropertyId() + " is not a valid property id, valid property ids are "
-								+ this.getContainerPropertyIds().toString());
-			}
-			this.setColumnHeader(column.getPropertyId(), column.getHeader());
-			if (column.getWidth() != null)
-			{
-				setColumnWidth(column.getPropertyId(), column.getWidth());
-			}
-			
-			if (column.isHidden())
-			{
-				setColumnCollapsingAllowed(true);
-				setColumnCollapsed(column.getPropertyId(), true);
-				
-			}
-
-		}
-
-		this.setVisibleColumns(colsToShow.toArray());
+		columnConfiguration.applyToTable(this, uniqueTableId);
 
 		this.setSelectable(true);
 		this.setImmediate(true);
