@@ -389,7 +389,7 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 				HorizontalLayout dateLayout = new HorizontalLayout();
 				dateLayout.setSizeFull();
 				dateLayout.setSpacing(true);
-				dateLayout.setHeight("40");
+				dateLayout.setHeight("55");
 
 				final ComboBox offsetType = new ComboBox(dateParam.getLabel(), offsetTypes);
 				offsetType.setImmediate(true);
