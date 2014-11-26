@@ -260,7 +260,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 				if (isDirty())
 				{
-					Notification.show("You must save first");
+					Notification.show("You must save first", Type.WARNING_MESSAGE);
 					return;
 				}
 				Object draggedItemId = event.getTransferable().getData("itemId");
