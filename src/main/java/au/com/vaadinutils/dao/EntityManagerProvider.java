@@ -136,6 +136,10 @@ public enum EntityManagerProvider
 		EntityManager entityManager = INSTANCE.emf.createEntityManager();
 
 		return entityManager;
+		
+		// you might want to use this if your having deadlocks...
+		// don't ever use JPAFactory to build your JPAContainers
+		//return new EntityManagerWrapper(entityManager);
 	}
 
 	/**

@@ -49,10 +49,10 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 	protected SelectableEntityTable<E> selectableTable;
 	protected Container.Filterable container;
 
-	public SearchableSelectableEntityTable()
+	public SearchableSelectableEntityTable(String uniqueId)
 	{
 		container = getContainer();
-		selectableTable = new SelectableEntityTable<E>(container, getHeadingPropertySet());
+		selectableTable = new SelectableEntityTable<E>(container, getHeadingPropertySet(),uniqueId);
 		selectableTable.setSizeFull();
 
 		if (!getSecurityManager().canUserView())

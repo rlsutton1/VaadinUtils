@@ -2,21 +2,25 @@ package au.com.vaadinutils.audit;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-public class AuditFactory
+public enum AuditFactory
 {
-	// Logger logger = LogManager.getLogger();
-	static final AtomicReference<Auditor> auditor = new AtomicReference<Auditor>();
-	{
-		auditor.set(new AuditorLoggingImpl());
-	}
+    SELF(new AuditorLoggingImpl());
 
-	public static Auditor getAuditor()
-	{
-		return auditor.get();
-	}
+    AuditFactory(Auditor auditor)
+    {
+	this.auditor.set(auditor);
+    }
 
-	public static void setAuditor(Auditor auditor)
-	{
-		AuditFactory.auditor.set(auditor);
-	}
+    // Logger logger = LogManager.getLogger();
+    AtomicReference<Auditor> auditor = new AtomicReference<Auditor>();
+
+    public static Auditor getAuditor()
+    {
+	return AuditFactory.SELF.auditor.get();
+    }
+
+    public static void setAuditor(Auditor auditor)
+    {
+	AuditFactory.SELF.auditor.set(auditor);
+    }
 }

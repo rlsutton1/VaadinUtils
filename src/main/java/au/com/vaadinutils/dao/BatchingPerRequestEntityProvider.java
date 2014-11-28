@@ -41,7 +41,7 @@ public class BatchingPerRequestEntityProvider<T> extends CachingMutableLocalEnti
 
 	private static final long serialVersionUID = 9174163487778140520L;
 
-	EntityManager em = EntityManagerProvider.getEntityManager();
+//	EntityManager em = EntityManagerProvider.getEntityManager();
 	/**
 	 * Creates a new <code>CachingBatchableLocalEntityProvider</code>. The
 	 * entity manager must be set using

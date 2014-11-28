@@ -27,6 +27,8 @@ import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Container.Filterable;
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.util.BeanContainer;
+import com.vaadin.data.util.filter.And;
+import com.vaadin.data.util.filter.Compare.Equal;
 import com.vaadin.data.util.filter.SimpleStringFilter;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -35,6 +37,7 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomField;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Table;
+import com.vaadin.ui.Table.ColumnGenerator;
 import com.vaadin.ui.VerticalLayout;
 
 public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCrudEntity> extends
@@ -55,6 +58,7 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
     private SingularAttribute<C, Long> beanIdField;
     private Button addButton;
     private Button removeButton;
+    private Filter baselineFilter;
 
     /**
      * Unfortunately TwinColumnSelect wont work with large sets, it isn't
@@ -72,6 +76,9 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
 	Metamodel metaModel = EntityManagerProvider.getEntityManager().getMetamodel();
 	EntityType<C> type = metaModel.entity(listField.getDeclaringType().getJavaType());
 	beanIdField = type.getDeclaredId(Long.class);
+	availableContainer = JpaBaseDao.getGenericDao(relation.getElementType().getJavaType()).createVaadinContainer();
+	availableContainer.sort(new Object[] { listField.getName() }, new boolean[] { true });
+
     }
 
     @Override
@@ -99,13 +106,16 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
 
 	return mainLayout;
     }
+    
+    public void setSelectedColumnGenerator(ColumnGenerator generatedColumn)
+    {
+	selectedCols.addGeneratedColumn(listField.getName(), generatedColumn);
+    }
 
     private void createAvailableTable()
     {
-	availableContainer = JpaBaseDao.getGenericDao(relation.getElementType().getJavaType()).createVaadinContainer();
-	availableContainer.sort(new Object[] { listField.getName() }, new boolean[] { true });
 
-	available = new SearchableSelectableEntityTable<C>()
+	available = new SearchableSelectableEntityTable<C>(this.getClass().getSimpleName())
 	{
 
 	    /**
@@ -132,6 +142,17 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
 		if (filterString != null && filterString.length() > 0)
 		{
 		    filter = new SimpleStringFilter(listField.getName(), filterString, true, false);
+		}
+		if (baselineFilter != null)
+		{
+		    if (filter != null)
+		    {
+			filter = new And(baselineFilter, filter);
+		    }
+		    else
+		    {
+			filter = baselineFilter;
+		    }
 		}
 		return filter;
 	    }
@@ -226,13 +247,13 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
     {
 	super.commit();
 	Collection<C> tmp = (Collection<C>) getConvertedValue();
-	
+
 	// avoid possible npe
 	if (sourceValue == null)
 	{
 	    sourceValue = tmp;
 	}
-	
+
 	// add missing
 	for (C c : tmp)
 	{
@@ -241,7 +262,7 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
 		sourceValue.add(c);
 	    }
 	}
-	
+
 	// remove unneeded
 	Set<C> toRemove = new HashSet<>();
 	for (C c : sourceValue)
@@ -312,6 +333,13 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
     public Class<? extends Collection<C>> getType()
     {
 	return (Class<? extends Collection<C>>) Collection.class;
+    }
+
+    public void setFilter(Filter filter)
+    {
+	baselineFilter = filter;
+	availableContainer.addContainerFilter(filter);
+
     }
 
 }
