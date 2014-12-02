@@ -65,18 +65,27 @@ public class EntityTable<E> extends Table implements EntityList<E>
 	    @Override
 	    public void valueChange(com.vaadin.data.Property.ValueChangeEvent event)
 	    {
-		if (EntityTable.this.rowChangeListener != null)
+		try
 		{
-		    Object entityId = EntityTable.this.getValue();
-
-		    if (entityId != null) // it can be null when a row is being
-					  // deleted.
+		    if (EntityTable.this.rowChangeListener != null)
 		    {
-			EntityItem<E> entity = EntityTable.this.entityContainer.getItem(entityId); // .getEntity();
-			EntityTable.this.rowChangeListener.rowChanged(entity);
+			Object entityId = EntityTable.this.getValue();
+
+			if (entityId != null) // it can be null when a row is
+					      // being
+					      // deleted.
+			{
+			    EntityItem<E> entity = EntityTable.this.entityContainer.getItem(entityId); // .getEntity();
+			    EntityTable.this.rowChangeListener.rowChanged(entity);
+			}
+			else
+			    EntityTable.this.rowChangeListener.rowChanged(null);
 		    }
-		    else
-			EntityTable.this.rowChangeListener.rowChanged(null);
+		}
+		catch (Exception e)
+		{
+		    logger.error("{} {}",this.getClass().getCanonicalName(),e.getMessage());
+		    throw e;
 		}
 	    }
 	});
