@@ -1,5 +1,6 @@
 package au.com.vaadinutils.ui;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -69,6 +70,7 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
 
     public TwinColumnSearchableSelect(String fieldName, SetAttribute<P, C> relation, SingularAttribute<C, ?> listField)
     {
+	mainLayout = new HorizontalLayout();
 
 	this.relation = relation;
 	this.listField = listField;
@@ -80,6 +82,12 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
 
 	selectedCols = new Table();
 	selectedCols.setContainerDataSource(createBeanContainer());
+	if (!selectedCols.getContainerPropertyIds().contains(listField.getName()))
+	{
+	    logger.error("you need to define a getter for the field {} in {}, valid fields are {}",
+		    listField.getName(), listField.getDeclaringType().getJavaType(),
+		    Arrays.toString(selectedCols.getContainerPropertyIds().toArray()));
+	}
 	selectedCols.setVisibleColumns(listField.getName());
 	selectedCols.setColumnHeaders(fieldName);
 	selectedCols.setSizeFull();
@@ -89,24 +97,20 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
     }
 
     @Override
-    public
-    void setHeight(String height)
+    public void setHeight(String height)
     {
 	super.setHeight(height);
 	selectedCols.setHeight(height);
 	available.setHeight(height);
 	mainLayout.setHeight(height);
     }
-    
+
     @Override
     protected Component initContent()
     {
-	 mainLayout = new HorizontalLayout();
 	mainLayout.setSizeFull();
 
 	mainLayout.addComponent(selectedCols);
-
-	
 
 	mainLayout.addComponent(buildButtons());
 
@@ -116,7 +120,7 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
 
 	return mainLayout;
     }
-    
+
     public void setSelectedColumnGenerator(ColumnGenerator generatedColumn)
     {
 	selectedCols.addGeneratedColumn(listField.getName(), generatedColumn);
@@ -185,7 +189,7 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
 	layout.setSizeFull();
 	layout.setWidth("50");
 	layout.setHeight("50");
-	
+
 	removeButton.addClickListener(new ClickListener()
 	{
 
@@ -207,7 +211,7 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
 	    }
 	});
 	removeButton.setHeight("50");
-	
+
 	addButton.addClickListener(new ClickListener()
 	{
 
@@ -355,7 +359,7 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
     public void setFilterDelegate(DefaultQueryModifierDelegate defaultQueryModifierDelegate)
     {
 	availableContainer.setQueryModifierDelegate(defaultQueryModifierDelegate);
-	
+
     }
 
 }
