@@ -22,13 +22,13 @@ import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.dao.JpaBaseDao;
 
 import com.vaadin.addon.jpacontainer.JPAContainer;
+import com.vaadin.addon.jpacontainer.util.DefaultQueryModifierDelegate;
 import com.vaadin.data.Buffered;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Container.Filterable;
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.util.BeanContainer;
 import com.vaadin.data.util.filter.And;
-import com.vaadin.data.util.filter.Compare.Equal;
 import com.vaadin.data.util.filter.SimpleStringFilter;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -54,11 +54,11 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
     private BeanContainer<Long, C> beans;
     private JPAContainer<C> availableContainer;
     private SearchableSelectableEntityTable<C> available;
-    private String fieldName;
     private SingularAttribute<C, Long> beanIdField;
-    private Button addButton;
-    private Button removeButton;
+    private Button addButton = new Button("<<");
+    private Button removeButton = new Button(">>");
     private Filter baselineFilter;
+    private HorizontalLayout mainLayout;
 
     /**
      * Unfortunately TwinColumnSelect wont work with large sets, it isn't
@@ -72,20 +72,12 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
 
 	this.relation = relation;
 	this.listField = listField;
-	this.fieldName = fieldName;
 	Metamodel metaModel = EntityManagerProvider.getEntityManager().getMetamodel();
 	EntityType<C> type = metaModel.entity(listField.getDeclaringType().getJavaType());
 	beanIdField = type.getDeclaredId(Long.class);
 	availableContainer = JpaBaseDao.getGenericDao(relation.getElementType().getJavaType()).createVaadinContainer();
 	availableContainer.sort(new Object[] { listField.getName() }, new boolean[] { true });
 
-    }
-
-    @Override
-    protected Component initContent()
-    {
-	HorizontalLayout mainLayout = new HorizontalLayout();
-	mainLayout.setSizeFull();
 	selectedCols = new Table();
 	selectedCols.setContainerDataSource(createBeanContainer());
 	selectedCols.setVisibleColumns(listField.getName());
@@ -93,10 +85,28 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
 	selectedCols.setSizeFull();
 	selectedCols.setHeight("200");
 	selectedCols.setSelectable(true);
+	createAvailableTable();
+    }
+
+    @Override
+    public
+    void setHeight(String height)
+    {
+	super.setHeight(height);
+	selectedCols.setHeight(height);
+	available.setHeight(height);
+	mainLayout.setHeight(height);
+    }
+    
+    @Override
+    protected Component initContent()
+    {
+	 mainLayout = new HorizontalLayout();
+	mainLayout.setSizeFull();
 
 	mainLayout.addComponent(selectedCols);
 
-	createAvailableTable();
+	
 
 	mainLayout.addComponent(buildButtons());
 
@@ -174,8 +184,8 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
 	VerticalLayout layout = new VerticalLayout();
 	layout.setSizeFull();
 	layout.setWidth("50");
-	layout.setHeight("100");
-	removeButton = new Button(">>");
+	layout.setHeight("50");
+	
 	removeButton.addClickListener(new ClickListener()
 	{
 
@@ -197,7 +207,7 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
 	    }
 	});
 	removeButton.setHeight("50");
-	addButton = new Button("<<");
+	
 	addButton.addClickListener(new ClickListener()
 	{
 
@@ -340,6 +350,12 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
 	baselineFilter = filter;
 	availableContainer.addContainerFilter(filter);
 
+    }
+
+    public void setFilterDelegate(DefaultQueryModifierDelegate defaultQueryModifierDelegate)
+    {
+	availableContainer.setQueryModifierDelegate(defaultQueryModifierDelegate);
+	
     }
 
 }
