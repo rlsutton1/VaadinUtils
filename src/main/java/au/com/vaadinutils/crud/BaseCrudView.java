@@ -1703,15 +1703,19 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
     protected void selectFirstErrorFieldAndShowTab()
     {
+	int ctr = 0;
 	for (Field<?> field : fieldGroup.getFields())
 	{
 
 	    try
 	    {
+		ctr++;
 		field.validate();
 	    }
 	    catch (Exception e)
 	    {
+		logger.warn("Invalid Field, caption:{} type:{} value:{} fieldNumber: {} crud: {}", field.getCaption(),
+			field.getValue(), ctr, this.getClass().getCanonicalName());
 		Component childField = field;
 
 		for (int i = 0; i < 10; i++)
@@ -1802,7 +1806,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	}
     }
 
-    protected boolean isNew()
+    public boolean isNew()
     {
 	return this.newEntity != null;
     }
@@ -1854,5 +1858,13 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
     public void saveClicked()
     {
 	save();
+    }
+
+    public void setSearchFilterText(String string)
+    {
+	entityTable.select(null);
+	searchField.setValue(string);
+	triggerFilter();
+	
     }
 }

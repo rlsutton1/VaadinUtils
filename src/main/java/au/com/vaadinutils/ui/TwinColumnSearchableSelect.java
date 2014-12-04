@@ -70,6 +70,8 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
 
     public TwinColumnSearchableSelect(String fieldName, SetAttribute<P, C> relation, SingularAttribute<C, ?> listField)
     {
+	beans = new BeanContainer<Long, C>(listField.getDeclaringType().getJavaType());
+
 	mainLayout = new HorizontalLayout();
 
 	this.relation = relation;
@@ -249,7 +251,6 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
 
     private BeanContainer<Long, C> createBeanContainer()
     {
-	beans = new BeanContainer<Long, C>(listField.getDeclaringType().getJavaType());
 	beans.setBeanIdProperty(beanIdField.getName());
 	return beans;
 
@@ -322,8 +323,10 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
 	super.setInternalValue(newValue);
 
 	beans.removeAllItems();
-	beans.addAll(newValue);
-
+	if (newValue != null)
+	{
+	    beans.addAll(newValue);
+	}
 	sourceValue = (Collection<C>) getConvertedValue();
     }
 

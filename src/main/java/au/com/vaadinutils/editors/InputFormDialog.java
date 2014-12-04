@@ -44,6 +44,7 @@ public class InputFormDialog extends Window
 
 		buttons = new HorizontalLayout();
 		buttons.setSpacing(true);
+		buttons.setHeight("50");
 
 		cancelButton = new Button("Cancel", new Button.ClickListener()
 		{
@@ -93,6 +94,7 @@ public class InputFormDialog extends Window
 
 		layout.addComponent(buttons);
 		layout.setComponentAlignment(buttons, Alignment.MIDDLE_RIGHT);
+		layout.setExpandRatio(form, 1);
 
 		this.setContent(layout);
 		parent.addWindow(this);

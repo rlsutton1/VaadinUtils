@@ -186,7 +186,7 @@ public class ReportParameterTable<T> extends ReportParameter<String>
 	 */
 	protected JPAContainer<T> createContainer(Class<T> tableClass, final SingularAttribute<T, String> displayField)
 	{
-		JPAContainer<T> cont = JPAContainerFactory.makeBatchable(tableClass, EntityManagerProvider.getEntityManager());
+		JPAContainer<T> cont = container =JpaBaseDao.getGenericDao(tableClass).createVaadinContainer();
 		cont.sort(new Object[] { displayField.getName() }, new boolean[] { true });
 
 		cont.setQueryModifierDelegate(getQueryModifierDelegate());

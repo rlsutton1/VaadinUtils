@@ -28,6 +28,11 @@ public class HeadingPropertySet<E>
     {
 	// use the builder!
     }
+    
+    public static <E> Builder<E> getBuilder(Class<E> Class)
+    {
+	return new Builder<E>();
+    }
 
     public static class Builder<E>
     {
@@ -127,7 +132,7 @@ public class HeadingPropertySet<E>
 	StackTraceElement[] trace = new Exception().getStackTrace();
 	for (StackTraceElement call : trace)
 	{
-	    if (call.getClassName().contains("au.com.vaadinutils"))
+	    if (!call.getClassName().contains("au.com.vaadinutils"))
 	    {
 		if (call.getClassName().contains("."))
 		{
@@ -137,7 +142,7 @@ public class HeadingPropertySet<E>
 		{
 		    applyToTable(table, call.getClassName());
 		}
-		break;
+		return;
 	    }
 	}
 	throw new RuntimeException("Unable to determine calling class name, "

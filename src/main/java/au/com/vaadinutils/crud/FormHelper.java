@@ -32,7 +32,6 @@ import au.com.vaadinutils.crud.splitFields.SplitPasswordField;
 import au.com.vaadinutils.crud.splitFields.SplitTextArea;
 import au.com.vaadinutils.crud.splitFields.SplitTextField;
 import au.com.vaadinutils.crud.splitFields.SplitTwinColSelect;
-import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.dao.JpaBaseDao;
 import au.com.vaadinutils.domain.iColor;
 import au.com.vaadinutils.domain.iColorFactory;
@@ -43,7 +42,6 @@ import au.com.vaadinutils.fields.DataBoundButton;
 
 import com.google.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.JPAContainer;
-import com.vaadin.addon.jpacontainer.JPAContainerFactory;
 import com.vaadin.addon.jpacontainer.fieldfactory.SingleSelectConverter;
 import com.vaadin.data.Container;
 import com.vaadin.data.fieldgroup.FieldGroup;
@@ -554,7 +552,8 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 			if (container == null)
 			{
 				Preconditions.checkNotNull(listClazz, "listClazz may not be null");
-				container = JPAContainerFactory.make(listClazz, EntityManagerProvider.getEntityManager());
+				container =JpaBaseDao.getGenericDao(listClazz).createVaadinContainer();
+				
 
 			}
 
@@ -734,7 +733,7 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 			if (container == null)
 			{
 				Preconditions.checkNotNull(listClazz, "listClazz may not be null");
-				container = JPAContainerFactory.make(listClazz, EntityManagerProvider.getEntityManager());
+				container =JpaBaseDao.getGenericDao(listClazz).createVaadinContainer();
 			}
 
 			Preconditions.checkState(container.getContainerPropertyIds().contains(listField), listField
@@ -912,7 +911,7 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 			if (container == null)
 			{
 				Preconditions.checkNotNull(listClazz, "listClazz may not be null");
-				container = JPAContainerFactory.make(listClazz, EntityManagerProvider.getEntityManager());
+				container =JpaBaseDao.getGenericDao(listClazz).createVaadinContainer();
 			}
 
 			Preconditions.checkState(container.getContainerPropertyIds().contains(listField), listField
