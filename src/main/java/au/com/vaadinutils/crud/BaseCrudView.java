@@ -1345,26 +1345,20 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		triggerFilter(searchField.getValue().trim());
 	}
 
+	int emptyFilterWarningCount = 3;
+
 	private void triggerFilter(String searchText)
 	{
 		boolean advancedSearchActive = advancedSearchOn;
-		if (advancedSearchActive || searchText.length() > 0)
+
+		Filter filter = getContainerFilter(searchText, advancedSearchActive);
+		if (filter == null && emptyFilterWarningCount-- > 0)
 		{
-			Filter filter = getContainerFilter(searchText, advancedSearchActive);
-			if (filter == null)
-			{
-				logger.warn(this.getClass().getCanonicalName() + ".getCotainerFilter() returned NULL");
-				resetFilters();
-			}
-			else
-			{
-				applyFilter(filter);
-			}
+			logger.warn( "({}.java:1) getCotainerFilter() returned NULL",this.getClass().getCanonicalName());
+
 		}
-		else
-		{
-			resetFilters();
-		}
+
+		applyFilter(filter);
 
 	}
 
@@ -1374,7 +1368,10 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		{
 			/* Reset the filter for the Entity Container. */
 			resetFilters();
-			container.addContainerFilter(filter);
+			if (filter != null)
+			{
+				container.addContainerFilter(filter);
+			}
 			container.discard();
 
 			entityTable.select(entityTable.firstItemId());
@@ -1730,8 +1727,10 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			}
 			catch (Exception e)
 			{
-				logger.warn("Invalid Field...\n caption:'{}'\n type:{}\n fieldNumber: {}\n value: '{}'\n crud: {} ({})\n", field.getCaption(),
-						field.getClass().getSimpleName(), ctr, field.getValue(), this.getClass().getCanonicalName(),this.getClass().getSimpleName()+".java:1");
+				logger.warn(
+						"Invalid Field...\n caption:'{}'\n type:{}\n fieldNumber: {}\n value: '{}'\n crud: {} ({})\n",
+						field.getCaption(), field.getClass().getSimpleName(), ctr, field.getValue(), this.getClass()
+								.getCanonicalName(), this.getClass().getSimpleName() + ".java:1");
 				Component childField = field;
 
 				for (int i = 0; i < 10; i++)
