@@ -1107,7 +1107,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	}
 
 	/**
-	 * @throws Exception  
+	 * @throws Exception
 	 */
 	protected boolean okToSave(EntityItem<E> entity) throws Exception
 	{
@@ -1730,8 +1730,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			}
 			catch (Exception e)
 			{
-				logger.warn("Invalid Field, caption:{} type:{} value:{} fieldNumber: {} crud: {}", field.getCaption(),
-						field.getValue(), ctr, this.getClass().getCanonicalName());
+				logger.warn("Invalid Field...\n caption:'{}'\n type:{}\n fieldNumber: {}\n value: '{}'\n crud: {} ({})\n", field.getCaption(),
+						field.getClass().getSimpleName(), ctr, field.getValue(), this.getClass().getCanonicalName(),this.getClass().getSimpleName()+".java:1");
 				Component childField = field;
 
 				for (int i = 0; i < 10; i++)

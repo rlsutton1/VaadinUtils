@@ -7,6 +7,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import javax.mail.internet.AddressException;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -15,6 +17,7 @@ import au.com.vaadinutils.crud.EntityTable;
 import au.com.vaadinutils.crud.FormHelper;
 import au.com.vaadinutils.crud.HeadingPropertySet;
 import au.com.vaadinutils.crud.ValidatingFieldGroup;
+import au.com.vaadinutils.dao.AttributesHashMap;
 import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.dao.JpaBaseDao;
 import au.com.vaadinutils.fields.CKEditorEmailField;
@@ -150,15 +153,12 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 		try
 		{
 			// set the sender
-			Container ds = sender.getContainerDataSource();
-			Object id = ds.addItem();
-			Item item = ds.getItem(id);
-			item.getItemProperty(ReportEmailSender_.username.getName()).setValue(
-					newEntity.getEntity().getSendersUsername());
-			item.getItemProperty(ReportEmailSender_.emailAddress.getName()).setValue(
-					newEntity.getEntity().getSendersEmailAddress());
+			Long newId = createSender(newEntity.getEntity());
+			
+			JPAContainer ds = (JPAContainer) sender.getContainerDataSource();
+			ds.refresh();
 			sender.setReadOnly(false);
-			sender.select(id);
+			sender.select(newId);
 			sender.setReadOnly(true);
 			outputFormat.setValue(OutputFormat.PDF);
 		}
@@ -167,6 +167,29 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 			Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
 			logger.error(e, e);
 		}
+	}
+
+	private Long createSender(ReportEmailScheduleEntity reportEmailScheduleEntity) throws AddressException
+	{
+		JpaBaseDao<ReportEmailSender, Long> dao = JpaBaseDao.getGenericDao(ReportEmailSender.class);
+		AttributesHashMap<ReportEmailSender> attributes = new AttributesHashMap<>();
+		String emailAddress = reportEmailScheduleEntity.getSendersEmailAddress().toString();
+
+		String username = reportEmailScheduleEntity.getSendersUsername();
+		attributes.safePut(ReportEmailSender_.username, username);
+		attributes.safePut(ReportEmailSender_.emailAddress, emailAddress);
+
+		ReportEmailSender senderEntity = dao.findOneByAttributes(attributes);
+		if (senderEntity == null)
+		{
+			senderEntity = new ReportEmailSender();
+			senderEntity.setUserName(username);
+			senderEntity.setEmailAddress(emailAddress);
+			EntityManagerProvider.persist(senderEntity);
+			EntityManagerProvider.getEntityManager().flush();
+		}
+		return senderEntity.getId();
+
 	}
 
 	public JPAContainer<ReportEmailScheduleEntity> makeJPAContainer()
@@ -289,9 +312,12 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 				{
 					mode = ScheduleMode.ONE_TIME;
 				}
+				oneTime.setRequired(false);
+
 				switch (mode)
 				{
 				case ONE_TIME:
+					oneTime.setRequired(true);
 					oneTime.setVisible(true);
 					timeOfDay.setVisible(false);
 					dayLayout.setVisible(false);
@@ -557,7 +583,7 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 		}
 		recips.clear();
 		recips.addAll(matchedRecips);
-		if (recips.size()==0)
+		if (recips.size() == 0)
 		{
 			throw new InvalidValueException("Select at least one Recipient");
 		}
@@ -729,7 +755,6 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 		return filter;
 	}
 
-
 	/**
 	 * Overload this method to provide cross-field (form level) validation.
 	 * 
@@ -754,11 +779,10 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 	public void enter(ViewChangeEvent event)
 	{
 		// TODO Auto-generated method stub
-		
 
 	}
-	
-	@Override 
+
+	@Override
 	public String getTitleText()
 	{
 		return "Report Scheduler";
