@@ -34,6 +34,7 @@ import com.vaadin.data.Container.ItemSetChangeListener;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.Validator.InvalidValueException;
+import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
@@ -968,17 +969,11 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			}
 			else if (e instanceof InvalidValueException)
 			{
-				InvalidValueException m = (InvalidValueException) e;
-
-				Notification.show("Please fix the form errors and then try again.\n\n " + e.getMessage(),
-						Type.ERROR_MESSAGE);
+				handleInvalidValueException((InvalidValueException) e);
 			}
 			else if (e.getCause() instanceof InvalidValueException)
 			{
-				InvalidValueException m = (InvalidValueException) e.getCause();
-
-				Notification.show("Please fix the form errors and then try again.\n\n " + e.getMessage(),
-						Type.ERROR_MESSAGE);
+				handleInvalidValueException((InvalidValueException) e.getCause());
 			}
 			else if (e.getCause() instanceof ConstraintViolationException)
 			{
@@ -1002,6 +997,16 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			}
 		}
 
+	}
+
+	protected void handleInvalidValueException(InvalidValueException m)
+	{
+		String causeMessage = "";
+		for (InvalidValueException cause : m.getCauses())
+		{
+			causeMessage += cause.getMessage()+". ";
+		}
+		Notification.show("Please fix the form errors and then try again.\n\n " + causeMessage, Type.ERROR_MESSAGE);
 	}
 
 	void handleConstraintViolationException(Throwable e)
@@ -1153,6 +1158,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		{
 			Filter filter = getContainerFilter(searchText, advancedSearchActive);
 			applyFilter(filter);
+			logger.warn("({}.java:1) getCotainerFilter() returned NULL", this.getClass().getCanonicalName());
+
 		}
 		else
 		{
