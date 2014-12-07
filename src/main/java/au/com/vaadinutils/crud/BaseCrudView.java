@@ -43,6 +43,7 @@ import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Container.ItemSetChangeEvent;
 import com.vaadin.data.Container.ItemSetChangeListener;
 import com.vaadin.data.Validator.InvalidValueException;
+import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
@@ -1074,16 +1075,11 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			}
 			else if (e instanceof InvalidValueException)
 			{
-				InvalidValueException m = (InvalidValueException) e;
-
-				Notification.show("Please fix the form errors and then try again.\n\n " + m.getMessage(),
-						Type.ERROR_MESSAGE);
+				handleInvalidValueException((InvalidValueException) e);
 			}
 			else if (e.getCause() instanceof InvalidValueException)
 			{
-				InvalidValueException m = (InvalidValueException) e.getCause();
-				Notification.show("Please fix the form errors and then try again.\n\n " + m.getMessage(),
-						Type.ERROR_MESSAGE);
+				handleInvalidValueException((InvalidValueException) e.getCause());
 			}
 			else
 			{
@@ -1104,6 +1100,16 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 		}
 
+	}
+
+	protected void handleInvalidValueException(InvalidValueException m)
+	{
+		String causeMessage = "";
+		for (InvalidValueException cause : m.getCauses())
+		{
+			causeMessage += cause.getMessage()+". ";
+		}
+		Notification.show("Please fix the form errors and then try again.\n\n " + causeMessage, Type.ERROR_MESSAGE);
 	}
 
 	/**
@@ -1354,7 +1360,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		Filter filter = getContainerFilter(searchText, advancedSearchActive);
 		if (filter == null && emptyFilterWarningCount-- > 0)
 		{
-			logger.warn( "({}.java:1) getCotainerFilter() returned NULL",this.getClass().getCanonicalName());
+			logger.warn("({}.java:1) getCotainerFilter() returned NULL", this.getClass().getCanonicalName());
 
 		}
 

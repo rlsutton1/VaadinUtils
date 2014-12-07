@@ -566,14 +566,13 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 	    }
 	    catch (InvalidValueException e)
 	    {
-		logger.error(e, e);
-		Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
+	    	handleInvalidValueException((InvalidValueException) e);
 	    }
 	    catch (CommitException e)
 	    {
 		if (e.getCause() instanceof InvalidValueException)
 		{
-		    Notification.show("Please fix the form errors and then try again.", Type.ERROR_MESSAGE);
+			handleInvalidValueException((InvalidValueException) e.getCause());
 		}
 		else
 		{
