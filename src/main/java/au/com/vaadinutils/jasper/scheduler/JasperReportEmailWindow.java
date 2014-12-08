@@ -207,6 +207,7 @@ public class JasperReportEmailWindow extends Window
 		ReportEmailScheduleEntity schedule = new ReportEmailScheduleEntity();
 		schedule.setTitle(reportProperties.getReportTitle());
 		schedule.setReportFilename(reportProperties.getReportFileName());
+		schedule.setReportTemplateIdentifier(reportProperties.getReportIdentifier());
 		schedule.setMessage(message.getValue());
 		schedule.setSubject(subject.getValue());
 
