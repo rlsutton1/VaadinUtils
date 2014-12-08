@@ -54,14 +54,18 @@ import com.vaadin.data.util.filter.SimpleStringFilter;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.shared.ui.datefield.Resolution;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.DateField;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TabSheet.Tab;
+import com.vaadin.ui.Table;
+import com.vaadin.ui.Table.ColumnGenerator;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
@@ -93,7 +97,8 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 
 		HeadingPropertySet<ReportEmailScheduleEntity> headings = new HeadingPropertySet.Builder<ReportEmailScheduleEntity>()
 
-		.addColumn("Report", ReportEmailScheduleEntity_.reportTitle)
+		.addGeneratedColumn("Status", ReportEmailScheduleEntity_.reportLog,getStatusColumnGenerator())
+				.addColumn("Report", ReportEmailScheduleEntity_.reportTitle)
 				.addColumn("Subject", ReportEmailScheduleEntity_.subject)
 				.addColumn("Owner", ReportEmailScheduleEntity_.sender)
 				.addColumn("Next Run", ReportEmailScheduleEntity_.nextScheduledTime)
@@ -102,6 +107,41 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 
 		this.disallowNew(true);
 		init(ReportEmailScheduleEntity.class, container, headings);
+	}
+
+	private ColumnGenerator getStatusColumnGenerator()
+	{
+		return new ColumnGenerator()
+		{
+
+			private static final long serialVersionUID = -1873561613938103218L;
+
+			@Override
+			public Object generateCell(Table source, Object itemId, Object columnId)
+			{
+				@SuppressWarnings("unchecked")
+				EntityItem<ReportEmailScheduleEntity> item = (EntityItem<ReportEmailScheduleEntity>) source
+						.getItem(itemId);
+				ReportEmailScheduleEntity schedule = item.getEntity();
+
+				final Label label = new Label("<font color='green'><b>Scheduled</b></font>");
+				label.setContentMode(ContentMode.HTML);
+				if (schedule.getReportLog() != null && schedule.getReportLog().length() > 0)
+				{
+					label.setValue("<font color='red'><b>Error</b></font>");
+				}
+				else
+				{
+					if (!schedule.isEnabled())
+					{
+						label.setValue("<font color='orange'><b>Disabled</b></font>");
+					}
+				}
+
+				return label;
+
+			}
+		};
 	}
 
 	public JasperReportScheduleLayout(ScheduleCreater creater)
@@ -752,8 +792,6 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 	@Override
 	public void enter(ViewChangeEvent event)
 	{
-		// TODO Auto-generated method stub
-		
 
 	}
 	
