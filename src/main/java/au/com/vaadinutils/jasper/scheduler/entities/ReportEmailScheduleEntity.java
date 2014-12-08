@@ -364,4 +364,20 @@ public class ReportEmailScheduleEntity implements Serializable, CrudEntity, Repo
 		
 	}
 
+	/**
+	 * @return the reportLog
+	 */
+	public String getReportLog()
+	{
+		return reportLog;
+	}
+
+	/**
+	 * @param reportLog the reportLog to set
+	 */
+	public void setReportLog(String reportLog)
+	{
+		this.reportLog = reportLog;
+	}
+
 }
