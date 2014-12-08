@@ -101,9 +101,7 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 				.addColumn("Report", ReportEmailScheduleEntity_.reportTitle)
 				.addColumn("Subject", ReportEmailScheduleEntity_.subject)
 				.addColumn("Owner", ReportEmailScheduleEntity_.sender)
-				.addColumn("Next Run", ReportEmailScheduleEntity_.nextScheduledTime)
-				.addColumn("Enabled", ReportEmailScheduleEntity_.enabled)
-				.addColumn("Last Run", ReportEmailScheduleEntity_.lastRuntime).build();
+				.addColumn("Next Run", ReportEmailScheduleEntity_.nextScheduledTime).build();
 
 		this.disallowNew(true);
 		init(ReportEmailScheduleEntity.class, container, headings);
@@ -124,7 +122,7 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 						.getItem(itemId);
 				ReportEmailScheduleEntity schedule = item.getEntity();
 
-				final Label label = new Label("<font color='green'><b>Scheduled</b></font>");
+				final Label label = new Label("<font color='green'>Scheduled</font>");
 				label.setContentMode(ContentMode.HTML);
 				if (schedule.getReportLog() != null && schedule.getReportLog().length() > 0)
 				{
