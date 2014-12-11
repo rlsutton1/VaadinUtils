@@ -41,6 +41,8 @@ public class InputFormDialog extends Window
 		//layout.setMargin(true);
 		layout.setSizeFull();
 		layout.addComponent(form);
+		layout.setComponentAlignment(form, Alignment.TOP_CENTER);
+		
 
 		buttons = new HorizontalLayout();
 		buttons.setSpacing(true);

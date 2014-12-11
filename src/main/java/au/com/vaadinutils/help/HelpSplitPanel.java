@@ -112,6 +112,11 @@ public class HelpSplitPanel extends HorizontalSplitPanel implements View, HelpPa
 		});
 
 	}
+	
+	public View getView()
+	{
+		return component;
+	}
 
 	boolean helpHiding = false;
 

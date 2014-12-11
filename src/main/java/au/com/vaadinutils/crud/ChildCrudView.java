@@ -431,7 +431,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 	}
 
 	@Override
-	protected void newClicked()
+	public void newClicked()
 	{
 
 		try

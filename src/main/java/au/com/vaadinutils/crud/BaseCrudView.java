@@ -1651,7 +1651,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		childCrudListeners.add(listener);
 	}
 
-	protected void newClicked()
+	public void newClicked()
 	{
 		/*
 		 * Rows in the Container data model are called Item. Here we add a new
@@ -1887,5 +1887,11 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		searchField.setValue(string);
 		triggerFilter();
 
+	}
+
+	public boolean isNewAllowed()
+	{
+	
+		return !disallowNew;
 	}
 }
