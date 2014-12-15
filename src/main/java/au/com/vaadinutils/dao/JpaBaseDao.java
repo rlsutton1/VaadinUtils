@@ -89,6 +89,12 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 	entityManager.remove(entity);
     }
 
+    @SuppressWarnings("unchecked")
+    public E findById(Integer id)
+    {
+	return findById((K) new Long(id));
+    }
+    
     public E findById(K id)
     {
 	return entityManager.find(entityClass, id);
