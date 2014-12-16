@@ -14,22 +14,34 @@ public class InputDialog extends Window implements InputFormDialogRecipient
 	private static final long serialVersionUID = -8135921877987898679L;
 	final Recipient recipient;
 	final TextField field = new TextField();
+	private InputFormDialog dialog;
 
 	public InputDialog(final UI parent, String title, String question, Recipient recipient)
 	{
 		this.recipient = recipient;
 		
 			FormLayout form = new FormLayout();
+			form.setMargin(true);
 		
 		
 		field.setCaption(question);
 		form.addComponent(field);
-		InputFormDialog dialog = new InputFormDialog(parent, title, field,  form, this);
+		dialog = new InputFormDialog(parent, title, field,  form, this);
 		dialog.setWidth("500");
 		dialog.setHeight("150");
 
 	}
 
+	
+	public void setWidth(String width)
+	{
+		dialog.setWidth(width);
+	}
+	public void setHeight(String width)
+	{
+		dialog.setHeight(width);
+	}
+	
 
 	/**
 	 * Add validators to the field which will be run when the user clicks OK.

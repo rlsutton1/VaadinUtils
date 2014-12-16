@@ -144,7 +144,7 @@ public class ValidatingFieldGroup<E> extends FieldGroup
 		{
 			if (field.isModified())
 			{
-				logger.warn("Dirty: " + field.getCaption());
+				logger.warn("Dirty: {} {}", field.getCaption(), field.getClass().getSimpleName());
 				logger.warn("Dirty value: " + field.getValue());
 
 				return true;

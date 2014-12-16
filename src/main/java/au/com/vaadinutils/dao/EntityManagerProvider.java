@@ -2,6 +2,9 @@ package au.com.vaadinutils.dao;
 
 import javax.persistence.EntityManager;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * The class is a place holder to allow access to an 'non-injected' entity
  * manager.
@@ -42,6 +45,8 @@ public enum EntityManagerProvider
 	private ThreadLocal<EntityManager> entityManagerThreadLocal = new ThreadLocal<EntityManager>();
 	private javax.persistence.EntityManagerFactory emf;
 
+	static final Logger logger = LogManager.getLogger();
+
 	/**
 	 * Get the entity manager attached to this thread.
 	 * 
@@ -59,6 +64,15 @@ public enum EntityManagerProvider
 	 */
 	public static void setCurrentEntityManager(EntityManager em)
 	{
+		if (em == null)
+		{
+			logger.debug("Clearing entity manager for thread {}", Thread.currentThread().getId());
+		}
+		else
+		{
+			logger.debug("Setting entity manager for thread {}", Thread.currentThread().getId());
+
+		}
 		INSTANCE.entityManagerThreadLocal.set(em);
 	}
 
@@ -136,10 +150,10 @@ public enum EntityManagerProvider
 		EntityManager entityManager = INSTANCE.emf.createEntityManager();
 
 		return entityManager;
-		
+
 		// you might want to use this if your having deadlocks...
 		// don't ever use JPAFactory to build your JPAContainers
-		//return new EntityManagerWrapper(entityManager);
+		// return new EntityManagerWrapper(entityManager);
 	}
 
 	/**

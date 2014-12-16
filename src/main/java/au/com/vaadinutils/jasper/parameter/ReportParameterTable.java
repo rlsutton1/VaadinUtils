@@ -382,7 +382,7 @@ public class ReportParameterTable<T> extends ReportParameter<String>
 		{
 			for (String param : parameters)
 			{
-				logger.error("Exception while getting value(s) for " + param);
+				logger.error("Exception while getting value(s) for {}, thread{}" , param,Thread.currentThread().getId());
 			}
 			throw new RuntimeException(e);
 		}
