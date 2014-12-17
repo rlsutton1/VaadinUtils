@@ -24,19 +24,25 @@ public class UniqueFieldValidator<E extends CrudEntity, F> implements Validator
 	private SingularAttribute<E, F> matchField;
 	private BaseCrudView<E> crud;
 	transient Logger logger = LogManager.getLogger(UniqueFieldValidator.class);
+	private String warningMessage;
 
 	public UniqueFieldValidator(SingularAttribute<E, F> matchField, BaseCrudView<E> crud)
+	{
+		this(matchField,crud,"'" + matchField.getName() + "' must be unique");
+	}
+	public UniqueFieldValidator(SingularAttribute<E, F> matchField, BaseCrudView<E> crud,String warningMessage)
 	{
 		this.table = matchField.getDeclaringType().getJavaType();
 		this.matchField = matchField;
 		this.crud = crud;
+		this.warningMessage = warningMessage;
 
 	}
 
 	@Override
 	public void validate(Object value) throws InvalidValueException
 	{
-		if (value != null)
+		if (value != null && crud !=null && crud.getCurrent()!=null)
 		{
 
 			JpaBaseDao<E, Long> dao = new JpaBaseDao<E, Long>(table);
@@ -44,12 +50,12 @@ public class UniqueFieldValidator<E extends CrudEntity, F> implements Validator
 			List<E> matches = dao.findAllByAttribute(matchField, (F) value, null);
 			for (E message : matches)
 			{
-				if (crud == null || !message.getId().equals(crud.getCurrent().getId()))
+				if (!message.getId().equals(crud.getCurrent().getId()))
 				{
 
-					String message2 = "'" + matchField.getName() + "' must be unique";
-					logger.error(message2);
-					throw new InvalidValueException(message2);
+					
+					logger.error(warningMessage);
+					throw new InvalidValueException(warningMessage);
 				}
 			}
 		}
