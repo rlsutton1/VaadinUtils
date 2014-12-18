@@ -330,6 +330,24 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
 	sourceValue = (Collection<C>) getConvertedValue();
     }
 
+    @SuppressWarnings("unchecked")
+    public Collection<C> getValue()
+    {
+	return (Collection<C>) getConvertedValue();
+    }
+
+    @SuppressWarnings("unchecked")
+    public Collection<C> getFieldValue()
+    {
+	return (Collection<C>) getConvertedValue();
+    }
+    
+    @SuppressWarnings("unchecked")
+    public Collection<C> getInternalValue()
+    {
+	return (Collection<C>) getConvertedValue();
+    }
+
     public Object getConvertedValue()
     {
 
