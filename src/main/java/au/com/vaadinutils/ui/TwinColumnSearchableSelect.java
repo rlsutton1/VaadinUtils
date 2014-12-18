@@ -25,6 +25,7 @@ import au.com.vaadinutils.dao.JpaBaseDao;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.util.DefaultQueryModifierDelegate;
 import com.vaadin.data.Buffered;
+import com.vaadin.data.Property;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Container.Filterable;
 import com.vaadin.data.Validator.InvalidValueException;
@@ -34,6 +35,7 @@ import com.vaadin.data.util.filter.SimpleStringFilter;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
+import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomField;
 import com.vaadin.ui.HorizontalLayout;
@@ -60,6 +62,7 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
     private Button removeButton = new Button(">>");
     private Filter baselineFilter;
     private HorizontalLayout mainLayout;
+    private ValueChangeListener<C> listener;
 
     /**
      * Unfortunately TwinColumnSelect wont work with large sets, it isn't
@@ -96,6 +99,25 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
 	selectedCols.setHeight("200");
 	selectedCols.setSelectable(true);
 	createAvailableTable();
+    }
+
+    public interface ValueChangeListener<C>
+    {
+	void valueChanged(Collection<C> value);
+    }
+
+    @Override
+    @Deprecated
+    public void addValueChangeListener(Property.ValueChangeListener listener)
+    {
+
+    }
+
+    public void addValueChangeListener(ValueChangeListener<C> listener)
+    {
+
+	this.listener = listener;
+
     }
 
     @Override
@@ -204,6 +226,7 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
 		{
 		    Long id = (Long) selectedCols.getValue();
 		    beans.removeItem(id);
+		    listener.valueChanged(getFieldValue());
 		}
 		catch (Exception e)
 		{
@@ -237,6 +260,7 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
 		    if (cust != null)
 		    {
 			beans.addBean(cust);
+			listener.valueChanged(getFieldValue());
 		    }
 		}
 
@@ -341,7 +365,7 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
     {
 	return (Collection<C>) getConvertedValue();
     }
-    
+
     @SuppressWarnings("unchecked")
     public Collection<C> getInternalValue()
     {
