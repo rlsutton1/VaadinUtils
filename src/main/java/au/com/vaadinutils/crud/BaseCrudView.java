@@ -49,9 +49,11 @@ import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
 import com.vaadin.event.dd.DragAndDropEvent;
 import com.vaadin.event.dd.DropHandler;
+import com.vaadin.event.dd.TargetDetails;
 import com.vaadin.event.dd.acceptcriteria.AcceptCriterion;
 import com.vaadin.event.dd.acceptcriteria.SourceIsTarget;
 import com.vaadin.shared.ui.MarginInfo;
+import com.vaadin.shared.ui.dd.VerticalDropLocation;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.AbstractSelect.AbstractSelectTargetDetails;
@@ -73,6 +75,7 @@ import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.Table.ColumnGenerator;
 import com.vaadin.ui.Table.TableDragMode;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.Tree.TreeTargetDetails;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
@@ -267,7 +270,28 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 					return;
 				}
 				Object draggedItemId = event.getTransferable().getData("itemId");
+
+				AbstractSelectTargetDetails td = (AbstractSelectTargetDetails) event.getTargetDetails();
+				VerticalDropLocation dl = td.getDropLocation();
+				
 				Object targetId = ((AbstractSelectTargetDetails) event.getTargetDetails()).getItemIdOver();
+				int idx = container.indexOfId(targetId);
+				System.out.println("herlkwelrk");
+				
+				if (dl == VerticalDropLocation.BOTTOM)
+				{
+					idx++;
+				} else if (dl == VerticalDropLocation.TOP)
+				{
+					// no need to change the idx here
+				}
+				targetId = container.getIdByIndex(idx);
+				if (targetId ==  null)
+				{
+					Notification.show("Cant drag below the last row, try moving the last row up.",Type.ERROR_MESSAGE);
+					return;
+				}
+				
 
 				EntityItem<E> dragged = container.getItem(draggedItemId);
 				EntityItem<E> target = container.getItem(targetId);
