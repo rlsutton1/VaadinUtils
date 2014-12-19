@@ -276,8 +276,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				
 				Object targetId = ((AbstractSelectTargetDetails) event.getTargetDetails()).getItemIdOver();
 				int idx = container.indexOfId(targetId);
-				System.out.println("herlkwelrk");
-				
 				if (dl == VerticalDropLocation.BOTTOM)
 				{
 					idx++;
