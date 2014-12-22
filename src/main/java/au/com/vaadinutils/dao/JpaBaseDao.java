@@ -624,6 +624,12 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 	private Integer startPosition = null;
 
+	public <L> FindBuilder fetch(SingularAttribute<E,L> field)
+	{
+	    root.fetch(field,JoinType.LEFT);
+	    return this;
+	}
+	
 	public <L> FindBuilder whereEqual(SingularAttribute<E, L> field, L value)
 	{
 	    predicates.add(builder.equal(root.get(field), value));
@@ -680,7 +686,21 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 	    criteria.select(root);
 	}
 
-	public List<E> fetch()
+	public E getSingleResult()
+	{
+	    limit(1);
+	    TypedQuery<E> query = prepareQuery();
+	    
+	    return query.getSingleResult();
+	}
+	
+	public List<E> getResultList()
+	{
+	    TypedQuery<E> query = prepareQuery();
+	    return query.getResultList();
+	}
+
+	private TypedQuery<E> prepareQuery()
 	{
 	    Predicate filter = null;
 	    for (Predicate predicate : predicates)
@@ -708,7 +728,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 	    {
 		query.setFirstResult(startPosition);
 	    }
-	    return query.getResultList();
+	    return query;
 	}
 
 	public <L> FindBuilder whereNotEqueal(SingularAttribute<E, L> field, L value)

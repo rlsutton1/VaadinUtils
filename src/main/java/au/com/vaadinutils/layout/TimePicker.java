@@ -108,7 +108,7 @@ public class TimePicker extends HorizontalLayout implements Field
 
     private Date parseDate(String value)
     {
-	if (value == null)
+	if (value == null || value.equals(EMPTY))
 	{
 	    return null;
 	}
