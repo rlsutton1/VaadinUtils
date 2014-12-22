@@ -260,7 +260,10 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
 		    if (cust != null)
 		    {
 			beans.addBean(cust);
-			listener.valueChanged(getFieldValue());
+			if (listener != null)
+			{
+			    listener.valueChanged(getFieldValue());
+			}
 		    }
 		}
 
