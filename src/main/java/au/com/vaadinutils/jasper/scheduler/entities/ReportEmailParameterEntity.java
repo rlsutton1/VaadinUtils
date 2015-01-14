@@ -10,7 +10,7 @@ import javax.persistence.Table;
 import au.com.vaadinutils.jasper.scheduler.ReportEmailParameter;
 
 @Entity
-@Table(name = "tblReportEmailParameterEntity")
+@Table(name = "tblreportemailparameterentity")
 
 public class ReportEmailParameterEntity implements ReportEmailParameter
 {

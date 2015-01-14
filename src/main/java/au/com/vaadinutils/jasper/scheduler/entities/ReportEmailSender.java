@@ -8,7 +8,7 @@ import javax.persistence.Table;
 
 import au.com.vaadinutils.crud.CrudEntity;
 @Entity
-@Table(name = "tblReportEmailSender")
+@Table(name = "tblreportemailsender")
 public class ReportEmailSender implements CrudEntity
 {
 	@Id

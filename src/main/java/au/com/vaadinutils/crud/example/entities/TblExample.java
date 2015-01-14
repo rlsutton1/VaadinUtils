@@ -17,7 +17,7 @@ import au.com.vaadinutils.crud.CrudEntity;
  */
 @Entity
 
-@Table(name = "tblExample")
+@Table(name = "tblexample")
 public class TblExample implements Serializable, CrudEntity
 {
 	private static final long serialVersionUID = 1L;

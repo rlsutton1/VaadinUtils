@@ -9,7 +9,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="tblReportEmailRecipient")
+@Table(name="tblreportemailrecipient")
 public class ReportEmailRecipient
 {
 	@Id

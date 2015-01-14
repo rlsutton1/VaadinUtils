@@ -15,7 +15,7 @@ import javax.persistence.TemporalType;
 import au.com.vaadinutils.jasper.scheduler.ScheduledDateParameter;
 
 @Entity
-@Table(name = "tblReportEmailScheduledDateParameter")
+@Table(name = "tblreportemailscheduleddateparameter")
 public class ReportEmailScheduledDateParameter implements ScheduledDateParameter
 {
 

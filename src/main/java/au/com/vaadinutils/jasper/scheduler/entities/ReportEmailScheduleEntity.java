@@ -33,7 +33,7 @@ import au.com.vaadinutils.jasper.scheduler.ScheduledDateParameter;
 import au.com.vaadinutils.jasper.ui.JasperReportProperties;
 
 @Entity
-@Table(name = "tblReportEmailSchedule")
+@Table(name = "tblreportemailschedule")
 public class ReportEmailScheduleEntity implements Serializable, CrudEntity, ReportEmailSchedule
 {
 	/*
