@@ -40,7 +40,7 @@ public class TableCheckBoxSelect extends Table
 		this.addGeneratedColumn(TABLE_CHECK_BOX_SELECT, getGenerator());
 		super.setMultiSelect(false);
 		super.setSelectable(false);
-
+		
 	}
 
 	public void setMultiSelect(boolean multi)
@@ -205,6 +205,7 @@ public class TableCheckBoxSelect extends Table
 		selectable = false;
 		super.setSelectable(true);
 		removeGeneratedColumn(TABLE_CHECK_BOX_SELECT);
+		
 	}
 
 	@Override

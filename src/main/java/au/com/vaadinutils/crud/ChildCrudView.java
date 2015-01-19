@@ -51,7 +51,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 	transient Logger logger = LogManager.getLogger(ChildCrudView.class);
 	private String parentKey;
 	protected String childKey;
-	private Object parentId;
+	public Object parentId;
 	protected P currentParent;
 	protected Filter parentFilter;
 	protected boolean dirty = false;

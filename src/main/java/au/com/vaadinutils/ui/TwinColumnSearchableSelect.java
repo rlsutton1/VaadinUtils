@@ -43,12 +43,10 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.ColumnGenerator;
 import com.vaadin.ui.VerticalLayout;
 
-public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCrudEntity> extends
-	CustomField<Collection<C>>
+public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomField<Collection<C>>
 {
 
     private static final long serialVersionUID = -4316521010865902678L;
-    private SetAttribute<P, C> relation;
     private SingularAttribute<C, ?> listField;
 
     private Collection<C> sourceValue;
@@ -58,8 +56,10 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
     private JPAContainer<C> availableContainer;
     private SearchableSelectableEntityTable<C> available;
     private SingularAttribute<C, Long> beanIdField;
-    private Button addButton = new Button("<<");
-    private Button removeButton = new Button(">>");
+    private Button addButton = new Button("<");
+    private Button removeButton = new Button(">");
+    private Button removeAllButton = new Button(">>");
+    private Button addAllButton = new Button("<<");
     private Filter baselineFilter;
     private HorizontalLayout mainLayout;
     private ValueChangeListener<C> listener;
@@ -71,18 +71,18 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
      * Hopefully I'll address all of these issues here.
      */
 
-    public TwinColumnSearchableSelect(String fieldName, SetAttribute<P, C> relation, SingularAttribute<C, ?> listField)
+    public TwinColumnSearchableSelect(String fieldName, SingularAttribute<C, ?> listField)
     {
 	beans = new BeanContainer<Long, C>(listField.getDeclaringType().getJavaType());
 
 	mainLayout = new HorizontalLayout();
 
-	this.relation = relation;
 	this.listField = listField;
 	Metamodel metaModel = EntityManagerProvider.getEntityManager().getMetamodel();
 	EntityType<C> type = metaModel.entity(listField.getDeclaringType().getJavaType());
 	beanIdField = type.getDeclaredId(Long.class);
-	availableContainer = JpaBaseDao.getGenericDao(relation.getElementType().getJavaType()).createVaadinContainer();
+	availableContainer = JpaBaseDao.getGenericDao(listField.getDeclaringType().getJavaType())
+		.createVaadinContainer();
 	availableContainer.sort(new Object[] { listField.getName() }, new boolean[] { true });
 
 	selectedCols = new Table();
@@ -212,7 +212,7 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
 	VerticalLayout layout = new VerticalLayout();
 	layout.setSizeFull();
 	layout.setWidth("50");
-	layout.setHeight("50");
+	layout.setHeight("100");
 
 	removeButton.addClickListener(new ClickListener()
 	{
@@ -226,7 +226,10 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
 		{
 		    Long id = (Long) selectedCols.getValue();
 		    beans.removeItem(id);
-		    listener.valueChanged(getFieldValue());
+		    if (listener != null)
+		    {
+			listener.valueChanged(getFieldValue());
+		    }
 		}
 		catch (Exception e)
 		{
@@ -236,6 +239,32 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
 	    }
 	});
 	removeButton.setHeight("50");
+	
+	removeAllButton.addClickListener(new ClickListener()
+	{
+
+	    private static final long serialVersionUID = 1L;
+
+	    @Override
+	    public void buttonClick(ClickEvent event)
+	    {
+		try
+		{
+		    beans.removeAllItems();
+		    if (listener != null)
+		    {
+			listener.valueChanged(getFieldValue());
+		    }
+		}
+		catch (Exception e)
+		{
+		    logger.error(e, e);
+		}
+
+	    }
+	});
+	removeAllButton.setHeight("50");
+
 
 	addButton.addClickListener(new ClickListener()
 	{
@@ -254,8 +283,41 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
 		Long id = ids.get(0);
 		if (id != null)
 		{
-		    JpaBaseDao<C, Long> dao = (JpaBaseDao<C, Long>) JpaBaseDao.getGenericDao(relation.getElementType()
-			    .getJavaType());
+		    JpaBaseDao<C, Long> dao = (JpaBaseDao<C, Long>) JpaBaseDao.getGenericDao(listField
+			    .getDeclaringType().getJavaType());
+		    C cust = dao.findById(id);
+		    if (cust != null)
+		    {
+			beans.addBean(cust);
+			if (listener != null)
+			{
+			    listener.valueChanged(getFieldValue());
+			}
+		    }
+		}
+
+	    }
+	});
+	
+	addAllButton.addClickListener(new ClickListener()
+	{
+
+	    /**
+	     * 
+	     */
+	    private static final long serialVersionUID = 1L;
+
+	    @SuppressWarnings("unchecked")
+	    @Override
+	    public void buttonClick(ClickEvent event)
+	    {
+		beans.removeAllItems();
+		List<Long> ids = new LinkedList<>();
+		ids.addAll((Collection<? extends Long>) available.getContainer().getItemIds());
+		
+		for (Long id:ids){
+		    JpaBaseDao<C, Long> dao = (JpaBaseDao<C, Long>) JpaBaseDao.getGenericDao(listField
+			    .getDeclaringType().getJavaType());
 		    C cust = dao.findById(id);
 		    if (cust != null)
 		    {
@@ -271,6 +333,8 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
 	});
 	layout.addComponent(removeButton);
 	layout.addComponent(addButton);
+	layout.addComponent(removeAllButton);
+	layout.addComponent(addAllButton);
 
 	return layout;
 
@@ -400,6 +464,7 @@ public class TwinColumnSearchableSelect<P extends CrudEntity, C extends ChildCru
     public void setFilter(Filter filter)
     {
 	baselineFilter = filter;
+	availableContainer.removeAllContainerFilters();
 	availableContainer.addContainerFilter(filter);
 
     }

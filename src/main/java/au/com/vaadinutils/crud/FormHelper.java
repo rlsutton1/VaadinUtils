@@ -535,7 +535,7 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 		{
 			Preconditions.checkNotNull(label, "Label may not be null");
 			Preconditions.checkNotNull(listField, "ListField may not be null");
-			Preconditions.checkNotNull(field, "Field may not be null");
+			Preconditions.checkArgument(group == null || field!=null, "Field may not be null");
 			if (builderForm == null)
 			{
 				builderForm = form;
@@ -672,6 +672,12 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 							"As you have set the field as a singularAttribute, the listClass is set automatically so there is no need to call setListClass.");
 			this.listClazz = listClazz;
 			return this;
+		}
+
+		@SuppressWarnings("unchecked")
+		public JPAContainer<L> getContainer()
+		{
+		   return (JPAContainer<L>) container;
 		}
 
 	}
@@ -890,7 +896,7 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 		{
 			Preconditions.checkNotNull(label, "label may not be null");
 			Preconditions.checkNotNull(listField, "colField Property may not be null");
-			Preconditions.checkNotNull(field, "Field may not be null");
+			Preconditions.checkArgument(group !=null && field==null, "Field may not be null");
 			if (builderForm == null)
 			{
 				builderForm = form;
@@ -1209,6 +1215,15 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 		return new EntityFieldBuilder<J>();
 
 	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	static public <J extends CrudEntity> FormHelper<?>.EntityFieldBuilder<J> getEntityFieldBuilder(AbstractLayout form,Class<J> j)
+	{
+	    FormHelper<?> helper = new FormHelper(form,null);
+		return helper.new EntityFieldBuilder<J>().setListClass(j);
+
+	}
+
 
 	public <J extends CrudEntity> FormHelper<E>.TwinColSelectBuilder<J> getTwinColSelectBuilder(Class<J> j)
 	{
