@@ -896,7 +896,7 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 		{
 			Preconditions.checkNotNull(label, "label may not be null");
 			Preconditions.checkNotNull(listField, "colField Property may not be null");
-			Preconditions.checkArgument(group !=null && field==null, "Field may not be null");
+			Preconditions.checkArgument(group ==null || field!=null, "Field may not be null");
 			if (builderForm == null)
 			{
 				builderForm = form;

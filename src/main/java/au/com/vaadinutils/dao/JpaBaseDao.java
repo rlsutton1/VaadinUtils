@@ -624,6 +624,11 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 	private Integer startPosition = null;
 
+	/**
+	 * specify that JPA should fetch child entities in a single query!
+	 * @param field
+	 * @return
+	 */
 	public <L> FindBuilder fetch(SingularAttribute<E,L> field)
 	{
 	    root.fetch(field,JoinType.LEFT);
