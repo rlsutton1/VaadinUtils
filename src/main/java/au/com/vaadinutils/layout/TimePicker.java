@@ -64,7 +64,7 @@ public class TimePicker extends HorizontalLayout implements Field
 			@Override
 			public void validate(Object value) throws InvalidValueException
 			{
-				if (value.equals(EMPTY))
+				if (value == null || value.equals(EMPTY))
 				{
 					return;
 				}

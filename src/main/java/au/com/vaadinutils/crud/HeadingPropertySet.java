@@ -19,6 +19,11 @@ public class HeadingPropertySet<E>
 		// use the builder!
 	}
 	
+	public static<B> Builder<B> getBuilder(Class<B> clazz)
+	{
+		return new HeadingPropertySet.Builder<B>();
+	}
+	
 	public static class Builder<E>
 	{
 		List<HeadingToPropertyId<E>> cols = new LinkedList<HeadingToPropertyId<E>>();

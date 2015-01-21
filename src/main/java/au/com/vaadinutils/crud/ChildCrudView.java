@@ -118,7 +118,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 			{
 				logger.error("Child key " + childKey + " doesn't exist in the container " + container.getEntityClass());
 			}
-			if (reference == null || reference.getValue() == null)
+			if (reference == null || reference.getValue() == null )
 			{
 				try
 				{
