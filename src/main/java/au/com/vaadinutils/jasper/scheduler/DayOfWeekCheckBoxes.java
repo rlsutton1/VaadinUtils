@@ -122,14 +122,13 @@ public class DayOfWeekCheckBoxes extends HorizontalLayout implements Field<Strin
 	@Override
 	public boolean isValid()
 	{
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	@Override
 	public void validate() throws InvalidValueException
 	{
-		if (getValue().length()==0)
+		if (isVisible() && getValue().length()==0)
 		{
 			throw new InvalidValueException("You must select at least one day");
 		}
