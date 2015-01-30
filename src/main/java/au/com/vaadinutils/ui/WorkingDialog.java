@@ -157,6 +157,21 @@ public class WorkingDialog extends Window implements ProgressListener<String>
 
 	}
 
+	@Override
+	public void close()
+	{
+		ui.accessSynchronously(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				WorkingDialog.super.close();
+				
+			}
+		});
+		
+	}
+	
 	/**
 	 * Pass a Runnable that WorkingDialog will run in a background thread. On
 	 * completion of the thread the complete listener will be notified and the
@@ -213,7 +228,7 @@ public class WorkingDialog extends Window implements ProgressListener<String>
 
 	public void addUserComponent(final Component component)
 	{
-		ui.access(new Runnable()
+		ui.accessSynchronously(new Runnable()
 		{
 			@Override
 			public void run()
@@ -225,7 +240,7 @@ public class WorkingDialog extends Window implements ProgressListener<String>
 
 	public void progress(int count, int max, final String message)
 	{
-		ui.access(new Runnable()
+		ui.accessSynchronously(new Runnable()
 		{
 			@Override
 			public void run()
@@ -237,7 +252,7 @@ public class WorkingDialog extends Window implements ProgressListener<String>
 
 	public void complete(int sent)
 	{
-		ui.access(new Runnable()
+		ui.accessSynchronously(new Runnable()
 		{
 			
 			@Override
@@ -262,7 +277,7 @@ public class WorkingDialog extends Window implements ProgressListener<String>
 	@Override
 	public void exception(Exception e)
 	{
-		ui.access(new Runnable()
+		ui.accessSynchronously(new Runnable()
 		{
 			
 			@Override
