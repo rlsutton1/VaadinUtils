@@ -273,23 +273,23 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 				AbstractSelectTargetDetails td = (AbstractSelectTargetDetails) event.getTargetDetails();
 				VerticalDropLocation dl = td.getDropLocation();
-				
+
 				Object targetId = ((AbstractSelectTargetDetails) event.getTargetDetails()).getItemIdOver();
 				int idx = container.indexOfId(targetId);
 				if (dl == VerticalDropLocation.BOTTOM)
 				{
 					idx++;
-				} else if (dl == VerticalDropLocation.TOP)
+				}
+				else if (dl == VerticalDropLocation.TOP)
 				{
 					// no need to change the idx here
 				}
 				targetId = container.getIdByIndex(idx);
-				if (targetId ==  null)
+				if (targetId == null)
 				{
-					Notification.show("Cant drag below the last row, try moving the last row up.",Type.ERROR_MESSAGE);
+					Notification.show("Cant drag below the last row, try moving the last row up.", Type.ERROR_MESSAGE);
 					return;
 				}
-				
 
 				EntityItem<E> dragged = container.getItem(draggedItemId);
 				EntityItem<E> target = container.getItem(targetId);
@@ -499,7 +499,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			return ((Menus) annotation).menus()[0].display();
 		}
 
-		return "Override getTitleText() to set a custom title.";
+		return "Override getTitleText() to set a custom title. " + this.getClass().getCanonicalName();
 	}
 
 	protected Component getTitle()
@@ -693,6 +693,14 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			advancedSearchLayout.setVisible(false);
 		}
 		return advancedSearchLayout;
+	}
+
+	public void showAdvancedSearch()
+	{
+		advancedSearchOn = true;
+		advancedSearchLayout.setVisible(advancedSearchOn);
+		advancedSearchCheckbox.setStyleName(ValoTheme.BUTTON_FRIENDLY);
+
 	}
 
 	protected AbstractLayout getAdvancedSearchLayout()
@@ -1767,11 +1775,16 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			}
 			catch (Exception e)
 			{
-				ret = field.getCaption();
+				String message = "";
+				if (e instanceof InvalidValueException)
+				{
+					message = ((InvalidValueException) e).getMessage();
+				}
+				ret = field.getCaption() + "\n\n" + message;
 				logger.warn(
-						"Invalid Field...\n caption:'{}'\n type:{}\n fieldNumber: {}\n value: '{}'\n crud: {} ({})\n",
+						"Invalid Field...\n caption:'{}'\n type:{}\n fieldNumber: {}\n value: '{}'\n crud: {} ({})\n {}\n",
 						field.getCaption(), field.getClass().getSimpleName(), ctr, field.getValue(), this.getClass()
-								.getCanonicalName(), this.getClass().getSimpleName() + ".java:1");
+								.getCanonicalName(), this.getClass().getSimpleName() + ".java:1",message);
 				Component childField = field;
 
 				for (int i = 0; i < 10; i++)

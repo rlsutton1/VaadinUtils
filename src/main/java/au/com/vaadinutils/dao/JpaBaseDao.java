@@ -704,7 +704,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 	    TypedQuery<E> query = prepareQuery();
 	    return query.getResultList();
 	}
-
+	
 	private TypedQuery<E> prepareQuery()
 	{
 	    Predicate filter = null;
@@ -756,6 +756,8 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 	    return this;
 
 	}
+
+	
 
     }
 

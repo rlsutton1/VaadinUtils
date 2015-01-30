@@ -12,9 +12,11 @@ import org.apache.logging.log4j.Logger;
 import com.vaadin.data.Property;
 import com.vaadin.data.Validator;
 import com.vaadin.data.Validator.InvalidValueException;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
+import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -58,7 +60,6 @@ public class TimePicker extends HorizontalLayout implements Field
 	setCaption(title);
 	field = new TextField();
 	field.setWidth("125");
-	field.setStyleName("v-datefield-textfield");
 	field.setImmediate(true);
 	displayTime.setImmediate(true);
 	validator = new Validator()
@@ -83,14 +84,17 @@ public class TimePicker extends HorizontalLayout implements Field
 	field.addValidator(validator);
 
 	this.title = title;
-	HorizontalLayout hl = new HorizontalLayout();
-	hl.setStyleName("v-datefield v-datefield-popupcalendar v-datefield-day");
+	
+	CssLayout hl = new CssLayout();
+	hl.addStyleName("v-component-group");
+	hl.setWidth("100%");
+	hl.setHeight("35");
 
-	NativeButton b = new NativeButton();
-	b.setStyleName("v-datefield-button");
+	Button b = new Button();
+	b.setIcon(FontAwesome.CLOCK_O);
 
-	hl.addComponent(field);
 	hl.addComponent(b);
+	hl.addComponent(field);
 	b.addClickListener(new ClickListener()
 	{
 
