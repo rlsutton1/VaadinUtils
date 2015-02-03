@@ -12,21 +12,24 @@ public class HeadingToPropertyId<E>
 	private final ColumnGenerator columnGenerator;
 	private final SingularAttribute<E, ?> attribute;
 	private Integer width;
+	private boolean hidden=false;
 
 	/**
 	 * 
 	 * @param heading
+	 * @param columnGenerator2 
+	 * @param hidden TODO
 	 * @param propertyId
 	 *            - the real field name
-	 * @param columnGenerator2 
 	 */
-	public <M extends Object> HeadingToPropertyId(String heading, SingularAttribute<E, M> attribute, ColumnGenerator columnGenerator2)
+	public <M extends Object> HeadingToPropertyId(String heading, SingularAttribute<E, M> attribute, ColumnGenerator columnGenerator2, Boolean hidden)
 	{
 		Preconditions.checkNotNull(attribute);
 		this.heading = heading;
 		this.propertyId = null;
 		this.attribute = attribute;
 		this.columnGenerator = columnGenerator2;
+		this.hidden = hidden;
 	}
 	
 	/**
@@ -43,6 +46,12 @@ public class HeadingToPropertyId<E>
 		this.propertyId = propertyId;
 		this.attribute = null;
 		this.columnGenerator = columnGenerator2;
+	}
+	
+	public HeadingToPropertyId<E> setHidden()
+	{
+		hidden = true;
+		return this;
 	}
 	
 	public HeadingToPropertyId<E> setWidth(Integer width)
@@ -80,6 +89,11 @@ public class HeadingToPropertyId<E>
 	public Integer getWidth()
 	{
 		return width;
+	}
+
+	public boolean isHidden()
+	{
+		return hidden;
 	}
 
 }

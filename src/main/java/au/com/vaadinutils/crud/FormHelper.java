@@ -194,6 +194,15 @@ public class FormHelper<E> implements Serializable
 		return field;
 	}
 
+	public DateField bindDateField(String label, String member,
+			String dateFormat, Resolution resolution)
+	{
+		DateField field = bindDateField(form, group, label, member, dateFormat, resolution);
+		field.setWidth(STANDARD_COMBO_WIDTH);
+		this.fieldList.add(field);
+		return field;
+	}
+	
 	public DateField bindDateField(String label, SingularAttribute<E, Date> member,
 			String dateFormat, Resolution resolution)
 	{

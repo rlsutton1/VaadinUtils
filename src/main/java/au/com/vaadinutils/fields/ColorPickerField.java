@@ -56,8 +56,7 @@ public class ColorPickerField extends CustomField<iColor>
 	public void setInternalValue(iColor newFieldValue)
 	{
 		if (newFieldValue != null)
-			this.colorPicker.setColor(new com.vaadin.shared.ui.colorpicker.Color(newFieldValue.getRed(), newFieldValue
-					.getGreen(), newFieldValue.getBlue(), newFieldValue.getAlpha()));
+			this.colorPicker.setColor(new com.vaadin.shared.ui.colorpicker.Color(newFieldValue.getRGB()));
 		super.setInternalValue(newFieldValue);
 	}
 
