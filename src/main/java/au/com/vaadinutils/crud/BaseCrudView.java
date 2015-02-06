@@ -130,7 +130,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	private boolean disallowNew = false;
 	private Label actionLabel;
 	private boolean noEditor;
-	private boolean advancedSearchOn = false;
+	public boolean advancedSearchOn = false;
 	private Button advancedSearchCheckbox;
 	private Set<RowChangedListener<E>> rowChangedListeners = new CopyOnWriteArraySet<RowChangedListener<E>>();
 	private int minSearchTextLength = 0;

@@ -53,6 +53,7 @@ public class TimePicker extends HorizontalLayout implements Field
     private int tabIndex;
     private boolean isBuffered;
     private Validator validator;
+    private Button pickerButton;
 
     public TimePicker(String title)
     {
@@ -90,12 +91,12 @@ public class TimePicker extends HorizontalLayout implements Field
 	hl.setWidth("100%");
 	hl.setHeight("35");
 
-	Button b = new Button();
-	b.setIcon(FontAwesome.CLOCK_O);
+	pickerButton = new Button();
+	pickerButton.setIcon(FontAwesome.CLOCK_O);
 
-	hl.addComponent(b);
+	hl.addComponent(pickerButton);
 	hl.addComponent(field);
-	b.addClickListener(new ClickListener()
+	pickerButton.addClickListener(new ClickListener()
 	{
 
 	    private static final long serialVersionUID = 1L;
@@ -108,6 +109,14 @@ public class TimePicker extends HorizontalLayout implements Field
 	    }
 	});
 	addComponent(hl);
+    }
+    
+    @Override
+    public void setReadOnly(boolean readOnly)
+    {
+	field.setReadOnly(readOnly);
+        pickerButton.setEnabled(!readOnly);
+        super.setReadOnly(readOnly);
     }
 
     private Date parseDate(String value)
@@ -511,8 +520,16 @@ public class TimePicker extends HorizontalLayout implements Field
 	amPm = "AM";
 	isSet = false;
 	displayTime.setValue(EMPTY);
-	field.setValue(EMPTY);
+	internalSetReadonlyFieldValue(EMPTY);
 
+    }
+    
+    private void internalSetReadonlyFieldValue(String value)
+    {
+	boolean isRo = field.isReadOnly();
+	field.setReadOnly(false);
+	field.setValue(value);
+	field.setReadOnly(isRo);
     }
 
     public final String getValueAsString()
@@ -549,7 +566,7 @@ public class TimePicker extends HorizontalLayout implements Field
 		hour = "12";
 	    }
 	    displayTime.setValue(getValueAsString());
-	    field.setValue(getValueAsString());
+	    internalSetReadonlyFieldValue(getValueAsString());
 	    // logger.info("set to " + getValueAsString());
 	}
 	if (isModified())
@@ -561,7 +578,7 @@ public class TimePicker extends HorizontalLayout implements Field
     private void setNewValue()
     {
 	displayTime.setValue(getValueAsString());
-	field.setValue(getValueAsString());
+	internalSetReadonlyFieldValue(getValueAsString());
 	if (changedHandler != null)
 	{
 	    changedHandler.onChanged(getValueAsString());

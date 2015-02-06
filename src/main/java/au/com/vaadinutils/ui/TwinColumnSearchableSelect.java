@@ -239,7 +239,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	    }
 	});
 	removeButton.setHeight("50");
-	
+
 	removeAllButton.addClickListener(new ClickListener()
 	{
 
@@ -265,7 +265,6 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	});
 	removeAllButton.setHeight("50");
 
-
 	addButton.addClickListener(new ClickListener()
 	{
 
@@ -280,25 +279,27 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	    {
 		List<Long> ids = new LinkedList<>();
 		ids.addAll((Collection<? extends Long>) available.getSelectedItems());
-		Long id = ids.get(0);
-		if (id != null)
+		if (ids.size() > 0)
 		{
-		    JpaBaseDao<C, Long> dao = (JpaBaseDao<C, Long>) JpaBaseDao.getGenericDao(listField
-			    .getDeclaringType().getJavaType());
-		    C cust = dao.findById(id);
-		    if (cust != null)
+		    Long id = ids.get(0);
+		    if (id != null)
 		    {
-			beans.addBean(cust);
-			if (listener != null)
+			JpaBaseDao<C, Long> dao = (JpaBaseDao<C, Long>) JpaBaseDao.getGenericDao(listField
+				.getDeclaringType().getJavaType());
+			C cust = dao.findById(id);
+			if (cust != null)
 			{
-			    listener.valueChanged(getFieldValue());
+			    beans.addBean(cust);
+			    if (listener != null)
+			    {
+				listener.valueChanged(getFieldValue());
+			    }
 			}
 		    }
 		}
-
 	    }
 	});
-	
+
 	addAllButton.addClickListener(new ClickListener()
 	{
 
@@ -314,8 +315,9 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 		beans.removeAllItems();
 		List<Long> ids = new LinkedList<>();
 		ids.addAll((Collection<? extends Long>) available.getContainer().getItemIds());
-		
-		for (Long id:ids){
+
+		for (Long id : ids)
+		{
 		    JpaBaseDao<C, Long> dao = (JpaBaseDao<C, Long>) JpaBaseDao.getGenericDao(listField
 			    .getDeclaringType().getJavaType());
 		    C cust = dao.findById(id);
