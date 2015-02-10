@@ -18,6 +18,7 @@ import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.dao.JpaBaseDao;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Stopwatch;
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.EntityItemProperty;
 import com.vaadin.addon.jpacontainer.EntityProviderChangeEvent;
@@ -32,7 +33,6 @@ import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.data.util.filter.Compare;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.Notification.Type;
 
 /**
@@ -187,9 +187,12 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 
 	// container.discard();
 	container.refresh();
-	if (container.getItemIds().size() != numberOfChildren)
+
+	int changeInItems = numberOfChildren - container.getItemIds().size();
+	if (changeInItems != 0)
 	{
-	    String message = "The number of items in the container is not the same as it was before the refresh.";
+	    String message = "+" + changeInItems
+		    + ", The number of items in the container is not the same as it was before the refresh.";
 	    message += " This is usually caused by a filter the eliminates a newly added child. An example of this is ";
 	    message += " where a child crud is associated via a ManyToMany and the ManyToMany relationship is not yet updated and the ";
 	    message += " filter therefore eliminates the new child. - see the above TODO.";
@@ -442,11 +445,12 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 	try
 	{
 	    inNew = true;
+	    E previousEntity = getCurrent();
 	    saveEditsToTemp();
 	    resetFilters();
 	    triggerFilter();
 
-	    createNewEntity();
+	    createNewEntity(previousEntity);
 
 	    // if we call the overridden version we loop indefinitely
 
@@ -635,6 +639,13 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
     boolean preventRowChangeCascade = false;
     private Collection<RowChangedListener<P>> parentRowChangeListeners = new LinkedList<>();
 
+    private boolean isInitialised = false;
+
+    protected void initializeEntityTable()
+    {
+	// do nothing, this will be done when the parent selects the first row!
+    }
+
     /**
      * this method is called when the parent crud changes row, so we set filters
      * so that this child only displays the associated rows
@@ -644,19 +655,57 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
     {
 	try
 	{
+
+	    if (item != null && item.getEntity() != null)
+	    {
+		logger.error("Parent Row Changed {} {}", item.getEntity().getId(), item.getEntity().getName());
+	    }
+
 	    searchField.setValue("");
 	    clearAdvancedFilters();
-	    saveEditsToTemp();
-	    createParentFilter(item);
-	    currentParent = null;
-	    if (item != null)
+	    if (!isInitialised)
 	    {
-		currentParent = item.getEntity();
+		isInitialised = true;
+
+		createParentFilter(item);
+		currentParent = null;
+		if (item != null)
+		{
+		    currentParent = item.getEntity();
+		}
+		Stopwatch timer = new Stopwatch();
+		try
+		{
+		    timer.start();
+		    resetFilters();
+		    entityTable.init(this.getClass().getSimpleName());
+		}
+		catch (Exception e)
+		{
+		    handleConstraintViolationException(e);
+
+		}
+		finally
+		{
+		    logger.error("Child crud load {} took {}", this.getClass().getSimpleName(), timer.elapsedMillis());
+		}
+
 	    }
-	    fieldGroup.discard();
-	    container.discard();
-	    dirty = false;
-	    resetFilters();
+	    else
+	    {
+
+		saveEditsToTemp();
+		createParentFilter(item);
+		currentParent = null;
+		if (item != null)
+		{
+		    currentParent = item.getEntity();
+		}
+		fieldGroup.discard();
+		container.discard();
+		dirty = false;
+		resetFilters();
+	    }
 	    Object id = entityTable.firstItemId();
 	    if (id != null)
 	    {

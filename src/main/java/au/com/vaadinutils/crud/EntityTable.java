@@ -29,6 +29,7 @@ public class EntityTable<E> extends Table implements EntityList<E>
 	this.entityContainer = entityContainer;
 	this.columnConfiguration = headingPropertySet;
 	addStyleName(ValoTheme.TABLE_COMPACT);
+	this.setContainerDataSource(entityContainer);
 
     }
 
@@ -51,7 +52,6 @@ public class EntityTable<E> extends Table implements EntityList<E>
     public void init(String uniqueTableId)
     {
 
-	this.setContainerDataSource(entityContainer);
 
 	columnConfiguration.applyToTable(this, uniqueTableId);
 
