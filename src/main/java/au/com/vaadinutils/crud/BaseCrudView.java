@@ -1941,9 +1941,12 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
     public void setSearchFilterText(String string)
     {
-	entityTable.select(null);
-	searchField.setValue(string);
-	triggerFilter();
+	if (!searchField.getValue().equals(string))
+	{
+	    entityTable.select(null);
+	    searchField.setValue(string);
+	    triggerFilter();
+	}
 
     }
 
@@ -1951,5 +1954,15 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
     {
 
 	return !disallowNew;
+    }
+
+    /**
+     * useful when using query delegates to get the current search text
+     * 
+     * @return
+     */
+    public String getSearchText()
+    {
+	return searchField.getValue();
     }
 }
