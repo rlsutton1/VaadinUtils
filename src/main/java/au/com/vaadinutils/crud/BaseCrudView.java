@@ -3,9 +3,12 @@ package au.com.vaadinutils.crud;
 import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ExecutionException;
@@ -33,6 +36,7 @@ import au.com.vaadinutils.menu.Menu;
 import au.com.vaadinutils.menu.Menus;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Stopwatch;
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.EntityItemProperty;
 import com.vaadin.addon.jpacontainer.JPAContainer;
@@ -120,7 +124,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
     private Component editor;
     protected CrudPanelPair splitPanel;
     protected BaseCrudSaveCancelButtonTray buttonLayout;
-    private AbstractLayout advancedSearchLayout;
+    protected AbstractLayout advancedSearchLayout;
     private VerticalLayout searchLayout;
     protected Set<ChildCrudListener<E>> childCrudListeners = new HashSet<ChildCrudListener<E>>();
     private CrudDisplayMode displayMode = CrudDisplayMode.HORIZONTAL;
@@ -1397,7 +1401,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
     int emptyFilterWarningCount = 3;
 
-    private void triggerFilter(String searchText)
+    protected void triggerFilter(String searchText)
     {
 	boolean advancedSearchActive = advancedSearchOn;
 
@@ -1547,11 +1551,16 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	splitPanel.showSecondComponet();
 	fieldGroup.setItemDataSource(item);
 
+	Map<String, Long> times = new HashMap<>();
 	// notifiy ChildCrudView's taht we've changed row.
 	for (ChildCrudListener<E> commitListener : childCrudListeners)
 	{
+	    Stopwatch timer = new Stopwatch();
+	    timer.start();
 	    commitListener.selectedParentRowChanged(item);
+	    times.put(commitListener.getClass().getSimpleName(), timer.elapsedMillis());
 	}
+
 
 	if (item != null || newEntity != null)
 	{
@@ -1570,6 +1579,10 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	else
 	{
 	    notifyRowChangedListeners(item.getEntity());
+	}
+	for (Entry<String, Long> time : times.entrySet())
+	{
+	    logger.warn("{}: {}ms", time.getKey(), time.getValue());
 	}
 
     }
@@ -1956,13 +1969,4 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	return !disallowNew;
     }
 
-    /**
-     * useful when using query delegates to get the current search text
-     * 
-     * @return
-     */
-    public String getSearchText()
-    {
-	return searchField.getValue();
-    }
 }

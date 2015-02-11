@@ -153,9 +153,9 @@ public class TimePicker extends HorizontalLayout implements Field
     private void showPopupTimePicker()
     {
 
-	Date value = parseDate(field.getValue());
 	try
 	{
+		Date value = parseDate(field.getValue());
 	    int hourNumber = value.getHours() % 12;
 	    if (hourNumber == 0)
 	    {
@@ -174,6 +174,7 @@ public class TimePicker extends HorizontalLayout implements Field
 	}
 	catch (Exception e)
 	{
+	    logger.error(e);
 	    clearValue();
 	}
 

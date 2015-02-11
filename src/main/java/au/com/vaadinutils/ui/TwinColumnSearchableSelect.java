@@ -9,13 +9,11 @@ import java.util.Set;
 
 import javax.persistence.metamodel.EntityType;
 import javax.persistence.metamodel.Metamodel;
-import javax.persistence.metamodel.SetAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import au.com.vaadinutils.crud.ChildCrudEntity;
 import au.com.vaadinutils.crud.CrudEntity;
 import au.com.vaadinutils.crud.HeadingPropertySet;
 import au.com.vaadinutils.crud.SearchableSelectableEntityTable;
@@ -25,17 +23,17 @@ import au.com.vaadinutils.dao.JpaBaseDao;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.util.DefaultQueryModifierDelegate;
 import com.vaadin.data.Buffered;
-import com.vaadin.data.Property;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Container.Filterable;
+import com.vaadin.data.Property;
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.util.BeanContainer;
 import com.vaadin.data.util.filter.And;
 import com.vaadin.data.util.filter.SimpleStringFilter;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
-import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomField;
 import com.vaadin.ui.HorizontalLayout;
@@ -63,6 +61,8 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
     private Filter baselineFilter;
     private HorizontalLayout mainLayout;
     private ValueChangeListener<C> listener;
+    private Button addNewButton = new Button(FontAwesome.PLUS);
+    private CreateNewCallback<C> createNewCallback;
 
     /**
      * Unfortunately TwinColumnSelect wont work with large sets, it isn't
@@ -99,6 +99,14 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	selectedCols.setHeight("200");
 	selectedCols.setSelectable(true);
 	createAvailableTable();
+	
+	addNewButton.setVisible(false);
+    }
+
+    public void allowAddNew(CreateNewCallback<C> createNewCallback)
+    {
+	addNewButton.setVisible(true);
+	this.createNewCallback = createNewCallback;
     }
 
     public interface ValueChangeListener<C>
@@ -333,10 +341,34 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 
 	    }
 	});
+
+	
+	addNewButton.addClickListener(new ClickListener()
+	{
+
+	    private static final long serialVersionUID = 173977618488084577L;
+
+	    @Override
+	    public void buttonClick(ClickEvent event)
+	    {
+		createNewCallback.createNew(new RefreshCallback()
+		{
+		    @Override
+		    public void refresh()
+		    {
+			availableContainer.refresh();
+		    }
+		});
+
+	    }
+	});
+
 	layout.addComponent(removeButton);
 	layout.addComponent(addButton);
 	layout.addComponent(removeAllButton);
 	layout.addComponent(addAllButton);
+	layout.addComponent(addNewButton);
+
 
 	return layout;
 
@@ -475,6 +507,17 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
     {
 	availableContainer.setQueryModifierDelegate(defaultQueryModifierDelegate);
 
+    }
+
+    /**
+     * defaults to true (visible)
+     * 
+     * @param show
+     */
+    public void showAddAndRemoveAllButtons(boolean show)
+    {
+	addAllButton.setVisible(show);
+	removeAllButton.setVisible(show);
     }
 
 }

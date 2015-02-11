@@ -1,8 +1,10 @@
 package au.com.vaadinutils.dao;
 
 import java.lang.reflect.ParameterizedType;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.persistence.EntityManager;
@@ -20,6 +22,7 @@ import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.Attribute;
 import javax.persistence.metamodel.EntityType;
 import javax.persistence.metamodel.Metamodel;
+import javax.persistence.metamodel.SetAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.vaadin.addons.lazyquerycontainer.EntityContainer;
@@ -626,15 +629,16 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 	/**
 	 * specify that JPA should fetch child entities in a single query!
+	 * 
 	 * @param field
 	 * @return
 	 */
-	public <L> FindBuilder fetch(SingularAttribute<E,L> field)
+	public <L> FindBuilder fetch(SingularAttribute<E, L> field)
 	{
-	    root.fetch(field,JoinType.LEFT);
+	    root.fetch(field, JoinType.LEFT);
 	    return this;
 	}
-	
+
 	public <L> FindBuilder whereEqual(SingularAttribute<E, L> field, L value)
 	{
 	    predicates.add(builder.equal(root.get(field), value));
@@ -695,16 +699,16 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 	{
 	    limit(1);
 	    TypedQuery<E> query = prepareQuery();
-	    
+
 	    return query.getSingleResult();
 	}
-	
+
 	public List<E> getResultList()
 	{
 	    TypedQuery<E> query = prepareQuery();
 	    return query.getResultList();
 	}
-	
+
 	private TypedQuery<E> prepareQuery()
 	{
 	    Predicate filter = null;
@@ -757,7 +761,49 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 	}
 
-	
+	public Predicate like(SingularAttribute<E, String> field, String value)
+	{
+	    return builder.like(root.get(field), value);
+
+	}
+
+	public <J> Join<E, J> join(SingularAttribute<E, J> joinAttribute, JoinType joinType)
+	{
+
+	    return root.join(joinAttribute, joinType);
+
+	}
+
+	public <J> Predicate joinLike(Join<E, J> join, SingularAttribute<J, String> field, String value)
+	{
+	    return builder.like(join.get(field), value);
+
+	}
+
+	public FindBuilder whereAnd(Predicate pred)
+	{
+	    predicates.add(pred);
+	    return this;
+	}
+
+	public FindBuilder whereOr(List<Predicate> orPredicates)
+	{
+	    Predicate or = null;
+	    for (Predicate pred : orPredicates)
+	    {
+		if (or == null)
+		{
+		    or = pred;
+		}
+		else
+		{
+		    or = builder.or(or, pred);
+		}
+	    }
+	    predicates.add(or);
+	    return this;
+
+	}
 
     }
 
