@@ -800,7 +800,10 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		    or = builder.or(or, pred);
 		}
 	    }
-	    predicates.add(or);
+	    if (or != null)
+	    {
+		predicates.add(or);
+	    }
 	    return this;
 
 	}

@@ -678,6 +678,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 		{
 		    timer.start();
 		    resetFilters();
+		    triggerFilter();
 		    entityTable.init(this.getClass().getSimpleName());
 		}
 		catch (Exception e)
@@ -705,6 +706,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 		container.discard();
 		dirty = false;
 		resetFilters();
+		triggerFilter();
 	    }
 	    Object id = entityTable.firstItemId();
 	    if (id != null)

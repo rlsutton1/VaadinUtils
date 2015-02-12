@@ -225,12 +225,12 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 	/**
 	 * call this method to cause filters to be applied
 	 */
-	protected void triggerFilter()
+	public void triggerFilter()
 	{
 		triggerFilter(searchField.getValue());
 	}
 
-	private void triggerFilter(String searchText)
+	protected void triggerFilter(String searchText)
 	{
 		boolean advancedSearchActive = advancedSearchCheckbox != null && advancedSearchCheckbox.getValue();
 		Filter filter = getContainerFilter(searchText, advancedSearchActive);
@@ -253,7 +253,7 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 
 	}
 
-	protected String getSearchFieldText()
+	public String getSearchFieldText()
 	{
 		return searchField.getValue();
 	}
@@ -344,6 +344,12 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 	public Object getSelectedItems()
 	{
 	   return  selectableTable.getSelectedItems();
+	}
+
+	public void setSearchFilterText(String text)
+	{
+	    searchField.setValue(text);
+	    triggerFilter(text);
 	}
 
 }
