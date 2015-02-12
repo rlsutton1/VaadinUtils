@@ -1558,7 +1558,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	    Stopwatch timer = new Stopwatch();
 	    timer.start();
 	    commitListener.selectedParentRowChanged(item);
-	    times.put(commitListener.getClass().getSimpleName(), timer.elapsedMillis());
+	    times.put(commitListener.getClass().getSimpleName()+":"+commitListener.hashCode(), timer.elapsedMillis());
 	}
 
 
