@@ -131,7 +131,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 		try
 		{
-			if (!getSecurityManager().canUseView())
+			if (!getSecurityManager().canUserView())
 			{
 				this.setSizeFull();
 				Label sorryMessage = new Label("Sorry, you do not have permission to access " + getTitleText());
@@ -189,7 +189,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		// uninitialised components
 		try
 		{
-			if (!getSecurityManager().canUseView())
+			if (!getSecurityManager().canUserView())
 			{
 				this.setSizeFull();
 				Label sorryMessage = new Label("Sorry, you do not have permission to access " + getTitleText());
@@ -1009,7 +1009,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		Notification.show("Please fix the form errors and then try again.\n\n " + causeMessage, Type.ERROR_MESSAGE);
 	}
 
-	void handleConstraintViolationException(Throwable e)
+	protected void handleConstraintViolationException(Throwable e)
 	{
 		Throwable cause = e.getCause();
 		if (cause instanceof ConstraintViolationException)
@@ -1114,8 +1114,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 * is unreliable
 	 * 
 	 * @param item
+	 * @throws Exception 
 	 */
-	protected void interceptSaveValues(EntityItem<E> entityItem)
+	protected void interceptSaveValues(EntityItem<E> entityItem) throws Exception
 	{
 	}
 

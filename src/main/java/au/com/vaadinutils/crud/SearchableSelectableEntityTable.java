@@ -52,7 +52,7 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 
 		try
 		{
-			if (!getSecurityManager().canUseView())
+			if (!getSecurityManager().canUserView())
 			{
 				this.setSizeFull();
 				this.addComponent(new Label("Sorry, you do not have permission to access " + getTitle()));
