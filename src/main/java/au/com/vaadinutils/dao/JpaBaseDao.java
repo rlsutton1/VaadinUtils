@@ -426,8 +426,6 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 	}
 
-
-
 	static public <T> SingularAttribute<T, Long> getIdField(Class<T> type)
 	{
 		Metamodel metaModel = EntityManagerProvider.getEntityManager().getMetamodel();
@@ -735,6 +733,75 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 			predicates.add(builder.isNull(root.get(field)));
 			return this;
 
+		}
+
+		public Predicate like(SingularAttribute<E, String> field, String value)
+		{
+			return builder.like(root.get(field), value);
+
+		}
+
+		public <J> Join<E, J> join(SingularAttribute<E, J> joinAttribute, JoinType joinType)
+		{
+
+			return root.join(joinAttribute, joinType);
+
+		}
+
+		public <J> Predicate joinLike(Join<E, J> join, SingularAttribute<J, String> field, String value)
+		{
+			return builder.like(join.get(field), value);
+
+		}
+
+		public FindBuilder whereAnd(Predicate pred)
+		{
+			predicates.add(pred);
+			return this;
+		}
+
+		public FindBuilder whereOr(List<Predicate> orPredicates)
+		{
+			Predicate or = null;
+			for (Predicate pred : orPredicates)
+			{
+				if (or == null)
+				{
+					or = pred;
+				}
+				else
+				{
+					or = builder.or(or, pred);
+				}
+			}
+			if (or != null)
+			{
+				predicates.add(or);
+			}
+			return this;
+
+		}
+
+		public <L extends Comparable<? super L>> FindBuilder whereLessThanOrEqualTo(SingularAttribute<E, L> field,
+				L value)
+		{
+			predicates.add(builder.lessThanOrEqualTo(root.get(field), value));
+
+			return this;
+
+		}
+
+		public <L extends Comparable<? super L>> Predicate greaterThanOrEqualTo(SingularAttribute<E, L> field,
+				L value)
+		{
+			return builder.greaterThanOrEqualTo(root.get(field), value);
+			
+		}
+
+		public <L> Predicate isNull(SingularAttribute<E, L> field)
+		{
+			return builder.isNull(root.get(field));
+			
 		}
 
 	}

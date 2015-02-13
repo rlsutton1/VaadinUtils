@@ -177,6 +177,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		entityTable.setColumnCollapsingAllowed(true);
 
 		initLayout();
+		resetFilters();
 		entityTable.init();
 		initSearch();
 		initButtons();
