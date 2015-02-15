@@ -1,6 +1,7 @@
 package au.com.vaadinutils.help;
 
 import com.vaadin.ui.AbstractLayout;
+import com.vaadin.ui.AbstractOrderedLayout;
 
 public interface HelpIndex
 {
@@ -13,6 +14,6 @@ public interface HelpIndex
 
 	
 
-	void setHelpSource(Enum<?> helpId, AbstractLayout layout, HelpDisplayedCallback callback);
+	void setHelpSource(Enum<?> helpId, AbstractOrderedLayout layout, HelpDisplayedCallback callback);
 
 }
