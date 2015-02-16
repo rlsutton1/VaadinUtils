@@ -51,7 +51,7 @@ public class TimePicker24 extends HorizontalLayout implements Field
 	private Validator validator;
 	private SimpleDateFormat sdf;
 	private String amPm;
-	private NativeButton popUpButton;
+	private Button pickerButton;
 
 	public TimePicker24(String title, String format)
 	{
@@ -98,12 +98,12 @@ public class TimePicker24 extends HorizontalLayout implements Field
 		hl.setWidth("100%");
 		hl.setHeight("35");
 
-		Button b = new Button();
-		b.setIcon(FontAwesome.CLOCK_O);
+		pickerButton = new Button();
+		pickerButton.setIcon(FontAwesome.CLOCK_O);
 
 		hl.addComponent(field);
-		hl.addComponent(popUpButton);
-		popUpButton.addClickListener(new ClickListener()
+		hl.addComponent(pickerButton);
+		pickerButton.addClickListener(new ClickListener()
 		{
 
 			private static final long serialVersionUID = 1L;
@@ -121,7 +121,7 @@ public class TimePicker24 extends HorizontalLayout implements Field
 	@Override
 	public void setReadOnly(boolean readOnly)
 	{
-		popUpButton.setReadOnly(true);
+		pickerButton.setReadOnly(true);
 	}
 
 	public void focus()
