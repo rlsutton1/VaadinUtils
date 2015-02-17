@@ -107,25 +107,10 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 	// child cruds dont have save/cancel buttons
 	rightLayout.removeComponent(buttonLayout);
 
-	createAuditor();
 
     }
 
-    @SuppressWarnings("unchecked")
-    private void createAuditor()
-    {
-	CrudEventDistributer.addListener((Class<? extends BaseCrudView<?>>) this.getClass(), new CrudEventListener()
-	{
-
-	    @Override
-	    public void crudEvent(CrudEventType event, CrudEntity entity)
-	    {
-		AuditFactory.getAuditor().audit(event, entity);
-
-	    }
-	});
-    }
-
+   
     /**
      * this method is invoked when the parent saves, signalling the children
      * that they too should save.
@@ -658,7 +643,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 
 	    if (item != null && item.getEntity() != null)
 	    {
-		logger.error("Parent Row Changed {} {}", item.getEntity().getId(), item.getEntity().getName());
+		logger.info("Parent Row Changed {} {}", item.getEntity().getId(), item.getEntity().getName());
 	    }
 
 	    searchField.setValue("");
@@ -688,7 +673,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 		}
 		finally
 		{
-		    logger.error("Child crud load {} took {}", this.getClass().getSimpleName(), timer.elapsedMillis());
+		    logger.info("Child crud load {} took {}", this.getClass().getSimpleName(), timer.elapsedMillis());
 		}
 
 	    }

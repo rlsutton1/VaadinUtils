@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import au.com.vaadinutils.audit.AuditFactory;
 import au.com.vaadinutils.crud.BaseCrudView;
 import au.com.vaadinutils.crud.CrudEntity;
 
@@ -46,5 +47,7 @@ public enum CrudEventDistributer
 				listener.crudEvent(event, entity);
 			}
 		}
+		
+		AuditFactory.getAuditor().audit(event, entity);
 	}
 }

@@ -158,7 +158,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 	protected void init(Class<E> entityClass, JPAContainer<E> container, HeadingPropertySet<E> headings)
 	{
-		createAuditor();
 		this.entityClass = entityClass;
 		this.container = container;
 		try
@@ -244,20 +243,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	private void createAuditor()
-	{
-		CrudEventDistributer.addListener((Class<? extends BaseCrudView<?>>) this.getClass(), new CrudEventListener()
-		{
-
-			@Override
-			public void crudEvent(CrudEventType event, CrudEntity entity)
-			{
-				AuditFactory.getAuditor().audit(event, entity);
-
-			}
-		});
-	}
+	
 
 	/**
 	 * allows the user to sort the items in the list via drag and drop
@@ -626,7 +612,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			public void exec(BaseCrudView<E> crud, EntityItem<E> entity)
 			{
 
-				new ContainerCSVExport(getTitleText(),(Table) entityTable, headings);
+				new ContainerCSVExport(getTitleText(), (Table) entityTable, headings);
 
 			}
 
@@ -1617,7 +1603,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		}
 		for (Entry<String, Long> time : times.entrySet())
 		{
-			logger.warn("{}: {}ms", time.getKey(), time.getValue());
+			logger.info("{}: {}ms", time.getKey(), time.getValue());
 		}
 
 	}
