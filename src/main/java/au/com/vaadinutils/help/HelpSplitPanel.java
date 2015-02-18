@@ -201,11 +201,63 @@ public class HelpSplitPanel extends HorizontalSplitPanel implements View, HelpPa
 
 		helpPane = new VerticalLayout();
 		helpPane.setImmediate(false);
-		helpPane.setMargin(false);
-		helpPane.setSizeFull();
+		helpPane.setMargin(true);
+		helpPane.setHeight("" + (UI.getCurrent().getPage().getBrowserWindowHeight()) * .8);
+		helpPane.setWidth("" + (UI.getCurrent().getPage().getBrowserWindowWidth() * .8));
+		helpPane.addComponent(new Label("Loading help..."));
+
+		tb = new Toolbox();
+		tb.setOrientation(ORIENTATION.RIGHT_CENTER);
+		tb.setIcon(FontAwesome.QUESTION);
+		tb.setAnimationTime(500);
+		tb.setFoldOnClickOnly(true);
+		tb.setContent(helpPane);
+
+		setSplitPosition(100, Unit.PERCENTAGE, false);
+		setLocked(true);
+
+		super.setSecondComponent(tb);
+
+		Page.getCurrent().addBrowserWindowResizeListener(new BrowserWindowResizeListener()
+		{
+
+			private static final long serialVersionUID = -8548907013566961812L;
+
+			@Override
+			public void browserWindowResized(BrowserWindowResizeEvent event)
+			{
+
+				resizeHelp();
+				tb.setToolboxVisible(false);
+
+			}
+
+			
+		});
 
 	}
 
+	
+	private void resizeHelp()
+	{
+		if (!showHelpOnPage)
+		{
+			helpPane.setHeight("" + (UI.getCurrent().getPage().getBrowserWindowHeight()) * .8);
+			helpPane.setWidth("" + (UI.getCurrent().getPage().getBrowserWindowWidth() * .8));
+			helpHolder.setHeight("" + (UI.getCurrent().getPage().getBrowserWindowHeight()) * .78);
+			helpHolder.setWidth("" + (UI.getCurrent().getPage().getBrowserWindowWidth() * .79));
+		}
+		else
+		{
+			helpPane.setSizeFull();
+			helpHolder.setSizeFull();
+			helpPane.setMargin(false);
+			helpHolder.setMargin(false);
+			//helpPane.setWidth(""+(getWidth()*getSplitPosition()/100));
+			//helpHolder.setWidth(""+(getWidth()*getSplitPosition()/100));
+		}
+	}
+	
 	@Override
 	public void removeAllComponents()
 	{
@@ -245,95 +297,21 @@ public class HelpSplitPanel extends HorizontalSplitPanel implements View, HelpPa
 			@Override
 			public void success()
 			{
-				if (showHelpOnPage)
-				{
-					showHelpOnPage();
-				}
-				else
-				{
-					setUpToolBox();
-				}
-
+				helpPane.removeAllComponents();
+				helpPane.addComponent(helpHolder);
 				addFooter();
+				resizeHelp();
 
 			}
 
 			@Override
 			public void fail()
 			{
-				if (showHelpOnPage)
-				{
-					showHelpOnPage();
-				}
-				else
-				{
-					setUpToolBox();
-					tb.setToolboxVisible(true);
-				}
+				helpPane.removeAllComponents();
+				helpPane.addComponent(helpHolder);
 				addFooter();
+				resizeHelp();
 
-			}
-
-			private void showHelpOnPage()
-			{
-				adjustHelpSize(currentHelpId);
-				setLocked(false);
-				helpHolder.setSizeFull();
-				HelpSplitPanel.super.addComponent(helpHolder);
-				if (tb != null)
-				{
-					tb.setToolboxVisible(false);
-					//tb.setVisible(false);
-					HelpSplitPanel.this.componentPane.removeComponent(tb);
-				}
-			}
-
-			private void setUpToolBox()
-			{
-				setSplitPosition(100, Unit.PERCENTAGE, false);
-				setLocked(true);
-
-				if (tb != null)
-				{
-					HelpSplitPanel.this.componentPane.removeComponent(tb);
-				}
-
-				tb = new Toolbox();
-				tb.setOrientation(ORIENTATION.RIGHT_CENTER);
-
-				helpHolder.setMargin(true);
-				tb.setContent(helpHolder);
-				tb.setIcon(FontAwesome.QUESTION);
-
-				tb.setAnimationTime(500);
-				tb.setFoldOnClickOnly(true);
-
-				setHelpSize();
-				HelpSplitPanel.this.componentPane.addComponent(tb);
-
-				Page.getCurrent().addBrowserWindowResizeListener(new BrowserWindowResizeListener()
-				{
-
-					@Override
-					public void browserWindowResized(BrowserWindowResizeEvent event)
-					{
-						setHelpSize();
-
-					}
-				});
-			}
-
-			private void setHelpSize()
-			{
-				if (!showHelpOnPage)
-				{
-					helpHolder.setHeight("" + (UI.getCurrent().getPage().getBrowserWindowHeight()) * .8);
-					helpHolder.setWidth("" + (UI.getCurrent().getPage().getBrowserWindowWidth() * .8));
-				}
-				else
-				{
-					helpHolder.setSizeFull();
-				}
 			}
 
 			private void addFooter()
@@ -348,14 +326,13 @@ public class HelpSplitPanel extends HorizontalSplitPanel implements View, HelpPa
 					@Override
 					public void buttonClick(ClickEvent event)
 					{
-						if (tb != null)
-						{
-							tb.setToolboxVisible(false);
-							//tb.setVisible(false);
-							HelpSplitPanel.this.componentPane.removeComponent(tb);
-						}
+						HelpSplitPanel.super.removeComponent(HelpSplitPanel.super.getSecondComponent());
+						HelpSplitPanel.super.setSecondComponent(helpPane);
 						showHelpOnPage = true;
 						setHelpPageId(currentHelpId);
+						adjustHelpSize(currentHelpId);
+						setLocked(false);
+						resizeHelp();
 
 					}
 				});
