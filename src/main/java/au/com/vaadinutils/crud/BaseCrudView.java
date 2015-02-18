@@ -1573,7 +1573,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		fieldGroup.setItemDataSource(item);
 
 		Map<String, Long> times = new HashMap<>();
-		// notifiy ChildCrudView's taht we've changed row.
+		// notifiy ChildCrudView's that we've changed row.
 		for (ChildCrudListener<E> commitListener : childCrudListeners)
 		{
 			Stopwatch timer = new Stopwatch();
