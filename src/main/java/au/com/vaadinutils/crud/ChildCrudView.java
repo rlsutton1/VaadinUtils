@@ -10,10 +10,6 @@ import javax.validation.ConstraintViolationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import au.com.vaadinutils.audit.AuditFactory;
-import au.com.vaadinutils.crud.events.CrudEventDistributer;
-import au.com.vaadinutils.crud.events.CrudEventListener;
-import au.com.vaadinutils.crud.events.CrudEventType;
 import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.dao.JpaBaseDao;
 
