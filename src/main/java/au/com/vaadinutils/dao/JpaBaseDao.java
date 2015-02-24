@@ -1,6 +1,7 @@
 package au.com.vaadinutils.dao;
 
 import java.lang.reflect.ParameterizedType;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
@@ -741,10 +742,17 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 		}
 
-		public <J> Join<E, J> join(SingularAttribute<E, J> joinAttribute, JoinType joinType)
+//		public <J> Join<E, J> join(SingularAttribute<E, J> joinAttribute, JoinType joinType)
+//		{
+//
+//			return root.join(joinAttribute, joinType);
+//
+//		}
+		
+		public <J>  Join<? super E, J> join(SingularAttribute<? super E, J> joinAttribute, JoinType joinType)
 		{
 
-			return root.join(joinAttribute, joinType);
+			return root.join( joinAttribute, joinType);
 
 		}
 
@@ -752,6 +760,19 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		{
 			return builder.like(join.get(field), value);
 
+		}
+		
+		public <J> Predicate joinGreaterThanOrEqualTo(Join<? super E, J> join,
+				SingularAttribute<J, Date> field, Date value)
+		{
+			return builder.greaterThanOrEqualTo(join.get(field), value);
+			
+		}
+		
+		public <J> Predicate joinLessThan(Join<? super E, J> join,
+				SingularAttribute<J, Date> field, Date value)
+		{
+			return builder.lessThan(join.get(field), value);
 		}
 
 		public FindBuilder whereAnd(Predicate pred)
@@ -803,6 +824,10 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 			return builder.isNull(root.get(field));
 			
 		}
+
+		
+
+		
 
 	}
 
