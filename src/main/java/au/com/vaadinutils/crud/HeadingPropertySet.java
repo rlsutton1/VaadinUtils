@@ -15,8 +15,6 @@ import au.com.vaadinutils.user.UserSettingsStorageFactory;
 import com.google.common.base.Preconditions;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.ColumnGenerator;
-import com.vaadin.ui.Table.ColumnReorderEvent;
-import com.vaadin.ui.Table.ColumnReorderListener;
 import com.vaadin.ui.Table.ColumnResizeEvent;
 import com.vaadin.ui.Table.ColumnResizeListener;
 
@@ -49,31 +47,34 @@ public class HeadingPropertySet<E>
 
 		public Builder<E> addGeneratedColumn(String heading, ColumnGenerator columnGenerator)
 		{
-			cols.add(new HeadingToPropertyId<E>(heading, heading + "-generated", columnGenerator));
+			addGeneratedColumn(heading, heading + "-generated",  columnGenerator);
 			return this;
 
 		}
 
 		public Builder<E> addGeneratedColumn(String heading, ColumnGenerator columnGenerator, int width)
 		{
-			cols.add(new HeadingToPropertyId<E>(heading, heading + "-generated", columnGenerator).setWidth(width));
+			addGeneratedColumn(heading, heading + "-generated",  columnGenerator, width);
 			return this;
 
 		}
 
 		/**
-		 * use addGeneratedColumn(String heading, ColumnGenerator
-		 * columnGenerator)
-		 * 
 		 * @param heading
 		 * @param headingPropertyId
 		 * @param columnGenerator
 		 * @return
 		 */
-		@Deprecated
 		public Builder<E> addGeneratedColumn(String heading, String headingPropertyId, ColumnGenerator columnGenerator)
 		{
-			addGeneratedColumn(heading, columnGenerator);
+			cols.add(new HeadingToPropertyId<E>(heading, headingPropertyId, columnGenerator));
+			return this;
+
+		}
+
+		public Builder<E> addGeneratedColumn(String heading, String headingPropertyId, ColumnGenerator columnGenerator, int width)
+		{
+			cols.add(new HeadingToPropertyId<E>(heading, headingPropertyId, columnGenerator).setWidth(width));
 			return this;
 
 		}
@@ -123,37 +124,29 @@ public class HeadingPropertySet<E>
 		}
 
 		/**
-		 * use addGeneratedColumn(String heading, ColumnGenerator
-		 * columnGenerator)
-		 * 
 		 * @param heading
 		 * @param headingPropertyId
 		 * @param columnGenerator
 		 * @return
 		 */
-		@Deprecated
 		public <T extends Object> Builder<E> addGeneratedColumn(String heading,
 				SingularAttribute<E, T> headingPropertyId, ColumnGenerator columnGenerator)
 		{
-			addGeneratedColumn(heading, columnGenerator);
+		    cols.add(new HeadingToPropertyId<E>(heading, headingPropertyId.getName(), columnGenerator));
 			return this;
 
 		}
 
 		/**
-		 * use addGeneratedColumn(String heading, ColumnGenerator
-		 * columnGenerator, int width)
-		 * 
 		 * @param heading
 		 * @param headingPropertyId
 		 * @param columnGenerator
 		 * @return
 		 */
-		@Deprecated
 		public <T extends Object> Builder<E> addGeneratedColumn(String heading,
 				SingularAttribute<E, T> headingPropertyId, ColumnGenerator columnGenerator, int width)
 		{
-			addGeneratedColumn(heading, columnGenerator, width);
+		    cols.add(new HeadingToPropertyId<E>(heading, headingPropertyId.getName(), columnGenerator).setWidth(width));
 			return this;
 
 		}
