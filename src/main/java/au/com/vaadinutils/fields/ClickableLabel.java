@@ -32,4 +32,10 @@ public class ClickableLabel extends VerticalLayout
 	{
 		label.setStyleName(style);
 	}
+
+	public void setContentMode(ContentMode contentMode)
+	{
+		label.setContentMode(contentMode);
+		
+	}
 }

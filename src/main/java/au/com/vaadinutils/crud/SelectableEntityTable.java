@@ -1,12 +1,9 @@
 package au.com.vaadinutils.crud;
 
 import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
 
 import au.com.vaadinutils.fields.TableCheckBoxSelect;
 
-import com.google.common.base.Preconditions;
 import com.vaadin.data.Container;
 
 public class SelectableEntityTable<E> extends TableCheckBoxSelect

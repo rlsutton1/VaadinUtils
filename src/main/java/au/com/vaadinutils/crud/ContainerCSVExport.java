@@ -1,6 +1,5 @@
 package au.com.vaadinutils.crud;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -8,8 +7,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.util.Collections;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -36,8 +33,8 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
-import com.vaadin.ui.UI;
 import com.vaadin.ui.Table.ColumnGenerator;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 
 public class ContainerCSVExport<E>

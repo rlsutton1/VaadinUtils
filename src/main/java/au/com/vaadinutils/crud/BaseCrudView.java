@@ -1,10 +1,5 @@
 package au.com.vaadinutils.crud;
 
-import java.io.BufferedWriter;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.Collections;
@@ -30,9 +25,7 @@ import org.eclipse.persistence.exceptions.DatabaseException;
 import org.eclipse.persistence.exceptions.DescriptorException;
 import org.vaadin.dialogs.ConfirmDialog;
 
-import au.com.vaadinutils.audit.AuditFactory;
 import au.com.vaadinutils.crud.events.CrudEventDistributer;
-import au.com.vaadinutils.crud.events.CrudEventListener;
 import au.com.vaadinutils.crud.events.CrudEventType;
 import au.com.vaadinutils.crud.security.SecurityManagerFactoryProxy;
 import au.com.vaadinutils.dao.EntityManagerProvider;
@@ -52,13 +45,11 @@ import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Container.ItemSetChangeEvent;
 import com.vaadin.data.Container.ItemSetChangeListener;
 import com.vaadin.data.Validator.InvalidValueException;
-import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
 import com.vaadin.event.dd.DragAndDropEvent;
 import com.vaadin.event.dd.DropHandler;
-import com.vaadin.event.dd.TargetDetails;
 import com.vaadin.event.dd.acceptcriteria.AcceptCriterion;
 import com.vaadin.event.dd.acceptcriteria.SourceIsTarget;
 import com.vaadin.shared.ui.MarginInfo;
@@ -85,7 +76,6 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.ColumnGenerator;
 import com.vaadin.ui.Table.TableDragMode;
 import com.vaadin.ui.TextField;
-import com.vaadin.ui.Tree.TreeTargetDetails;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
@@ -158,7 +148,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 	protected void init(Class<E> entityClass, JPAContainer<E> container, HeadingPropertySet<E> headings)
 	{
-		createAuditor();
 		this.entityClass = entityClass;
 		this.container = container;
 		try
@@ -244,20 +233,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	private void createAuditor()
-	{
-		CrudEventDistributer.addListener((Class<? extends BaseCrudView<?>>) this.getClass(), new CrudEventListener()
-		{
-
-			@Override
-			public void crudEvent(CrudEventType event, CrudEntity entity)
-			{
-				AuditFactory.getAuditor().audit(event, entity);
-
-			}
-		});
-	}
+	
 
 	/**
 	 * allows the user to sort the items in the list via drag and drop
@@ -616,6 +592,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		CrudAction<E> exportAction = new CrudAction<E>()
 		{
 
+			private static final long serialVersionUID = -7703959823800614876L;
+
 			@Override
 			public boolean isDefault()
 			{
@@ -626,7 +604,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			public void exec(BaseCrudView<E> crud, EntityItem<E> entity)
 			{
 
-				new ContainerCSVExport(getTitleText(),(Table) entityTable, headings);
+				new ContainerCSVExport(getTitleText(), (Table) entityTable, headings);
 
 			}
 
@@ -1587,7 +1565,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		fieldGroup.setItemDataSource(item);
 
 		Map<String, Long> times = new HashMap<>();
-		// notifiy ChildCrudView's taht we've changed row.
+		// notifiy ChildCrudView's that we've changed row.
 		for (ChildCrudListener<E> commitListener : childCrudListeners)
 		{
 			Stopwatch timer = new Stopwatch();
@@ -1617,7 +1595,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		}
 		for (Entry<String, Long> time : times.entrySet())
 		{
-			logger.warn("{}: {}ms", time.getKey(), time.getValue());
+			logger.info("{}: {}ms", time.getKey(), time.getValue());
 		}
 
 	}

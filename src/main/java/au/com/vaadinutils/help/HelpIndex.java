@@ -1,6 +1,5 @@
 package au.com.vaadinutils.help;
 
-import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.AbstractOrderedLayout;
 
 public interface HelpIndex
