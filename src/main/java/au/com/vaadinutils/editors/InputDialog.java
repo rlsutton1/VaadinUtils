@@ -41,6 +41,16 @@ public class InputDialog extends Window implements InputFormDialogRecipient
 	dialog.setHeight(width);
     }
 
+    public void setFieldWidth(String width)
+    {
+	field.setWidth(width);
+    }
+
+    public void setFieldHeight(String width)
+    {
+	field.setHeight(width);
+    }
+
     /**
      * Add validators to the field which will be run when the user clicks OK.
      * 
