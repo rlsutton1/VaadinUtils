@@ -1,6 +1,7 @@
 package au.com.vaadinutils.dao;
 
 import java.lang.reflect.ParameterizedType;
+import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -781,7 +782,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 			return this;
 		}
 
-		public FindBuilder whereOr(List<Predicate> orPredicates)
+		public FindBuilder whereOr(Collection<Predicate> orPredicates)
 		{
 			Predicate or = null;
 			for (Predicate pred : orPredicates)
@@ -802,7 +803,41 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 			return this;
 
 		}
-
+		
+		public Predicate And(Collection<Predicate> orPredicates)
+		{
+			Predicate result = null;
+			for (Predicate pred : orPredicates)
+			{
+				if (result == null)
+				{
+					result = pred;
+				}
+				else
+				{
+					result = builder.and(result, pred);
+				}
+			}
+			return result;
+		}
+		
+		public Predicate Or(Collection<Predicate> orPredicates)
+		{
+			Predicate result = null;
+			for (Predicate pred : orPredicates)
+			{
+				if (result == null)
+				{
+					result = pred;
+				}
+				else
+				{
+					result = builder.or(result, pred);
+				}
+			}
+			return result;
+		}
+		
 		public <L extends Comparable<? super L>> FindBuilder whereLessThanOrEqualTo(SingularAttribute<E, L> field,
 				L value)
 		{

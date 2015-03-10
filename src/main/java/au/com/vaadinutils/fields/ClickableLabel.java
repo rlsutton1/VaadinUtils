@@ -1,5 +1,6 @@
 package au.com.vaadinutils.fields;
 
+import com.vaadin.server.FontAwesome;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
@@ -31,5 +32,10 @@ public class ClickableLabel extends VerticalLayout
 	public void setStyleName(String style)
 	{
 		label.setStyleName(style);
+	}
+
+	public void setContentMode(ContentMode contentMode)
+	{
+		label.setContentMode(contentMode);
 	}
 }
