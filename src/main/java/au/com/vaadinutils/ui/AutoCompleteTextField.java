@@ -1,86 +1,119 @@
 package au.com.vaadinutils.ui;
 
-import com.zybnet.autocomplete.server.AutocompleteField;
-import com.zybnet.autocomplete.shared.AutocompleteServerRpc;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
-public class AutoCompleteTextField<E> extends AutocompleteField<E> implements AutocompleteServerRpc
+import org.vaadin.peter.contextmenu.ContextMenu;
+import org.vaadin.peter.contextmenu.ContextMenu.ContextMenuItem;
+import org.vaadin.peter.contextmenu.ContextMenu.ContextMenuItemClickEvent;
+import org.vaadin.peter.contextmenu.ContextMenu.ContextMenuItemClickListener;
+
+import com.vaadin.event.FieldEvents.TextChangeEvent;
+import com.vaadin.event.FieldEvents.TextChangeListener;
+import com.vaadin.ui.TextField;
+
+public class AutoCompleteTextField<E> extends TextField
 {
 
-    private static final long serialVersionUID = -7921633418513324024L;
-    String originalValue;
-    private String currentValue;
+    private static final long serialVersionUID = 1L;
 
-    @Override
-    protected void setInternalValue(String newValue)
-    {
+    private AutoCompeleteQueryListener<E> listener;
 
-	super.setInternalValue(newValue);
-	setValue(newValue);
-    }
+    Map<String, E> options = new LinkedHashMap<>();
+
+    private AutoCompleteOptionSelected<E> optionListener;
+
+    private ContextMenu contextMenu;
 
     /**
-     * protect against possible recursion/stack overflow
+     * <pre>
+     * {@code
+     * sample usage
+     * 
+     * 	AutoCompleteTextFieldV2<PostCode> suburb = new AutoCompleteTextFieldV2<>();
+     * 
+     * suburb.setQueryListener(new AutoCompeleteQueryListener<PostCode>()
+     * {
+     * 
+     * 	    @Override
+     * 	    public void handleQuery(AutoCompleteTextFieldV2<PostCode> field,String queryText)
+     * 	    {
+     * 		    field.addOption(new PostCode(3241),"Title");
+     * 	    }
+     * 	});
+     * 
+     * 	suburb.setOptionSelectionListener(new AutoCompleteOptionSelected<PostCode>()
+     * 	{
+     * 	    
+     * 	    @Override
+     * 	    public void optionSelected(AutoCompleteTextFieldV2<PostCode> field, PostCode option)
+     * 	    {
+     * 		field.setValue(option.getSuburb());
+     * 	    }
+     * 	});
+     * }
+     * </pre>
      */
-    boolean inSetValue;
 
-    @Override
-    public void setValue(String newValue) throws ReadOnlyException
+    public AutoCompleteTextField()
     {
-	if (!inSetValue)
+
+	contextMenu = new ContextMenu();
+	contextMenu.setAsContextMenuOf(this);
+	contextMenu.setOpenAutomatically(false);
+
+	setTextChangeEventMode(TextChangeEventMode.LAZY);
+	setImmediate(true);
+	addTextChangeListener(new TextChangeListener()
 	{
-	    try
+	    private static final long serialVersionUID = 1L;
+
+	    public void textChange(final TextChangeEvent event)
 	    {
-		inSetValue = true;
-		super.setValue(newValue);
-		setText(newValue);
-		originalValue = newValue;
-		currentValue = newValue;
+		options.clear();
+		listener.handleQuery(AutoCompleteTextField.this, event.getText());
+		showOptionMenu();
 	    }
-	    finally
+
+	});
+
+    }
+
+    private void showOptionMenu()
+    {
+
+	contextMenu.removeAllItems();
+	contextMenu.open(this);
+
+	for (final Entry<String, E> option : options.entrySet())
+	{
+	    ContextMenuItem menuItem = contextMenu.addItem(option.getKey());
+	    menuItem.addItemClickListener(new ContextMenuItemClickListener()
 	    {
-		inSetValue = false;
-	    }
+
+		@Override
+		public void contextMenuItemClicked(ContextMenuItemClickEvent event)
+		{
+		    optionListener.optionSelected(AutoCompleteTextField.this, option.getValue());
+		}
+	    });
 	}
 
     }
 
-    @Override
-    public String getValue()
+    public void setOptionSelectionListener(AutoCompleteOptionSelected<E> listener)
     {
-	return currentValue;
+	this.optionListener = listener;
     }
 
-    @Override
-    public Object getConvertedValue()
+    public void setQueryListener(AutoCompeleteQueryListener<E> listener)
     {
-	return currentValue;
+	this.listener = listener;
     }
 
-    @Override
-    protected String getInternalValue()
+    public void addOption(E option, String optionLabel)
     {
-	return currentValue;
-    }
-
-    public void onQuery(String query)
-    {
-	super.onQuery(query);
-	currentValue = query;
-    }
-
-    @Override
-    public boolean isModified()
-    {
-	boolean ret = super.isModified();
-	ret |= originalValue == null && currentValue != null;
-	if (originalValue != null)
-	{
-	    ret |= !originalValue.equals(currentValue);
-	}
-	if (!ret)
-	{
-	    System.out.println("NOt dirty");
-	}
-	return ret;
+	options.put(optionLabel, option);
     }
 }
