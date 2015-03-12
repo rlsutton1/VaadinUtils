@@ -1122,11 +1122,11 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	    container.refreshItem(newEntity.getId());
 	    CrudEventDistributer.publishEvent(this, eventType, newEntity);
 
-//	    if (eventType == CrudEventType.CREATE)
-//	    {
-//		addFilterToShowNewRow(newEntity);
-//		container.discard();
-//	    }
+	    if (eventType == CrudEventType.CREATE)
+	    {
+		addFilterToShowNewRow(newEntity);
+		container.discard();
+	    }
 
 	    // select has been moved to here because when it happens earlier,
 	    // child cruds are caused to discard their data before saving it for
@@ -2004,6 +2004,16 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
     {
 
 	return !disallowNew;
+    }
+
+    public boolean hasDirtyChildren()
+    {
+	boolean dirty = false;
+	for (ChildCrudListener<E> child : childCrudListeners)
+	{
+	    dirty |=child.isDirty();
+	}
+	return dirty;
     }
 
 }

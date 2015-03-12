@@ -136,14 +136,15 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 
 		});
 
-		basicSearchLayout.addComponent(searchField);
-		basicSearchLayout.setExpandRatio(searchField, 1.0f);
-		basicSearchLayout.setSpacing(true);
-
 		// clear button
 		Button clear = createClearButton();
 		basicSearchLayout.addComponent(clear);
 		basicSearchLayout.setComponentAlignment(clear, Alignment.MIDDLE_CENTER);
+
+		basicSearchLayout.addComponent(searchField);
+		basicSearchLayout.setExpandRatio(searchField, 1.0f);
+		basicSearchLayout.setSpacing(true);
+
 
 		searchField.focus();
 
