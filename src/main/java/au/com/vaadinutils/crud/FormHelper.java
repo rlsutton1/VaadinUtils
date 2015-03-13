@@ -1217,6 +1217,14 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
+	static public <J extends CrudEntity> FormHelper<?>.ListSelectBuilder<J> getListSelectBuilder(AbstractLayout form,Class<J> j)
+	{
+	    FormHelper<?> helper = new FormHelper(form,null);
+		return helper.new ListSelectBuilder<J>().setListClass(j);
+
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	static public <J extends CrudEntity> FormHelper<?>.EntityFieldBuilder<J> getEntityFieldBuilder(AbstractLayout form,Class<J> j)
 	{
 	    FormHelper<?> helper = new FormHelper(form,null);
