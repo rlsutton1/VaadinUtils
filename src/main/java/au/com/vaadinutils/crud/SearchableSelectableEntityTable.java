@@ -10,6 +10,7 @@ import au.com.vaadinutils.crud.security.SecurityManagerFactoryProxy;
 import au.com.vaadinutils.fields.SelectionListener;
 import au.com.vaadinutils.listener.ClickEventLogged;
 
+import com.google.common.base.Preconditions;
 import com.vaadin.data.Container;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Property.ValueChangeEvent;
@@ -46,6 +47,13 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 	public SearchableSelectableEntityTable(Container.Filterable entityContainer,
 			HeadingPropertySet<E> headingPropertySet)
 	{
+		if (headingPropertySet == null)
+		{
+			headingPropertySet = getHeadingPropertySet();
+		}
+		
+		Preconditions.checkNotNull(headingPropertySet);
+		
 		selectableTable = new SelectableEntityTable<E>(entityContainer, headingPropertySet);
 		selectableTable.setSizeFull();
 		container = entityContainer;
@@ -78,6 +86,11 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 		this.addComponent(selectableTable);
 		this.setExpandRatio(selectableTable, 1);
 		triggerFilter();
+	}
+	
+	protected HeadingPropertySet<E>  getHeadingPropertySet()
+	{
+		return null;
 	}
 
 	abstract public String getTitle();

@@ -15,6 +15,8 @@ import org.apache.logging.log4j.Logger;
 import com.google.common.base.Preconditions;
 
 /**
+ * Must be called from the Reader thread
+ * 
  * encapsulates the process of joining together a PipedInputStream and a
  * PipedOutputStream, without leaving either of them hanging
  * 
