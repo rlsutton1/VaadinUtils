@@ -34,7 +34,6 @@ import com.vaadin.data.Container.ItemSetChangeListener;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.Validator.InvalidValueException;
-import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
@@ -48,11 +47,13 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.Field;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.Table.ColumnGenerator;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
@@ -1005,7 +1006,11 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		String causeMessage = "";
 		for (InvalidValueException cause : m.getCauses())
 		{
-			causeMessage += cause.getMessage()+". ";
+			causeMessage += cause.getMessage() + ". ";
+		}
+		if (m.getMessage() != null && m.getMessage().length() > 0)
+		{
+			causeMessage += m.getMessage() + ". ";
 		}
 		Notification.show("Please fix the form errors and then try again.\n\n " + causeMessage, Type.ERROR_MESSAGE);
 	}
@@ -1115,7 +1120,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 * is unreliable
 	 * 
 	 * @param item
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	protected void interceptSaveValues(EntityItem<E> entityItem) throws Exception
 	{
@@ -1361,12 +1366,71 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	protected void commitFieldGroup() throws CommitException
 	{
 		formValidate();
+		String fieldName = selectFirstErrorFieldAndShowTab();
+		if (!fieldGroup.isValid())
+		{
+
+			throw new InvalidValueException("Invalid Field: " + fieldName);
+
+		}
 		fieldGroup.commit();
 		for (ChildCrudListener<E> child : childCrudListeners)
 		{
 			child.validateFieldz();
 		}
 
+	}
+
+	protected String selectFirstErrorFieldAndShowTab()
+	{
+		String ret = "";
+		int ctr = 0;
+		for (Field<?> field : fieldGroup.getFields())
+		{
+
+			try
+			{
+				ctr++;
+				field.validate();
+			}
+			catch (Exception e)
+			{
+				String message = "";
+				String causeMessage = "";
+				if (e instanceof InvalidValueException)
+				{
+					InvalidValueException m = (InvalidValueException) e;
+					for (InvalidValueException cause : m.getCauses())
+					{
+						message += cause.getMessage() + ". ";
+					}
+					if (m.getMessage() != null && m.getMessage().length() > 0)
+					{
+						message += m.getMessage() + ". ";
+					}
+				}
+				ret = field.getCaption() + "\n\n" + message;
+				logger.warn(
+						"Invalid Field...\n caption:'{}'\n type:{}\n fieldNumber: {}\n value: '{}'\n crud: {} ({})\n {}\n",
+						field.getCaption(), field.getClass().getSimpleName(), ctr, field.getValue(), this.getClass()
+								.getCanonicalName(), this.getClass().getSimpleName() + ".java:1", message);
+				Component childField = field;
+
+				for (int i = 0; i < 10; i++)
+				{
+					Component parentField = childField.getParent();
+					if (parentField instanceof TabSheet)
+					{
+						((TabSheet) parentField).setSelectedTab(childField);
+						break;
+					}
+					childField = parentField;
+				}
+				break;
+			}
+
+		}
+		return ret;
 	}
 
 	/**
