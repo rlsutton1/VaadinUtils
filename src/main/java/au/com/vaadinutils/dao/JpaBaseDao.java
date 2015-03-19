@@ -29,15 +29,417 @@ import com.vaadin.addon.jpacontainer.JPAContainerFactory;
 
 public class JpaBaseDao<E, K> implements Dao<E, K>
 {
-	protected Class<E> entityClass;
+	public interface Condition<E>
+	{
 
-	protected EntityManager entityManager;
+		Condition<E> and(Condition<E> c1);
+
+		Predicate getPredicates();
+
+		Condition<E> or(Condition<E> c1);
+
+	}
+
+	public class FindBuilder
+	{
+
+		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+		CriteriaQuery<E> criteria = builder.createQuery(entityClass);
+		Map<JoinDescriptor<E>, Join<E, ?>> joins = new HashMap<>();
+
+		private Integer limit = null;
+
+		Predicate predicate = null;
+
+		Root<E> root = criteria.from(entityClass);
+
+		private Integer startPosition = null;
+
+		FindBuilder()
+		{
+			criteria.select(root);
+		}
+
+		public Condition<E> and(final Condition<E> c1, final Condition<E> c2)
+		{
+			return new AbstractCondition<E>()
+			{
+
+				@Override
+				public Predicate getPredicates()
+				{
+					return builder.and(c1.getPredicates(), c2.getPredicates());
+				}
+			};
+		}
+
+		public <L> Condition<E> equal(final SingularAttribute<E, L> field, final L value)
+		{
+
+			return new AbstractCondition<E>()
+			{
+
+				@Override
+				public Predicate getPredicates()
+				{
+					return builder.equal(root.get(field), value);
+				}
+
+			};
+		}
+
+		/**
+		 * specify that JPA should fetch child entities in a single query!
+		 * 
+		 * @param field
+		 * @return
+		 */
+		public <L> FindBuilder fetch(SingularAttribute<E, L> field)
+		{
+			root.fetch(field, JoinType.LEFT);
+			return this;
+		}
+
+		private <J> Join<E, J> getJoin(SingularAttribute<? super E, J> joinAttribute, JoinType joinType)
+		{
+			JoinDescriptor<E> joinDescriptor = new JoinDescriptor<E>(joinAttribute, joinType);
+			@SuppressWarnings("unchecked")
+			Join<E, J> join = (Join<E, J>) joins.get(joinDescriptor);
+			{
+				if (join != null)
+				{
+					return join;
+				}
+			}
+			join = root.join(joinAttribute, joinType);
+			joins.put(joinDescriptor, join);
+			return join;
+		}
+
+		public List<E> getResultList()
+		{
+			TypedQuery<E> query = prepareQuery();
+			return query.getResultList();
+		}
+
+		public E getSingleResult()
+		{
+			limit(1);
+			TypedQuery<E> query = prepareQuery();
+
+			return query.getSingleResult();
+		}
+
+		public <J, V extends Comparable<? super V>> Condition<E> greaterThanOrEqualTo(
+				final SingularAttribute<? super E, J> joinAttribute, final JoinType joinType,
+				final SingularAttribute<J, V> field, final V value)
+		{
+			return new AbstractCondition<E>()
+			{
+
+				@Override
+				public Predicate getPredicates()
+				{
+					Join<E, J> join = getJoin(joinAttribute, joinType);
+					return builder.greaterThanOrEqualTo(join.get(field), value);
+				}
+
+			};
+
+		}
+
+		public <V extends Comparable<? super V>> Condition<E> greaterThanOrEqualTo(final SingularAttribute<E, V> field,
+				final V value)
+		{
+			return new AbstractCondition<E>()
+			{
+
+				@Override
+				public Predicate getPredicates()
+				{
+
+					return builder.greaterThanOrEqualTo(root.get(field), value);
+				}
+
+			};
+
+		}
+
+		/**
+		 * delegate to greaterThanOrEqualTo
+		 * 
+		 * @param joinAttribute
+		 * @param joinType
+		 * @param field
+		 * @param value
+		 * @return
+		 */
+		public <J, V extends Comparable<? super V>> Condition<E> gtEq(
+				final SingularAttribute<? super E, J> joinAttribute, final JoinType joinType,
+				final SingularAttribute<J, V> field, final V value)
+		{
+			return greaterThanOrEqualTo(joinAttribute, joinType, field, value);
+		}
+
+		public <L> Condition<E> isNotNull(final SingularAttribute<E, L> field)
+		{
+			return new AbstractCondition<E>()
+			{
+
+				@Override
+				public Predicate getPredicates()
+				{
+					return builder.isNotNull(root.get(field));
+				}
+
+			};
+
+		}
+
+		public <L> Condition<E> isNull(final SingularAttribute<E, L> field)
+		{
+			return new AbstractCondition<E>()
+			{
+
+				@Override
+				public Predicate getPredicates()
+				{
+					return builder.isNull(root.get(field));
+				}
+
+			};
+
+		}
+
+		public <J> Condition<E> joinLike(final SingularAttribute<E, J> joinAttribute, final JoinType joinType,
+				final SingularAttribute<J, String> field, final String value)
+		{
+			return new AbstractCondition<E>()
+			{
+
+				@Override
+				public Predicate getPredicates()
+				{
+					Join<E, J> join = getJoin(joinAttribute, joinType);
+					return builder.like(join.get(field), value);
+				}
+
+			};
+
+		}
+
+		public <J, V extends Comparable<? super V>> Condition<E> lessThan(
+				final SingularAttribute<? super E, J> joinAttribute, final JoinType joinType,
+				final SingularAttribute<J, V> field, final V value)
+		{
+			return new AbstractCondition<E>()
+			{
+
+				@Override
+				public Predicate getPredicates()
+				{
+					Join<E, J> join = getJoin(joinAttribute, joinType);
+					return builder.lessThan(join.get(field), value);
+				}
+
+			};
+
+		}
+
+		public <V extends Comparable<? super V>> Condition<E> lessThan(final SingularAttribute<E, V> field,
+				final V value)
+		{
+			return new AbstractCondition<E>()
+			{
+
+				@Override
+				public Predicate getPredicates()
+				{
+
+					return builder.lessThan(root.get(field), value);
+				}
+
+			};
+
+		}
+
+		public <J, V extends Comparable<? super V>> Condition<E> lessThanOrEqualTo(
+				final SingularAttribute<? super E, J> joinAttribute, final JoinType joinType,
+				final SingularAttribute<J, V> field, final V value)
+		{
+			return new AbstractCondition<E>()
+			{
+
+				@Override
+				public Predicate getPredicates()
+				{
+					Join<E, J> join = getJoin(joinAttribute, joinType);
+					return builder.lessThanOrEqualTo(join.get(field), value);
+				}
+
+			};
+
+		}
+
+		public <V extends Comparable<? super V>> Condition<E> lessThanOrEqualTo(final SingularAttribute<E, V> field,
+				final V value)
+		{
+			return new AbstractCondition<E>()
+			{
+
+				@Override
+				public Predicate getPredicates()
+				{
+
+					return builder.lessThanOrEqualTo(root.get(field), value);
+				}
+
+			};
+
+		}
+
+		public Condition<E> like(final SingularAttribute<E, String> field, final String value)
+		{
+			return new AbstractCondition<E>()
+			{
+
+				@Override
+				public Predicate getPredicates()
+				{
+
+					return builder.like(root.get(field), value);
+				}
+
+			};
+
+		}
+
+		public FindBuilder limit(int limit)
+		{
+			this.limit = limit;
+			return this;
+		}
+
+		public <L> Condition<E> notEqual(final SingularAttribute<E, L> field, final L value)
+		{
+
+			return new AbstractCondition<E>()
+			{
+
+				@Override
+				public Predicate getPredicates()
+				{
+					return builder.notEqual(root.get(field), value);
+				}
+
+			};
+		}
+
+		public Condition<E> or(final Condition<E> c1, final Condition<E> c2)
+		{
+			return new AbstractCondition<E>()
+			{
+
+				@Override
+				public Predicate getPredicates()
+				{
+					return builder.or(c1.getPredicates(), c2.getPredicates());
+				}
+			};
+		}
+
+		public FindBuilder orderBy(SingularAttribute<E, ?> field, boolean asc)
+		{
+			if (asc)
+			{
+				criteria.orderBy(builder.asc(root.get(field)));
+			}
+			else
+			{
+				criteria.orderBy(builder.desc(root.get(field)));
+			}
+			return this;
+		}
+
+		private TypedQuery<E> prepareQuery()
+		{
+
+			if (predicate != null)
+			{
+				criteria.where(predicate);
+			}
+			TypedQuery<E> query = entityManager.createQuery(criteria);
+			if (limit != null)
+			{
+				query.setMaxResults(limit);
+			}
+			if (startPosition != null)
+			{
+				query.setFirstResult(startPosition);
+			}
+			return query;
+		}
+
+		public FindBuilder startPosition(int startPosition)
+		{
+			this.startPosition = startPosition;
+			return this;
+		}
+
+		public FindBuilder where(Condition<E> condition)
+		{
+			predicate = condition.getPredicates();
+			return this;
+		}
+
+		public abstract class AbstractCondition<E> implements Condition<E>
+		{
+			public Condition<E> and(final Condition<E> c1)
+			{
+				return new AbstractCondition<E>()
+				{
+
+					@Override
+					public Predicate getPredicates()
+					{
+						return builder.and(AbstractCondition.this.getPredicates(), c1.getPredicates());
+					}
+				};
+			}
+
+			public Condition<E> or(final Condition<E> c1)
+			{
+				return new AbstractCondition<E>()
+				{
+
+					@Override
+					public Predicate getPredicates()
+					{
+						return builder.or(AbstractCondition.this.getPredicates(), c1.getPredicates());
+					}
+				};
+			}
+
+		}
+
+	}
 
 	static public <E> JpaBaseDao<E, Long> getGenericDao(Class<E> class1)
 	{
 		return new JpaBaseDao<E, Long>(class1);
 
 	}
+
+	static public <T> SingularAttribute<T, Long> getIdField(Class<T> type)
+	{
+		Metamodel metaModel = EntityManagerProvider.getEntityManager().getMetamodel();
+		EntityType<T> entityType = metaModel.entity(type);
+		return entityType.getDeclaredId(Long.class);
+	}
+
+	protected Class<E> entityClass;
+
+	protected EntityManager entityManager;
 
 	@SuppressWarnings("unchecked")
 	public JpaBaseDao()
@@ -55,14 +457,6 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		Preconditions.checkNotNull(this.entityClass);
 	}
 
-	@SuppressWarnings("unchecked")
-	public JpaBaseDao(EntityManager em)
-	{
-		this.entityManager = em;
-		ParameterizedType genericSuperclass = (ParameterizedType) getClass().getGenericSuperclass();
-		this.entityClass = (Class<E>) genericSuperclass.getActualTypeArguments()[0];
-	}
-
 	public JpaBaseDao(Class<E> class1)
 	{
 		this.entityManager = EntityManagerProvider.getEntityManager();
@@ -73,79 +467,109 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		entityClass = class1;
 	}
 
-	public void persist(E entity)
-	{
-		entityManager.persist(entity);
-	}
-
-	public E merge(E entity)
-	{
-		return entityManager.merge(entity);
-	}
-
-	public void remove(E entity)
-	{
-		entityManager.remove(entity);
-	}
-
 	@SuppressWarnings("unchecked")
-	public E findById(Integer id)
+	public JpaBaseDao(EntityManager em)
 	{
-		return findById((K) new Long(id));
+		this.entityManager = em;
+		ParameterizedType genericSuperclass = (ParameterizedType) getClass().getGenericSuperclass();
+		this.entityClass = (Class<E>) genericSuperclass.getActualTypeArguments()[0];
 	}
 
-	public E findById(K id)
+	public JPAContainer<E> createVaadinContainer()
 	{
-		return entityManager.find(entityClass, id);
+		JPAContainer<E> container = new JPAContainer<E>(entityClass);
+		container.setEntityProvider(new BatchingPerRequestEntityProvider<E>(entityClass));
+		return container;
+
 	}
 
-	protected E findSingleBySingleParameter(String queryName, SingularAttribute<E, String> paramName, String paramValue)
+	public JPAContainer<E> createVaadinContainer(final int sizeLimit)
 	{
-		E entity = null;
-		Query query = entityManager.createNamedQuery(queryName);
-		query.setParameter(paramName.getName(), paramValue);
-		query.setMaxResults(1);
-		@SuppressWarnings("unchecked")
-		List<E> entities = query.getResultList();
-		if (entities.size() > 0)
-			entity = entities.get(0);
-		return entity;
+		JPAContainer<E> container = new JPAContainer<E>(entityClass)
+		{
+			private static final long serialVersionUID = -3280358604354247501L;
+
+			@Override
+			public int size()
+			{
+				int size = super.size();
+				return Math.min(sizeLimit, size);
+			}
+		};
+		container.setEntityProvider(new BatchingPerRequestEntityProvider<E>(entityClass));
+		return container;
+
 	}
 
-	protected E findSingleBySingleParameter(String queryName, String paramName, String paramValue)
+	public JPAContainer<E> createVaadinContainerAndFlushCache()
 	{
-		E entity = null;
-		Query query = entityManager.createNamedQuery(queryName);
-		query.setParameter(paramName, paramValue);
-		query.setMaxResults(1);
-		@SuppressWarnings("unchecked")
-		List<E> entities = query.getResultList();
-		if (entities.size() > 0)
-			entity = entities.get(0);
-		return entity;
+		entityManager.getEntityManagerFactory().getCache().evict(entityClass);
+		return createVaadinContainer();
 	}
 
-	protected List<E> findListBySingleParameter(String queryName, String paramName, Object paramValue)
+	public JPAContainer<E> createVaadinContainerAndFlushCache(final int sizeLimit)
 	{
-		Query query = entityManager.createNamedQuery(queryName);
-		query.setParameter(paramName, paramValue);
-		@SuppressWarnings("unchecked")
-		List<E> entities = query.getResultList();
-		return entities;
+		entityManager.getEntityManagerFactory().getCache().evict(entityClass);
+		return createVaadinContainer(sizeLimit);
 	}
 
-	/**
-	 * Runs the given query returning all entities that matched by the query.
-	 * 
-	 * @param queryName
-	 * @return
-	 */
-	protected List<E> findList(String queryName)
+	public int deleteAll()
 	{
-		Query query = entityManager.createNamedQuery(queryName);
-		@SuppressWarnings("unchecked")
-		List<E> entities = query.getResultList();
-		return entities;
+		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+
+		CriteriaDelete<E> criteria = builder.createCriteriaDelete(entityClass);
+		int result = entityManager.createQuery(criteria).executeUpdate();
+
+		return result;
+
+	}
+
+	public <V> int deleteAllByAttribute(SingularAttribute<E, V> vKey, V value)
+	{
+
+		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+
+		CriteriaDelete<E> criteria = builder.createCriteriaDelete(entityClass);
+
+		Root<E> root = criteria.from(entityClass);
+
+		criteria.where(builder.equal(root.get(vKey), value));
+
+		int result = entityManager.createQuery(criteria).executeUpdate();
+
+		return result;
+
+	}
+
+	public <V, J> int deleteAllByAttributeJoin(SingularAttribute<J, V> vKey, V value, SingularAttribute<E, J> joinAttr)
+	{
+
+		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+
+		CriteriaDelete<E> criteria = builder.createCriteriaDelete(entityClass);
+
+		Root<E> root = criteria.from(entityClass);
+
+		Join<E, J> join = root.join(joinAttr, JoinType.LEFT);
+
+		criteria.where(builder.equal(join.get(vKey), value));
+
+		entityManager.getClass();
+		int result = entityManager.createQuery(criteria).executeUpdate();
+
+		return result;
+
+	}
+
+	public void detach(E entity)
+	{
+		this.entityManager.detach(entity);
+
+	}
+
+	public JpaBaseDao<E, K>.FindBuilder find()
+	{
+		return new FindBuilder();
 	}
 
 	@Override
@@ -227,16 +651,41 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 	}
 
-	public <V> E findOneByAttribute(SingularAttribute<E, V> vKey, V value)
+	/**
+	 * Find multiple records by multiple attributes. Searches using OR.
+	 *
+	 * @param <SK>
+	 *            attribute
+	 * @param attributes
+	 *            AttributeHashMap of SingularAttributes and values
+	 * @param order
+	 *            SingularAttribute to order by
+	 * @return a list of matching entities
+	 */
+	public <SK> List<E> findAllByAnyAttributes(AttributesHashMap<E> attributes, SingularAttribute<E, SK> order)
 	{
-		E ret = null;
-		List<E> results = findAllByAttribute(vKey, value, null, 1);
-		if (results.size() > 0)
-		{
-			ret = results.get(0);
-		}
 
-		return ret;
+		final CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+
+		final CriteriaQuery<E> criteria = builder.createQuery(entityClass);
+
+		final Root<E> root = criteria.from(entityClass);
+		criteria.select(root);
+
+		Predicate where = builder.conjunction();
+		for (Entry<SingularAttribute<E, Object>, Object> attr : attributes.entrySet())
+		{
+			where = builder.or(where, builder.equal(root.get(attr.getKey()), attr.getValue()));
+		}
+		criteria.where(where);
+
+		if (order != null)
+		{
+			criteria.orderBy(builder.asc(root.get(order)));
+		}
+		List<E> results = entityManager.createQuery(criteria).getResultList();
+
+		return results;
 	}
 
 	public <V, SK> List<E> findAllByAttribute(SingularAttribute<E, V> vKey, V value, SingularAttribute<E, SK> order)
@@ -269,6 +718,24 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 	}
 
+	public <V, J> List<E> findAllByAttributeJoin(SingularAttribute<E, J> joinAttr, SingularAttribute<J, V> vKey,
+			V value, JoinType joinType)
+	{
+
+		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+
+		CriteriaQuery<E> criteria = builder.createQuery(entityClass);
+
+		Root<E> root = criteria.from(entityClass);
+
+		Join<E, J> join = root.join(joinAttr, joinType);
+
+		criteria.where(builder.equal(join.get(vKey), value));
+
+		return entityManager.createQuery(criteria).getResultList();
+
+	}
+
 	public <SK> List<E> findAllByAttributeLike(SingularAttribute<E, String> vKey, String value,
 			SingularAttribute<E, SK> order)
 	{
@@ -288,25 +755,6 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 		return results;
 
-	}
-
-	/**
-	 * Find a single record by multiple attributes. Searches using AND.
-	 *
-	 * @param attributes
-	 *            AttributeHashMap of SingularAttributes and values
-	 * @return first matching entity
-	 */
-	public E findOneByAttributes(AttributesHashMap<E> attributes)
-	{
-		E ret = null;
-		List<E> results = findAllByAttributes(attributes, null);
-		if (results.size() > 0)
-		{
-			ret = results.get(0);
-		}
-
-		return ret;
 	}
 
 	/**
@@ -346,6 +794,40 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		return results;
 	}
 
+	@SuppressWarnings("unchecked")
+	public E findById(Integer id)
+	{
+		return findById((K) new Long(id));
+	}
+
+	public E findById(K id)
+	{
+		return entityManager.find(entityClass, id);
+	}
+
+	/**
+	 * Runs the given query returning all entities that matched by the query.
+	 * 
+	 * @param queryName
+	 * @return
+	 */
+	protected List<E> findList(String queryName)
+	{
+		Query query = entityManager.createNamedQuery(queryName);
+		@SuppressWarnings("unchecked")
+		List<E> entities = query.getResultList();
+		return entities;
+	}
+
+	protected List<E> findListBySingleParameter(String queryName, String paramName, Object paramValue)
+	{
+		Query query = entityManager.createNamedQuery(queryName);
+		query.setParameter(paramName, paramValue);
+		@SuppressWarnings("unchecked")
+		List<E> entities = query.getResultList();
+		return entities;
+	}
+
 	/**
 	 * Find a single record by multiple attributes. Searches using OR.
 	 *
@@ -365,187 +847,72 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		return ret;
 	}
 
+	public <V> E findOneByAttribute(SingularAttribute<E, V> vKey, V value)
+	{
+		E ret = null;
+		List<E> results = findAllByAttribute(vKey, value, null, 1);
+		if (results.size() > 0)
+		{
+			ret = results.get(0);
+		}
+
+		return ret;
+	}
+
 	/**
-	 * Find multiple records by multiple attributes. Searches using OR.
+	 * Find a single record by multiple attributes. Searches using AND.
 	 *
-	 * @param <SK>
-	 *            attribute
 	 * @param attributes
 	 *            AttributeHashMap of SingularAttributes and values
-	 * @param order
-	 *            SingularAttribute to order by
-	 * @return a list of matching entities
+	 * @return first matching entity
 	 */
-	public <SK> List<E> findAllByAnyAttributes(AttributesHashMap<E> attributes, SingularAttribute<E, SK> order)
+	public E findOneByAttributes(AttributesHashMap<E> attributes)
 	{
-
-		final CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-
-		final CriteriaQuery<E> criteria = builder.createQuery(entityClass);
-
-		final Root<E> root = criteria.from(entityClass);
-		criteria.select(root);
-
-		Predicate where = builder.conjunction();
-		for (Entry<SingularAttribute<E, Object>, Object> attr : attributes.entrySet())
+		E ret = null;
+		List<E> results = findAllByAttributes(attributes, null);
+		if (results.size() > 0)
 		{
-			where = builder.or(where, builder.equal(root.get(attr.getKey()), attr.getValue()));
+			ret = results.get(0);
 		}
-		criteria.where(where);
 
-		if (order != null)
-		{
-			criteria.orderBy(builder.asc(root.get(order)));
-		}
-		List<E> results = entityManager.createQuery(criteria).getResultList();
-
-		return results;
+		return ret;
 	}
 
-	/**
-	 * get count of entity with a simple criteria
-	 * 
-	 * @param vKey
-	 * @param value
-	 * @return
-	 */
-	public <V> Long getCount(SingularAttribute<E, V> vKey, V value)
+	protected E findSingleBySingleParameter(String queryName, SingularAttribute<E, String> paramName, String paramValue)
 	{
-		CriteriaBuilder qb = entityManager.getCriteriaBuilder();
-		CriteriaQuery<Long> cq = qb.createQuery(Long.class);
-		Root<E> root = cq.from(entityClass);
-		cq.select(qb.count(root));
-		cq.where(qb.equal(root.get(vKey), value));
-
-		return entityManager.createQuery(cq).getSingleResult();
+		E entity = null;
+		Query query = entityManager.createNamedQuery(queryName);
+		query.setParameter(paramName.getName(), paramValue);
+		query.setMaxResults(1);
+		@SuppressWarnings("unchecked")
+		List<E> entities = query.getResultList();
+		if (entities.size() > 0)
+			entity = entities.get(0);
+		return entity;
 	}
 
-	public JPAContainer<E> createVaadinContainer()
+	protected E findSingleBySingleParameter(String queryName, String paramName, String paramValue)
 	{
-		JPAContainer<E> container = new JPAContainer<E>(entityClass);
-		container.setEntityProvider(new BatchingPerRequestEntityProvider<E>(entityClass));
-		return container;
-
+		E entity = null;
+		Query query = entityManager.createNamedQuery(queryName);
+		query.setParameter(paramName, paramValue);
+		query.setMaxResults(1);
+		@SuppressWarnings("unchecked")
+		List<E> entities = query.getResultList();
+		if (entities.size() > 0)
+			entity = entities.get(0);
+		return entity;
 	}
 
-	static public <T> SingularAttribute<T, Long> getIdField(Class<T> type)
+	public void flush()
 	{
-		Metamodel metaModel = EntityManagerProvider.getEntityManager().getMetamodel();
-		EntityType<T> entityType = metaModel.entity(type);
-		return entityType.getDeclaredId(Long.class);
-	}
-
-	public SingularAttribute<E, Long> getIdField()
-	{
-		return getIdField(entityClass);
-
-	}
-
-	public JPAContainer<E> createVaadinContainer(final int sizeLimit)
-	{
-		JPAContainer<E> container = new JPAContainer<E>(entityClass)
-		{
-			private static final long serialVersionUID = -3280358604354247501L;
-
-			@Override
-			public int size()
-			{
-				int size = super.size();
-				return Math.min(sizeLimit, size);
-			}
-		};
-		container.setEntityProvider(new BatchingPerRequestEntityProvider<E>(entityClass));
-		return container;
+		this.entityManager.flush();
 
 	}
 
 	public void flushCache()
 	{
 		entityManager.getEntityManagerFactory().getCache().evict(entityClass);
-
-	}
-
-	public JPAContainer<E> createVaadinContainerAndFlushCache(final int sizeLimit)
-	{
-		entityManager.getEntityManagerFactory().getCache().evict(entityClass);
-		return createVaadinContainer(sizeLimit);
-	}
-
-	public JPAContainer<E> createVaadinContainerAndFlushCache()
-	{
-		entityManager.getEntityManagerFactory().getCache().evict(entityClass);
-		return createVaadinContainer();
-	}
-
-	@SuppressWarnings("unused")
-	private void oldCreateVaadinContainer()
-	{
-		JPAContainerFactory.makeBatchable(entityClass, entityManager);
-	}
-
-	public int deleteAll()
-	{
-		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-
-		CriteriaDelete<E> criteria = builder.createCriteriaDelete(entityClass);
-		int result = entityManager.createQuery(criteria).executeUpdate();
-
-		return result;
-
-	}
-
-	public <V> int deleteAllByAttribute(SingularAttribute<E, V> vKey, V value)
-	{
-
-		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-
-		CriteriaDelete<E> criteria = builder.createCriteriaDelete(entityClass);
-
-		Root<E> root = criteria.from(entityClass);
-
-		criteria.where(builder.equal(root.get(vKey), value));
-
-		int result = entityManager.createQuery(criteria).executeUpdate();
-
-		return result;
-
-	}
-
-	public <V, J> List<E> findAllByAttributeJoin(SingularAttribute<E, J> joinAttr, SingularAttribute<J, V> vKey,
-			V value, JoinType joinType)
-	{
-
-		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-
-		CriteriaQuery<E> criteria = builder.createQuery(entityClass);
-
-		Root<E> root = criteria.from(entityClass);
-
-		Join<E, J> join = root.join(joinAttr, joinType);
-
-		criteria.where(builder.equal(join.get(vKey), value));
-
-		return entityManager.createQuery(criteria).getResultList();
-
-	}
-
-	public <V, J> int deleteAllByAttributeJoin(SingularAttribute<J, V> vKey, V value, SingularAttribute<E, J> joinAttr)
-	{
-
-		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-
-		CriteriaDelete<E> criteria = builder.createCriteriaDelete(entityClass);
-
-		Root<E> root = criteria.from(entityClass);
-
-		Join<E, J> join = root.join(joinAttr, JoinType.LEFT);
-
-		criteria.where(builder.equal(join.get(vKey), value));
-
-		entityManager.getClass();
-		int result = entityManager.createQuery(criteria).executeUpdate();
-
-		return result;
 
 	}
 
@@ -569,10 +936,44 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 	}
 
-	public void flush()
+	/**
+	 * get count of entity with a simple criteria
+	 * 
+	 * @param vKey
+	 * @param value
+	 * @return
+	 */
+	public <V> Long getCount(SingularAttribute<E, V> vKey, V value)
 	{
-		this.entityManager.flush();
+		CriteriaBuilder qb = entityManager.getCriteriaBuilder();
+		CriteriaQuery<Long> cq = qb.createQuery(Long.class);
+		Root<E> root = cq.from(entityClass);
+		cq.select(qb.count(root));
+		cq.where(qb.equal(root.get(vKey), value));
 
+		return entityManager.createQuery(cq).getSingleResult();
+	}
+
+	public SingularAttribute<E, Long> getIdField()
+	{
+		return getIdField(entityClass);
+
+	}
+
+	public E merge(E entity)
+	{
+		return entityManager.merge(entity);
+	}
+
+	@SuppressWarnings("unused")
+	private void oldCreateVaadinContainer()
+	{
+		JPAContainerFactory.makeBatchable(entityClass, entityManager);
+	}
+
+	public void persist(E entity)
+	{
+		entityManager.persist(entity);
 	}
 
 	public void refresh(E entity)
@@ -580,392 +981,9 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		this.entityManager.refresh(entity);
 	}
 
-	public void detach(E entity)
+	public void remove(E entity)
 	{
-		this.entityManager.detach(entity);
-
-	}
-
-	public JpaBaseDao<E, K>.FindBuilder find()
-	{
-		return new FindBuilder();
-	}
-
-	public class FindBuilder
-	{
-		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-
-		CriteriaQuery<E> criteria = builder.createQuery(entityClass);
-		Root<E> root = criteria.from(entityClass);
-		Predicate predicate = null;
-
-		private Integer limit = null;
-
-		private Integer startPosition = null;
-
-		/**
-		 * specify that JPA should fetch child entities in a single query!
-		 * 
-		 * @param field
-		 * @return
-		 */
-		public <L> FindBuilder fetch(SingularAttribute<E, L> field)
-		{
-			root.fetch(field, JoinType.LEFT);
-			return this;
-		}
-
-		public FindBuilder limit(int limit)
-		{
-			this.limit = limit;
-			return this;
-		}
-
-		public FindBuilder startPosition(int startPosition)
-		{
-			this.startPosition = startPosition;
-			return this;
-		}
-
-		public FindBuilder orderBy(SingularAttribute<E, ?> field, boolean asc)
-		{
-			if (asc)
-			{
-				criteria.orderBy(builder.asc(root.get(field)));
-			}
-			else
-			{
-				criteria.orderBy(builder.desc(root.get(field)));
-			}
-			return this;
-		}
-
-		FindBuilder()
-		{
-			criteria.select(root);
-		}
-
-		public E getSingleResult()
-		{
-			limit(1);
-			TypedQuery<E> query = prepareQuery();
-
-			return query.getSingleResult();
-		}
-
-		public List<E> getResultList()
-		{
-			TypedQuery<E> query = prepareQuery();
-			return query.getResultList();
-		}
-
-		private TypedQuery<E> prepareQuery()
-		{
-
-			if (predicate != null)
-			{
-				criteria.where(predicate);
-			}
-			TypedQuery<E> query = entityManager.createQuery(criteria);
-			if (limit != null)
-			{
-				query.setMaxResults(limit);
-			}
-			if (startPosition != null)
-			{
-				query.setFirstResult(startPosition);
-			}
-			return query;
-		}
-
-		public <L> Condition<E> notEqual(final SingularAttribute<E, L> field, final L value)
-		{
-
-			return new AbstractCondition<E>()
-			{
-
-				@Override
-				public Predicate getPredicates()
-				{
-					return builder.notEqual(root.get(field), value);
-				}
-
-			};
-		}
-
-		public <L> Condition<E> isNotNull(final SingularAttribute<E, L> field)
-		{
-			return new AbstractCondition<E>()
-			{
-
-				@Override
-				public Predicate getPredicates()
-				{
-					return builder.isNotNull(root.get(field));
-				}
-
-			};
-
-		}
-
-		public Condition<E> like(final SingularAttribute<E, String> field, final String value)
-		{
-			return new AbstractCondition<E>()
-			{
-
-				@Override
-				public Predicate getPredicates()
-				{
-
-					return builder.like(root.get(field), value);
-				}
-
-			};
-
-		}
-
-		public <J> Condition<E> joinLike(final SingularAttribute<E, J> joinAttribute, final JoinType joinType,
-				final SingularAttribute<J, String> field, final String value)
-		{
-			return new AbstractCondition<E>()
-			{
-
-				@Override
-				public Predicate getPredicates()
-				{
-					Join<E, J> join = getJoin(joinAttribute, joinType);
-					return builder.like(join.get(field), value);
-				}
-
-			};
-
-		}
-
-		public <L> Condition<E> isNull(final SingularAttribute<E, L> field)
-		{
-			return new AbstractCondition<E>()
-			{
-
-				@Override
-				public Predicate getPredicates()
-				{
-					return builder.isNull(root.get(field));
-				}
-
-			};
-
-		}
-
-		public <V extends Comparable<? super V>> Condition<E> lessThan(final SingularAttribute<E, V> field,
-				final V value)
-		{
-			return new AbstractCondition<E>()
-			{
-
-				@Override
-				public Predicate getPredicates()
-				{
-
-					return builder.lessThan(root.get(field), value);
-				}
-
-			};
-
-		}
-
-		public <J, V extends Comparable<? super V>> Condition<E> lessThan(
-				final SingularAttribute<? super E, J> joinAttribute, final JoinType joinType,
-				final SingularAttribute<J, V> field, final V value)
-		{
-			return new AbstractCondition<E>()
-			{
-
-				@Override
-				public Predicate getPredicates()
-				{
-					Join<E, J> join = getJoin(joinAttribute, joinType);
-					return builder.lessThan(join.get(field), value);
-				}
-
-			};
-
-		}
-
-		public <V extends Comparable<? super V>> Condition<E> lessThanOrEqualTo(final SingularAttribute<E, V> field,
-				final V value)
-		{
-			return new AbstractCondition<E>()
-			{
-
-				@Override
-				public Predicate getPredicates()
-				{
-
-					return builder.lessThanOrEqualTo(root.get(field), value);
-				}
-
-			};
-
-		}
-
-		public <J, V extends Comparable<? super V>> Condition<E> lessThanOrEqualTo(
-				final SingularAttribute<E, J> joinAttribute, final JoinType joinType,
-				final SingularAttribute<J, V> field, final V value)
-		{
-			return new AbstractCondition<E>()
-			{
-
-				@Override
-				public Predicate getPredicates()
-				{
-					Join<E, J> join = getJoin(joinAttribute, joinType);
-					return builder.lessThanOrEqualTo(join.get(field), value);
-				}
-
-			};
-
-		}
-
-		public <V extends Comparable<? super V>> Condition<E> greaterThanOrEqualTo(final SingularAttribute<E, V> field,
-				final V value)
-		{
-			return new AbstractCondition<E>()
-			{
-
-				@Override
-				public Predicate getPredicates()
-				{
-
-					return builder.greaterThanOrEqualTo(root.get(field), value);
-				}
-
-			};
-
-		}
-
-		public <J, V extends Comparable<? super V>> Condition<E> greaterThanOrEqualTo(
-				final SingularAttribute<? super E, J> joinAttribute, final JoinType joinType,
-				final SingularAttribute<J, V> field, final V value)
-		{
-			return new AbstractCondition<E>()
-			{
-
-				@Override
-				public Predicate getPredicates()
-				{
-					Join<E, J> join = getJoin(joinAttribute, joinType);
-					return builder.greaterThanOrEqualTo(join.get(field), value);
-				}
-
-			};
-
-		}
-
-		Map<JoinDescriptor<E>,Join<E,?>> joins = new HashMap<>();
-		private <J> Join<E, J> getJoin(SingularAttribute<? super E, J> joinAttribute, JoinType joinType)
-		{
-			JoinDescriptor<E> joinDescriptor = new JoinDescriptor<E>(joinAttribute,joinType);
-			@SuppressWarnings("unchecked")
-			Join<E, J> join = (Join<E, J>) joins.get(joinDescriptor);
-			{
-				if (join!=null)
-				{
-					return join;
-				}
-			}
-			join =  root.join(joinAttribute, joinType);
-			joins.put(joinDescriptor, join);
-			return join;
-		}
-
-		public FindBuilder where(Condition<E> condition)
-		{
-			predicate = condition.getPredicates();
-			return this;
-		}
-
-		public Condition<E> and(final Condition<E> c1, final Condition<E> c2)
-		{
-			return new AbstractCondition<E>()
-			{
-
-				@Override
-				public Predicate getPredicates()
-				{
-					return builder.and(c1.getPredicates(), c2.getPredicates());
-				}
-			};
-		}
-
-		public Condition<E> or(final Condition<E> c1, final Condition<E> c2)
-		{
-			return new AbstractCondition<E>()
-			{
-
-				@Override
-				public Predicate getPredicates()
-				{
-					return builder.or(c1.getPredicates(), c2.getPredicates());
-				}
-			};
-		}
-
-		public abstract class AbstractCondition<E> implements Condition<E>
-		{
-			public Condition<E> and(final Condition<E> c1)
-			{
-				return new AbstractCondition<E>()
-				{
-
-					@Override
-					public Predicate getPredicates()
-					{
-						return builder.and(AbstractCondition.this.getPredicates(), c1.getPredicates());
-					}
-				};
-			}
-
-			public Condition<E> or(final Condition<E> c1)
-			{
-				return new AbstractCondition<E>()
-				{
-
-					@Override
-					public Predicate getPredicates()
-					{
-						return builder.or(AbstractCondition.this.getPredicates(), c1.getPredicates());
-					}
-				};
-			}
-
-		}
-
-		public <L> Condition<E> equal(final SingularAttribute<E, L> field, final L value)
-		{
-
-			return new AbstractCondition<E>()
-			{
-
-				@Override
-				public Predicate getPredicates()
-				{
-					return builder.equal(root.get(field), value);
-				}
-
-			};
-		}
-
-	}
-
-	public interface Condition<E>
-	{
-
-		Predicate getPredicates();
-
-		Condition<E> and(Condition<E> c1);
-
-		Condition<E> or(Condition<E> c1);
-
+		entityManager.remove(entity);
 	}
 
 }
