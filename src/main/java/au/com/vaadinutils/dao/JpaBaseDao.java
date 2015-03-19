@@ -1,10 +1,10 @@
 package au.com.vaadinutils.dao;
 
 import java.lang.reflect.ParameterizedType;
-import java.util.Collection;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.persistence.EntityManager;
@@ -597,7 +597,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 		CriteriaQuery<E> criteria = builder.createQuery(entityClass);
 		Root<E> root = criteria.from(entityClass);
-		List<Predicate> predicates = new LinkedList<>();
+		Predicate predicate = null;
 
 		private Integer limit = null;
 
@@ -612,32 +612,6 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		public <L> FindBuilder fetch(SingularAttribute<E, L> field)
 		{
 			root.fetch(field, JoinType.LEFT);
-			return this;
-		}
-
-		public <L> FindBuilder whereEqual(SingularAttribute<E, L> field, L value)
-		{
-			predicates.add(builder.equal(root.get(field), value));
-			return this;
-		}
-
-		public FindBuilder whereLike(SingularAttribute<E, String> field, String value)
-		{
-			predicates.add(builder.like(root.get(field), value));
-			return this;
-		}
-
-		public <L extends Comparable<? super L>> FindBuilder whereGreaterThan(SingularAttribute<E, L> field, L value)
-		{
-			predicates.add(builder.greaterThan(root.get(field), value));
-			return this;
-		}
-
-		public <L extends Comparable<? super L>> FindBuilder whereGreaterThanOrEqualTo(SingularAttribute<E, L> field,
-				L value)
-		{
-
-			predicates.add(builder.greaterThanOrEqualTo(root.get(field), value));
 			return this;
 		}
 
@@ -687,22 +661,10 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 		private TypedQuery<E> prepareQuery()
 		{
-			Predicate filter = null;
-			for (Predicate predicate : predicates)
-			{
-				if (filter == null)
-				{
-					filter = predicate;
-				}
-				else
-				{
-					filter = builder.and(filter, predicate);
-				}
 
-			}
-			if (filter != null)
+			if (predicate != null)
 			{
-				criteria.where(filter);
+				criteria.where(predicate);
 			}
 			TypedQuery<E> query = entityManager.createQuery(criteria);
 			if (limit != null)
@@ -716,153 +678,293 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 			return query;
 		}
 
-		public <L> FindBuilder whereNotEqueal(SingularAttribute<E, L> field, L value)
-		{
-			predicates.add(builder.notEqual(root.get(field), value));
-			return this;
-
-		}
-
-		public <L> FindBuilder whereNotNull(SingularAttribute<E, L> field)
-		{
-			predicates.add(builder.isNotNull(root.get(field)));
-			return this;
-
-		}
-
-		public <L> FindBuilder whereNull(SingularAttribute<E, L> field)
-		{
-			predicates.add(builder.isNull(root.get(field)));
-			return this;
-
-		}
-
-		public Predicate like(SingularAttribute<E, String> field, String value)
-		{
-			return builder.like(root.get(field), value);
-
-		}
-
-//		public <J> Join<E, J> join(SingularAttribute<E, J> joinAttribute, JoinType joinType)
-//		{
-//
-//			return root.join(joinAttribute, joinType);
-//
-//		}
-		
-		public <J>  Join<? super E, J> join(SingularAttribute<? super E, J> joinAttribute, JoinType joinType)
+		public <L> Condition<E> notEqual(final SingularAttribute<E, L> field, final L value)
 		{
 
-			return root.join( joinAttribute, joinType);
-
-		}
-
-		public <J> Predicate joinLike(Join<E, J> join, SingularAttribute<J, String> field, String value)
-		{
-			return builder.like(join.get(field), value);
-
-		}
-		
-		public <J> Predicate joinGreaterThanOrEqualTo(Join<? super E, J> join,
-				SingularAttribute<J, Date> field, Date value)
-		{
-			return builder.greaterThanOrEqualTo(join.get(field), value);
-			
-		}
-		
-		public <J> Predicate joinLessThan(Join<? super E, J> join,
-				SingularAttribute<J, Date> field, Date value)
-		{
-			return builder.lessThan(join.get(field), value);
-		}
-
-		public FindBuilder whereAnd(Predicate pred)
-		{
-			predicates.add(pred);
-			return this;
-		}
-
-		public FindBuilder whereOr(Collection<Predicate> orPredicates)
-		{
-			Predicate or = null;
-			for (Predicate pred : orPredicates)
+			return new AbstractCondition<E>()
 			{
-				if (or == null)
+
+				@Override
+				public Predicate getPredicates()
 				{
-					or = pred;
+					return builder.notEqual(root.get(field), value);
 				}
-				else
+
+			};
+		}
+
+		public <L> Condition<E> isNotNull(final SingularAttribute<E, L> field)
+		{
+			return new AbstractCondition<E>()
+			{
+
+				@Override
+				public Predicate getPredicates()
 				{
-					or = builder.or(or, pred);
+					return builder.isNotNull(root.get(field));
+				}
+
+			};
+
+		}
+
+		public Condition<E> like(final SingularAttribute<E, String> field, final String value)
+		{
+			return new AbstractCondition<E>()
+			{
+
+				@Override
+				public Predicate getPredicates()
+				{
+
+					return builder.like(root.get(field), value);
+				}
+
+			};
+
+		}
+
+		public <J> Condition<E> joinLike(final SingularAttribute<E, J> joinAttribute, final JoinType joinType,
+				final SingularAttribute<J, String> field, final String value)
+		{
+			return new AbstractCondition<E>()
+			{
+
+				@Override
+				public Predicate getPredicates()
+				{
+					Join<E, J> join = getJoin(joinAttribute, joinType);
+					return builder.like(join.get(field), value);
+				}
+
+			};
+
+		}
+
+		public <L> Condition<E> isNull(final SingularAttribute<E, L> field)
+		{
+			return new AbstractCondition<E>()
+			{
+
+				@Override
+				public Predicate getPredicates()
+				{
+					return builder.isNull(root.get(field));
+				}
+
+			};
+
+		}
+
+		public <V extends Comparable<? super V>> Condition<E> lessThan(final SingularAttribute<E, V> field,
+				final V value)
+		{
+			return new AbstractCondition<E>()
+			{
+
+				@Override
+				public Predicate getPredicates()
+				{
+
+					return builder.lessThan(root.get(field), value);
+				}
+
+			};
+
+		}
+
+		public <J, V extends Comparable<? super V>> Condition<E> lessThan(
+				final SingularAttribute<? super E, J> joinAttribute, final JoinType joinType,
+				final SingularAttribute<J, V> field, final V value)
+		{
+			return new AbstractCondition<E>()
+			{
+
+				@Override
+				public Predicate getPredicates()
+				{
+					Join<E, J> join = getJoin(joinAttribute, joinType);
+					return builder.lessThan(join.get(field), value);
+				}
+
+			};
+
+		}
+
+		public <V extends Comparable<? super V>> Condition<E> lessThanOrEqualTo(final SingularAttribute<E, V> field,
+				final V value)
+		{
+			return new AbstractCondition<E>()
+			{
+
+				@Override
+				public Predicate getPredicates()
+				{
+
+					return builder.lessThanOrEqualTo(root.get(field), value);
+				}
+
+			};
+
+		}
+
+		public <J, V extends Comparable<? super V>> Condition<E> lessThanOrEqualTo(
+				final SingularAttribute<E, J> joinAttribute, final JoinType joinType,
+				final SingularAttribute<J, V> field, final V value)
+		{
+			return new AbstractCondition<E>()
+			{
+
+				@Override
+				public Predicate getPredicates()
+				{
+					Join<E, J> join = getJoin(joinAttribute, joinType);
+					return builder.lessThanOrEqualTo(join.get(field), value);
+				}
+
+			};
+
+		}
+
+		public <V extends Comparable<? super V>> Condition<E> greaterThanOrEqualTo(final SingularAttribute<E, V> field,
+				final V value)
+		{
+			return new AbstractCondition<E>()
+			{
+
+				@Override
+				public Predicate getPredicates()
+				{
+
+					return builder.greaterThanOrEqualTo(root.get(field), value);
+				}
+
+			};
+
+		}
+
+		public <J, V extends Comparable<? super V>> Condition<E> greaterThanOrEqualTo(
+				final SingularAttribute<? super E, J> joinAttribute, final JoinType joinType,
+				final SingularAttribute<J, V> field, final V value)
+		{
+			return new AbstractCondition<E>()
+			{
+
+				@Override
+				public Predicate getPredicates()
+				{
+					Join<E, J> join = getJoin(joinAttribute, joinType);
+					return builder.greaterThanOrEqualTo(join.get(field), value);
+				}
+
+			};
+
+		}
+
+		Map<JoinDescriptor<E>,Join<E,?>> joins = new HashMap<>();
+		private <J> Join<E, J> getJoin(SingularAttribute<? super E, J> joinAttribute, JoinType joinType)
+		{
+			JoinDescriptor<E> joinDescriptor = new JoinDescriptor<E>(joinAttribute,joinType);
+			@SuppressWarnings("unchecked")
+			Join<E, J> join = (Join<E, J>) joins.get(joinDescriptor);
+			{
+				if (join!=null)
+				{
+					return join;
 				}
 			}
-			if (or != null)
-			{
-				predicates.add(or);
-			}
+			join =  root.join(joinAttribute, joinType);
+			joins.put(joinDescriptor, join);
+			return join;
+		}
+
+		public FindBuilder where(Condition<E> condition)
+		{
+			predicate = condition.getPredicates();
 			return this;
-
 		}
-		
-		public Predicate And(Collection<Predicate> orPredicates)
+
+		public Condition<E> and(final Condition<E> c1, final Condition<E> c2)
 		{
-			Predicate result = null;
-			for (Predicate pred : orPredicates)
+			return new AbstractCondition<E>()
 			{
-				if (result == null)
+
+				@Override
+				public Predicate getPredicates()
 				{
-					result = pred;
+					return builder.and(c1.getPredicates(), c2.getPredicates());
 				}
-				else
-				{
-					result = builder.and(result, pred);
-				}
-			}
-			return result;
+			};
 		}
-		
-		public Predicate Or(Collection<Predicate> orPredicates)
+
+		public Condition<E> or(final Condition<E> c1, final Condition<E> c2)
 		{
-			Predicate result = null;
-			for (Predicate pred : orPredicates)
+			return new AbstractCondition<E>()
 			{
-				if (result == null)
+
+				@Override
+				public Predicate getPredicates()
 				{
-					result = pred;
+					return builder.or(c1.getPredicates(), c2.getPredicates());
 				}
-				else
+			};
+		}
+
+		public abstract class AbstractCondition<E> implements Condition<E>
+		{
+			public Condition<E> and(final Condition<E> c1)
+			{
+				return new AbstractCondition<E>()
 				{
-					result = builder.or(result, pred);
-				}
+
+					@Override
+					public Predicate getPredicates()
+					{
+						return builder.and(AbstractCondition.this.getPredicates(), c1.getPredicates());
+					}
+				};
 			}
-			return result;
+
+			public Condition<E> or(final Condition<E> c1)
+			{
+				return new AbstractCondition<E>()
+				{
+
+					@Override
+					public Predicate getPredicates()
+					{
+						return builder.or(AbstractCondition.this.getPredicates(), c1.getPredicates());
+					}
+				};
+			}
+
 		}
-		
-		public <L extends Comparable<? super L>> FindBuilder whereLessThanOrEqualTo(SingularAttribute<E, L> field,
-				L value)
+
+		public <L> Condition<E> equal(final SingularAttribute<E, L> field, final L value)
 		{
-			predicates.add(builder.lessThanOrEqualTo(root.get(field), value));
 
-			return this;
+			return new AbstractCondition<E>()
+			{
 
+				@Override
+				public Predicate getPredicates()
+				{
+					return builder.equal(root.get(field), value);
+				}
+
+			};
 		}
 
-		public <L extends Comparable<? super L>> Predicate greaterThanOrEqualTo(SingularAttribute<E, L> field,
-				L value)
-		{
-			return builder.greaterThanOrEqualTo(root.get(field), value);
-			
-		}
+	}
 
-		public <L> Predicate isNull(SingularAttribute<E, L> field)
-		{
-			return builder.isNull(root.get(field));
-			
-		}
+	public interface Condition<E>
+	{
 
-		
+		Predicate getPredicates();
 
-		
+		Condition<E> and(Condition<E> c1);
+
+		Condition<E> or(Condition<E> c1);
 
 	}
 
