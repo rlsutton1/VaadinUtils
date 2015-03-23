@@ -1,6 +1,8 @@
 package au.com.vaadinutils.dao;
 
 import java.lang.reflect.ParameterizedType;
+import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -44,20 +46,21 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 	{
 
 		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-		CriteriaQuery<E> criteria = builder.createQuery(entityClass);
 		Map<JoinDescriptor<E>, Join<E, ?>> joins = new HashMap<>();
 
 		private Integer limit = null;
 
 		Predicate predicate = null;
 
-		Root<E> root = criteria.from(entityClass);
-
 		private Integer startPosition = null;
+		final CriteriaQuery<E> criteria;
 
 		FindBuilder()
 		{
+			criteria = builder.createQuery(entityClass);
+			root = criteria.from(entityClass);
 			criteria.select(root);
+
 		}
 
 		public Condition<E> and(final Condition<E> c1, final Condition<E> c2)
@@ -348,16 +351,14 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 			};
 		}
 
+		SingularAttribute<E, ?> orderAttrib;
+		boolean orderDirection;
+		private Root<E> root;
+
 		public FindBuilder orderBy(SingularAttribute<E, ?> field, boolean asc)
 		{
-			if (asc)
-			{
-				criteria.orderBy(builder.asc(root.get(field)));
-			}
-			else
-			{
-				criteria.orderBy(builder.desc(root.get(field)));
-			}
+			orderAttrib = field;
+			orderDirection = asc;
 			return this;
 		}
 
@@ -369,6 +370,18 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 				criteria.where(predicate);
 			}
 			TypedQuery<E> query = entityManager.createQuery(criteria);
+			if (orderAttrib != null)
+			{
+				if (orderDirection)
+				{
+					criteria.orderBy(builder.asc(root.get(orderAttrib)));
+				}
+				else
+				{
+					criteria.orderBy(builder.desc(root.get(orderAttrib)));
+				}
+
+			}
 			if (limit != null)
 			{
 				query.setMaxResults(limit);
@@ -378,6 +391,34 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 				query.setFirstResult(startPosition);
 			}
 			return query;
+		}
+
+		/**
+		 * WARNING, order will not be honoured by this method
+		 * 
+		 * @return
+		 */
+		public int delete()
+		{
+			Preconditions.checkArgument(orderAttrib == null, "Order is not supported for delete");
+			CriteriaDelete<E> deleteCriteria = builder.createCriteriaDelete(entityClass);
+			root = deleteCriteria.getRoot();
+			if (predicate != null)
+			{
+				deleteCriteria.where(predicate);
+			}
+			Query query = entityManager.createQuery(deleteCriteria);
+
+			if (limit != null)
+			{
+				query.setMaxResults(limit);
+			}
+			if (startPosition != null)
+			{
+				query.setFirstResult(startPosition);
+			}
+			return query.executeUpdate();
+
 		}
 
 		public FindBuilder startPosition(int startPosition)
@@ -420,6 +461,39 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 				};
 			}
 
+		}
+
+		public Condition<E> in(final SingularAttribute<E, Long> attribute, final Collection<Long> queueIds)
+		{
+			return new AbstractCondition<E>()
+			{
+
+				@Override
+				public Predicate getPredicates()
+				{
+					return root.get(attribute).in(queueIds);
+				}
+			};
+		}
+
+		public Condition<E> gtEq(SingularAttribute<E, Date> field, Date value)
+		{
+			return greaterThanOrEqualTo(field, value);
+		}
+
+		public Condition<E> ltEq(SingularAttribute<E, Date> field, Date value)
+		{
+			return lessThanOrEqualTo(field, value);
+		}
+
+		public Condition<E> lt(SingularAttribute<E, Date> field, Date value)
+		{
+			return lessThan(field, value);
+		}
+
+		public Condition<E> eq(SingularAttribute<E, String> field, String value)
+		{
+			return equal(field, value);
 		}
 
 	}
