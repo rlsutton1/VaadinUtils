@@ -521,7 +521,6 @@ public class FormHelper<E> implements Serializable
 		{
 			Preconditions.checkNotNull(label, "Label may not be null");
 			Preconditions.checkNotNull(listField, "ListField may not be null");
-			Preconditions.checkNotNull(field, "Field may not be null");
 			if (builderForm == null)
 			{
 				builderForm = form;
@@ -559,6 +558,7 @@ public class FormHelper<E> implements Serializable
 			component.setImmediate(true);
 			if (group != null)
 			{
+				Preconditions.checkNotNull(field, "Field may not be null");
 				Collection<? extends Object> ids = null;
 				if (group.getContainer() != null)
 
@@ -1159,6 +1159,34 @@ public class FormHelper<E> implements Serializable
 	{
 		return bindEnumField(fieldLabel, fieldName.getName(), fieldName.getBindableJavaType());
 
+	}
+
+	public <J extends CrudEntity> FormHelper<E>.EntityFieldBuilder<J> getEntityFieldBuilder(Class<J> j)
+	{
+		return new EntityFieldBuilder<J>();
+
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	static public <J extends CrudEntity> FormHelper<?>.ListSelectBuilder<J> getListSelectBuilder(AbstractLayout form,Class<J> j)
+	{
+	    FormHelper<?> helper = new FormHelper(form,null);
+		return helper.new ListSelectBuilder<J>().setListClass(j);
+
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	static public <J extends CrudEntity> FormHelper<?>.EntityFieldBuilder<J> getEntityFieldBuilder(AbstractLayout form,Class<J> j)
+	{
+	    FormHelper<?> helper = new FormHelper(form,null);
+		return helper.new EntityFieldBuilder<J>().setListClass(j);
+
+	}
+
+
+	public <J extends CrudEntity> FormHelper<E>.TwinColSelectBuilder<J> getTwinColSelectBuilder(Class<J> j)
+	{
+		return new TwinColSelectBuilder<J>();
 	}
 
 }

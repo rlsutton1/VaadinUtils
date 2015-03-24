@@ -168,22 +168,6 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 		}
 
-		/**
-		 * delegate to greaterThanOrEqualTo
-		 * 
-		 * @param joinAttribute
-		 * @param joinType
-		 * @param field
-		 * @param value
-		 * @return
-		 */
-		public <J, V extends Comparable<? super V>> Condition<E> gtEq(
-				final SingularAttribute<? super E, J> joinAttribute, final JoinType joinType,
-				final SingularAttribute<J, V> field, final V value)
-		{
-			return greaterThanOrEqualTo(joinAttribute, joinType, field, value);
-		}
-
 		public <L> Condition<E> isNotNull(final SingularAttribute<E, L> field)
 		{
 			return new AbstractCondition<E>()
@@ -249,7 +233,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 		}
 
-		public <V extends Comparable<? super V>> Condition<E> lessThan(final SingularAttribute<E, V> field,
+		public <V extends Comparable<? super V>> Condition<E> lessThan(final SingularAttribute<? super E, V> field,
 				final V value)
 		{
 			return new AbstractCondition<E>()
@@ -351,14 +335,19 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 			};
 		}
 
-		SingularAttribute<E, ?> orderAttrib;
-		boolean orderDirection;
+		List<Order> orders = new LinkedList<>();
 		private Root<E> root;
 
 		public FindBuilder orderBy(SingularAttribute<E, ?> field, boolean asc)
 		{
-			orderAttrib = field;
-			orderDirection = asc;
+			if (asc)
+			{
+				orders.add(builder.asc(root.get(field)));
+			}
+			else
+			{
+				orders.add(builder.desc(root.get(field)));
+			}
 			return this;
 		}
 
@@ -369,19 +358,11 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 			{
 				criteria.where(predicate);
 			}
-			TypedQuery<E> query = entityManager.createQuery(criteria);
-			if (orderAttrib != null)
+			if (orders.size() > 0)
 			{
-				if (orderDirection)
-				{
-					criteria.orderBy(builder.asc(root.get(orderAttrib)));
-				}
-				else
-				{
-					criteria.orderBy(builder.desc(root.get(orderAttrib)));
-				}
-
+				criteria.orderBy(orders);
 			}
+			TypedQuery<E> query = entityManager.createQuery(criteria);
 			if (limit != null)
 			{
 				query.setMaxResults(limit);
@@ -400,7 +381,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		 */
 		public int delete()
 		{
-			Preconditions.checkArgument(orderAttrib == null, "Order is not supported for delete");
+			Preconditions.checkArgument(orders.size() > 0, "Order is not supported for delete");
 			CriteriaDelete<E> deleteCriteria = builder.createCriteriaDelete(entityClass);
 			root = deleteCriteria.getRoot();
 			if (predicate != null)
@@ -486,7 +467,14 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 			return lessThanOrEqualTo(field, value);
 		}
 
-		public Condition<E> lt(SingularAttribute<E, Date> field, Date value)
+		public <J, V extends Comparable<? super V>> Condition<E> gtEq(
+				final SingularAttribute<? super E, J> joinAttribute, final JoinType joinType,
+				final SingularAttribute<J, V> field, final V value)
+		{
+			return greaterThanOrEqualTo(joinAttribute, joinType, field, value);
+		}
+
+		public Condition<E> lt(SingularAttribute<? super E, Date> field, Date value)
 		{
 			return lessThan(field, value);
 		}
@@ -494,6 +482,13 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		public Condition<E> eq(SingularAttribute<E, String> field, String value)
 		{
 			return equal(field, value);
+		}
+
+		public <J, V extends Comparable<? super V>> Condition<E> lt(
+				final SingularAttribute<? super E, J> joinAttribute, final JoinType joinType,
+				final SingularAttribute<J, V> field, final V value)
+		{
+			return lessThan(joinAttribute, joinType,field,value);
 		}
 
 	}
