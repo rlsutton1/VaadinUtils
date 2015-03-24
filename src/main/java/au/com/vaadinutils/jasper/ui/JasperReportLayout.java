@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -707,6 +708,10 @@ class JasperReportLayout extends VerticalLayout
 				catch (InterruptedException  e)
 				{
 					logger.error(e, e);
+				}
+				catch (TimeoutException e)
+				{
+					logger.error(e,e);
 				}
 				return null;
 			}

@@ -678,8 +678,9 @@ public class JasperManager implements Runnable
 		return concurrentLimit.getQueueLength();
 	}
 
-	public InputStream getStream() throws InterruptedException
+	public InputStream getStream() throws InterruptedException, TimeoutException
 	{
+		outputStream.waitForOutputToBeReady(1, TimeUnit.MINUTES);
 		return outputStream.getInputStream();
 	}
 
