@@ -67,4 +67,10 @@ public class ContainerAdaptorJPA<E extends CrudEntity> implements ContainerAdapt
 	
     }
 
+	@Override
+	public Class<E> getEntityClass()
+	{
+		return container.getEntityClass();
+	}
+
 }

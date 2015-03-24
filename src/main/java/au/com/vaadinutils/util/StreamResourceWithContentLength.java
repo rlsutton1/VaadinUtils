@@ -6,12 +6,12 @@ import com.vaadin.server.StreamResource;
 public class StreamResourceWithContentLength extends StreamResource
 {
 
-	private int contentLength;
+	private ContenctLengthProviderStreamSource contentLengthProvider;
 
-	public StreamResourceWithContentLength(StreamSource streamSource, String filename, int contentLength)
+	public StreamResourceWithContentLength(ContenctLengthProviderStreamSource streamSource, String filename)
 	{
 		super(streamSource, filename);
-		this.contentLength = contentLength;
+		this.contentLengthProvider = streamSource;
 	}
 
 	private static final long serialVersionUID = 1L;
@@ -24,11 +24,14 @@ public class StreamResourceWithContentLength extends StreamResource
 		{
 			return null;
 		}
+		long contentLength = contentLengthProvider.getContentLength();
 		final DownloadStream ds = new DownloadStream(ss.getStream(), getMIMEType(), getFilename());
 		ds.setParameter("Content-Length", String.valueOf(contentLength));
 		ds.setBufferSize(getBufferSize());
 		ds.setCacheTime(getCacheTime());
 		return ds;
 	}
+
+	
 
 }

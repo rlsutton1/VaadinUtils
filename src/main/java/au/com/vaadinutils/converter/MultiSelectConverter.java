@@ -26,9 +26,13 @@ import java.util.Set;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import au.com.vaadinutils.crud.CrudEntity;
 
 import com.google.common.base.Preconditions;
+import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.EntityItemProperty;
 import com.vaadin.addon.jpacontainer.metadata.EntityClassMetadata;
 import com.vaadin.addon.jpacontainer.metadata.MetadataFactory;
@@ -47,6 +51,7 @@ public class MultiSelectConverter<T extends CrudEntity> implements Converter<Col
 	private String mappedBy;
 	@SuppressWarnings("rawtypes")
 	private Class type;
+	Logger logger = LogManager.getLogger();
 
 	public MultiSelectConverter(AbstractSelect select, @SuppressWarnings("rawtypes") Class type)
 	{
@@ -54,7 +59,7 @@ public class MultiSelectConverter<T extends CrudEntity> implements Converter<Col
 		this.type = type;
 	}
 
-	@SuppressWarnings("unchecked")
+	
 	private ContainerAdaptor<T> getContainer()
 	{
 		return ContainerAdaptorFactory.getAdaptor( select.getContainerDataSource());
@@ -139,14 +144,22 @@ public class MultiSelectConverter<T extends CrudEntity> implements Converter<Col
 		// orphaned collection
 		for (Object id : idset)
 		{
-		    	T entity = getContainer().getEntity(id);
-			 
-			if (!modelValue.contains(entity))
+			EntityItem<T> item = (EntityItem<T>) getContainer().getItem(id);
+			if (item != null)
 			{
-				modelValue.add(entity);
-				addBackReference(entity);
+				T entity = item.getEntity();
+				if (!modelValue.contains(entity))
+				{
+					modelValue.add(entity);
+					addBackReference(entity);
+				}
+				orphaned.remove(entity);
 			}
-			orphaned.remove(entity);
+			else
+			{
+				logger.error("couldn't find id {} in database for type {} entityClass {}", id, type, getContainer()
+						.getEntityClass());
+			}
 		}
 
 		// remove orphanded

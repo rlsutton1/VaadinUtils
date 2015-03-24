@@ -68,4 +68,11 @@ public class ContainerAdaptorEntity<E extends CrudEntity> implements ContainerAd
 	container.addContainerFilter(filter);
 	
     }
+
+	@Override
+	public Class<E> getEntityClass()
+	{
+		//TODO:
+		return null;
+	}
 }

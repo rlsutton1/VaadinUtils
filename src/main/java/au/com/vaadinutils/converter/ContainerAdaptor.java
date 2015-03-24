@@ -25,4 +25,6 @@ public interface ContainerAdaptor<T extends CrudEntity>
 
     void addContainerFilter(Filter filter);
 
+	Class<T> getEntityClass();
+
 }
