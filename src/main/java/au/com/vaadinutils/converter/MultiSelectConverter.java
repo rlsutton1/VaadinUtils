@@ -26,6 +26,9 @@ import java.util.Set;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.google.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.EntityContainer;
 import com.vaadin.addon.jpacontainer.EntityItem;
@@ -46,6 +49,7 @@ public class MultiSelectConverter<T> implements Converter<Collection<Object>, Co
 	private String mappedBy;
 	@SuppressWarnings("rawtypes")
 	private Class type;
+	Logger logger = LogManager.getLogger();
 
 	public MultiSelectConverter(AbstractSelect select, @SuppressWarnings("rawtypes") Class type)
 	{
@@ -140,13 +144,21 @@ public class MultiSelectConverter<T> implements Converter<Collection<Object>, Co
 		for (Object id : idset)
 		{
 			EntityItem<T> item = getContainer().getItem(id);
-			T entity = item.getEntity();
-			if (!modelValue.contains(entity))
+			if (item != null)
 			{
-				modelValue.add(entity);
-				addBackReference(entity);
+				T entity = item.getEntity();
+				if (!modelValue.contains(entity))
+				{
+					modelValue.add(entity);
+					addBackReference(entity);
+				}
+				orphaned.remove(entity);
 			}
-			orphaned.remove(entity);
+			else
+			{
+				logger.error("couldn't find id {} in database for type {} entityClass {}", id, type, getContainer()
+						.getEntityClass());
+			}
 		}
 
 		// remove orphanded
