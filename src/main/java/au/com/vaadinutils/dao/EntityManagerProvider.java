@@ -1,6 +1,15 @@
 package au.com.vaadinutils.dao;
 
 import javax.persistence.EntityManager;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.eclipse.jdt.internal.core.util.HandleFactory;
+
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Notification.Type;
 
 /**
  * The class is a place holder to allow access to an 'non-injected' entity
@@ -41,6 +50,8 @@ public enum EntityManagerProvider
 
 	private ThreadLocal<EntityManager> entityManagerThreadLocal = new ThreadLocal<EntityManager>();
 	private javax.persistence.EntityManagerFactory emf;
+
+	static Logger logger = LogManager.getLogger();
 
 	/**
 	 * Get the entity manager attached to this thread.
@@ -156,8 +167,15 @@ public enum EntityManagerProvider
 
 	public static <T> void persist(T record)
 	{
-		getEntityManager().persist(record);
-
+		try
+		{
+			getEntityManager().persist(record);
+		}
+		catch (Throwable e)
+		{
+			handleConstraintViolationException(e);
+			throw e;
+		}
 	}
 
 	public static <T> void refresh(T record)
@@ -168,8 +186,38 @@ public enum EntityManagerProvider
 
 	public static <T> void detach(T record)
 	{
-		getEntityManager().detach(record);
+		try
+		{
+			getEntityManager().detach(record);
+		}
+		catch (Throwable e)
+		{
+			handleConstraintViolationException(e);
+			throw e;
+		}
 
+	}
+
+	static void handleConstraintViolationException(Throwable e)
+	{
+		Throwable cause = e;
+		if (e.getCause() != null)
+		{
+			cause = e.getCause();
+		}
+		if (cause instanceof ConstraintViolationException)
+		{
+			String groupedViolationMessage = e.getClass().getSimpleName() + " ";
+			for (ConstraintViolation<?> violation : ((ConstraintViolationException) cause).getConstraintViolations())
+			{
+				logger.error(violation.getLeafBean().getClass().getCanonicalName() + " " + violation.getLeafBean());
+				String violationMessage = violation.getLeafBean().getClass().getSimpleName() + " "
+						+ violation.getPropertyPath() + " " + violation.getMessage() + ", the value was "
+						+ violation.getInvalidValue();
+				logger.error(violationMessage);
+				groupedViolationMessage += violationMessage + "\n";
+			}
+		}
 	}
 
 }

@@ -258,6 +258,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		searchLayout = new VerticalLayout();
 		searchLayout.setWidth("100%");
 		searchField.setWidth("100%");
+		searchField.setImmediate(true);
 
 		// expandratio and use of setSizeFull are incompatible
 		// searchLayout.setSizeFull();
@@ -1125,6 +1126,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	protected void interceptSaveValues(EntityItem<E> entityItem) throws Exception
 	{
 	}
+	volatile private String searchFilterText;
 
 	private void initSearch()
 	{
@@ -1141,8 +1143,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				// for triggering the filter.
 				if (advancedSearchCheckbox == null || !advancedSearchCheckbox.getValue())
 				{
-					String filterString = event.getText();
-					triggerFilter(filterString);
+					searchFilterText = event.getText();
+					triggerFilter(searchFilterText);
 				}
 			}
 		});
@@ -1196,7 +1198,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 	protected String getSearchFieldText()
 	{
-		return searchField.getValue();
+			return searchFilterText;
 	}
 
 	/**

@@ -599,5 +599,23 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 	{
 		entityManager.remove(entity);
 	}
+	
+	public JpaDslBuilder<E> jpaContainerDelegate(CriteriaBuilder criteriaBuilder, CriteriaQuery<E> query)
+	{
+		return new JpaDslBuilder<E>( query,  entityClass,entityManager);
+	}
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
 }

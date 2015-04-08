@@ -3,6 +3,7 @@ package au.com.vaadinutils.servlet;
 import java.io.IOException;
 
 import javax.persistence.EntityManager;
+import javax.persistence.RollbackException;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -44,7 +45,9 @@ public class EntityManagerInjectorFilter implements Filter
 
 			t.commit();
 		}
-		catch (ConstraintViolationException e)
+		
+		
+		catch (ConstraintViolationException |RollbackException e)
 		{
 
 			if (e.getCause() instanceof ConstraintViolationException)
@@ -53,7 +56,7 @@ public class EntityManagerInjectorFilter implements Filter
 
 				if (e2 != null)
 				{
-					for (ConstraintViolation<?> violation : e.getConstraintViolations())
+					for (ConstraintViolation<?> violation : e2.getConstraintViolations())
 					{
 						StringBuilder sb = new StringBuilder();
 						sb.append("Constraint Violation: \n");

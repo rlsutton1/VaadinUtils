@@ -18,6 +18,8 @@ import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Subquery;
+import javax.persistence.metamodel.SetAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 
 import au.com.vaadinutils.dao.JpaBaseDao.Condition;
@@ -27,17 +29,16 @@ import com.google.common.base.Preconditions;
 public class JpaDslBuilder<E>
 {
 
-	final private CriteriaBuilder builder;
-	Map<JoinDescriptor<E>, Join<E, ?>> joins = new HashMap<>();
+	protected CriteriaBuilder builder;
 
 	private Integer limit = null;
 
 	Predicate predicate = null;
 
 	private Integer startPosition = null;
-	final CriteriaQuery<E> criteria;
-	final private EntityManager entityManager;
-	final private Class<E> entityClass;
+	private CriteriaQuery<E> criteria;
+	protected EntityManager entityManager;
+	protected Class<E> entityClass;
 
 	JpaDslBuilder(EntityManager entityManager, Class<E> entityClass)
 	{
@@ -48,6 +49,32 @@ public class JpaDslBuilder<E>
 		criteria = builder.createQuery(entityClass);
 		root = criteria.from(entityClass);
 		criteria.select(root);
+
+	}
+
+	protected JpaDslBuilder()
+	{
+		// TODO Auto-generated constructor stub
+	}
+
+	/**
+	 * constructor specifically for the JpaContainerDelegate usage
+	 * 
+	 * @param query
+	 * @param entityClass
+	 * @param entityManager
+	 */
+	@SuppressWarnings("unchecked")
+	public JpaDslBuilder(CriteriaQuery<E> query, Class<E> entityClass, EntityManager entityManager)
+	{
+		this.entityManager = entityManager;
+		this.entityClass = entityClass;
+		builder = entityManager.getCriteriaBuilder();
+
+		criteria = query;
+		root = (Root<E>) criteria.getRoots().iterator().next();
+
+		isJpaContainerDelegate = true;
 
 	}
 
@@ -106,22 +133,6 @@ public class JpaDslBuilder<E>
 	{
 		root.fetch(field, JoinType.LEFT);
 		return this;
-	}
-
-	private <J> Join<E, J> getJoin(SingularAttribute<? super E, J> joinAttribute, JoinType joinType)
-	{
-		JoinDescriptor<E> joinDescriptor = new JoinDescriptor<E>(joinAttribute, joinType);
-		@SuppressWarnings("unchecked")
-		Join<E, J> join = (Join<E, J>) joins.get(joinDescriptor);
-		{
-			if (join != null)
-			{
-				return join;
-			}
-		}
-		join = root.join(joinAttribute, joinType);
-		joins.put(joinDescriptor, join);
-		return join;
 	}
 
 	public List<E> getResultList()
@@ -303,7 +314,7 @@ public class JpaDslBuilder<E>
 
 	}
 
-	public Condition<E> like(final SingularAttribute<E, String> field, final String value)
+	public Condition<E> like(final SingularAttribute<? super E, String> field, final String value)
 	{
 		return new AbstractCondition<E>()
 		{
@@ -354,7 +365,7 @@ public class JpaDslBuilder<E>
 	}
 
 	List<Order> orders = new LinkedList<>();
-	private Root<E> root;
+	protected Root<E> root;
 
 	public JpaDslBuilder<E> orderBy(SingularAttribute<E, ?> field, boolean asc)
 	{
@@ -419,7 +430,7 @@ public class JpaDslBuilder<E>
 		return query.executeUpdate();
 
 	}
-	
+
 	public Long count()
 	{
 		CriteriaQuery<Long> query = builder.createQuery(Long.class);
@@ -428,10 +439,10 @@ public class JpaDslBuilder<E>
 			query.where(predicate);
 		}
 		query.select(builder.count(query.from(entityClass)));
-		
+
 		return entityManager.createQuery(query).getSingleResult();
 	}
-	
+
 	public Long countDistinct()
 	{
 		CriteriaQuery<Long> query = builder.createQuery(Long.class);
@@ -440,7 +451,7 @@ public class JpaDslBuilder<E>
 			query.where(predicate);
 		}
 		query.select(builder.countDistinct(query.from(entityClass)));
-		
+
 		return entityManager.createQuery(query).getSingleResult();
 	}
 
@@ -448,6 +459,27 @@ public class JpaDslBuilder<E>
 	{
 		this.startPosition = startPosition;
 		return this;
+	}
+
+	/**
+	 * you can't do anything with this currently, but it paves the way for
+	 * chained joins A joinBuilder could then be an argument to something that
+	 * implements Condition
+	 * 
+	 * @param attribute
+	 * @param type
+	 * @return
+	 */
+	public <K> JoinBuilder<E, K> join(final SingularAttribute<? super E, K> attribute, JoinType type)
+	{
+		// TODO: make use of this
+		return new JoinBuilder<E, K>(attribute, type);
+	}
+
+	public <K> JoinBuilder<E, K> join(final SetAttribute<? super E, K> attribute, JoinType type)
+	{
+		// TODO: make use of this
+		return new JoinBuilder<E, K>(attribute, type);
 	}
 
 	public JpaDslBuilder<E> where(Condition<E> condition)
@@ -486,7 +518,7 @@ public class JpaDslBuilder<E>
 
 	}
 
-	public Condition<E> in(final SingularAttribute<E, Long> attribute, final Collection<Long> queueIds)
+	public <V> Condition<E> in(final SingularAttribute<E, V> attribute, final Collection<V> values)
 	{
 		return new AbstractCondition<E>()
 		{
@@ -494,7 +526,20 @@ public class JpaDslBuilder<E>
 			@Override
 			public Predicate getPredicates()
 			{
-				return root.get(attribute).in(queueIds);
+				return root.get(attribute).in(values);
+			}
+		};
+	}
+
+	public <V> Condition<E> in(final SetAttribute<E, V> agents, final V agent)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+				return root.get(agents).in(agent);
 			}
 		};
 	}
@@ -557,6 +602,97 @@ public class JpaDslBuilder<E>
 			}
 
 		};
+	}
+
+	public <V extends Comparable<? super V>> Condition<E> between(final JoinBuilder<E, ? super V> joinBuilder,
+			final SingularAttribute<? super V, Date> field, final Date start, final Date end)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@SuppressWarnings({ "unchecked", "rawtypes" })
+			@Override
+			public Predicate getPredicates()
+			{
+
+				return builder.between(getJoin(joinBuilder).get((SingularAttribute) field), start, end);
+			}
+
+		};
+	}
+
+	Map<JoinBuilder<E, ?>, Join<E, ?>> joins2 = new HashMap<>();
+
+	private boolean isJpaContainerDelegate;
+
+	@SuppressWarnings("unchecked")
+	<K> Join<E, K> getJoin(JoinBuilder<E, K> builder)
+	{
+		Join<E, K> join = (Join<E, K>) joins2.get(builder);
+		if (join == null)
+		{
+			join = builder.getJoin(root);
+			joins2.put(builder, join);
+		}
+		return join;
+	}
+
+	private <J> Join<E, J> getJoin(SingularAttribute<? super E, J> joinAttribute, JoinType joinType)
+	{
+		JoinBuilder<E, J> jb = join(joinAttribute, joinType);
+		return getJoin(jb);
+	}
+
+	public <V> Condition<E> like(final JoinBuilder<E, V> join, final SingularAttribute<V, String> attribute,
+			final String pattern)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+				return builder.like(getJoin(join).get(attribute), pattern);
+			}
+		};
+	}
+
+	/**
+	 * for use with vaadin JPAContainer queryDelegate
+	 * 
+	 * @param criteriaBuilder
+	 * @param query
+	 * @param predicates
+	 */
+	public void filtersWillBeAdded(List<Predicate> predicates)
+	{
+		Preconditions.checkArgument(isJpaContainerDelegate, "You must call isJpaContainerDelegate first!");
+		// the query wouldn't be built with the vaadinContainer's query object
+		// if you didn't call isJpaContainerDelegate.
+		if (predicate != null)
+		{
+			predicates.add(predicate);
+		}
+
+	}
+
+	public <J> AbstractCondition<E> exists(final JpaDslSubqueryBuilder<E, J> subquery)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+				return builder.exists(subquery.getSubQuery());
+			}
+		};
+
+	}
+
+	public <J> JpaDslSubqueryBuilder<E, J> subQuery(Class<J> target)
+	{
+		return new JpaDslSubqueryBuilder<E, J>(entityManager, target, criteria, root);
 	}
 
 }
