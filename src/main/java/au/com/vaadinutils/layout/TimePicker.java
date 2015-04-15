@@ -474,6 +474,7 @@ public class TimePicker extends HorizontalLayout implements Field
 		dateTime.set(Calendar.HOUR, 0);
 		dateTime.set(Calendar.MINUTE, 0);
 		dateTime.set(Calendar.SECOND, 0);
+		dateTime.set(Calendar.MILLISECOND, 0);
 		dateTime.set(Calendar.AM_PM, Calendar.AM);
 		isSet = false;
 		displayTime.setValue(EMPTY);
