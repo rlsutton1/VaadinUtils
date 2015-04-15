@@ -642,6 +642,12 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 			return this;
 		}
 
+		public <J, L> FindBuilder joinWhereEqual(Join<E, J> join, SingularAttribute<J, L> field, L value)
+		{
+			predicates.add(builder.equal(join.get(field), value));
+			return this;
+		}
+
 		public FindBuilder whereLike(SingularAttribute<E, String> field, String value)
 		{
 			predicates.add(builder.like(root.get(field), value));
@@ -683,6 +689,19 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 			else
 			{
 				criteria.orderBy(builder.desc(root.get(field)));
+			}
+			return this;
+		}
+
+		public <J> FindBuilder joinOrderBy(Join<E, J> join, SingularAttribute<J, ?> field, boolean asc)
+		{
+			if (asc)
+			{
+				criteria.orderBy(builder.asc(join.get(field)));
+			}
+			else
+			{
+				criteria.orderBy(builder.desc(join.get(field)));
 			}
 			return this;
 		}
