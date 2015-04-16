@@ -5,10 +5,10 @@ import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.SetAttribute;
 
-public class JoinMetaDataPlural<E, K> implements JoinMetaData<E, K>
+public class JoinMetaDataSet<E, K> implements JoinMetaData<E, K>
 {
 
-	public JoinMetaDataPlural(SetAttribute<E, K> attribute2, JoinType type2)
+	public JoinMetaDataSet(SetAttribute<E, K> attribute2, JoinType type2)
 	{
 		attribute = attribute2;
 		type = type2;
@@ -21,7 +21,7 @@ public class JoinMetaDataPlural<E, K> implements JoinMetaData<E, K>
 	@Override
 	public boolean equals(Object obj)
 	{
-		JoinMetaDataPlural other = (JoinMetaDataPlural) obj;
+		JoinMetaDataSet other = (JoinMetaDataSet) obj;
 		return type == other.type && attribute == other.attribute;
 	}
 

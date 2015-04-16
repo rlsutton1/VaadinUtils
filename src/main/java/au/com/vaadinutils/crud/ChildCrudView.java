@@ -300,7 +300,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	{
 		try
 		{
-			if (!fieldGroup.isValid())
+			if (getCurrent()!= null && !fieldGroup.isValid())
 			{
 
 				throw new InvalidValueException("Fields are invalid");

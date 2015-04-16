@@ -46,6 +46,7 @@ import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.shared.ui.datefield.Resolution;
 import com.vaadin.ui.AbstractComponent;
+import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.AbstractSelect.ItemCaptionMode;
 import com.vaadin.ui.CheckBox;
@@ -104,7 +105,7 @@ public class FormHelper<E> implements Serializable
 		return field;
 	}
 	
-	public <T extends CustomField<?>> T doBinding(String fieldLabel,SingularAttribute<?, ?> field,T customField)
+	public <T extends AbstractField<?>> T doBinding(String fieldLabel,SingularAttribute<?, ?> field,T customField)
 	{
 		
 		doBinding(group, field.getName(), customField);
@@ -1176,7 +1177,7 @@ public class FormHelper<E> implements Serializable
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	static public <J extends CrudEntity> FormHelper<?>.EntityFieldBuilder<J> getEntityFieldBuilder(AbstractLayout form,Class<J> j)
+	static public <J > FormHelper<?>.EntityFieldBuilder<J> getEntityFieldBuilder(AbstractLayout form,Class<J> j)
 	{
 	    FormHelper<?> helper = new FormHelper(form,null);
 		return helper.new EntityFieldBuilder<J>().setListClass(j);

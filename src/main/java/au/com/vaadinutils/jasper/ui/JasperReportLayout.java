@@ -1,21 +1,16 @@
 package au.com.vaadinutils.jasper.ui;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import au.com.vaadinutils.dao.JpaBaseDao;
 import au.com.vaadinutils.jasper.JasperManager;
@@ -64,6 +59,9 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Reindeer;
+
+import elemental.json.JsonArray;
+import elemental.json.JsonObject;
 
 /**
  * Base class for a view that provides a report filter selection area and a
@@ -212,24 +210,23 @@ class JasperReportLayout extends VerticalLayout
 			private static final long serialVersionUID = 1L;
 
 			@Override
-			public void call(JSONArray arguments) throws JSONException
+			public void call(JsonArray arguments) 
 			{
 				try
 				{
-					JSONObject args = arguments.getJSONObject(0);
+					JsonObject args = arguments.getObject(0);
 					String subReportFileName = args.get("ReportFileName").toString();
 					String subTitle = args.get("ReportTitle").toString();
 
-					JSONObject params = arguments.getJSONObject(1);
+					JsonObject params = arguments.getObject(1);
 
 					List<ReportParameter<?>> subFilters = new LinkedList<ReportParameter<?>>();
 
 					boolean insitue = false;
-					@SuppressWarnings("unchecked")
-					Iterator<String> itr = params.keys();
-					while (itr.hasNext())
+					
+					for (String key: params.keys())
 					{
-						String key = itr.next();
+					
 						if (key.equalsIgnoreCase("ReportParameterInsitue"))
 						{
 							insitue = true;

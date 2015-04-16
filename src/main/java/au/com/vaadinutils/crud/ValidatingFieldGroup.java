@@ -137,6 +137,8 @@ public class ValidatingFieldGroup<E> extends FieldGroup
 	{
 		for (Field<?> field : getFields())
 		{
+			System.out.println("checking "+field.getCaption()+" "+field.getPropertyDataSource());
+			field.getValue();
 			if (field.isModified())
 			{
 				System.out.println("8234873: Dirty: " + field.getCaption());

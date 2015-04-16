@@ -6,6 +6,7 @@ import java.util.List;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Root;
+import javax.persistence.metamodel.ListAttribute;
 import javax.persistence.metamodel.SetAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 
@@ -13,6 +14,51 @@ public class JoinBuilder<  E, K>
 {
 
 	
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode()
+	{
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((joins == null) ? 0 : joins.hashCode());
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (this == obj)
+		{
+			return true;
+		}
+		if (obj == null)
+		{
+			return false;
+		}
+		if (!(obj instanceof JoinBuilder))
+		{
+			return false;
+		}
+		JoinBuilder other = (JoinBuilder) obj;
+		if (joins == null)
+		{
+			if (other.joins != null)
+			{
+				return false;
+			}
+		}
+		else if (!joins.equals(other.joins))
+		{
+			return false;
+		}
+		return true;
+	}
 
 	@SuppressWarnings("rawtypes")
 	List<JoinMetaData> joins = new LinkedList<>();
@@ -31,7 +77,14 @@ public class JoinBuilder<  E, K>
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public JoinBuilder(SetAttribute<? super E, K> attribute, JoinType type)
 	{
-		joins.add(new JoinMetaDataPlural(attribute, type));
+		joins.add(new JoinMetaDataSet(attribute, type));
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public JoinBuilder(ListAttribute<? super E, K> attribute, JoinType type)
+	{
+		joins.add(new JoinMetaDataList(attribute, type));
+
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -71,7 +124,7 @@ public class JoinBuilder<  E, K>
 
 		JoinBuilder<E, T> jb = new JoinBuilder<E, T>();
 		jb.joins.addAll(joins);
-		jb.joins.add(new JoinMetaDataPlural(attribute, type));
+		jb.joins.add(new JoinMetaDataSet(attribute, type));
 		return jb;
 	}
 }

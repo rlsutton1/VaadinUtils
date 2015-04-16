@@ -49,13 +49,19 @@ public class EntityManagerInjectorFilter implements Filter
 		
 		catch (ConstraintViolationException |RollbackException e)
 		{
-
-			if (e.getCause() instanceof ConstraintViolationException)
+			Throwable ex = e;
+			int i= 0;
+			while (i < 5 && ex !=null && !(ex instanceof ConstraintViolationException))
 			{
-				ConstraintViolationException e2 = (ConstraintViolationException) e.getCause();
+				ex =ex.getCause();
+				i++;
+			}
+			
+			if (ex instanceof ConstraintViolationException)
+			{
+				ConstraintViolationException e2 = (ConstraintViolationException) ex;
 
-				if (e2 != null)
-				{
+				
 					for (ConstraintViolation<?> violation : e2.getConstraintViolations())
 					{
 						StringBuilder sb = new StringBuilder();
@@ -68,7 +74,7 @@ public class EntityManagerInjectorFilter implements Filter
 						logger.error(sb.toString());
 					}
 
-				}
+				
 			}
 			throw e;
 		}

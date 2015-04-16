@@ -726,7 +726,7 @@ public class TimePicker extends HorizontalLayout implements Field
 	{
 		clearValue();
 		datasource = newDataSource;
-		if (datasource.getValue() != null)
+		if (datasource !=null && datasource.getValue() != null)
 		{
 			setValues(datasource.getValue());
 		}
@@ -777,5 +777,19 @@ public class TimePicker extends HorizontalLayout implements Field
 	public String getRequiredError()
 	{
 		return requiredErrorMessage;
+	}
+
+	@Override
+	public boolean isEmpty()
+	{
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void clear()
+	{
+		// TODO Auto-generated method stub
+		
 	}
 }
