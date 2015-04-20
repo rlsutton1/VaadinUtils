@@ -296,4 +296,5 @@ public class DayOfWeekCheckBoxes extends HorizontalLayout implements Field<Strin
 		// TODO Auto-generated method stub
 		
 	}
+
 }

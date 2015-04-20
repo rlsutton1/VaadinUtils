@@ -880,6 +880,16 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 	public void save()
 	{
+		// WARNING WARNING WARNING
+
+		// JPAContainer will only save nested properties if the relationship has
+		// cascade merge.
+
+		// ALSO an entity in a child crud must NOT have cascade Persist on, as the
+		// cascade will cause changes to be lost
+		
+		// not quite a paradox?
+
 		boolean selected = false;
 		try
 		{
@@ -1126,6 +1136,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	protected void interceptSaveValues(EntityItem<E> entityItem) throws Exception
 	{
 	}
+
 	volatile private String searchFilterText;
 
 	private void initSearch()
@@ -1198,7 +1209,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 	protected String getSearchFieldText()
 	{
-			return searchFilterText;
+		return searchFilterText;
 	}
 
 	/**

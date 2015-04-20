@@ -189,23 +189,6 @@ class JasperReportLayout extends VerticalLayout
 		JavaScript.getCurrent().addFunction("au.com.noojee.reportDrillDown", new JavaScriptFunction()
 		{
 
-			// expected syntax of a call to this javascript hook method
-			//
-			// window.parent.au.com.noojee.reportDrillDown(
-			// {
-			// 'reportFileName':
-			// 'CallDetailsPerTeamAgentPerHour_CallDetails.jasper',
-			// 'reportTitle': 'Call Details Per Team Agent Per Hour'
-			// },
-			// {
-			// 'ReportParameterStartDate'='$P{StartDate}',
-			// 'ReportParameterEndDate'='$P{EndDate}',
-			// 'ReportParameterExtension'='$F{loginid}',
-			// 'ReportParameterTeamId'='$P{TeamId}',
-			// 'ReportParameterHour'='$F{Day}.toString()'
-			// }
-			//
-			// );
 
 			private static final long serialVersionUID = 1L;
 

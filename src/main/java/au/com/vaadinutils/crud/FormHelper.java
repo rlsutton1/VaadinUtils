@@ -168,6 +168,13 @@ public class FormHelper<E> implements Serializable
 		return field;
 	}
 
+	public <M> TextArea bindTextAreaField(String fieldLabel, SingularAttribute<E, M> member, int rows)
+	{
+		TextArea field = bindTextAreaField(form, group, fieldLabel, member.getName(), rows);
+		this.fieldList.add(field);
+		return field;
+	}
+
 	public TextArea bindTextAreaField(String fieldLabel, String fieldName, int rows)
 	{
 		TextArea field = bindTextAreaField(form, group, fieldLabel, fieldName, rows);
