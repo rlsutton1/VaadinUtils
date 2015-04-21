@@ -1839,6 +1839,17 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				if (e instanceof InvalidValueException)
 				{
 					message = ((InvalidValueException) e).getMessage();
+					if (message == null)
+					{
+						for (InvalidValueException cause : ((InvalidValueException) e).getCauses())
+						{
+							message = cause.getMessage();
+							if (message != null)
+							{
+								break;
+							}
+						}
+					}
 				}
 				ret = field.getCaption() + "\n\n" + message;
 				logger.warn(
