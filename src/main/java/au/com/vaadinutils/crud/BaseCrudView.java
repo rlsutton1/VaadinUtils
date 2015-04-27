@@ -1070,7 +1070,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				fieldGroup.setItemDataSource(item);
 				selected = true;
 
-				newEntity = null;
 				if (restoreDelete)
 				{
 					activateEditMode(false);
@@ -1128,6 +1127,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				addFilterToShowNewRow(newEntity);
 				container.discard();
 			}
+			this.newEntity = null;
 
 			// select has been moved to here because when it happens earlier,
 			// child cruds are caused to discard their data before saving it for
