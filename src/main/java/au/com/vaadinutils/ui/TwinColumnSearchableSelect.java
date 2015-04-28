@@ -64,6 +64,8 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	private ValueChangeListener<C> listener;
 	private Button addNewButton = new Button(FontAwesome.PLUS);
 	private CreateNewCallback<C> createNewCallback;
+	@SuppressWarnings("rawtypes")
+	private Class<? extends Collection> valueClass;
 
 	/**
 	 * Unfortunately TwinColumnSelect wont work with large sets, it isn't
@@ -76,7 +78,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	{
 		this(fieldName, listField, null);
 	}
-	
+
 	public TwinColumnSearchableSelect(String fieldName, SingularAttribute<C, ?> listField, String itemLabel)
 	{
 		beans = new BeanContainer<Long, C>(listField.getDeclaringType().getJavaType());
@@ -102,8 +104,8 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 		selectedCols.setContainerDataSource(createBeanContainer());
 		if (!selectedCols.getContainerPropertyIds().contains(itemLabel))
 		{
-			logger.error("you need to define a getter for the field {} in {}, valid fields are {}",
-					itemLabel, listField.getDeclaringType().getJavaType(),
+			logger.error("you need to define a getter for the field {} in {}, valid fields are {}", itemLabel,
+					listField.getDeclaringType().getJavaType(),
 					Arrays.toString(selectedCols.getContainerPropertyIds().toArray()));
 		}
 		selectedCols.setVisibleColumns(itemLabel);
@@ -456,6 +458,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	@Override
 	protected void setInternalValue(Collection<C> newValue)
 	{
+		valueClass = newValue.getClass();
 		super.setInternalValue(newValue);
 
 		beans.removeAllItems();
@@ -486,8 +489,16 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 
 	public Object getConvertedValue()
 	{
+		Collection<C> selected;
+		if (valueClass != null && List.class.isAssignableFrom(valueClass))
+		{
+			selected = new LinkedList<>();
+		}
+		else
+		{
+			selected = new HashSet<>();
+		}
 
-		Collection<C> selected = new HashSet<>();
 		if (beans != null)
 		{
 			for (Long id : beans.getItemIds())
