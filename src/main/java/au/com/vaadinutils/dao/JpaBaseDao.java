@@ -34,6 +34,18 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 	protected EntityManager entityManager;
 
+	
+	public interface Condition<E>
+	{
+
+		Condition<E> and(Condition<E> c1);
+
+		Predicate getPredicates();
+
+		Condition<E> or(Condition<E> c1);
+
+	}
+	
 	static public <E> JpaBaseDao<E, Long> getGenericDao(Class<E> class1)
 	{
 		return new JpaBaseDao<E, Long>(class1);
@@ -607,11 +619,21 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 	}
 
+	public JpaBaseDao<E, K>.FindBuilder findOld()
+	{
+		return new FindBuilder();
+	}
+	
 	public JpaDslBuilder<E> find()
 	{
 		return new JpaDslBuilder<E>(entityManager, entityClass);
 	}
 
+	public JpaDslBuilder<E> jpaContainerDelegate(CriteriaBuilder criteriaBuilder, CriteriaQuery<E> query)
+	{
+		return new JpaDslBuilder<E>( query,  entityClass,entityManager);
+	}
+	
 	public class FindBuilder
 	{
 		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
