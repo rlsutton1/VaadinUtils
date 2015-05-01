@@ -611,5 +611,240 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 	{
 		return new JpaDslBuilder<E>(entityManager, entityClass);
 	}
-	
+
+	public class FindBuilder
+	{
+		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+
+		CriteriaQuery<E> criteria = builder.createQuery(entityClass);
+		Root<E> root = criteria.from(entityClass);
+		List<Predicate> predicates = new LinkedList<>();
+
+		private Integer limit = null;
+
+		private Integer startPosition = null;
+
+		/**
+		 * specify that JPA should fetch child entities in a single query!
+		 * 
+		 * @param field
+		 * @return
+		 */
+		public <L> FindBuilder fetch(SingularAttribute<E, L> field)
+		{
+			root.fetch(field, JoinType.LEFT);
+			return this;
+		}
+
+		public <L> FindBuilder whereEqual(SingularAttribute<E, L> field, L value)
+		{
+			predicates.add(builder.equal(root.get(field), value));
+			return this;
+		}
+
+		public <J, L> FindBuilder joinWhereEqual(Join<E, J> join, SingularAttribute<J, L> field, L value)
+		{
+			predicates.add(builder.equal(join.get(field), value));
+			return this;
+		}
+
+		public FindBuilder whereLike(SingularAttribute<E, String> field, String value)
+		{
+			predicates.add(builder.like(root.get(field), value));
+			return this;
+		}
+
+		public <L extends Comparable<? super L>> FindBuilder whereGreaterThan(SingularAttribute<E, L> field, L value)
+		{
+			predicates.add(builder.greaterThan(root.get(field), value));
+			return this;
+		}
+
+		public <L extends Comparable<? super L>> FindBuilder whereGreaterThanOrEqualTo(SingularAttribute<E, L> field,
+				L value)
+		{
+
+			predicates.add(builder.greaterThanOrEqualTo(root.get(field), value));
+			return this;
+		}
+
+		public FindBuilder limit(int limit)
+		{
+			this.limit = limit;
+			return this;
+		}
+
+		public FindBuilder startPosition(int startPosition)
+		{
+			this.startPosition = startPosition;
+			return this;
+		}
+
+		public FindBuilder orderBy(SingularAttribute<E, ?> field, boolean asc)
+		{
+			if (asc)
+			{
+				criteria.orderBy(builder.asc(root.get(field)));
+			}
+			else
+			{
+				criteria.orderBy(builder.desc(root.get(field)));
+			}
+			return this;
+		}
+
+		public <J> FindBuilder joinOrderBy(Join<E, J> join, SingularAttribute<J, ?> field, boolean asc)
+		{
+			if (asc)
+			{
+				criteria.orderBy(builder.asc(join.get(field)));
+			}
+			else
+			{
+				criteria.orderBy(builder.desc(join.get(field)));
+			}
+			return this;
+		}
+
+		FindBuilder()
+		{
+			criteria.select(root);
+		}
+
+		public E getSingleResult()
+		{
+			limit(1);
+			TypedQuery<E> query = prepareQuery();
+
+			return query.getSingleResult();
+		}
+
+		public List<E> getResultList()
+		{
+			TypedQuery<E> query = prepareQuery();
+			return query.getResultList();
+		}
+
+		private TypedQuery<E> prepareQuery()
+		{
+			Predicate filter = null;
+			for (Predicate predicate : predicates)
+			{
+				if (filter == null)
+				{
+					filter = predicate;
+				}
+				else
+				{
+					filter = builder.and(filter, predicate);
+				}
+
+			}
+			if (filter != null)
+			{
+				criteria.where(filter);
+			}
+			TypedQuery<E> query = entityManager.createQuery(criteria);
+			if (limit != null)
+			{
+				query.setMaxResults(limit);
+			}
+			if (startPosition != null)
+			{
+				query.setFirstResult(startPosition);
+			}
+			return query;
+		}
+
+		public <L> FindBuilder whereNotEqueal(SingularAttribute<E, L> field, L value)
+		{
+			predicates.add(builder.notEqual(root.get(field), value));
+			return this;
+
+		}
+
+		public <L> FindBuilder whereNotNull(SingularAttribute<E, L> field)
+		{
+			predicates.add(builder.isNotNull(root.get(field)));
+			return this;
+
+		}
+
+		public <L> FindBuilder whereNull(SingularAttribute<E, L> field)
+		{
+			predicates.add(builder.isNull(root.get(field)));
+			return this;
+
+		}
+
+		public Predicate like(SingularAttribute<E, String> field, String value)
+		{
+			return builder.like(root.get(field), value);
+
+		}
+
+		public <J> Join<E, J> join(SingularAttribute<E, J> joinAttribute, JoinType joinType)
+		{
+
+			return root.join(joinAttribute, joinType);
+
+		}
+
+		public <J> Predicate joinLike(Join<E, J> join, SingularAttribute<J, String> field, String value)
+		{
+			return builder.like(join.get(field), value);
+
+		}
+
+		public FindBuilder whereAnd(Predicate pred)
+		{
+			predicates.add(pred);
+			return this;
+		}
+
+		public FindBuilder whereOr(List<Predicate> orPredicates)
+		{
+			Predicate or = null;
+			for (Predicate pred : orPredicates)
+			{
+				if (or == null)
+				{
+					or = pred;
+				}
+				else
+				{
+					or = builder.or(or, pred);
+				}
+			}
+			if (or != null)
+			{
+				predicates.add(or);
+			}
+			return this;
+
+		}
+
+		public <L extends Comparable<? super L>> FindBuilder whereLessThanOrEqualTo(SingularAttribute<E, L> field,
+				L value)
+		{
+			predicates.add(builder.lessThanOrEqualTo(root.get(field), value));
+
+			return this;
+
+		}
+
+		public <L extends Comparable<? super L>> Predicate greaterThanOrEqualTo(SingularAttribute<E, L> field, L value)
+		{
+			return builder.greaterThanOrEqualTo(root.get(field), value);
+
+		}
+
+		public <L> Predicate isNull(SingularAttribute<E, L> field)
+		{
+			return builder.isNull(root.get(field));
+
+		}
+
+	}
+
 }

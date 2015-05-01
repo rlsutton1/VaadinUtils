@@ -9,6 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
+import javax.persistence.metamodel.ListAttribute;
 import javax.persistence.metamodel.SetAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 import javax.validation.ConstraintViolation;
@@ -117,6 +118,16 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 	}
 
 	public <T extends CustomField<?>> T doBinding(String fieldLabel, SetAttribute<?, ?> field, T customField)
+	{
+
+		doBinding(group, field.getName(), customField);
+		this.fieldList.add(customField);
+		form.addComponent(customField);
+		return customField;
+
+	}
+
+	public <T extends CustomField<?>> T doBinding(String fieldLabel, ListAttribute<?, ?> field, T customField)
 	{
 
 		doBinding(group, field.getName(), customField);

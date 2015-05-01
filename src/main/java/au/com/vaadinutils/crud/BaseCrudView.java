@@ -240,7 +240,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 */
 	public void enableDragAndDropOrdering(final SingularAttribute<E, Long> ordinalField)
 	{
-		container.sort(new Object[] { ordinalField.getName() }, new boolean[] { true });
+		container.sort(new Object[]
+		{ ordinalField.getName() }, new boolean[]
+		{ true });
 
 		this.entityTable.setDragMode(TableDragMode.ROW);
 		this.entityTable.setDropHandler(new DropHandler()
@@ -320,7 +322,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 				container.commit();
 				container.refresh();
-				container.sort(new Object[] { ordinalField.getName() }, new boolean[] { true });
+				container.sort(new Object[]
+				{ ordinalField.getName() }, new boolean[]
+				{ true });
 
 				// cause this crud to save, or if its a child cause the parent
 				// to save.
@@ -1066,7 +1070,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				fieldGroup.setItemDataSource(item);
 				selected = true;
 
-				newEntity = null;
 				if (restoreDelete)
 				{
 					activateEditMode(false);
@@ -1124,6 +1127,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				addFilterToShowNewRow(newEntity);
 				container.discard();
 			}
+			this.newEntity = null;
 
 			// select has been moved to here because when it happens earlier,
 			// child cruds are caused to discard their data before saving it for
@@ -1764,8 +1768,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				try
 				{
 					E previousEntity = getCurrent();
-					searchField.setValue("");
-					resetFilters();
+//					searchField.setValue("");
+//					resetFilters();
 
 					createNewEntity(previousEntity);
 
@@ -1834,14 +1838,17 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				String message = "";
 				if (e instanceof InvalidValueException)
 				{
-					InvalidValueException m = (InvalidValueException) e;
-					for (InvalidValueException cause : m.getCauses())
+					message = ((InvalidValueException) e).getMessage();
+					if (message == null)
 					{
-						message += cause.getMessage() + ". ";
-					}
-					if (m.getMessage() != null && m.getMessage().length() > 0)
-					{
-						message += m.getMessage() + ". ";
+						for (InvalidValueException cause : ((InvalidValueException) e).getCauses())
+						{
+							message = cause.getMessage();
+							if (message != null)
+							{
+								break;
+							}
+						}
 					}
 				}
 				ret = field.getCaption() + "\n\n" + message;
@@ -1991,7 +1998,41 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	@Override
 	public void saveClicked()
 	{
+		// If interceptSaveClicked returns false then abort saving
+		if (!interceptSaveClicked())
+		{
+			// return save/edit buttons to default settings
+			buttonLayout.setDefaultState();
+			return;
+		}
+		for (ChildCrudListener<E> child : getChildCrudListeners())
+		{
+			if (!child.interceptSaveClicked())
+			{
+				// return save/edit buttons to default settings
+				buttonLayout.setDefaultState();
+				return;
+			}
+		}
+
 		save();
+	}
+
+	/**
+	 * Override this method to intercept the save process after clicking the
+	 * save button.
+	 * 
+	 * Return true if you would like the save action to proceed otherwise return
+	 * false if you want to halt the save process.
+	 * 
+	 * When suppressing the action you should display a notification as to why
+	 * you suppressed it.
+	 * 
+	 * @return whether to continue saving
+	 */
+	public boolean interceptSaveClicked()
+	{
+		return true;
 	}
 
 	public void setSearchFilterText(String string)

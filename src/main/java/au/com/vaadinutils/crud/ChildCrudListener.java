@@ -33,5 +33,7 @@ public interface ChildCrudListener<E>
 	public void discard();
 
 	public void saveEditsToTemp() throws Exception;
+	
+	public boolean interceptSaveClicked();
 
 }

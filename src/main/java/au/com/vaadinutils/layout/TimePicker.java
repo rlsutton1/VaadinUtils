@@ -1,10 +1,13 @@
 package au.com.vaadinutils.layout;
 
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -30,813 +33,757 @@ import com.vaadin.ui.themes.Reindeer;
 @SuppressWarnings("rawtypes")
 public class TimePicker extends HorizontalLayout implements Field
 {
+	private static final String TIME_FORMAT = "HH:mm a";
+	private static final String TIME_FORMAT2 = "HH:mma";
+	private static final long serialVersionUID = 1826417125815798837L;
+	private static final String EMPTY = "--:--";
+	String headerColor = "#B2D7FF";
+	final private TextField displayTime = new TextField();
+	private Calendar dateTime = Calendar.getInstance();
+	boolean isSet = false;
+	private ChangedHandler changedHandler;
+	private String title;
+	private TextField field;
+	private Property<Date> datasource;
+	// private boolean isRequired;
+	private String requiredErrorMessage;
+	private int tabIndex;
+	private boolean isBuffered;
+	private Validator timeValidator;
+	List<Validator> validators = new LinkedList<>();
+	List<ValueChangeListener> listeners = new LinkedList<>();
 
-    private static final String TIME_FORMAT = "HH:mm a";
-    private static final String TIME_FORMAT2 = "HH:mma";
-    private static final long serialVersionUID = 1826417125815798837L;
-    private static final String EMPTY = "--:--";
-    String headerColor = "#B2D7FF";
-    final private TextField displayTime = new TextField();
-    String hour = "12";
-    String minute = "00";
-    String amPm = "AM";
-    boolean isSet = false;
-    private Button am;
-    // private Button zeroHourButton;
-    // private Button zeroMinuteButton;
-    private ChangedHandler changedHandler;
-    private String title;
-    private TextField field;
-    private Property<Date> datasource;
-    // private boolean isRequired;
-    private String requiredErrorMessage;
-    private int tabIndex;
-    private boolean isBuffered;
-    private Validator validator;
-    private Button pickerButton;
+	private Button pickerButton;
 
-    public TimePicker(String title)
-    {
-
-	setCaption(title);
-	field = new TextField();
-	field.setWidth("125");
-	field.setImmediate(true);
-	displayTime.setImmediate(true);
-	validator = new Validator()
+	@SuppressWarnings("serial")
+	public TimePicker(String title)
 	{
 
-	    private static final long serialVersionUID = 6579163030027373837L;
+		setCaption(title);
+		field = new TextField();
+		field.setWidth("125");
+		field.setImmediate(true);
+		displayTime.setImmediate(true);
+		timeValidator = new Validator()
+		{
 
-	    @Override
-	    public void validate(Object value) throws InvalidValueException
-	    {
+			private static final long serialVersionUID = 6579163030027373837L;
 
+			@Override
+			public void validate(Object value) throws InvalidValueException
+			{
+
+				if (value == null || value.equals(EMPTY))
+				{
+					return;
+				}
+				parseDate((String) value);
+
+			}
+
+		};
+		displayTime.addValidator(timeValidator);
+		field.addValidator(timeValidator);
+		field.addValueChangeListener(new ValueChangeListener()
+		{
+
+			@Override
+			public void valueChange(com.vaadin.data.Property.ValueChangeEvent event)
+			{
+				TimePicker.this.valueChange(event);
+			}
+		});
+
+		this.title = title;
+
+		CssLayout hl = new CssLayout();
+		hl.addStyleName("v-component-group");
+		hl.setWidth("100%");
+		hl.setHeight("35");
+
+		pickerButton = new Button();
+		pickerButton.setIcon(FontAwesome.CLOCK_O);
+
+		hl.addComponent(pickerButton);
+		hl.addComponent(field);
+		pickerButton.addClickListener(new ClickListener()
+		{
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void buttonClick(ClickEvent event)
+			{
+				showPopupTimePicker();
+
+			}
+		});
+		addComponent(hl);
+	}
+
+	@Override
+	public void setReadOnly(boolean readOnly)
+	{
+		field.setReadOnly(readOnly);
+		pickerButton.setEnabled(!readOnly);
+		super.setReadOnly(readOnly);
+	}
+
+	private Date parseDate(String value)
+	{
 		if (value == null || value.equals(EMPTY))
 		{
-		    return;
+			return null;
 		}
-		parseDate((String) value);
-
-	    }
-
-	};
-	displayTime.addValidator(validator);
-	field.addValidator(validator);
-
-	this.title = title;
-	
-	CssLayout hl = new CssLayout();
-	hl.addStyleName("v-component-group");
-	hl.setWidth("100%");
-	hl.setHeight("35");
-
-	pickerButton = new Button();
-	pickerButton.setIcon(FontAwesome.CLOCK_O);
-
-	hl.addComponent(pickerButton);
-	hl.addComponent(field);
-	pickerButton.addClickListener(new ClickListener()
-	{
-
-	    private static final long serialVersionUID = 1L;
-
-	    @Override
-	    public void buttonClick(ClickEvent event)
-	    {
-		showPopupTimePicker();
-
-	    }
-	});
-	addComponent(hl);
-    }
-    
-    @Override
-    public void setReadOnly(boolean readOnly)
-    {
-	field.setReadOnly(readOnly);
-        pickerButton.setEnabled(!readOnly);
-        super.setReadOnly(readOnly);
-    }
-
-    private Date parseDate(String value)
-    {
-	if (value == null || value.equals(EMPTY))
-	{
-	    return null;
-	}
-	SimpleDateFormat sdf = new SimpleDateFormat(TIME_FORMAT);
-	try
-	{
-	    return sdf.parse(value);
-	}
-	catch (ParseException e)
-	{
-	    sdf = new SimpleDateFormat(TIME_FORMAT2);
-	    try
-	    {
-		return sdf.parse(value);
-	    }
-	    catch (ParseException e2)
-	    {
-		throw new InvalidValueException("Time format is " + TIME_FORMAT);
-	    }
-	}
-    }
-
-    public void focus()
-    {
-	this.focus();
-    }
-
-    @SuppressWarnings("deprecation")
-    private void showPopupTimePicker()
-    {
-
-	try
-	{
-		Date value = parseDate(field.getValue());
-	    int hourNumber = value.getHours() % 12;
-	    if (hourNumber == 0)
-	    {
-		hourNumber = 12;
-	    }
-	    hour = "" + hourNumber;
-
-	    minute = "" + value.getMinutes();
-	    amPm = "AM";
-	    if (value.getHours() >= 12)
-	    {
-		amPm = "PM";
-	    }
-
-	    displayTime.setValue(field.getValue());
-	}
-	catch (Exception e)
-	{
-	    logger.error(e);
-	    clearValue();
+		SimpleDateFormat sdf = new SimpleDateFormat(TIME_FORMAT);
+		try
+		{
+			return sdf.parse(value);
+		}
+		catch (ParseException e)
+		{
+			sdf = new SimpleDateFormat(TIME_FORMAT2);
+			try
+			{
+				return sdf.parse(value);
+			}
+			catch (ParseException e2)
+			{
+				throw new InvalidValueException("Time format is " + TIME_FORMAT);
+			}
+		}
 	}
 
-	final Window window = new Window(title);
-	window.setModal(true);
-	window.setResizable(false);
-	window.setWidth("430");
-	window.setHeight("220");
-	window.setClosable(false);
-
-	HorizontalLayout layout = new HorizontalLayout();
-	layout.setSizeFull();
-	layout.setMargin(true);
-	layout.setSpacing(true);
-	layout.setStyleName(Reindeer.BUTTON_SMALL);
-
-	displayTime.setWidth("100");
-
-	VerticalLayout hourPanelLabelWrapper = new VerticalLayout();
-
-	Label hourLabel = new Label("Hour");
-
-	// hourLabel.setBackgroundColor(headerColor);
-	hourLabel.setWidth("230");
-	// hourLabel.setHeight("30");
-	// hourLabel.setAutoFit(false);
-	HorizontalLayout innerHourLabelPanel = new HorizontalLayout();
-
-	// innerHourLabelPanel.setPadding(5);
-	innerHourLabelPanel.addComponent(hourLabel);
-	innerHourLabelPanel.setWidth("100");
-	// innerHourLabelPanel.setHeight("30");
-	hourPanelLabelWrapper.addComponent(innerHourLabelPanel);
-
-	VerticalLayout minuteLabelWrapper = new VerticalLayout();
-	minuteLabelWrapper.setWidth("60");
-	Label minuteLabel = new Label("Minute");
-	// minuteLabel.setBackgroundColor(headerColor);
-	// minuteLabel.setStyleName("njadmin-search-colour");
-
-	minuteLabel.setWidth("45");
-	// minuteLabel.setHeight("30");
-	// minuteLabel.setAutoFit(false);
-	VerticalLayout innerMinuteLabelPanel = new VerticalLayout();
-	// innerMinuteLabelPanel.setPadding(5);
-	innerMinuteLabelPanel.addComponent(minuteLabel);
-	innerMinuteLabelPanel.setWidth("45");
-	// innerMinuteLabelPanel.setHeight("30");
-
-	minuteLabelWrapper.addComponent(innerMinuteLabelPanel);
-
-	HorizontalLayout hourPanel = new HorizontalLayout();
-	// hourPanel.setPadding(5);
-
-	HorizontalLayout amPmPanel = new HorizontalLayout();
-	// amPmPanel.setPadding(5);
-
-	VerticalLayout amPmButtonPanel = new VerticalLayout();
-	amPmPanel.addComponent(amPmButtonPanel);
-	addAmPmButtons(amPmButtonPanel);
-
-	HorizontalLayout hourButtonPanel = new HorizontalLayout();
-	hourPanel.addComponent(hourButtonPanel);
-	addHourButtons(hourButtonPanel, 2, 6);
-
-	HorizontalLayout minutePanel = new HorizontalLayout();
-	// minutePanel.setPadding(5);
-	HorizontalLayout minuteButtonPanel = new HorizontalLayout();
-	minutePanel.addComponent(minuteButtonPanel);
-	addMinuteButtons(minuteButtonPanel, 2, 4);
-
-	HorizontalLayout amPmHourWrapper = new HorizontalLayout();
-	amPmHourWrapper.addComponent(amPmPanel);
-	amPmHourWrapper.addComponent(hourPanel);
-	hourPanelLabelWrapper.addComponent(amPmHourWrapper);
-
-	layout.addComponent(hourPanelLabelWrapper);
-
-	minuteLabelWrapper.addComponent(minutePanel);
-	layout.addComponent(minuteLabelWrapper);
-	layout.setExpandRatio(hourPanelLabelWrapper, 0.7f);
-	layout.setExpandRatio(minuteLabelWrapper, 0.3f);
-
-	HorizontalLayout okcancel = new HorizontalLayout();
-	okcancel.setSizeFull();
-	Button ok = new Button("OK");
-
-	ok.setWidth("75");
-	ok.addClickListener(new ClickListener()
+	public void focus()
 	{
+		this.focus();
+	}
 
-	    /**
-			 * 
-			 */
-	    private static final long serialVersionUID = 1L;
-
-	    @Override
-	    public void buttonClick(ClickEvent event)
-	    {
+	@SuppressWarnings("deprecation")
+	private void showPopupTimePicker()
+	{
 
 		try
 		{
-		    displayTime.validate();
-		    if (displayTime.getValue().equals(EMPTY))
-		    {
-			field.setValue("");
-		    }
-		    else
-		    {
-			field.setValue(displayTime.getValue());
-		    }
-		    window.close();
-		}
-		catch (InvalidValueException e)
-		{
-
-		}
-
-	    }
-	});
-
-	Button cancel = new Button("Cancel");
-	cancel.setWidth("75");
-	cancel.addClickListener(new ClickListener()
-	{
-
-	    /**
-			 * 
-			 */
-	    private static final long serialVersionUID = 1L;
-
-	    @Override
-	    public void buttonClick(ClickEvent event)
-	    {
-		window.close();
-
-	    }
-	});
-	okcancel.addComponent(displayTime);
-
-	okcancel.addComponent(cancel);
-	okcancel.addComponent(ok);
-	okcancel.setMargin(true);
-	okcancel.setSpacing(true);
-	okcancel.setExpandRatio(displayTime, 0.50f);
-	// okcancel.setExpandRatio(ok, 0.25f);
-	// okcancel.setExpandRatio(cancel, 0.25f);
-
-	VerticalLayout wrapper = new VerticalLayout();
-	// wrapper.setStyleName("njadmin-search-colour");
-
-	wrapper.setSizeFull();
-	wrapper.addComponent(layout);
-	wrapper.addComponent(okcancel);
-	wrapper.setExpandRatio(layout, 0.9f);
-	wrapper.setExpandRatio(okcancel, 0.5f);
-	window.setContent(wrapper);
-
-	UI.getCurrent().addWindow(window);
-
-    }
-
-    private void addMinuteButtons(HorizontalLayout minuteButtonPanel, int rows, int cols)
-    {
-	String[] numbers = new String[] { "00", "10", "15", "20", "30", "40", "45", "50" };
-	for (int col = 0; col < cols; col++)
-	{
-	    VerticalLayout rowsLayout = new VerticalLayout();
-	    for (int row = 0; row < rows; row++)
-	    {
-
-		final NativeButton button = new NativeButton("" + numbers[row + (col * rows)]);
-		rowsLayout.addComponent(button);
-
-		button.setStyleName(Reindeer.BUTTON_SMALL);
-
-		button.setWidth("30");
-		// button.setHeight("30");
-		// button.setAutoFit(false);
-		// button.setActionType(SelectionType.RADIO);
-		// button.addToRadioGroup("minuteButtons");
-		// if (row == 0 && col == 0)
-		// {
-		// zeroMinuteButton = button;
-		//
-		// }
-
-		button.addClickListener(new ClickListener()
-		{
-
-		    /**
-					 * 
-					 */
-		    private static final long serialVersionUID = 1L;
-
-		    @Override
-		    public void buttonClick(ClickEvent event)
-		    {
-
-			String title = button.getCaption();
-			minute = title;
-			isSet = true;
-			setNewValue();
-
-		    }
-		});
-
-	    }
-	    minuteButtonPanel.addComponent(rowsLayout);
-	}
-    }
-
-    private void addHourButtons(HorizontalLayout hourButtonPanel, int rows, int cols)
-    {
-	int[] numbers = new int[] { 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
-	for (int col = 0; col < cols; col++)
-	{
-	    VerticalLayout rowsLayout = new VerticalLayout();
-	    for (int row = 0; row < rows; row++)
-	    {
-		final NativeButton button = new NativeButton("" + numbers[col + (row * cols)]);
-		rowsLayout.addComponent(button);
-		button.setStyleName(Reindeer.BUTTON_SMALL);
-		button.setWidth("30");
-		// button.setHeight("15");
-		// button.setAutoFit(false);
-
-		// button.setActionType(SelectionType.RADIO);
-		// button.addToRadioGroup("hourButtons");
-		// if (row == 0 && col == 0)
-		// {
-		// zeroHourButton = button;
-		//
-		// }
-
-		button.addClickListener(new ClickListener()
-		{
-
-		    /**
-					 * 
-					 */
-		    private static final long serialVersionUID = 1L;
-
-		    @Override
-		    public void buttonClick(ClickEvent event)
-		    {
-			String title = button.getCaption();
-			hour = title;
-			if (displayTime.getValue().compareToIgnoreCase(EMPTY) == 0)
+			Date value = parseDate(field.getValue());
+			int hourNumber = value.getHours() % 12;
+			if (hourNumber == 0)
 			{
-			    if (Integer.parseInt(hour) == 12 || Integer.parseInt(hour) < 8)
-			    {
-				amPm = "PM";
-			    }
+				hourNumber = 12;
 			}
-			isSet = true;
-			setNewValue();
 
-		    }
-		});
-
-	    }
-	    hourButtonPanel.addComponent(rowsLayout);
-	}
-    }
-
-    private void addAmPmButtons(VerticalLayout amPmButtonPanel)
-    {
-	am = new NativeButton("AM");
-	final NativeButton pm = new NativeButton("PM");
-	amPmButtonPanel.addComponent(am);
-	amPmButtonPanel.addComponent(pm);
-	// am.setActionType(SelectionType.RADIO);
-	// am.addToRadioGroup("amPmButtons");
-	// pm.setActionType(SelectionType.RADIO);
-	// pm.addToRadioGroup("amPmButtons");
-
-	am.setStyleName(Reindeer.BUTTON_SMALL);
-	am.setWidth("35");
-	// am.setHeight("22");
-	// am.setAutoFit(false);
-
-	am.addClickListener(new ClickListener()
-	{
-
-	    /**
-			 * 
-			 */
-	    private static final long serialVersionUID = 1L;
-
-	    @Override
-	    public void buttonClick(ClickEvent event)
-	    {
-		String title = am.getCaption();
-		amPm = title;
-		isSet = true;
-		setNewValue();
-
-	    }
-	});
-	pm.setStyleName(Reindeer.BUTTON_SMALL);
-	pm.setWidth("35");
-	// pm.setHeight("22");
-	// pm.setAutoFit(false);
-
-	pm.addClickListener(new ClickListener()
-	{
-
-	    /**
-			 * 
-			 */
-	    private static final long serialVersionUID = 1L;
-
-	    @Override
-	    public void buttonClick(ClickEvent event)
-	    {
-		String title = pm.getCaption();
-		amPm = title;
-		isSet = true;
-		displayTime.setValue(getValueAsString());
-
-	    }
-	});
-
-    }
-
-    public void addChangedHandler(ChangedHandler pChangedHandler)
-    {
-	this.changedHandler = pChangedHandler;
-
-    }
-
-    public void clearValue()
-    {
-
-	// am.setSelected(true);
-	// am.setSelected(false);
-	// zeroHourButton.setSelected(true);
-	// zeroHourButton.setSelected(false);
-	// zeroMinuteButton.setSelected(true);
-	// zeroMinuteButton.setSelected(false);
-	hour = "12";
-	minute = "00";
-	amPm = "AM";
-	isSet = false;
-	displayTime.setValue(EMPTY);
-	internalSetReadonlyFieldValue(EMPTY);
-
-    }
-    
-    private void internalSetReadonlyFieldValue(String value)
-    {
-	boolean isRo = field.isReadOnly();
-	field.setReadOnly(false);
-	field.setValue(value);
-	field.setReadOnly(isRo);
-    }
-
-    public final String getValueAsString()
-    {
-	if (isSet)
-	    return "" + hour + ":" + minute + " " + amPm;
-	return null;
-    }
-
-    @SuppressWarnings("deprecation")
-    public void setValues(Date date)
-    {
-	if (date != null)
-	{
-	    hour = "" + date.getHours();
-	    minute = "" + date.getMinutes();
-	    if (date.getMinutes() < 10)
-	    {
-		minute = "0" + minute;
-	    }
-	    isSet = true;
-	    amPm = "AM";
-	    if (date.getHours() >= 12)
-	    {
-		amPm = "PM";
-		if (date.getHours() > 12)
+			displayTime.setValue(field.getValue());
+		}
+		catch (Exception e)
 		{
-		    hour = "" + (date.getHours() - 12);
+			logger.error(e);
+			clearValue();
 		}
 
-	    }
-	    if (date.getHours() == 0)
-	    {
-		hour = "12";
-	    }
-	    displayTime.setValue(getValueAsString());
-	    internalSetReadonlyFieldValue(getValueAsString());
-	    // logger.info("set to " + getValueAsString());
+		final Window window = new Window(title);
+		window.setModal(true);
+		window.setResizable(false);
+		window.setWidth("430");
+		window.setHeight("220");
+		window.setClosable(false);
+
+		HorizontalLayout layout = new HorizontalLayout();
+		layout.setSizeFull();
+		layout.setMargin(true);
+		layout.setSpacing(true);
+		layout.setStyleName(Reindeer.BUTTON_SMALL);
+
+		displayTime.setWidth("100");
+
+		VerticalLayout hourPanelLabelWrapper = new VerticalLayout();
+
+		Label hourLabel = new Label("Hour");
+
+		// hourLabel.setBackgroundColor(headerColor);
+		hourLabel.setWidth("230");
+		// hourLabel.setHeight("30");
+		// hourLabel.setAutoFit(false);
+		HorizontalLayout innerHourLabelPanel = new HorizontalLayout();
+
+		// innerHourLabelPanel.setPadding(5);
+		innerHourLabelPanel.addComponent(hourLabel);
+		innerHourLabelPanel.setWidth("100");
+		// innerHourLabelPanel.setHeight("30");
+		hourPanelLabelWrapper.addComponent(innerHourLabelPanel);
+
+		VerticalLayout minuteLabelWrapper = new VerticalLayout();
+		minuteLabelWrapper.setWidth("60");
+		Label minuteLabel = new Label("Minute");
+		// minuteLabel.setBackgroundColor(headerColor);
+		// minuteLabel.setStyleName("njadmin-search-colour");
+
+		minuteLabel.setWidth("45");
+		// minuteLabel.setHeight("30");
+		// minuteLabel.setAutoFit(false);
+		VerticalLayout innerMinuteLabelPanel = new VerticalLayout();
+		// innerMinuteLabelPanel.setPadding(5);
+		innerMinuteLabelPanel.addComponent(minuteLabel);
+		innerMinuteLabelPanel.setWidth("45");
+		// innerMinuteLabelPanel.setHeight("30");
+
+		minuteLabelWrapper.addComponent(innerMinuteLabelPanel);
+
+		HorizontalLayout hourPanel = new HorizontalLayout();
+		// hourPanel.setPadding(5);
+
+		HorizontalLayout amPmPanel = new HorizontalLayout();
+		// amPmPanel.setPadding(5);
+
+		VerticalLayout amPmButtonPanel = new VerticalLayout();
+		amPmPanel.addComponent(amPmButtonPanel);
+		addAmPmButtons(amPmButtonPanel);
+
+		HorizontalLayout hourButtonPanel = new HorizontalLayout();
+		hourPanel.addComponent(hourButtonPanel);
+		addHourButtons(hourButtonPanel, 2, 6);
+
+		HorizontalLayout minutePanel = new HorizontalLayout();
+		// minutePanel.setPadding(5);
+		HorizontalLayout minuteButtonPanel = new HorizontalLayout();
+		minutePanel.addComponent(minuteButtonPanel);
+		addMinuteButtons(minuteButtonPanel, 2, 4);
+
+		HorizontalLayout amPmHourWrapper = new HorizontalLayout();
+		amPmHourWrapper.addComponent(amPmPanel);
+		amPmHourWrapper.addComponent(hourPanel);
+		hourPanelLabelWrapper.addComponent(amPmHourWrapper);
+
+		layout.addComponent(hourPanelLabelWrapper);
+
+		minuteLabelWrapper.addComponent(minutePanel);
+		layout.addComponent(minuteLabelWrapper);
+		layout.setExpandRatio(hourPanelLabelWrapper, 0.7f);
+		layout.setExpandRatio(minuteLabelWrapper, 0.3f);
+
+		HorizontalLayout okcancel = new HorizontalLayout();
+		okcancel.setSizeFull();
+		Button ok = new Button("OK");
+
+		ok.setWidth("75");
+		ok.addClickListener(new ClickListener()
+		{
+
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void buttonClick(ClickEvent event)
+			{
+				field.setValue(displayTime.getValue());
+				window.close();
+			}
+		});
+
+		Button cancel = new Button("Cancel");
+		cancel.setWidth("75");
+		cancel.addClickListener(new ClickListener()
+		{
+
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void buttonClick(ClickEvent event)
+			{
+				window.close();
+
+			}
+		});
+
+		Button clear = new Button("Clear");
+		clear.setWidth("75");
+		clear.addClickListener(new ClickListener()
+		{
+
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void buttonClick(ClickEvent event)
+			{
+				isSet = false;
+				clearValue();
+			}
+		});
+
+		okcancel.addComponent(displayTime);
+		okcancel.addComponent(cancel);
+		okcancel.addComponent(clear);
+		okcancel.addComponent(ok);
+		okcancel.setMargin(true);
+		okcancel.setSpacing(true);
+		okcancel.setExpandRatio(displayTime, 0.50f);
+
+		VerticalLayout wrapper = new VerticalLayout();
+
+		wrapper.setSizeFull();
+		wrapper.addComponent(layout);
+		wrapper.addComponent(okcancel);
+		wrapper.setExpandRatio(layout, 0.9f);
+		wrapper.setExpandRatio(okcancel, 0.5f);
+		window.setContent(wrapper);
+
+		UI.getCurrent().addWindow(window);
+
 	}
-	if (isModified())
+
+	private void addMinuteButtons(HorizontalLayout minuteButtonPanel, int rows, int cols)
 	{
-	    throw new RuntimeException("Inconsistent value");
-	}
-    }
+		String[] numbers = new String[]
+		{ "00", "10", "15", "20", "30", "40", "45", "50" };
+		for (int col = 0; col < cols; col++)
+		{
+			VerticalLayout rowsLayout = new VerticalLayout();
+			for (int row = 0; row < rows; row++)
+			{
 
-    private void setNewValue()
-    {
-	displayTime.setValue(getValueAsString());
-	internalSetReadonlyFieldValue(getValueAsString());
-	if (changedHandler != null)
-	{
-	    changedHandler.onChanged(getValueAsString());
+				final NativeButton button = new NativeButton("" + numbers[row + (col * rows)]);
+				rowsLayout.addComponent(button);
 
-	}
-    }
+				button.setStyleName(Reindeer.BUTTON_SMALL);
 
-    @Override
-    public boolean isInvalidCommitted()
-    {
-	return false;
-    }
+				button.setWidth("30");
 
-    @Override
-    public void setInvalidCommitted(boolean isCommitted)
-    {
-    }
+				button.addClickListener(new ClickListener()
+				{
 
-    @Override
-    public void commit() throws SourceException, InvalidValueException
-    {
-	datasource.setValue((Date) getValue());
+					/**
+					 * 
+					 */
+					private static final long serialVersionUID = 1L;
 
-    }
+					@Override
+					public void buttonClick(ClickEvent event)
+					{
 
-    @Override
-    public void discard() throws SourceException
-    {
-	setValues(datasource.getValue());
+						String title = button.getCaption();
+						dateTime.set(Calendar.MINUTE, Integer.parseInt(title));
+						isSet = true;
+						setNewValue();
 
-    }
+					}
+				});
 
-    @Override
-    public void setBuffered(boolean buffered)
-    {
-	this.isBuffered = buffered;
-
-    }
-
-    @Override
-    public boolean isBuffered()
-    {
-	return isBuffered;
-    }
-
-    Logger logger = LogManager.getLogger();
-
-    @Override
-    public boolean isModified()
-    {
-	Date value = (Date) getValue();
-	if (datasource == null)
-	{
-	    return false;
-	}
-	Date dsValue = datasource.getValue();
-	if (dsValue == null)
-	{
-	    boolean ret = value != null;
-	    if (ret)
-	    {
-		logger.info("Values {} and {}", dsValue, value);
-	    }
-	    return ret;
-	}
-	if (value == null)
-	{
-	    logger.info("Values {} and {}", dsValue, value);
-	    return true;
+			}
+			minuteButtonPanel.addComponent(rowsLayout);
+		}
 	}
 
-	SimpleDateFormat sdf = new SimpleDateFormat("hh:mma");
-	String v1 = sdf.format(dsValue);
-	String v2 = sdf.format(value);
-	boolean ret = !v1.equals(v2);
-	if (ret)
+	private void addHourButtons(HorizontalLayout hourButtonPanel, int rows, int cols)
 	{
-	    logger.info("Values {} and {}", v1, v2);
+		int[] numbers = new int[]
+		{ 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
+		for (int col = 0; col < cols; col++)
+		{
+			VerticalLayout rowsLayout = new VerticalLayout();
+			for (int row = 0; row < rows; row++)
+			{
+				final NativeButton button = new NativeButton("" + numbers[col + (row * cols)]);
+				rowsLayout.addComponent(button);
+				button.setStyleName(Reindeer.BUTTON_SMALL);
+				button.setWidth("30");
+
+				button.addClickListener(new ClickListener()
+				{
+
+					/**
+					 * 
+					 */
+					private static final long serialVersionUID = 1L;
+
+					@Override
+					public void buttonClick(ClickEvent event)
+					{
+						String title = button.getCaption();
+						dateTime.set(Calendar.HOUR, Integer.parseInt(title));
+						isSet = true;
+						setNewValue();
+					}
+				});
+			}
+			hourButtonPanel.addComponent(rowsLayout);
+		}
 	}
-	return ret;
-    }
 
-    @Override
-    public void addValidator(Validator validator)
-    {
-    }
-
-    @Override
-    public void removeValidator(Validator validator)
-    {
-    }
-
-    @Override
-    public void removeAllValidators()
-    {
-    }
-
-    @Override
-    public Collection<Validator> getValidators()
-    {
-	Collection<Validator> validators = new LinkedList<Validator>();
-	validators.add(validator);
-	return validators;
-    }
-
-    @Override
-    public boolean isValid()
-    {
-	boolean valid = true;
-	try
+	private void addAmPmButtons(VerticalLayout amPmButtonPanel)
 	{
-	    validator.validate(getValueAsString());
+		final NativeButton am = new NativeButton("AM");
+		final NativeButton pm = new NativeButton("PM");
+		amPmButtonPanel.addComponent(am);
+		amPmButtonPanel.addComponent(pm);
+
+		am.setStyleName(Reindeer.BUTTON_SMALL);
+		am.setWidth("35");
+
+		am.addClickListener(new ClickListener()
+		{
+
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void buttonClick(ClickEvent event)
+			{
+				dateTime.set(Calendar.AM_PM, Calendar.AM);
+				isSet = true;
+				setNewValue();
+			}
+		});
+		pm.setStyleName(Reindeer.BUTTON_SMALL);
+		pm.setWidth("35");
+
+		pm.addClickListener(new ClickListener()
+		{
+
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void buttonClick(ClickEvent event)
+			{
+				dateTime.set(Calendar.AM_PM, Calendar.PM);
+				isSet = true;
+				setNewValue();
+			}
+		});
 	}
-	catch (Exception e)
+
+	public void addChangedHandler(ChangedHandler pChangedHandler)
 	{
-	    valid = false;
+		this.changedHandler = pChangedHandler;
 	}
-	return valid;
-    }
 
-    @Override
-    public void validate() throws InvalidValueException
-    {
-	validator.validate(getValueAsString());
-
-    }
-
-    @Override
-    public boolean isInvalidAllowed()
-    {
-	return false;
-    }
-
-    @Override
-    public void setInvalidAllowed(boolean invalidValueAllowed) throws UnsupportedOperationException
-    {
-    }
-
-    @Override
-    public Object getValue()
-    {
-
-	try
+	public void clearValue()
 	{
-	    String valueAsString = getValueAsString();
-	    if (valueAsString == null)
-	    {
+		dateTime.setTime(new Date());
+		dateTime.set(Calendar.HOUR, 0);
+		dateTime.set(Calendar.MINUTE, 0);
+		dateTime.set(Calendar.SECOND, 0);
+		dateTime.set(Calendar.MILLISECOND, 0);
+		dateTime.set(Calendar.AM_PM, Calendar.AM);
+		isSet = false;
+		displayTime.setValue(EMPTY);
+		internalSetReadonlyFieldValue(EMPTY);
+	}
+
+	private void internalSetReadonlyFieldValue(String value)
+	{
+		boolean isRo = field.isReadOnly();
+		field.setReadOnly(false);
+		field.setValue(value);
+		field.setReadOnly(isRo);
+	}
+
+	public final String getValueAsString()
+	{
+		if (isSet)
+		{
+			int hour = dateTime.get(Calendar.HOUR);
+			if (hour == 0)
+			{
+				hour = 12;
+			}
+			final int minute = dateTime.get(Calendar.MINUTE);
+			final String amPm = dateTime.get(Calendar.HOUR_OF_DAY) <= 12 ? "AM" : "PM";
+			DecimalFormat df = new DecimalFormat("00");
+			return df.format(hour) + ":" + df.format(minute) + " " + amPm;
+		}
 		return null;
-	    }
-	    
-	    // special parsing here. we format for the user HH:mm, but then mess with it and change 00 hour to 12
-	    SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a");
-	    return sdf.parse(valueAsString);
 	}
-	catch (ParseException e)
+
+	public void setValues(Date date)
 	{
-	    throw new InvalidValueException("Time format is " + TIME_FORMAT);
+		if (date != null)
+		{
+			dateTime.setTime(date);
+			isSet = true;
+			displayTime.setValue(getValueAsString());
+			internalSetReadonlyFieldValue(getValueAsString());
+		}
+		else
+		{
+			clearValue();
+		}
 	}
-    }
 
-    @Override
-    public void setValue(Object newValue)
-    {
-	setValues((Date) newValue);
-
-    }
-
-    @Override
-    public Class getType()
-    {
-
-	return Date.class;
-    }
-
-    @Override
-    public void addValueChangeListener(ValueChangeListener listener)
-    {
-    }
-
-    @Override
-    public void addListener(ValueChangeListener listener)
-    {
-    }
-
-    @Override
-    public void removeValueChangeListener(ValueChangeListener listener)
-    {
-    }
-
-    @Override
-    public void removeListener(ValueChangeListener listener)
-    {
-    }
-
-    @Override
-    public void valueChange(com.vaadin.data.Property.ValueChangeEvent event)
-    {
-	System.out.println("Value change");
-
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public void setPropertyDataSource(Property newDataSource)
-    {
-	clearValue();
-	datasource = newDataSource;
-	if (datasource.getValue() != null)
+	private void setNewValue()
 	{
-	    setValues(datasource.getValue());
+		displayTime.setValue(getValueAsString());
+		internalSetReadonlyFieldValue(getValueAsString());
+		if (changedHandler != null)
+		{
+			changedHandler.onChanged(getValueAsString());
+
+		}
 	}
 
-    }
+	@Override
+	public boolean isInvalidCommitted()
+	{
+		return false;
+	}
 
-    @Override
-    public Property<Date> getPropertyDataSource()
-    {
-	return datasource;
-    }
+	@Override
+	public void setInvalidCommitted(boolean isCommitted)
+	{
+	}
 
-    @Override
-    public int getTabIndex()
-    {
-	return tabIndex;
-    }
+	@Override
+	public void commit() throws SourceException, InvalidValueException
+	{
 
-    @Override
-    public void setTabIndex(int tabIndex)
-    {
-	this.tabIndex = tabIndex;
+		datasource.setValue((Date) getValue());
+	}
 
-    }
+	@Override
+	public void discard() throws SourceException
+	{
+		setValues(datasource.getValue());
+	}
 
-    @Override
-    public boolean isRequired()
-    {
-	return isVisible();
+	@Override
+	public void setBuffered(boolean buffered)
+	{
+		this.isBuffered = buffered;
+	}
 
-    }
+	@Override
+	public boolean isBuffered()
+	{
+		return isBuffered;
+	}
 
-    @Override
-    public void setRequired(boolean required)
-    {
-	// isRequired = required;
+	Logger logger = LogManager.getLogger();
 
-    }
+	@Override
+	public boolean isModified()
+	{
+		Date value = (Date) getValue();
+		if (datasource == null)
+		{
+			return false;
+		}
+		Date dsValue = datasource.getValue();
+		if (dsValue == null)
+		{
+			boolean ret = value != null;
+			if (ret)
+			{
+				logger.info("Values {} and {}", dsValue, value);
+			}
+			return ret;
+		}
+		if (value == null)
+		{
+			logger.info("Values {} and {}", dsValue, value);
+			return true;
+		}
 
-    @Override
-    public void setRequiredError(String requiredMessage)
-    {
-	requiredErrorMessage = requiredMessage;
+		SimpleDateFormat sdf = new SimpleDateFormat("hh:mma");
+		String v1 = sdf.format(dsValue);
+		String v2 = sdf.format(value);
+		boolean ret = !v1.equals(v2);
+		if (ret)
+		{
+			logger.info("Values {} and {}", v1, v2);
+		}
+		return ret;
+	}
 
-    }
+	@Override
+	public void addValidator(Validator validator)
+	{
+		validators.add(validator);
+	}
 
-    @Override
-    public String getRequiredError()
-    {
-	return requiredErrorMessage;
-    }
+	@Override
+	public void removeValidator(Validator validator)
+	{
+		validators.remove(validator);
+	}
+
+	@Override
+	public void removeAllValidators()
+	{
+		validators.clear();
+	}
+
+	@Override
+	public Collection<Validator> getValidators()
+	{
+		Collection<Validator> validators = new LinkedList<Validator>();
+		validators.add(timeValidator);
+		validators.addAll(this.validators);
+		return validators;
+	}
+
+	@Override
+	public boolean isValid()
+	{
+		boolean valid = true;
+		try
+		{
+			this.validate();
+		}
+		catch (Exception e)
+		{
+			valid = false;
+		}
+		return valid;
+	}
+
+	@Override
+	public void validate() throws InvalidValueException
+	{
+		timeValidator.validate(getValueAsString());
+		for (Validator validator : validators)
+		{
+			validator.validate(getValue());
+		}
+
+	}
+
+	@Override
+	public boolean isInvalidAllowed()
+	{
+		return false;
+	}
+
+	@Override
+	public void setInvalidAllowed(boolean invalidValueAllowed) throws UnsupportedOperationException
+	{
+	}
+
+	@Override
+	public Date getValue()
+	{
+		Date value = null;
+		if (isSet)
+		{
+			value = dateTime.getTime();
+		}
+
+		return value;
+	}
+
+	@Override
+	public void setValue(Object newValue)
+	{
+		setValues((Date) newValue);
+
+	}
+
+	@Override
+	public Class getType()
+	{
+
+		return Date.class;
+	}
+
+	@Override
+	public void addValueChangeListener(ValueChangeListener listener)
+	{
+		addListener(listener);
+	}
+
+	@Override
+	public void addListener(ValueChangeListener listener)
+	{
+		listeners.add(listener);
+	}
+
+	@Override
+	public void removeValueChangeListener(ValueChangeListener listener)
+	{
+		removeListener(listener);
+	}
+
+	@Override
+	public void removeListener(ValueChangeListener listener)
+	{
+		listeners.remove(listener);
+	}
+
+	@Override
+	public void valueChange(com.vaadin.data.Property.ValueChangeEvent event)
+	{
+		for (ValueChangeListener listener : listeners)
+		{
+			listener.valueChange(event);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public void setPropertyDataSource(Property newDataSource)
+	{
+		clearValue();
+		datasource = newDataSource;
+		if (datasource.getValue() != null)
+		{
+			setValues(datasource.getValue());
+		}
+
+	}
+
+	@Override
+	public Property<Date> getPropertyDataSource()
+	{
+		return datasource;
+	}
+
+	@Override
+	public int getTabIndex()
+	{
+		return tabIndex;
+	}
+
+	@Override
+	public void setTabIndex(int tabIndex)
+	{
+		this.tabIndex = tabIndex;
+
+	}
+
+	@Override
+	public boolean isRequired()
+	{
+		return isVisible();
+
+	}
+
+	@Override
+	public void setRequired(boolean required)
+	{
+		// isRequired = required;
+
+	}
+
+	@Override
+	public void setRequiredError(String requiredMessage)
+	{
+		requiredErrorMessage = requiredMessage;
+
+	}
+
+	@Override
+	public String getRequiredError()
+	{
+		return requiredErrorMessage;
+	}
 }
