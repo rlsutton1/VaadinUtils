@@ -109,6 +109,16 @@ public class JoinBuilder<  E, K>
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public <T> JoinBuilder<E, T> join(final ListAttribute<K, T> attribute, JoinType type)
+	{
+
+		JoinBuilder<E, T> jb = new JoinBuilder<E, T>();
+		jb.joins.addAll(joins);
+		jb.joins.add(new JoinMetaDataList(attribute, type));
+		return jb;
+	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public <T> JoinBuilder<E, T> join(final SingularAttribute<K, T> attribute, JoinType type)
 	{
 

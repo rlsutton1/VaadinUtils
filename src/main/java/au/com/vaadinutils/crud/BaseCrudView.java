@@ -1381,6 +1381,13 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	{
 	}
 
+	private String searchFieldText;
+
+	protected String getSearchFieldText()
+	{
+	    return searchFieldText;
+	}
+	
 	private void initSearch()
 	{
 		searchField.setInputPrompt("Search");
@@ -1399,10 +1406,10 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 					// for triggering the filter.
 					if (!advancedSearchOn)
 					{
-						String filterString = event.getText();
-						if (filterString.length() >= minSearchTextLength)
+						searchFieldText = event.getText();
+						if (searchFieldText.length() >= minSearchTextLength)
 						{
-							triggerFilter(filterString);
+							triggerFilter(searchFieldText);
 						}
 					}
 				}
@@ -1475,11 +1482,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 	}
 
-	protected String getSearchFieldText()
-	{
-		return searchField.getValue();
-	}
-
+	
 	/**
 	 * create a filter for the text supplied, the text is as entered in the text
 	 * search bar.
