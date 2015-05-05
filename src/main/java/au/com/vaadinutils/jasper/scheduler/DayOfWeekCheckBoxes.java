@@ -73,56 +73,56 @@ public class DayOfWeekCheckBoxes extends HorizontalLayout implements Field<Strin
 	@Override
 	public void setBuffered(boolean buffered)
 	{
-		// TODO Auto-generated method stub
+		
 
 	}
 
 	@Override
 	public boolean isBuffered()
 	{
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
 	@Override
 	public boolean isModified()
 	{
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
 	@Override
 	public void addValidator(Validator validator)
 	{
-		// TODO Auto-generated method stub
+		
 
 	}
 
 	@Override
 	public void removeValidator(Validator validator)
 	{
-		// TODO Auto-generated method stub
+		
 
 	}
 
 	@Override
 	public void removeAllValidators()
 	{
-		// TODO Auto-generated method stub
+		
 
 	}
 
 	@Override
 	public Collection<Validator> getValidators()
 	{
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
 	@Override
 	public boolean isValid()
 	{
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -197,35 +197,35 @@ public class DayOfWeekCheckBoxes extends HorizontalLayout implements Field<Strin
 	@Override
 	public void addValueChangeListener(com.vaadin.data.Property.ValueChangeListener listener)
 	{
-		// TODO Auto-generated method stub
+		
 
 	}
 
 	@Override
 	public void addListener(com.vaadin.data.Property.ValueChangeListener listener)
 	{
-		// TODO Auto-generated method stub
+		
 
 	}
 
 	@Override
 	public void removeValueChangeListener(com.vaadin.data.Property.ValueChangeListener listener)
 	{
-		// TODO Auto-generated method stub
+		
 
 	}
 
 	@Override
 	public void removeListener(com.vaadin.data.Property.ValueChangeListener listener)
 	{
-		// TODO Auto-generated method stub
+		
 
 	}
 
 	@Override
 	public void valueChange(com.vaadin.data.Property.ValueChangeEvent event)
 	{
-		// TODO Auto-generated method stub
+		
 
 	}
 
@@ -234,7 +234,12 @@ public class DayOfWeekCheckBoxes extends HorizontalLayout implements Field<Strin
 	public void setPropertyDataSource(@SuppressWarnings("rawtypes") Property newDataSource)
 	{
 		datasource = newDataSource;
-		setValue(datasource.getValue());
+		if (datasource!=null){
+		setValue(datasource.getValue());}
+		else 
+		{
+			setValue("");
+		}
 
 	}
 
@@ -273,7 +278,7 @@ public class DayOfWeekCheckBoxes extends HorizontalLayout implements Field<Strin
 	@Override
 	public void setRequiredError(String requiredMessage)
 	{
-		// TODO Auto-generated method stub
+		
 
 	}
 
@@ -286,14 +291,14 @@ public class DayOfWeekCheckBoxes extends HorizontalLayout implements Field<Strin
 	@Override
 	public boolean isEmpty()
 	{
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
 	@Override
 	public void clear()
 	{
-		// TODO Auto-generated method stub
+		
 		
 	}
 

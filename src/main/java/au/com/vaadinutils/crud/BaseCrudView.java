@@ -442,7 +442,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		rightLayout.addComponent(buttonLayout);
 	}
 
-	private void buildSearchBar()
+	protected void buildSearchBar()
 	{
 		HorizontalLayout basicSearchLayout = new HorizontalLayout();
 		basicSearchLayout.setSizeFull();
@@ -1211,6 +1211,12 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	{
 		return searchFilterText;
 	}
+	
+	protected void setSearchFieldText(String text)
+	{
+		searchField.setValue(text);
+		searchFilterText = text;
+	}
 
 	/**
 	 * create a filter for the text supplied, the text is as entered in the text
@@ -1505,7 +1511,12 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 */
 	public boolean isDirty()
 	{
-		return fieldGroup.isModified() || newEntity != null;
+		boolean dirty = fieldGroup.isModified() || newEntity != null;
+		for (ChildCrudListener<E> commitListener : childCrudListeners)
+		{
+			dirty |= commitListener.isDirty();
+		}
+		return dirty;
 	}
 
 	/**

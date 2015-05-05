@@ -10,6 +10,8 @@ import javax.persistence.criteria.Subquery;
 import javax.persistence.metamodel.SetAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 
+import au.com.vaadinutils.dao.JpaBaseDao.Condition;
+
 public class JpaDslSubqueryBuilder<J, E> extends JpaDslBuilder<E>
 {
 
@@ -30,7 +32,7 @@ public class JpaDslSubqueryBuilder<J, E> extends JpaDslBuilder<E>
 		subQuery.select(root);
 	}
 
-	public <V> AbstractCondition<E> eq(final SingularAttribute<J, V> parentAttrib, final SetAttribute<E, V> attrib)
+	public <V> AbstractCondition<E> joinParentQuery(final SingularAttribute<J, V> parentAttrib, final SetAttribute<E, V> attrib)
 	{
 		return new AbstractCondition<E>()
 		{
@@ -43,6 +45,43 @@ public class JpaDslSubqueryBuilder<J, E> extends JpaDslBuilder<E>
 			}
 		};
 	}
+	
+	public <V> AbstractCondition<E> joinParentQuery(final SingularAttribute<J, V> parentAttrib, final SingularAttribute<E, V> subQueryAttrib)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+				return builder.equal(parentRoot.get(parentAttrib),root.get(subQueryAttrib));
+				
+			}
+		};
+	}
+	
+	/**
+	 * something like 
+	 * @param join
+	 * @param parentAttrib
+	 * @param subQueryAttrib
+	 * @return
+	 */
+	public <V> Condition<E> joinParentQuery(final JoinBuilder<E,J> join,
+		final SingularAttribute<J, V> parentAttrib, final SingularAttribute<J, V> subQueryAttrib)
+	{
+	    return new AbstractCondition<E>()
+			{
+
+				@Override
+				public Predicate getPredicates()
+				{
+					return builder.equal(parentRoot.get(parentAttrib),join.getJoin(root).get(subQueryAttrib));
+					
+				}
+			};
+	}
+
 
 	public Subquery<E> getSubQuery()
 	{

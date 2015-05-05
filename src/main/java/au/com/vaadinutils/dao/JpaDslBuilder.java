@@ -136,6 +136,21 @@ public class JpaDslBuilder<E>
 
 	}
 
+	public <J, V> Condition<E> eq(final JoinBuilder<E, J> join, final SingularAttribute<J, V> field, final V value)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+
+				return builder.equal(join.getJoin(root).get(field), value);
+			}
+
+		};
+	}
+
 	/**
 	 * specify that JPA should fetch child entities in a single query!
 	 * 
@@ -192,7 +207,7 @@ public class JpaDslBuilder<E>
 		};
 
 	}
-	
+
 	public <J, V extends Comparable<? super V>> Condition<E> greaterThanOrEqualTo(
 			final ListAttribute<? super E, J> joinAttribute, final JoinType joinType,
 			final SingularAttribute<J, V> field, final V value)
@@ -210,7 +225,7 @@ public class JpaDslBuilder<E>
 		};
 
 	}
-	
+
 	public <J, V extends Comparable<? super V>> Condition<E> greaterThanOrEqualTo(
 			final SetAttribute<? super E, J> joinAttribute, final JoinType joinType,
 			final SingularAttribute<J, V> field, final V value)
@@ -345,7 +360,7 @@ public class JpaDslBuilder<E>
 		};
 
 	}
-	
+
 	public <J, V extends Comparable<? super V>> Condition<E> lessThanOrEqualTo(
 			final ListAttribute<? super E, J> joinAttribute, final JoinType joinType,
 			final SingularAttribute<J, V> field, final V value)
@@ -363,7 +378,7 @@ public class JpaDslBuilder<E>
 		};
 
 	}
-	
+
 	public <J, V extends Comparable<? super V>> Condition<E> lessThanOrEqualTo(
 			final SetAttribute<? super E, J> joinAttribute, final JoinType joinType,
 			final SingularAttribute<J, V> field, final V value)
@@ -464,9 +479,8 @@ public class JpaDslBuilder<E>
 		}
 		return this;
 	}
-	
-	public <K,V> JpaDslBuilder<E> orderBy(JoinBuilder<E, K> join,
-			SingularAttribute<K, V> field, boolean asc)
+
+	public <K, V> JpaDslBuilder<E> orderBy(JoinBuilder<E, K> join, SingularAttribute<K, V> field, boolean asc)
 	{
 		if (asc)
 		{
@@ -478,8 +492,6 @@ public class JpaDslBuilder<E>
 		}
 		return this;
 	}
-
-	
 
 	private TypedQuery<E> prepareQuery()
 	{
@@ -576,7 +588,7 @@ public class JpaDslBuilder<E>
 		// TODO: make use of this
 		return new JoinBuilder<E, K>(attribute, type);
 	}
-	
+
 	public <K> JoinBuilder<E, K> join(final ListAttribute<? super E, K> attribute, JoinType type)
 	{
 		// TODO: make use of this
@@ -660,35 +672,34 @@ public class JpaDslBuilder<E>
 	{
 		return lessThanOrEqualTo(field, value);
 	}
-	
+
 	public <J, V extends Comparable<? super V>> Condition<E> ltEq(final SetAttribute<? super E, J> joinAttribute,
 			final JoinType joinType, final SingularAttribute<J, V> field, final V value)
 	{
 		return lessThanOrEqualTo(joinAttribute, joinType, field, value);
 
 	}
-	
+
 	public <J, V extends Comparable<? super V>> Condition<E> gtEq(final ListAttribute<? super E, J> joinAttribute,
 			final JoinType joinType, final SingularAttribute<J, V> field, final V value)
 	{
 		return greaterThanOrEqualTo(joinAttribute, joinType, field, value);
 
 	}
-	
+
 	public <J, V extends Comparable<? super V>> Condition<E> ltEq(final ListAttribute<? super E, J> joinAttribute,
 			final JoinType joinType, final SingularAttribute<J, V> field, final V value)
 	{
 		return lessThanOrEqualTo(joinAttribute, joinType, field, value);
 
 	}
-	
+
 	public <J, V extends Comparable<? super V>> Condition<E> gtEq(final SetAttribute<? super E, J> joinAttribute,
 			final JoinType joinType, final SingularAttribute<J, V> field, final V value)
 	{
 		return greaterThanOrEqualTo(joinAttribute, joinType, field, value);
 
 	}
-
 
 	public <J, V extends Comparable<? super V>> Condition<E> ltEq(final SingularAttribute<? super E, J> joinAttribute,
 			final JoinType joinType, final SingularAttribute<J, V> field, final V value)
@@ -778,13 +789,13 @@ public class JpaDslBuilder<E>
 		JoinBuilder<E, J> jb = join(joinAttribute, joinType);
 		return getJoin(jb);
 	}
-	
+
 	private <J> Join<E, J> getJoin(ListAttribute<? super E, J> joinAttribute, JoinType joinType)
 	{
 		JoinBuilder<E, J> jb = join(joinAttribute, joinType);
 		return getJoin(jb);
 	}
-	
+
 	private <J> Join<E, J> getJoin(SetAttribute<? super E, J> joinAttribute, JoinType joinType)
 	{
 		JoinBuilder<E, J> jb = join(joinAttribute, joinType);
@@ -843,11 +854,4 @@ public class JpaDslBuilder<E>
 		return new JpaDslSubqueryBuilder<E, J>(entityManager, target, criteria, root);
 	}
 
-	
-
-
-
-	
-
-	
 }
