@@ -706,4 +706,19 @@ public class TimePicker24 extends HorizontalLayout implements Field
 	{
 		return requiredErrorMessage;
 	}
+	
+	@Override
+	public boolean isEmpty()
+	{
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void clear()
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
 }

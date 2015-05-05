@@ -62,6 +62,9 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Reindeer;
 
+import elemental.json.JsonArray;
+import elemental.json.JsonObject;
+
 /**
  * Base class for a view that provides a report filter selection area and a
  * report viewing area.
@@ -209,24 +212,23 @@ class JasperReportLayout extends VerticalLayout
 			private static final long serialVersionUID = 1L;
 
 			@Override
-			public void call(JSONArray arguments) throws JSONException
+			public void call(JsonArray arguments)
 			{
+		
 				try
 				{
-					JSONObject args = arguments.getJSONObject(0);
+					JsonObject args = arguments.getObject(0);
 					String subReportFileName = args.get("ReportFileName").toString();
 					String subTitle = args.get("ReportTitle").toString();
 
-					JSONObject params = arguments.getJSONObject(1);
+					JsonObject params = arguments.getObject(1);
 
 					List<ReportParameter<?>> subFilters = new LinkedList<ReportParameter<?>>();
 
 					boolean insitue = false;
-					@SuppressWarnings("unchecked")
-					Iterator<String> itr = params.keys();
-					while (itr.hasNext())
+					String[] itr = params.keys();
+					for (String key:itr)
 					{
-						String key = itr.next();
 						if (key.equalsIgnoreCase("ReportParameterInsitue"))
 						{
 							insitue = true;
@@ -254,6 +256,8 @@ class JasperReportLayout extends VerticalLayout
 					logger.error(e, e);
 				}
 			}
+
+			
 		});
 
 	}
