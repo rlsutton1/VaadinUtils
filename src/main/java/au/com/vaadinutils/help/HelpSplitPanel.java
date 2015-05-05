@@ -222,12 +222,10 @@ public class HelpSplitPanel extends HorizontalSplitPanel implements View, HelpPa
 
 			}
 
-			
 		});
 
 	}
 
-	
 	private void resizeHelp()
 	{
 		if (!showHelpOnPage)
@@ -243,11 +241,11 @@ public class HelpSplitPanel extends HorizontalSplitPanel implements View, HelpPa
 			helpHolder.setSizeFull();
 			helpPane.setMargin(false);
 			helpHolder.setMargin(false);
-			//helpPane.setWidth(""+(getWidth()*getSplitPosition()/100));
-			//helpHolder.setWidth(""+(getWidth()*getSplitPosition()/100));
+			// helpPane.setWidth(""+(getWidth()*getSplitPosition()/100));
+			// helpHolder.setWidth(""+(getWidth()*getSplitPosition()/100));
 		}
 	}
-	
+
 	@Override
 	public void removeAllComponents()
 	{
@@ -329,12 +327,10 @@ public class HelpSplitPanel extends HorizontalSplitPanel implements View, HelpPa
 
 				HorizontalLayout helpFooter = new HorizontalLayout();
 				helpFooter.setWidth("100%");
+				helpFooter.setSpacing(true);
 
-				helpFooter.addComponent(new Label("Help id is " + helpId));
 				if (!showHelpOnPage)
 				{
-					helpFooter.addComponent(hideButton);
-					helpFooter.setComponentAlignment(hideButton, Alignment.BOTTOM_RIGHT);
 
 					Button closeButton = new Button("Close");
 					closeButton.addClickListener(new ClickListener()
@@ -352,8 +348,15 @@ public class HelpSplitPanel extends HorizontalSplitPanel implements View, HelpPa
 
 						}
 					});
+
 					helpFooter.addComponent(closeButton);
+					helpFooter.setComponentAlignment(closeButton, Alignment.BOTTOM_LEFT);
+
+					helpFooter.addComponent(hideButton);
+					helpFooter.addComponent(new Label("Help id is " + helpId));
+
 					helpFooter.setComponentAlignment(hideButton, Alignment.BOTTOM_RIGHT);
+
 					closeButton.setStyleName(Reindeer.BUTTON_SMALL);
 
 				}
