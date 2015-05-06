@@ -5,15 +5,11 @@ import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import au.com.vaadinutils.dao.JpaBaseDao;
 import au.com.vaadinutils.jasper.JasperManager;
@@ -35,10 +31,10 @@ import au.com.vaadinutils.listener.CancelListener;
 import au.com.vaadinutils.listener.ClickEventLogged;
 import au.com.vaadinutils.ui.WorkingDialog;
 
-import com.github.wolfie.refresher.Refresher;
-import com.github.wolfie.refresher.Refresher.RefreshListener;
 import com.google.common.base.Preconditions;
 import com.vaadin.data.Item;
+import com.vaadin.event.UIEvents.PollEvent;
+import com.vaadin.event.UIEvents.PollListener;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.StreamResource;
 import com.vaadin.server.StreamResource.StreamSource;
@@ -159,19 +155,20 @@ class JasperReportLayout extends VerticalLayout
 			// window opens we kick of the report generation which creates the
 			// progress dialog then, which allows it to be in front.
 
-			final Refresher refresher = new Refresher();
-			refresher.addListener(new RefreshListener()
+			UI.getCurrent().setPollInterval(500);
+			UI.getCurrent().addPollListener(new PollListener()
 			{
 
-				private static final long serialVersionUID = -5629950903521881207L;
+				private static final long serialVersionUID = 1L;
 
 				@Override
-				public void refresh(Refresher source)
+				public void poll(PollEvent event)
 				{
 
 					try
 					{
-						removeExtension(refresher);
+						UI.getCurrent().setPollInterval(-1);
+						UI.getCurrent().removePollListener(this);
 						generateReport(reportProperties.getDefaultFormat(),
 								JasperReportLayout.this.builder.getReportParameters());
 
@@ -184,7 +181,7 @@ class JasperReportLayout extends VerticalLayout
 
 				}
 			});
-			addExtension(refresher);
+			
 		}
 		splash.addComponent(splashLabel);
 
@@ -214,12 +211,12 @@ class JasperReportLayout extends VerticalLayout
 			@Override
 			public void call(JsonArray arguments)
 			{
-		
+
 				try
 				{
 					JsonObject args = arguments.getObject(0);
-					String subReportFileName = args.get("ReportFileName").toString();
-					String subTitle = args.get("ReportTitle").toString();
+					String subReportFileName = args.getString("ReportFileName");
+					String subTitle = args.getString("ReportTitle");
 
 					JsonObject params = arguments.getObject(1);
 
@@ -227,7 +224,7 @@ class JasperReportLayout extends VerticalLayout
 
 					boolean insitue = false;
 					String[] itr = params.keys();
-					for (String key:itr)
+					for (String key : itr)
 					{
 						if (key.equalsIgnoreCase("ReportParameterInsitue"))
 						{
@@ -257,7 +254,6 @@ class JasperReportLayout extends VerticalLayout
 				}
 			}
 
-			
 		});
 
 	}
@@ -548,24 +544,20 @@ class JasperReportLayout extends VerticalLayout
 
 		UI.getCurrent().addWindow(dialog);
 
-		// add refresher component
-		final Refresher refresher = new Refresher();
-		refresher.setRefreshInterval(200);
-		addExtension(refresher);
 
-		RefreshListener refreshListener = getProgressDialogRefreshListener(dialog, refresher);
-		refresher.addListener(refreshListener);
+ getProgressDialogRefreshListener(dialog);
 
-		RefreshListener streamListener = getStreamConnectorRefreshListener(outputFormat);
-		refresher.addListener(streamListener);
 
-		JasperProgressListener listener = getJasperManagerProgressListener(UI.getCurrent(),dialog, refresher, outputFormat);
+		getStreamConnectorRefreshListener(outputFormat);
+		
+
+		JasperProgressListener listener = getJasperManagerProgressListener(UI.getCurrent(), dialog, outputFormat);
 		manager.exportAsync(outputFormat, params, listener);
 
 	}
 
-	private JasperProgressListener getJasperManagerProgressListener(final UI ui,final WorkingDialog dialog,
-			final Refresher refresher, final OutputFormat outputFormat)
+	private JasperProgressListener getJasperManagerProgressListener(final UI ui, final WorkingDialog dialog,
+			final OutputFormat outputFormat)
 	{
 		JasperProgressListener listener = new JasperProgressListener()
 		{
@@ -598,7 +590,7 @@ class JasperReportLayout extends VerticalLayout
 				{
 					componet.getComponent().setEnabled(true);
 				}
-				removeExtension(refresher);
+				
 				dialog.close();
 			}
 
@@ -620,16 +612,18 @@ class JasperReportLayout extends VerticalLayout
 		return listener;
 	}
 
-	private RefreshListener getStreamConnectorRefreshListener(final JasperManager.OutputFormat outputFormat)
+	private void getStreamConnectorRefreshListener(final JasperManager.OutputFormat outputFormat)
 	{
-		RefreshListener streamListener = new RefreshListener()
+		UI.getCurrent().setPollInterval(500);
+		UI.getCurrent().addPollListener(new PollListener()
 		{
-
-			private static final long serialVersionUID = -2042404606367957120L;
+	
+			private static final long serialVersionUID = -5641305025399715756L;
 
 			@Override
-			public void refresh(Refresher source)
+			public void poll(PollEvent event)
 			{
+
 				if (streamReady && !streamConnected)
 				{
 					// jasper manager is ready, so get the report stream and set
@@ -673,8 +667,8 @@ class JasperReportLayout extends VerticalLayout
 				return name + outputFormat.getFileExtension();
 
 			}
-		};
-		return streamListener;
+		});
+		
 	}
 
 	private void showCsvSplash()
@@ -717,7 +711,7 @@ class JasperReportLayout extends VerticalLayout
 		return source;
 	}
 
-	private RefreshListener getProgressDialogRefreshListener(final WorkingDialog dialog, final Refresher refresher)
+	private void getProgressDialogRefreshListener(final WorkingDialog dialog)
 	{
 		final Table reportQueue = new Table();
 		reportQueue.addContainerProperty("Time", String.class, "");
@@ -732,16 +726,16 @@ class JasperReportLayout extends VerticalLayout
 		reportQueue.setColumnWidth("User", 100);
 		// reportQueue.setColumnWidth("Status", 100);
 
-		RefreshListener refreshListener = new RefreshListener()
+		UI.getCurrent().setPollInterval(500);
+		UI.getCurrent().addPollListener(new PollListener()
 		{
 			int refreshDivider = 0;
 			boolean tableAdded = false;
 
 			private static final long serialVersionUID = -5641305025399715756L;
 
-			@SuppressWarnings("unchecked")
 			@Override
-			public void refresh(Refresher source)
+			public void poll(PollEvent event)
 			{
 
 				ReportStatus status = manager.getStatus();
@@ -789,13 +783,13 @@ class JasperReportLayout extends VerticalLayout
 					{
 						componet.getComponent().setEnabled(true);
 					}
-					removeExtension(refresher);
+					UI.getCurrent().removePollListener(this);
+					UI.getCurrent().setPollInterval(-1);
 					dialog.close();
 				}
 				refreshDivider++;
 			}
-		};
-		return refreshListener;
+		});
 	}
 
 	private CancelListener getProgressDialogCancelListener()

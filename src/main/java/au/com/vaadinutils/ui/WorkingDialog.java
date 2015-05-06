@@ -5,7 +5,6 @@ import au.com.vaadinutils.listener.ClickEventLogged;
 import au.com.vaadinutils.listener.CompleteListener;
 import au.com.vaadinutils.listener.ProgressListener;
 
-import com.github.wolfie.refresher.Refresher;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -57,34 +56,10 @@ public class WorkingDialog extends Window implements ProgressListener<String>
 	 */
 	public WorkingDialog(String caption, String message)
 	{
-		this(caption, message, null, null);
+		this(caption, message, null);
 	}
 
-	/**
-	 * Displays a dialog designed to be shown when a long running task is in
-	 * progress.
-	 * 
-	 * @param caption
-	 * @param message
-	 * @param listener
-	 */
-	public WorkingDialog(String caption, String message, CancelListener listener)
-	{
-		this(caption, message, listener, null);
-	}
-
-	/**
-	 * Displays a dialog designed to be shown when a long running task is in
-	 * progress.
-	 * 
-	 * @param caption
-	 * @param message
-	 * @param refresher
-	 */
-	public WorkingDialog(String caption, String message, Refresher refresher)
-	{
-		this(caption, message, null, refresher);
-	}
+	
 
 	/**
 	 * Display the Working Dialog with a Cancel Button. If the user clicks the
@@ -96,7 +71,7 @@ public class WorkingDialog extends Window implements ProgressListener<String>
 	 * @param listener
 	 * @param refresher
 	 */
-	public WorkingDialog(String caption, String message, CancelListener listener, Refresher refresher)
+	public WorkingDialog(String caption, String message,CancelListener listener)
 	{
 		super(caption);
 		ui = UI.getCurrent();
@@ -149,8 +124,6 @@ public class WorkingDialog extends Window implements ProgressListener<String>
 
 		}
 
-		if (refresher != null)
-			addExtension(refresher);
 
 		this.setContent(content);
 		this.center();

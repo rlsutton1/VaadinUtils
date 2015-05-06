@@ -240,12 +240,12 @@
 			<!-- currently at https://github.com/rlsutton1/WizardsForVaadin.git -->
 		</dependency>
 
-		<dependency>
+<!-- 		<dependency>
 			<groupId>org.vaadin.addons</groupId>
 			<artifactId>refresher</artifactId>
 			<version>1.2.1.7</version>
 		</dependency>
-
+-->
 
 
 
@@ -366,12 +366,6 @@
 			<artifactId>junit</artifactId>
 			<version>4.4</version>
 			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>com.vaadin</groupId>
-			<artifactId>vaadin-testbench</artifactId>
-			<version>4.0.0.alpha3</version>
 		</dependency>
 
 		<dependency>
