@@ -245,4 +245,18 @@ public class DataBoundButton<T> extends Button implements Field<T>
 		return requiredMessage;
 	}
 
+	@Override
+	public boolean isEmpty()
+	{
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void clear()
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
 }

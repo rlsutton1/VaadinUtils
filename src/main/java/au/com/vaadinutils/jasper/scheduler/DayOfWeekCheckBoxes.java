@@ -281,4 +281,19 @@ public class DayOfWeekCheckBoxes extends HorizontalLayout implements Field<Strin
 	{
 		return "You must select at least one day";
 	}
+	
+	@Override
+	public boolean isEmpty()
+	{
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void clear()
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
 }
