@@ -458,7 +458,10 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	@Override
 	protected void setInternalValue(Collection<C> newValue)
 	{
-		valueClass = newValue.getClass();
+		if (newValue != null)
+		{
+			valueClass = newValue.getClass();
+		}
 		super.setInternalValue(newValue);
 
 		beans.removeAllItems();
