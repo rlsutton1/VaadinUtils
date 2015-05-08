@@ -13,6 +13,7 @@ import au.com.vaadinutils.listener.ClickEventLogged;
 import com.google.common.base.Preconditions;
 import com.vaadin.data.Container;
 import com.vaadin.data.Container.Filter;
+import com.vaadin.data.Container.Filterable;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
@@ -52,6 +53,11 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 			headingPropertySet = getHeadingPropertySet();
 		}
 		
+		if (entityContainer == null)
+		{
+			entityContainer = getContainer();
+		}
+		
 		Preconditions.checkNotNull(headingPropertySet);
 		
 		selectableTable = new SelectableEntityTable<E>(entityContainer, headingPropertySet);
@@ -88,6 +94,12 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 		triggerFilter();
 	}
 	
+	protected Filterable getContainer()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	protected HeadingPropertySet<E>  getHeadingPropertySet()
 	{
 		return null;
