@@ -175,12 +175,13 @@
 		<!-- dont need this as we compile our own widget set <dependency> <groupId>com.vaadin</groupId> 
 			<artifactId>vaadin-client-compiled</artifactId> <version>${vaadin.version}</version> 
 			</dependency> -->
-		<dependency>
+
+<!-- 		<dependency>
 			<groupId>com.vaadin</groupId>
 			<artifactId>vaadin-push</artifactId>
 			<version>${vaadin.version}</version>
 		</dependency>
-
+-->
 		<dependency>
 			<groupId>org.vaadin.addon</groupId>
 			<artifactId>confirmdialog</artifactId>

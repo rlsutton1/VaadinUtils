@@ -8,6 +8,7 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.themes.Reindeer;
+import com.vaadin.ui.themes.ValoTheme;
 
 public class BaseCrudSaveCancelButtonTray extends HorizontalLayout
 {
@@ -54,7 +55,7 @@ public class BaseCrudSaveCancelButtonTray extends HorizontalLayout
 
 			}
 		});
-		saveButton.setStyleName(Reindeer.BUTTON_DEFAULT);
+		saveButton.setStyleName(ValoTheme.BUTTON_PRIMARY);
 		saveButton.setDisableOnClick(true);
 
 		cancelButton.addClickListener(new ClickListener()

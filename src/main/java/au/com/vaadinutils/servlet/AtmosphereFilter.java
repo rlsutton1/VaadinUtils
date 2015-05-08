@@ -1,13 +1,5 @@
 package au.com.vaadinutils.servlet;
 
-import javax.persistence.EntityManager;
-
-import org.atmosphere.cpr.Action;
-import org.atmosphere.cpr.AtmosphereInterceptorAdapter;
-import org.atmosphere.cpr.AtmosphereResource;
-
-import au.com.vaadinutils.dao.EntityManagerProvider;
-import au.com.vaadinutils.dao.Transaction;
 
 /**
  * Designed to inject the EntityManager into requests that arrive via websockets (Vaadin Push) as these
@@ -35,40 +27,43 @@ import au.com.vaadinutils.dao.Transaction;
  * 
  */
 
-public class AtmosphereFilter extends AtmosphereInterceptorAdapter
-{
-	Transaction t;
+public class AtmosphereFilter 
+{}
 
-	public Action inspect(AtmosphereResource r)
-	{
-		// do pre-request stuff
-
-		EntityManager em = EntityManagerProvider.createEntityManager();
-		t = new Transaction(em);
-
-		// Create and set the entity manager
-		EntityManagerProvider.setCurrentEntityManager(em);
-
-		return super.inspect(r);
-	}
-
-	// do post-request stuff (Vaadin request handling is done at this point)
-	public void postInspect(AtmosphereResource r)
-	{
-		try
-		{
-			t.commit();
-		}
-		catch (Throwable e)
-		{
-			throw new RuntimeException(e);
-		}
-		finally
-		{
-			// Reset the entity manager as we get a new one everytime we inspect is called.
-			EntityManagerProvider.setCurrentEntityManager(null);
-		}
-
-
-	}
-}
+//public class AtmosphereFilter extends AtmosphereInterceptorAdapter
+//{
+//	Transaction t;
+//
+//	public Action inspect(AtmosphereResource r)
+//	{
+//		// do pre-request stuff
+//
+//		EntityManager em = EntityManagerProvider.createEntityManager();
+//		t = new Transaction(em);
+//
+//		// Create and set the entity manager
+//		EntityManagerProvider.setCurrentEntityManager(em);
+//
+//		return super.inspect(r);
+//	}
+//
+//	// do post-request stuff (Vaadin request handling is done at this point)
+//	public void postInspect(AtmosphereResource r)
+//	{
+//		try
+//		{
+//			t.commit();
+//		}
+//		catch (Throwable e)
+//		{
+//			throw new RuntimeException(e);
+//		}
+//		finally
+//		{
+//			// Reset the entity manager as we get a new one everytime we inspect is called.
+//			EntityManagerProvider.setCurrentEntityManager(null);
+//		}
+//
+//
+//	}
+//}
