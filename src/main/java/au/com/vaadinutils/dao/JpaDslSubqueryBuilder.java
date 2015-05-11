@@ -58,7 +58,7 @@ public class JpaDslSubqueryBuilder<P, E> extends JpaDslBuilder<E>
      * @param parentAttrib
      * @return
      */
-    public AbstractCondition<E> joinParentQueryOnSubAttrib(final SingularAttribute<E, ?> subQueryAttrib)
+    public AbstractCondition<E> joinParentQueryOnSubAttrib(final SingularAttribute<E, P> subQueryAttrib)
     {
 	return new AbstractCondition<E>()
 	{
