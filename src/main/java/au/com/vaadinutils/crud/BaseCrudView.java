@@ -1387,9 +1387,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 	protected String getSearchFieldText()
 	{
-	    return searchFieldText;
+		return searchFieldText;
 	}
-	
+
 	private void initSearch()
 	{
 		searchField.setInputPrompt("Search");
@@ -1469,15 +1469,17 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		}
 
 		applyFilter(filter);
-
 	}
 
 	public void applyFilter(final Filter filter)
 	{
 		try
 		{
-			/* Reset the filter for the Entity Container. */
+			// Prevent bound components from populating unnecessarily while
+			// wrong (no) filters are applied.
+			container.setFireContainerItemSetChangeEvents(false);
 			resetFilters();
+			container.setFireContainerItemSetChangeEvents(true);
 			if (filter != null)
 			{
 				container.addContainerFilter(filter);
@@ -1493,7 +1495,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 	}
 
-	
 	/**
 	 * create a filter for the text supplied, the text is as entered in the text
 	 * search bar.
@@ -1782,8 +1783,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				try
 				{
 					E previousEntity = getCurrent();
-//					searchField.setValue("");
-//					resetFilters();
+					// searchField.setValue("");
+					// resetFilters();
 
 					createNewEntity(previousEntity);
 
@@ -1952,7 +1953,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		try
 		{
 			container.removeAllContainerFilters();
-			((EntityTable<E>) this.entityTable).refreshRowCache();
+			// ((EntityTable<E>) this.entityTable).refreshRowCache();
 		}
 		catch (Exception e)
 		{
