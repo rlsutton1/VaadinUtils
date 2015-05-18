@@ -90,7 +90,6 @@ public class Scheduler implements Runnable
 			Thread.currentThread().setName("Jasper Report Scheduler");
 			dbManager.beginDbTransaction();
 			List<ReportEmailSchedule> schedules = scheduleProvider.getSchedules();
-			boolean hasSchedules = false;
 			for (ReportEmailSchedule schedule : schedules)
 			{
 				if (schedule.isEnabled())
@@ -134,11 +133,6 @@ public class Scheduler implements Runnable
 										+ schedule);
 							}
 						}
-						if (deleted == false)
-						{
-							hasSchedules = true;
-						}
-
 					}
 					catch (Exception e)
 					{

@@ -62,7 +62,6 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.TabSheet;
-import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.ColumnGenerator;
 import com.vaadin.ui.TextField;
@@ -247,7 +246,7 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 		main.setSpacing(true);
 		main.setMargin(true);
 		main.setSizeFull();
-		Tab emailTab = tabsheet.addTab(main, "Email");
+		tabsheet.addTab(main, "Email");
 
 		main.addComponent(emailTargetLayout);
 

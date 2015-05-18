@@ -40,6 +40,7 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 {
 	private static final long serialVersionUID = 1L;
 
+	@SuppressWarnings("unused")
 	private static Logger logger = LogManager.getLogger();
 
 	protected TextField searchField = new TextField();

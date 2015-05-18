@@ -4,7 +4,6 @@ import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.ListAttribute;
-import javax.persistence.metamodel.SetAttribute;
 
 public class JoinMetaDataList<E, K> implements JoinMetaData<E, K>
 {
