@@ -330,6 +330,13 @@
 			<version>2.2.2</version>
 		</dependency>
 		
+				<dependency>
+			<groupId>org.vaadin.addons</groupId>
+			<artifactId>toolbox</artifactId>
+			<version>1.0.1</version>
+		</dependency>
+		
+		
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
