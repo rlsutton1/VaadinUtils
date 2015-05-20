@@ -44,6 +44,8 @@ import com.vaadin.data.Buffered.SourceException;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Container.ItemSetChangeEvent;
 import com.vaadin.data.Container.ItemSetChangeListener;
+import com.vaadin.data.Property.ValueChangeEvent;
+import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
@@ -1385,14 +1387,24 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 	protected String getSearchFieldText()
 	{
-	    return searchFieldText;
+		return searchFieldText;
 	}
-	
+
 	private void initSearch()
 	{
 		searchField.setInputPrompt("Search");
 		searchField.setTextChangeEventMode(TextChangeEventMode.LAZY);
 		searchField.setImmediate(true);
+		searchField.addValueChangeListener(new ValueChangeListener()
+		{
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void valueChange(ValueChangeEvent event)
+			{
+				searchFieldText = (String) event.getProperty().getValue();
+			}
+		});
 		searchField.addTextChangeListener(new TextChangeListener()
 		{
 			private static final long serialVersionUID = 1L;
@@ -1419,7 +1431,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 					Notification.show(e.getClass().getSimpleName() + " " + e.getMessage(), Type.ERROR_MESSAGE);
 				}
 			}
-
 		});
 
 		searchField.focus();
@@ -1458,15 +1469,17 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		}
 
 		applyFilter(filter);
-
 	}
 
 	public void applyFilter(final Filter filter)
 	{
 		try
 		{
-			/* Reset the filter for the Entity Container. */
+			// Prevent bound components from populating unnecessarily while
+			// wrong (no) filters are applied.
+			container.setFireContainerItemSetChangeEvents(false);
 			resetFilters();
+			container.setFireContainerItemSetChangeEvents(true);
 			if (filter != null)
 			{
 				container.addContainerFilter(filter);
@@ -1482,7 +1495,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 	}
 
-	
 	/**
 	 * create a filter for the text supplied, the text is as entered in the text
 	 * search bar.
@@ -1771,8 +1783,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				try
 				{
 					E previousEntity = getCurrent();
-//					searchField.setValue("");
-//					resetFilters();
+					// searchField.setValue("");
+					// resetFilters();
 
 					createNewEntity(previousEntity);
 
@@ -1941,7 +1953,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		try
 		{
 			container.removeAllContainerFilters();
-			((EntityTable<E>) this.entityTable).refreshRowCache();
+			// ((EntityTable<E>) this.entityTable).refreshRowCache();
 		}
 		catch (Exception e)
 		{

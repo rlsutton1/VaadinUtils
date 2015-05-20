@@ -734,7 +734,7 @@ public class TimePicker extends HorizontalLayout implements Field
 	{
 		clearValue();
 		datasource = newDataSource;
-		if (datasource.getValue() != null)
+		if (datasource != null && datasource.getValue() != null)
 		{
 			setValues(datasource.getValue());
 		}
