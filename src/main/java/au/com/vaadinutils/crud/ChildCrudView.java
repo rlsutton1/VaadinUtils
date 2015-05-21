@@ -346,6 +346,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 	E entity = dao.findById((Long) entityId);
 	EntityManagerProvider.remove(entity);
 	parentCrud.reloadDataFromDB();
+	reloadDataFromDB();
 
     }
 
