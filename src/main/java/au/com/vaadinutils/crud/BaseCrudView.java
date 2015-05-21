@@ -1475,14 +1475,18 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	{
 		try
 		{
-			// Prevent bound components from populating unnecessarily while
-			// wrong (no) filters are applied.
-			container.setFireContainerItemSetChangeEvents(false);
-			resetFilters();
-			container.setFireContainerItemSetChangeEvents(true);
+			// If there are filters to be applied then don't fire item set
+			// change listeners until we have applied the correct set of filters
 			if (filter != null)
 			{
+				container.setFireContainerItemSetChangeEvents(false);
+				resetFilters();
+				container.setFireContainerItemSetChangeEvents(true);
 				container.addContainerFilter(filter);
+			}
+			else
+			{
+				resetFilters();
 			}
 			container.discard();
 
