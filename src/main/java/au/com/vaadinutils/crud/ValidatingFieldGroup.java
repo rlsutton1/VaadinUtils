@@ -11,6 +11,7 @@ import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.fieldgroup.FieldGroup;
+import com.vaadin.data.fieldgroup.FieldGroup.BindException;
 import com.vaadin.data.validator.BeanValidator;
 import com.vaadin.ui.Field;
 
@@ -151,6 +152,23 @@ public class ValidatingFieldGroup<E> extends FieldGroup
 			}
 		}
 		return false;
+	}
+
+	public void bind(Field<?> field, Object propertyId) throws BindException
+	{
+
+		boolean isReadonly = false;
+		try
+		{
+			isReadonly = field.isReadOnly();
+			field.setReadOnly(false);
+			super.bind(field, propertyId);
+
+		}
+		finally
+		{
+			field.setReadOnly(isReadonly);
+		}
 	}
 
 }
