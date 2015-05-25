@@ -1886,6 +1886,11 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 						((TabSheet) parentField).setSelectedTab(childField);
 						break;
 					}
+					if (parentField == null)
+					{
+						//couldn't find a tab in the hierarchy 
+						break;
+					}
 					childField = parentField;
 				}
 				break;

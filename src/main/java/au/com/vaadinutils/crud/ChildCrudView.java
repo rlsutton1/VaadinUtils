@@ -375,13 +375,14 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
     {
 	try
 	{
+		if (getCurrent()!=null){
 	    String fieldName = selectFirstErrorFieldAndShowTab();
 	    if (!fieldGroup.isValid())
 	    {
 
 		throw new InvalidValueException("Invalid Field: " + fieldName);
 
-	    }
+	    }}
 	}
 	catch (InvalidValueException e)
 	{
