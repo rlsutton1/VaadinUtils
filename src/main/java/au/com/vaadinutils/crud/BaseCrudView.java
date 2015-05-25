@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.persistence.PersistenceException;
@@ -1608,11 +1609,11 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		// notifiy ChildCrudView's that we've changed row.
 		for (ChildCrudListener<E> commitListener : childCrudListeners)
 		{
-			Stopwatch timer = new Stopwatch();
+			Stopwatch timer = Stopwatch.createUnstarted();
 			timer.start();
 			commitListener.selectedParentRowChanged(item);
 			times.put(commitListener.getClass().getSimpleName() + ":" + commitListener.hashCode(),
-					timer.elapsedMillis());
+					timer.elapsed(TimeUnit.MILLISECONDS));
 		}
 
 		if (item != null || newEntity != null)

@@ -2,6 +2,7 @@ package au.com.vaadinutils.crud;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.concurrent.TimeUnit;
 
 import javax.persistence.PersistenceException;
 import javax.persistence.metamodel.SingularAttribute;
@@ -678,7 +679,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 	    }
 	    dirty = false;
 
-	    Stopwatch timer = new Stopwatch();
+	    Stopwatch timer = Stopwatch.createUnstarted();;
 	    timer.start();
 	    resetFilters();
 	    triggerFilter();
@@ -691,7 +692,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 		// so we'll simulate one!
 		rowChanged(entityTable.getCurrent());
 	    }
-	    logger.info("Child crud load {} took {}", this.getClass().getSimpleName(), timer.elapsedMillis());
+	    logger.info("Child crud load {} took {}", this.getClass().getSimpleName(), timer.elapsed(TimeUnit.MILLISECONDS));
 
 	    Object id = entityTable.firstItemId();
 	    if (id != null)
