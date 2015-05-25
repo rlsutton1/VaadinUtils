@@ -47,14 +47,14 @@ public class HeadingPropertySet<E>
 
 		public Builder<E> addGeneratedColumn(String heading, ColumnGenerator columnGenerator)
 		{
-			addGeneratedColumn(heading, heading + "-generated",  columnGenerator);
+			addGeneratedColumn(heading, heading + "-generated", columnGenerator);
 			return this;
 
 		}
 
 		public Builder<E> addGeneratedColumn(String heading, ColumnGenerator columnGenerator, int width)
 		{
-			addGeneratedColumn(heading, heading + "-generated",  columnGenerator, width);
+			addGeneratedColumn(heading, heading + "-generated", columnGenerator, width);
 			return this;
 
 		}
@@ -72,7 +72,8 @@ public class HeadingPropertySet<E>
 
 		}
 
-		public Builder<E> addGeneratedColumn(String heading, String headingPropertyId, ColumnGenerator columnGenerator, int width)
+		public Builder<E> addGeneratedColumn(String heading, String headingPropertyId, ColumnGenerator columnGenerator,
+				int width)
 		{
 			cols.add(new HeadingToPropertyId<E>(heading, headingPropertyId, columnGenerator).setWidth(width));
 			return this;
@@ -82,6 +83,13 @@ public class HeadingPropertySet<E>
 		public Builder<E> addHiddenColumn(String heading, String headingPropertyId)
 		{
 			cols.add(new HeadingToPropertyId<E>(heading, headingPropertyId, null).setHidden());
+			return this;
+
+		}
+
+		public Builder<E> addGeneratedHiddenColumn(String heading, ColumnGenerator columnGenerator)
+		{
+			cols.add(new HeadingToPropertyId<E>(heading, heading + "-generated", columnGenerator).setHidden());
 			return this;
 
 		}
@@ -132,7 +140,7 @@ public class HeadingPropertySet<E>
 		public <T extends Object> Builder<E> addGeneratedColumn(String heading,
 				SingularAttribute<E, T> headingPropertyId, ColumnGenerator columnGenerator)
 		{
-		    cols.add(new HeadingToPropertyId<E>(heading, headingPropertyId.getName(), columnGenerator));
+			cols.add(new HeadingToPropertyId<E>(heading, headingPropertyId.getName(), columnGenerator));
 			return this;
 
 		}
@@ -146,7 +154,7 @@ public class HeadingPropertySet<E>
 		public <T extends Object> Builder<E> addGeneratedColumn(String heading,
 				SingularAttribute<E, T> headingPropertyId, ColumnGenerator columnGenerator, int width)
 		{
-		    cols.add(new HeadingToPropertyId<E>(heading, headingPropertyId.getName(), columnGenerator).setWidth(width));
+			cols.add(new HeadingToPropertyId<E>(heading, headingPropertyId.getName(), columnGenerator).setWidth(width));
 			return this;
 
 		}
