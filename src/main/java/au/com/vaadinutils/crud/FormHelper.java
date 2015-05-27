@@ -583,7 +583,7 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 			component.setConverter(converter);
 			component.setNewItemsAllowed(false);
 			component.setNullSelectionAllowed(false);
-			component.setTextInputAllowed(false);
+			component.setTextInputAllowed(true);
 			component.setWidth(STANDARD_COMBO_WIDTH);
 			component.setImmediate(true);
 			if (group != null)

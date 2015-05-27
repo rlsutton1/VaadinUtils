@@ -49,6 +49,11 @@ public class HelpSplitPanel extends HorizontalSplitPanel implements View, HelpPa
 	UserSettingsStorage userSettings = UserSettingsStorageFactory.getUserSettingsStorage();
 	private float lastSplitPosition;
 
+	public View getActiveView()
+	{
+		return component;
+	}
+	
 	public HelpSplitPanel(View component)
 	{
 		super();
