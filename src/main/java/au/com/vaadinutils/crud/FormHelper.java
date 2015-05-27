@@ -306,7 +306,7 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 		// field.setCaption(fieldLabel);
 		field.setNewItemsAllowed(false);
 		field.setNullSelectionAllowed(false);
-		field.setTextInputAllowed(false);
+		field.setTextInputAllowed(true);
 		field.setWidth(STANDARD_COMBO_WIDTH);
 		field.setImmediate(true);
 		doBinding(group, fieldName, field);
@@ -379,7 +379,7 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 		ComboBox field = new SplitComboBox(fieldLabel, options);
 		field.setNewItemsAllowed(false);
 		field.setNullSelectionAllowed(false);
-		field.setTextInputAllowed(false);
+		field.setTextInputAllowed(true);
 		field.setWidth(STANDARD_COMBO_WIDTH);
 		field.setImmediate(true);
 		form.addComponent(field);
