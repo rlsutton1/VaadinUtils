@@ -55,6 +55,7 @@ import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.shared.ui.datefield.Resolution;
 import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.DateField;
 import com.vaadin.ui.FormLayout;
@@ -90,6 +91,8 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 
 	private ComboBox outputFormat;
 
+	private TextField reportLogField;
+
 	public JasperReportScheduleLayout()
 	{
 
@@ -97,7 +100,7 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 
 		HeadingPropertySet<ReportEmailScheduleEntity> headings = new HeadingPropertySet.Builder<ReportEmailScheduleEntity>()
 
-		.addGeneratedColumn("Status", ReportEmailScheduleEntity_.reportLog,getStatusColumnGenerator())
+		.addGeneratedColumn("Status", ReportEmailScheduleEntity_.reportLog, getStatusColumnGenerator())
 				.addColumn("Report", ReportEmailScheduleEntity_.reportTitle)
 				.addColumn("Subject", ReportEmailScheduleEntity_.subject)
 				.addColumn("Owner", ReportEmailScheduleEntity_.sender)
@@ -248,7 +251,8 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 		helper.bindTextField("Subject", ReportEmailScheduleEntity_.subject);
 		CKEditorEmailField message = helper.bindEditorField("Message", ReportEmailScheduleEntity_.message, false);
 
-		helper.bindTextField("Report Log", ReportEmailScheduleEntity_.reportLog.getName()).setReadOnly(true);
+		reportLogField = helper.bindTextField("Report Log", ReportEmailScheduleEntity_.reportLog.getName());
+		reportLogField.setReadOnly(true);
 
 		main.setExpandRatio(message, 1);
 
@@ -279,7 +283,25 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 			FormLayout main, FormHelper<ReportEmailScheduleEntity> helper)
 	{
 
-		helper.bindBooleanField(main, validatingFieldGroup, "Enabled", ReportEmailScheduleEntity_.enabled);
+		CheckBox enabled = helper.bindBooleanField(main, validatingFieldGroup, "Enabled",
+				ReportEmailScheduleEntity_.enabled);
+
+		enabled.addValueChangeListener(new ValueChangeListener()
+		{
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void valueChange(ValueChangeEvent event)
+			{
+				if (((Boolean)event.getProperty().getValue()) == true)
+				{
+					reportLogField.setReadOnly(false);
+					reportLogField.setValue("");
+					reportLogField.setReadOnly(true);
+				}
+			}
+		});
 
 		helper.bindDateField(main, validatingFieldGroup, "Last Run Time", ReportEmailScheduleEntity_.lastRuntime,
 				"yyyy/MM/dd HH:mm", Resolution.MINUTE).setReadOnly(true);
@@ -595,7 +617,7 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 		}
 		recips.clear();
 		recips.addAll(matchedRecips);
-		if (recips.size()==0)
+		if (recips.size() == 0)
 		{
 			throw new InvalidValueException("Select at least one Recipient");
 		}
@@ -792,8 +814,8 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 	{
 
 	}
-	
-	@Override 
+
+	@Override
 	public String getTitleText()
 	{
 		return "Report Scheduler";
