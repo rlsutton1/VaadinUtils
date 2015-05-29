@@ -492,7 +492,11 @@ public class TimePicker extends HorizontalLayout implements Field
 	public void setValues(Date date)
 	{
 		hour = "" + date.getHours();
-		minute = "" + date.getMinutes();
+		if (date.getMinutes()< 10)
+		{
+			minute ="0";
+		}
+		minute += "" + date.getMinutes();
 		isSet = true;
 		amPm = "AM";
 		if (date.getHours() >= 12)
