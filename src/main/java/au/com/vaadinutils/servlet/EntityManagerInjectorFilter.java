@@ -38,6 +38,7 @@ public class EntityManagerInjectorFilter implements Filter
 		{
 			// Create and set the entity manager
 			EntityManagerProvider.setCurrentEntityManager(em);
+			
 
 			// Handle the request
 			filterChain.doFilter(servletRequest, servletResponse);

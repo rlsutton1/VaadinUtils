@@ -25,6 +25,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 
+import com.google.common.base.Preconditions;
+
 import au.com.vaadinutils.crud.CrudEntity;
 import au.com.vaadinutils.jasper.JasperManager.OutputFormat;
 import au.com.vaadinutils.jasper.scheduler.ReportEmailParameter;
@@ -61,7 +63,7 @@ public class ReportEmailScheduleEntity implements Serializable, CrudEntity, Repo
 	private String JasperReportPropertiesClassName;
 
 	@OneToMany(cascade = { CascadeType.REMOVE, CascadeType.PERSIST })
-	private List<ReportEmailScheduledDateParameter> dateParameters;
+	private List<ReportEmailScheduledDateParameter> dateParameters = new LinkedList<>();
 
 	boolean enabled = true;
 
@@ -216,10 +218,15 @@ public class ReportEmailScheduleEntity implements Serializable, CrudEntity, Repo
 
 	}
 
+	public boolean hasSenderEmailAddress()
+	{
+		return sender!=null;
+	}
+	
 	@Override
 	public Address getSendersEmailAddress() throws AddressException
 	{
-
+		Preconditions.checkNotNull(sender,"You should call hasSenderEmailAddress first to check if there is a sender");
 		return new InternetAddress(sender.getEmail());
 	}
 

@@ -174,7 +174,7 @@ public class DayOfWeekCheckBoxes extends HorizontalLayout implements Field<Strin
 		{
 			box.setValue(false);
 		}
-		if (newValue.length() > 0)
+		if (newValue != null && newValue.length() > 0)
 		{
 			String[] values = newValue.split(",");
 			for (String value : values)
@@ -233,7 +233,12 @@ public class DayOfWeekCheckBoxes extends HorizontalLayout implements Field<Strin
 	public void setPropertyDataSource(@SuppressWarnings("rawtypes") Property newDataSource)
 	{
 		datasource = newDataSource;
-		setValue(datasource.getValue());
+		if (datasource !=null){
+		setValue(datasource.getValue());}
+		else
+		{
+			setValue(null);
+		}
 
 	}
 

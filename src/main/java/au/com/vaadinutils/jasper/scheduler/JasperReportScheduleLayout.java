@@ -182,13 +182,24 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 		return scheduleCreater.create();
 	}
 
+	
+	@Override
+	protected ReportEmailScheduleEntity preNew(ReportEmailScheduleEntity previousEntity) throws InstantiationException,
+			IllegalAccessException
+	{
+		return scheduleCreater.create();
+	}
 	@SuppressWarnings("unchecked")
 	protected void postNew(EntityItem<ReportEmailScheduleEntity> newEntity)
 	{
 		try
 		{
+			
+			EntityManagerProvider.persist(newEntity.getEntity().getSender());
+			EntityManagerProvider.getEntityManager().flush();
+
 			// set the sender
-			Long newId = createSender(newEntity.getEntity());
+			Long newId =newEntity.getEntity().getSender().getId();
 
 			JPAContainer<ReportEmailSender> ds = (JPAContainer<ReportEmailSender>) sender.getContainerDataSource();
 			ds.refresh();
@@ -204,28 +215,34 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 		}
 	}
 
-	private Long createSender(ReportEmailScheduleEntity reportEmailScheduleEntity) throws AddressException
-	{
-		JpaBaseDao<ReportEmailSender, Long> dao = JpaBaseDao.getGenericDao(ReportEmailSender.class);
-		AttributesHashMap<ReportEmailSender> attributes = new AttributesHashMap<>();
-		String emailAddress = reportEmailScheduleEntity.getSendersEmailAddress().toString();
-
-		String username = reportEmailScheduleEntity.getSendersUsername();
-		attributes.safePut(ReportEmailSender_.username, username);
-		attributes.safePut(ReportEmailSender_.emailAddress, emailAddress);
-
-		ReportEmailSender senderEntity = dao.findOneByAttributes(attributes);
-		if (senderEntity == null)
-		{
-			senderEntity = new ReportEmailSender();
-			senderEntity.setUserName(username);
-			senderEntity.setEmailAddress(emailAddress);
-			EntityManagerProvider.persist(senderEntity);
-			EntityManagerProvider.getEntityManager().flush();
-		}
-		return senderEntity.getId();
-
-	}
+//	private Long createSender(ReportEmailScheduleEntity reportEmailScheduleEntity) throws AddressException
+//	{
+//		ReportEmailSender senderEntity =null;
+//		if (reportEmailScheduleEntity.hasSenderEmailAddress())
+//		{
+//			JpaBaseDao<ReportEmailSender, Long> dao = JpaBaseDao.getGenericDao(ReportEmailSender.class);
+//			AttributesHashMap<ReportEmailSender> attributes = new AttributesHashMap<>();
+//			String emailAddress = reportEmailScheduleEntity.getSendersEmailAddress().toString();
+//
+//			String username = reportEmailScheduleEntity.getSendersUsername();
+//			attributes.safePut(ReportEmailSender_.username, username);
+//			attributes.safePut(ReportEmailSender_.emailAddress, emailAddress);
+//
+//			senderEntity = dao.findOneByAttributes(attributes);
+//	
+//		}
+//		if (senderEntity == null)
+//		{
+//			senderEntity = new ReportEmailSender();
+//			scheduleCreater.create()
+//			senderEntity.setUserName(username);
+//			senderEntity.setEmailAddress(emailAddress);
+//			EntityManagerProvider.persist(senderEntity);
+//			EntityManagerProvider.getEntityManager().flush();
+//		}
+//		return senderEntity.getId();
+//
+//	}
 
 	public JPAContainer<ReportEmailScheduleEntity> makeJPAContainer()
 	{
