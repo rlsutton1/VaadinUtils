@@ -680,6 +680,19 @@ public class JpaDslBuilder<E>
 
 	}
 
+	public <V,K> Condition<E> in(final JoinBuilder<E,V> join ,final SingularAttribute<V, K> attribute, final Collection<K> values)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+				return getJoin(join).get(attribute).in(values);
+			}
+		};
+	}
+
 	public <V> Condition<E> in(final SingularAttribute<E, V> attribute, final Collection<V> values)
 	{
 		return new AbstractCondition<E>()
