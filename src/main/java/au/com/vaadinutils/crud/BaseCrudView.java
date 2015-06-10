@@ -1384,7 +1384,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	{
 	}
 
-	private String searchFieldText;
+	private String searchFieldText = "";
 
 	protected String getSearchFieldText()
 	{
