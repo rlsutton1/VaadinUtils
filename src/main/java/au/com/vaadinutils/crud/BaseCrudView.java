@@ -220,6 +220,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 		rightLayout.addComponent(buttonLayout);
 		// resetFilters();
+		
+		
 
 	}
 
@@ -1396,6 +1398,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		searchField.setInputPrompt("Search");
 		searchField.setTextChangeEventMode(TextChangeEventMode.LAZY);
 		searchField.setImmediate(true);
+		searchField.focus();
 		searchField.addValueChangeListener(new ValueChangeListener()
 		{
 			private static final long serialVersionUID = 1L;

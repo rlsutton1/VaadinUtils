@@ -496,6 +496,21 @@ public class JpaDslBuilder<E>
 		};
 	}
 
+	public <J, L> Condition<E> notEqual(final JoinBuilder<E, J> join, final SingularAttribute<J, L> field, final L value)
+	{
+
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+				return builder.notEqual(getJoin(join).get(field), value);
+			}
+
+		};
+	}
+
 	public Condition<E> or(final Condition<E> c1, final Condition<E> c2)
 	{
 		return new AbstractCondition<E>()
@@ -680,7 +695,8 @@ public class JpaDslBuilder<E>
 
 	}
 
-	public <V,K> Condition<E> in(final JoinBuilder<E,V> join ,final SingularAttribute<V, K> attribute, final Collection<K> values)
+	public <V, K> Condition<E> in(final JoinBuilder<E, V> join, final SingularAttribute<V, K> attribute,
+			final Collection<K> values)
 	{
 		return new AbstractCondition<E>()
 		{
@@ -824,8 +840,7 @@ public class JpaDslBuilder<E>
 		return new AbstractCondition<E>()
 		{
 
-			@SuppressWarnings(
-			{ "unchecked", "rawtypes" })
+			@SuppressWarnings({ "unchecked", "rawtypes" })
 			@Override
 			public Predicate getPredicates()
 			{
@@ -919,6 +934,34 @@ public class JpaDslBuilder<E>
 
 	}
 
+	public <J> AbstractCondition<E> not(final Condition<E> condition)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+				return builder.not(condition.getPredicates());
+			}
+		};
+
+	}
+
+	public <J> AbstractCondition<E> notExists(final JpaDslSubqueryBuilder<E, J> subquery)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+				return builder.not(builder.exists(subquery.getSubQuery()));
+			}
+		};
+
+	}
+
 	public <J> JpaDslSubqueryBuilder<E, J> subQuery(Class<J> target)
 	{
 		return new JpaDslSubqueryBuilder<E, J>(entityManager, target, criteria, root);
@@ -962,6 +1005,19 @@ public class JpaDslBuilder<E>
 			public Predicate getPredicates()
 			{
 				return builder.like(concat, value);
+			}
+		};
+	}
+
+	public Condition<E> isNull(final Condition<E> condition)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+				return builder.isNull(condition.getPredicates());
 			}
 		};
 	}
