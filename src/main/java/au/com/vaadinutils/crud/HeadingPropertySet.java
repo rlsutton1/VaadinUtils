@@ -94,6 +94,14 @@ public class HeadingPropertySet<E>
 
 		}
 
+		public Builder<E> addGeneratedHiddenColumn(String heading, String headingPropertyId,
+				ColumnGenerator columnGenerator)
+		{
+			cols.add(new HeadingToPropertyId<E>(heading, headingPropertyId, columnGenerator).setHidden());
+			return this;
+
+		}
+
 		public Builder<E> addColumn(String heading, String headingPropertyId)
 		{
 			cols.add(new HeadingToPropertyId<E>(heading, headingPropertyId, null));
