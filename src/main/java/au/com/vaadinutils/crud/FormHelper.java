@@ -196,6 +196,14 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 		return field;
 	}
 
+	public TextArea bindTextAreaField(String fieldLabel, String fieldName, int rows, int maxlength)
+	{
+		TextArea field = bindTextAreaField(form, group, fieldLabel, fieldName, rows);
+		field.setMaxLength(maxlength);
+		this.fieldList.add(field);
+		return field;
+	}
+
 	public TextArea bindTextAreaField(AbstractLayout form, ValidatingFieldGroup<E> group, String fieldLabel,
 			String fieldName, int rows)
 	{
@@ -546,7 +554,7 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 		{
 			Preconditions.checkNotNull(label, "Label may not be null");
 			Preconditions.checkNotNull(listField, "ListField may not be null");
-			Preconditions.checkArgument(group == null || field!=null, "Field may not be null");
+			Preconditions.checkArgument(group == null || field != null, "Field may not be null");
 			if (builderForm == null)
 			{
 				builderForm = form;
@@ -563,8 +571,7 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 			if (container == null)
 			{
 				Preconditions.checkNotNull(listClazz, "listClazz may not be null");
-				container =JpaBaseDao.getGenericDao(listClazz).createVaadinContainer();
-				
+				container = JpaBaseDao.getGenericDao(listClazz).createVaadinContainer();
 
 			}
 
@@ -575,7 +582,9 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 
 			ContainerAdaptor<L> adaptor = ContainerAdaptorFactory.getAdaptor(container);
 			if (adaptor.getSortableContainerPropertyIds().contains(listField))
-				adaptor.sort(new String[] { listField }, new boolean[] { true });
+				adaptor.sort(new String[]
+				{ listField }, new boolean[]
+				{ true });
 
 			component.setItemCaptionPropertyId(listField);
 			component.setContainerDataSource(container);
@@ -688,7 +697,7 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 		@SuppressWarnings("unchecked")
 		public JPAContainer<L> getContainer()
 		{
-		   return (JPAContainer<L>) container;
+			return (JPAContainer<L>) container;
 		}
 
 	}
@@ -726,7 +735,8 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 		private AbstractLayout builderForm;
 		private boolean multiSelect = false;
 
-		@SuppressWarnings({ "unchecked", "rawtypes" })
+		@SuppressWarnings(
+		{ "unchecked", "rawtypes" })
 		public SplitListSelect build()
 		{
 			Preconditions.checkNotNull(label, "label may not be null");
@@ -750,14 +760,16 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 			if (container == null)
 			{
 				Preconditions.checkNotNull(listClazz, "listClazz may not be null");
-				container =JpaBaseDao.getGenericDao(listClazz).createVaadinContainer();
+				container = JpaBaseDao.getGenericDao(listClazz).createVaadinContainer();
 			}
 
 			Preconditions.checkState(container.getContainerPropertyIds().contains(listField), listField
 					+ " is not valid, valid listFields are " + container.getContainerPropertyIds().toString());
 
 			if (container.getSortableContainerPropertyIds().contains(listField))
-				container.sort(new String[] { listField }, new boolean[] { true });
+				container.sort(new String[]
+				{ listField }, new boolean[]
+				{ true });
 
 			component.setContainerDataSource(container);
 
@@ -902,12 +914,13 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 		private String leftColumnCaption = "Available";
 		private String rightColumnCaption = "Selected";
 
-		@SuppressWarnings({ "unchecked", "rawtypes" })
+		@SuppressWarnings(
+		{ "unchecked", "rawtypes" })
 		public SplitTwinColSelect build()
 		{
 			Preconditions.checkNotNull(label, "label may not be null");
 			Preconditions.checkNotNull(listField, "colField Property may not be null");
-			Preconditions.checkArgument(group ==null || field!=null, "Field may not be null");
+			Preconditions.checkArgument(group == null || field != null, "Field may not be null");
 			if (builderForm == null)
 			{
 				builderForm = form;
@@ -928,7 +941,7 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 			if (container == null)
 			{
 				Preconditions.checkNotNull(listClazz, "listClazz may not be null");
-				container =JpaBaseDao.getGenericDao(listClazz).createVaadinContainer();
+				container = JpaBaseDao.getGenericDao(listClazz).createVaadinContainer();
 			}
 
 			Preconditions.checkState(container.getContainerPropertyIds().contains(listField), listField
@@ -936,7 +949,9 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 
 			ContainerAdaptor<L> adaptor = ContainerAdaptorFactory.getAdaptor(container);
 			if (adaptor.getSortableContainerPropertyIds().contains(listField))
-				adaptor.sort(new String[] { listField }, new boolean[] { true });
+				adaptor.sort(new String[]
+				{ listField }, new boolean[]
+				{ true });
 
 			component.setContainerDataSource(container);
 			component.setConverter(new MultiSelectConverter(component, Set.class));
@@ -1226,23 +1241,26 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 		return new EntityFieldBuilder<J>();
 
 	}
-	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	static public <J extends CrudEntity> FormHelper<?>.ListSelectBuilder<J> getListSelectBuilder(AbstractLayout form,Class<J> j)
+
+	@SuppressWarnings(
+	{ "rawtypes", "unchecked" })
+	static public <J extends CrudEntity> FormHelper<?>.ListSelectBuilder<J> getListSelectBuilder(AbstractLayout form,
+			Class<J> j)
 	{
-	    FormHelper<?> helper = new FormHelper(form,null);
+		FormHelper<?> helper = new FormHelper(form, null);
 		return helper.new ListSelectBuilder<J>().setListClass(j);
 
 	}
-	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	static public <J extends CrudEntity> FormHelper<?>.EntityFieldBuilder<J> getEntityFieldBuilder(AbstractLayout form,Class<J> j)
+
+	@SuppressWarnings(
+	{ "rawtypes", "unchecked" })
+	static public <J extends CrudEntity> FormHelper<?>.EntityFieldBuilder<J> getEntityFieldBuilder(AbstractLayout form,
+			Class<J> j)
 	{
-	    FormHelper<?> helper = new FormHelper(form,null);
+		FormHelper<?> helper = new FormHelper(form, null);
 		return helper.new EntityFieldBuilder<J>().setListClass(j);
 
 	}
-
 
 	public <J extends CrudEntity> FormHelper<E>.TwinColSelectBuilder<J> getTwinColSelectBuilder(Class<J> j)
 	{
