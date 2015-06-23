@@ -13,6 +13,7 @@ import org.apache.logging.log4j.Logger;
 
 import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.dao.JpaBaseDao;
+import au.com.vaadinutils.errorHandling.ErrorWindow;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Stopwatch;
@@ -741,8 +742,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 		}
 		catch (Exception e)
 		{
-			handleConstraintViolationException(e);
-			logger.error(e, e);
+			ErrorWindow.showErrorWindow( e);
 		}
 
 	}
@@ -821,7 +821,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 		}
 		catch (Exception e)
 		{
-			handleConstraintViolationException(e);
+			ErrorWindow.showErrorWindow(e);
 
 		}
 	}

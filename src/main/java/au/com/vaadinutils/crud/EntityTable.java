@@ -7,6 +7,8 @@ import java.util.UUID;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import au.com.vaadinutils.errorHandling.ErrorWindow;
+
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.data.Property;
@@ -135,7 +137,7 @@ public class EntityTable<E> extends Table implements EntityList<E>
 		}
 		catch (Exception e)
 		{
-			BaseCrudView.handleConstraintViolationException(e);
+			ErrorWindow.showErrorWindow(e);
 		}
 	}
 

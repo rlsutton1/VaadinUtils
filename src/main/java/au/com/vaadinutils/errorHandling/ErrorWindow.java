@@ -40,6 +40,16 @@ public class ErrorWindow
 
 	static public void showErrorWindow(Throwable error)
 	{
+
+		try
+		{
+			ViolationConstraintHandler.handleConstraintViolationException(error);
+		}
+		catch (Throwable e)
+		{
+			error = e;
+		}
+
 		// Find the final cause
 		String fullTrace = "";
 

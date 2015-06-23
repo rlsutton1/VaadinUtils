@@ -6,6 +6,8 @@ import javax.persistence.EntityTransaction;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import au.com.vaadinutils.errorHandling.ErrorWindow;
+
 public class Transaction
 {
 	private EntityTransaction transaction;
@@ -41,12 +43,18 @@ public class Transaction
 
 	public void commit()
 	{
+		try{
 		if (!nested)
 		{
 			if (transaction.isActive())
 				transaction.commit();
 			else
 				throw new IllegalStateException("Commit has already been called on the transaction");
+		}
+		}catch (Exception e)
+		{
+			ErrorWindow.showErrorWindow(e);
+			throw e;
 		}
 
 	}
