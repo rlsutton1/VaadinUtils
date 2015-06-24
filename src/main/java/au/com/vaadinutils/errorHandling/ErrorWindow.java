@@ -163,7 +163,7 @@ public class ErrorWindow
 		layout.addComponent(notes);
 		layout.addComponent(printMessage);
 		layout.addComponent(close);
-		layout.addComponent(new Label("Information about this error will be sent to Noojee Telephony."));
+		layout.addComponent(new Label("Information about this error will be sent to " + ErrorSettingsFactory.getErrorSettings().getSupportCompanyName()));
 		window.setContent(layout);
 		// Display the error message in a custom fashion
 

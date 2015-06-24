@@ -4,6 +4,11 @@ package au.com.vaadinutils.errorHandling;
 public class DefaultErrorSettings implements ErrorSettings
 {
 	
+	@Override
+	public String getSupportCompanyName()
+	{
+		return "Support company name not set, call ErrorSettingsFactory.setErrorSettings and implement appropriate settings";
+	}
 	
 	@Override
 	public String getSystemName()
