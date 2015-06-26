@@ -310,15 +310,11 @@ public class HelpSplitPanel extends HorizontalSplitPanel implements View, HelpPa
 					@Override
 					public void buttonClick(ClickEvent event)
 					{
-						HelpSplitPanel.super.removeComponent(HelpSplitPanel.super.getSecondComponent());
-						HelpSplitPanel.super.setSecondComponent(helpPane);
-						showHelpOnPage = true;
-						setHelpPageId(currentHelpId);
-						adjustHelpSize(currentHelpId);
-						setLocked(false);
-						resizeHelp();
+						showHelpOnPage();
 
 					}
+
+					
 				});
 
 				HorizontalLayout helpFooter = new HorizontalLayout();
@@ -365,6 +361,18 @@ public class HelpSplitPanel extends HorizontalSplitPanel implements View, HelpPa
 
 		});
 
+	}
+	
+	@Override
+	public void showHelpOnPage()
+	{
+		HelpSplitPanel.super.removeComponent(HelpSplitPanel.super.getSecondComponent());
+		HelpSplitPanel.super.setSecondComponent(helpPane);
+		showHelpOnPage = true;
+		setHelpPageId(currentHelpId);
+		adjustHelpSize(currentHelpId);
+		setLocked(false);
+		resizeHelp();
 	}
 
 	@Override

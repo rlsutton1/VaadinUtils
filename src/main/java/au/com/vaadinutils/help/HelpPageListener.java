@@ -23,4 +23,6 @@ public interface HelpPageListener
 	 * @param helpSplitPanel
 	 */
 	public void setHelpPageListener(HelpPageListener helpSplitPanel);
+	
+	public void showHelpOnPage();
 }
