@@ -221,8 +221,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 		rightLayout.addComponent(buttonLayout);
 		// resetFilters();
-		
-		
 
 	}
 
@@ -246,9 +244,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 */
 	public void enableDragAndDropOrdering(final SingularAttribute<E, Long> ordinalField)
 	{
-		container.sort(new Object[]
-		{ ordinalField.getName() }, new boolean[]
-		{ true });
+		container.sort(new Object[] { ordinalField.getName() }, new boolean[] { true });
 
 		this.entityTable.setDragMode(TableDragMode.ROW);
 		this.entityTable.setDropHandler(new DropHandler()
@@ -279,30 +275,18 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				int idx = container.indexOfId(targetId);
 				if (dl == VerticalDropLocation.BOTTOM)
 				{
+					//drop below so move the idx down one
 					idx++;
 				}
-				else if (dl == VerticalDropLocation.TOP)
+
+				if (idx > -1)
 				{
-					// no need to change the idx here
-				}
-				targetId = container.getIdByIndex(idx);
-				if (targetId == null)
-				{
-					Notification.show("Cant drag below the last row, try moving the last row up.", Type.ERROR_MESSAGE);
-					return;
+					targetId = container.getIdByIndex(idx);
 				}
 
 				EntityItem<E> dragged = container.getItem(draggedItemId);
-				EntityItem<E> target = container.getItem(targetId);
 
-				if (target != null)
-				{
-					// EntityItemProperty targetOrdinalProp =
-					// target.getItemProperty(ordinalField.getName());
-					// Long targetOrdinal = (Long) targetOrdinalProp.getValue();
-				}
 				EntityItemProperty draggedOrdinalProp = dragged.getItemProperty(ordinalField.getName());
-				// Long draggedOrdinal = (Long) draggedOrdinalProp.getValue();
 
 				boolean added = false;
 				Long ctr = 1l;
@@ -328,9 +312,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 				container.commit();
 				container.refresh();
-				container.sort(new Object[]
-				{ ordinalField.getName() }, new boolean[]
-				{ true });
+				container.sort(new Object[] { ordinalField.getName() }, new boolean[] { true });
 
 				// cause this crud to save, or if its a child cause the parent
 				// to save.
@@ -1207,9 +1189,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		return true;
 	}
 
-
-
-	
 	/**
 	 * commits the container and retrieves the new recordid
 	 * 
@@ -1802,7 +1781,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 					}
 					if (parentField == null)
 					{
-						//couldn't find a tab in the hierarchy 
+						// couldn't find a tab in the hierarchy
 						break;
 					}
 					childField = parentField;

@@ -53,7 +53,7 @@ public class HelpSplitPanel extends HorizontalSplitPanel implements View, HelpPa
 	{
 		return component;
 	}
-	
+
 	public HelpSplitPanel(View component)
 	{
 		super();
@@ -156,7 +156,10 @@ public class HelpSplitPanel extends HorizontalSplitPanel implements View, HelpPa
 
 		helpPane.setVisible(true);
 		// helpHolder.setVisible(true);
-		hideButton.setCaption("Hide");
+		if (hideButton != null)
+		{
+			hideButton.setCaption("Hide");
+		}
 
 		setSplitPosition(pos, Unit.PERCENTAGE, false);
 	}
@@ -314,7 +317,6 @@ public class HelpSplitPanel extends HorizontalSplitPanel implements View, HelpPa
 
 					}
 
-					
 				});
 
 				HorizontalLayout helpFooter = new HorizontalLayout();
@@ -362,7 +364,7 @@ public class HelpSplitPanel extends HorizontalSplitPanel implements View, HelpPa
 		});
 
 	}
-	
+
 	@Override
 	public void showHelpOnPage()
 	{
