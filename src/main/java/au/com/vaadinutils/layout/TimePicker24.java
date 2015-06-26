@@ -40,7 +40,6 @@ public class TimePicker24 extends HorizontalLayout implements Field
 	boolean isSet = false;
 	// private Button zeroHourButton;
 	// private Button zeroMinuteButton;
-	private ChangedHandler changedHandler;
 	private String title;
 	private TextField field;
 	private Property<Date> datasource;
@@ -401,11 +400,11 @@ public class TimePicker24 extends HorizontalLayout implements Field
 		}
 	}
 
-	public void addChangedHandler(ChangedHandler pChangedHandler)
-	{
-		this.changedHandler = pChangedHandler;
-
-	}
+//	public void addChangedHandler(ChangedHandler pChangedHandler)
+//	{
+//		this.changedHandler = pChangedHandler;
+//
+//	}
 
 	public void clearValue()
 	{
@@ -467,12 +466,6 @@ public class TimePicker24 extends HorizontalLayout implements Field
 	private void setNewValue()
 	{
 		displayTime.setValue(getValueAsString());
-		field.setValue(getValueAsString());
-		if (changedHandler != null)
-		{
-			changedHandler.onChanged(getValueAsString());
-
-		}
 	}
 
 	@Override
