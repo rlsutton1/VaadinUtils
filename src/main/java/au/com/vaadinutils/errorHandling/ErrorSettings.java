@@ -15,4 +15,6 @@ public interface ErrorSettings
 
 	public void sendEmail(String emailAddress, String subject, String bodyText);
 
+	String getBuildVersion();
+
 }

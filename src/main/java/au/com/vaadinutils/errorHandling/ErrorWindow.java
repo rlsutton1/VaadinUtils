@@ -12,6 +12,8 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
@@ -88,7 +90,8 @@ public class ErrorWindow
 		final Throwable finalCause = cause;
 		final String reference = UUID.randomUUID().toString();
 
-		logger.error("Reference: " + reference + " " + error, error);
+		logger.error("Reference: " + reference + " Version: " + getBuildVersion() + " System: " + getSystemName() + " "
+				+ error, error);
 		logger.error("Reference: " + reference + " " + cause, cause);
 
 		if (UI.getCurrent() != null)
@@ -123,7 +126,7 @@ public class ErrorWindow
 
 		final TextArea notes = new TextArea();
 		notes.setWidth("100%");
-		final String supportEmail = ErrorSettingsFactory.getErrorSettings().getTargetEmailAddress();
+		final String supportEmail = getTargetEmailAddress();
 
 		Button close = new Button("OK");
 		close.addClickListener(new ClickListener()
@@ -134,23 +137,34 @@ public class ErrorWindow
 			@Override
 			public void buttonClick(ClickEvent event)
 			{
-				logger.error("Reference: " + reference + " " + notes.getValue());
+				try
+				{
+					logger.error("Reference: " + reference + " " + notes.getValue());
 
-				String subject = "";
-				String companyName = ErrorSettingsFactory.getErrorSettings().getSystemName();
-				subject += "Error: " + finalId + " " + companyName + " ref: " + reference;
+					String subject = "";
+					String companyName = getSystemName();
+					subject += "Error: " + finalId + " " + companyName + " ref: " + reference;
 
-				String viewClass = ErrorSettingsFactory.getErrorSettings().getViewName();
+					String viewClass = getViewName();
 
-				ErrorSettingsFactory.getErrorSettings().sendEmail(
-						supportEmail,
-						subject,
-						subject + "\n\nTime: " + time.toString() + "\n\nView: " + viewClass + "\n\nUser: "
-								+ ErrorSettingsFactory.getErrorSettings().getUserName() + "\n\nUser notes:"
-								+ notes.getValue() + "\n\n" + finalTrace);
-				window.close();
-
+					ErrorSettingsFactory.getErrorSettings().sendEmail(
+							supportEmail,
+							subject,
+							subject + "\n\nTime: " + time.toString() + "\n\nView: " + viewClass + "\n\nUser: "
+									+ getUserName() + "\n\n" + "Version: " + getBuildVersion() + "\n\n" + "User notes:"
+									+ notes.getValue() + "\n\n" + finalTrace);
+				}
+				catch (Exception e)
+				{
+					logger.error(e, e);
+					Notification.show("Error sending error report", Type.ERROR_MESSAGE);
+				}
+				finally
+				{
+					window.close();
+				}
 			}
+
 		});
 		close.setStyleName(ValoTheme.BUTTON_DANGER);
 
@@ -163,12 +177,90 @@ public class ErrorWindow
 		layout.addComponent(notes);
 		layout.addComponent(printMessage);
 		layout.addComponent(close);
-		layout.addComponent(new Label("Information about this error will be sent to " + ErrorSettingsFactory.getErrorSettings().getSupportCompanyName()));
+		layout.addComponent(new Label("Information about this error will be sent to " + getSupportCompanyName()));
 		window.setContent(layout);
 		// Display the error message in a custom fashion
 
 		// Do the default error handling (optional)
 		// doDefault(event);
+	}
+
+	private static String getViewName()
+	{
+		try
+		{
+			return ErrorSettingsFactory.getErrorSettings().getViewName();
+		}
+		catch (Exception e)
+		{
+			logger.error(e, e);
+		}
+		return "Error getting View name";
+	}
+
+	private static String getSupportCompanyName()
+	{
+		try
+		{
+			return ErrorSettingsFactory.getErrorSettings().getSupportCompanyName();
+		}
+		catch (Exception e)
+		{
+			logger.error(e, e);
+		}
+		return "Error getting Support Company Name";
+	}
+
+	private static String getTargetEmailAddress()
+	{
+		try
+		{
+			return ErrorSettingsFactory.getErrorSettings().getTargetEmailAddress();
+		}
+		catch (Exception e)
+		{
+			logger.error(e, e);
+		}
+		return "Error getting Target Email Address";
+	}
+
+	private static String getBuildVersion()
+	{
+		try
+		{
+			return ErrorSettingsFactory.getErrorSettings().getBuildVersion();
+		}
+		catch (Exception e)
+		{
+			logger.error(e, e);
+		}
+		return "Error getting build Version";
+	}
+
+	private static String getUserName()
+	{
+		try
+		{
+			return ErrorSettingsFactory.getErrorSettings().getUserName();
+		}
+		catch (Exception e)
+		{
+			logger.error(e, e);
+		}
+		return "Error getting user name";
+	}
+
+	private static String getSystemName()
+	{
+		try
+		{
+			return ErrorSettingsFactory.getErrorSettings().getSystemName();
+		}
+		catch (Exception e)
+		{
+			logger.error(e, e);
+		}
+		return "Error getting System name";
 	}
 
 }
