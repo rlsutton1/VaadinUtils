@@ -1,5 +1,7 @@
 package au.com.vaadinutils.errorHandling;
 
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
 import java.util.Date;
 import java.util.UUID;
 
@@ -16,12 +18,24 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.UI;
+import com.vaadin.ui.Upload;
+import com.vaadin.ui.Upload.FailedEvent;
+import com.vaadin.ui.Upload.FailedListener;
+import com.vaadin.ui.Upload.Receiver;
+import com.vaadin.ui.Upload.StartedEvent;
+import com.vaadin.ui.Upload.StartedListener;
+import com.vaadin.ui.Upload.SucceededEvent;
+import com.vaadin.ui.Upload.SucceededListener;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
 public class ErrorWindow
 {
+	private static final Long MAX_ATTACHMENT_SIZE = new Long(2000000); // 2MB
+	private Button close = new Button("OK");
+	private Label uploadStatus = new Label("&nbsp;", ContentMode.HTML);
+
 	static Logger logger = LogManager.getLogger();
 
 	public ErrorWindow()
@@ -34,13 +48,19 @@ public class ErrorWindow
 			@Override
 			public void error(com.vaadin.server.ErrorEvent event)
 			{
-				showErrorWindow(event.getThrowable());
+				internalShowErrorWindow(event.getThrowable());
 			}
 
 		});
 	}
 
-	static public void showErrorWindow(Throwable error)
+	public static void showErrorWindow(Throwable error)
+	{
+		new ErrorWindow().internalShowErrorWindow(error);
+		;
+	}
+
+	private void internalShowErrorWindow(Throwable error)
 	{
 
 		try
@@ -87,7 +107,7 @@ public class ErrorWindow
 
 		final String finalId = id;
 		final String finalTrace = fullTrace;
-		final Throwable finalCause = cause;
+		// final Throwable finalCause = cause;
 		final String reference = UUID.randomUUID().toString();
 
 		logger.error("Reference: " + reference + " Version: " + getBuildVersion() + " System: " + getSystemName() + " "
@@ -100,7 +120,7 @@ public class ErrorWindow
 		}
 	}
 
-	private static void displayVaadinErrorWindow(String causeClass, String id, final Date time, final String finalId,
+	private void displayVaadinErrorWindow(String causeClass, String id, final Date time, final String finalId,
 			final String finalTrace, final String reference)
 	{
 		final Window window = new Window();
@@ -128,7 +148,6 @@ public class ErrorWindow
 		notes.setWidth("100%");
 		final String supportEmail = getTargetEmailAddress();
 
-		Button close = new Button("OK");
 		close.addClickListener(new ClickListener()
 		{
 
@@ -152,7 +171,8 @@ public class ErrorWindow
 							subject,
 							subject + "\n\nTime: " + time.toString() + "\n\nView: " + viewClass + "\n\nUser: "
 									+ getUserName() + "\n\n" + "Version: " + getBuildVersion() + "\n\n" + "User notes:"
-									+ notes.getValue() + "\n\n" + finalTrace);
+									+ notes.getValue() + "\n\n" + finalTrace, ErrorWindow.this.stream,
+							ErrorWindow.this.filename, ErrorWindow.this.MIMEType);
 				}
 				catch (Exception e)
 				{
@@ -175,7 +195,8 @@ public class ErrorWindow
 		layout.addComponent(message);
 		layout.addComponent(describe);
 		layout.addComponent(notes);
-		layout.addComponent(printMessage);
+		layout.addComponent(createAttachmentComponent());
+		layout.addComponent(uploadStatus);
 		layout.addComponent(close);
 		layout.addComponent(new Label("Information about this error will be sent to " + getSupportCompanyName()));
 		window.setContent(layout);
@@ -183,6 +204,106 @@ public class ErrorWindow
 
 		// Do the default error handling (optional)
 		// doDefault(event);
+	}
+
+	private ByteArrayOutputStream stream = null;
+	private String filename;
+	private String MIMEType;
+	private boolean attachmentTooLarge;
+
+	@SuppressWarnings("serial")
+	private Upload createAttachmentComponent()
+	{
+		final Receiver receiver = new Receiver()
+		{
+
+			private static final long serialVersionUID = 3413693084667621411L;
+
+			@Override
+			public OutputStream receiveUpload(String filename, String MIMEType)
+			{
+				ErrorWindow.this.stream = new ByteArrayOutputStream();
+				ErrorWindow.this.filename = filename;
+				ErrorWindow.this.MIMEType = MIMEType;
+				return ErrorWindow.this.stream;
+			}
+		};
+
+		final Upload upload = new Upload(
+				"Taking a screenshot and attaching it will help with diagnosing the problem (Optional - Maximum 2MB)",
+				receiver);
+		upload.setButtonCaption("Upload Attachment");
+		upload.setImmediate(true);
+
+		final SucceededListener succeededListener = new SucceededListener()
+		{
+
+			@Override
+			public void uploadSucceeded(SucceededEvent event)
+			{
+				ErrorWindow.this.setUploadStatus("Uploaded attachment: " + event.getFilename(), false);
+				close.setEnabled(true);
+			}
+		};
+		upload.addSucceededListener(succeededListener);
+
+		final FailedListener failedListener = new FailedListener()
+		{
+
+			@Override
+			public void uploadFailed(FailedEvent event)
+			{
+				if (attachmentTooLarge)
+				{
+					attachmentTooLarge = false;
+					ErrorWindow.this.setUploadStatus("Attachment is too large. Maximum size is 2MB.", true);
+				}
+				else
+				{
+					ErrorWindow.this.setUploadStatus("Failed to upload attachment: " + event.getFilename(), true);
+					logger.error(event.getReason(), event.getReason());
+				}
+				close.setEnabled(true);
+			}
+		};
+		upload.addFailedListener(failedListener);
+
+		final StartedListener startedListener = new StartedListener()
+		{
+
+			@Override
+			public void uploadStarted(StartedEvent event)
+			{
+				close.setEnabled(false);
+				attachmentTooLarge = false;
+				if (event.getContentLength() > MAX_ATTACHMENT_SIZE)
+				{
+					attachmentTooLarge = true;
+					upload.interruptUpload();
+				}
+				else
+				{
+					ErrorWindow.this.setUploadStatus("Uploading...", false);
+				}
+			}
+		};
+		upload.addStartedListener(startedListener);
+
+		return upload;
+	}
+
+	private void setUploadStatus(String message, boolean error)
+	{
+		// Prevent component collapsing
+		if (message.isEmpty())
+		{
+			message = "&nbsp;";
+		}
+		if (error)
+		{
+			message = "<font color='red'>" + message + "</font>";
+		}
+		uploadStatus.setValue(message);
 	}
 
 	private static String getViewName()

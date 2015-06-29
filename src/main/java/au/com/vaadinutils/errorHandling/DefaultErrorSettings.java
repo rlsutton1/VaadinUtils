@@ -1,5 +1,7 @@
 package au.com.vaadinutils.errorHandling;
 
+import java.io.ByteArrayOutputStream;
+
 
 public class DefaultErrorSettings implements ErrorSettings
 {
@@ -35,7 +37,7 @@ public class DefaultErrorSettings implements ErrorSettings
 	}
 
 	@Override
-	public void sendEmail(String emailAddress, String subject, String bodyText)
+	public void sendEmail(String emailAddress, String subject, String bodyText, ByteArrayOutputStream attachment, String filename, String MIMEType)
 	{
 		// TODO Auto-generated method stub
 		

@@ -1,5 +1,7 @@
 package au.com.vaadinutils.errorHandling;
 
+import java.io.ByteArrayOutputStream;
+
 public interface ErrorSettings
 {
 
@@ -13,7 +15,7 @@ public interface ErrorSettings
 
 	String getTargetEmailAddress();
 
-	public void sendEmail(String emailAddress, String subject, String bodyText);
+	public void sendEmail(String emailAddress, String subject, String bodyText, ByteArrayOutputStream attachment, String filename, String MIMEType);
 
 	String getBuildVersion();
 
