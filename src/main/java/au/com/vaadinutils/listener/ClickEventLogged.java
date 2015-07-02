@@ -1,15 +1,9 @@
 package au.com.vaadinutils.listener;
 
-import javax.validation.ConstraintViolationException;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import au.com.vaadinutils.crud.FormHelper;
 import au.com.vaadinutils.errorHandling.ErrorWindow;
-
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.Notification.Type;
 
 public class ClickEventLogged
 {

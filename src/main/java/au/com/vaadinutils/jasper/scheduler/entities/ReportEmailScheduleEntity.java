@@ -25,14 +25,14 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 
-import com.google.common.base.Preconditions;
-
 import au.com.vaadinutils.crud.CrudEntity;
 import au.com.vaadinutils.jasper.JasperManager.OutputFormat;
 import au.com.vaadinutils.jasper.scheduler.ReportEmailParameter;
 import au.com.vaadinutils.jasper.scheduler.ReportEmailSchedule;
 import au.com.vaadinutils.jasper.scheduler.ScheduledDateParameter;
 import au.com.vaadinutils.jasper.ui.JasperReportProperties;
+
+import com.google.common.base.Preconditions;
 
 @Entity
 @Table(name = "tblreportemailschedule")
