@@ -611,7 +611,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	private void buildSearchBar()
 	{
 		AbstractLayout group = new HorizontalLayout();
-		if (UI.getCurrent().getTheme() == ValoTheme.class.getSimpleName())
+		if (UI.getCurrent().getTheme().equals(ValoTheme.class.getSimpleName()))
 		{
 			group = new CssLayout();
 			group.addStyleName("v-component-group");

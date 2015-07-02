@@ -57,7 +57,7 @@ public class ErrorWindow
 	public static void showErrorWindow(Throwable error)
 	{
 		new ErrorWindow().internalShowErrorWindow(error);
-		;
+		
 	}
 
 	private void internalShowErrorWindow(Throwable error)

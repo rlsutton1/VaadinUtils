@@ -604,7 +604,7 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 				else if (group.getItemDataSource() != null)
 					ids = group.getItemDataSource().getItemPropertyIds();
 
-				Preconditions.checkArgument(ids != null,
+				Preconditions.checkNotNull(ids ,
 						"The group must have either a Container or an ItemDataSource attached.");
 
 				Preconditions.checkState(ids.contains(field),
