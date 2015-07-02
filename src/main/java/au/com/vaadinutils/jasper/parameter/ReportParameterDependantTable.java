@@ -53,6 +53,7 @@ abstract public class ReportParameterDependantTable<P extends ReportParameterTab
 				@SuppressWarnings("unchecked")
 				Collection<Long> selectedIds = (Collection<Long>) event.getProperty().getValue();
 				removeAllContainerFilters();
+				boolean filtersAdded = false;
 				if (selectedIds.size() > 0)
 				{
 					Filter filter = null;
@@ -60,6 +61,7 @@ abstract public class ReportParameterDependantTable<P extends ReportParameterTab
 					{
 						for (Long id : mapParentIdToPrimaryKey(parentId))
 						{
+							filtersAdded = true;
 							if (filter == null)
 							{
 								filter = new Compare.Equal(getPrimaryKeyFieldName(), id);
@@ -70,7 +72,14 @@ abstract public class ReportParameterDependantTable<P extends ReportParameterTab
 							}
 						}
 					}
-					addContainerFilter(filter);
+					if (filter != null)
+					{
+						addContainerFilter(filter);
+					}
+				}
+				if (!filtersAdded)
+				{
+					addContainerFilter(new Compare.Equal(getPrimaryKeyFieldName(), -1));
 				}
 
 			}

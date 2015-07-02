@@ -254,7 +254,6 @@ public class TableCheckBoxSelect extends Table
 
 	}
 
-	private CheckBox lastChecked;
 
 	protected ColumnGenerator getGenerator()
 	{
@@ -270,6 +269,15 @@ public class TableCheckBoxSelect extends Table
 				final CheckBox checkbox = new CheckBox();
 				checkbox.setWidth("25");
 				checkbox.setHeight("20");
+				
+				// important that the following code is executed before the value change listener is added
+				boolean inList = markedIds.contains(itemId);
+				checkbox.setValue(inList);
+				if (!markedIds.isTrackingSelected())
+				{
+					checkbox.setValue(!inList);
+				}
+
 				checkbox.addValueChangeListener(new ValueChangeListener()
 				{
 
@@ -284,16 +292,12 @@ public class TableCheckBoxSelect extends Table
 							if ((Boolean) event.getProperty().getValue() == markedIds.isTrackingSelected())
 							{
 								markedIds.add(itemId);
-								if (lastChecked != null)
-								{
-									lastChecked.setValue(false);
-								}
-								lastChecked = checkbox;
+								
 							}
 							else
 							{
 								markedIds.remove(itemId);
-								lastChecked = null;
+								
 							}
 
 						}
@@ -313,12 +317,6 @@ public class TableCheckBoxSelect extends Table
 					}
 
 				});
-				boolean inList = markedIds.contains(itemId);
-				checkbox.setValue(inList);
-				if (!markedIds.isTrackingSelected())
-				{
-					checkbox.setValue(!inList);
-				}
 				checkbox.setImmediate(true);
 
 				return checkbox;

@@ -1022,4 +1022,19 @@ public class JpaDslBuilder<E>
 		};
 	}
 
+	public Condition<E> isEmptyString(final SingularAttribute<E, String> attribute)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+				return builder.or(builder.isNull(root.get(attribute)),
+						builder.equal(builder.length(root.get(attribute)), 0));
+
+			}
+		};
+	}
+
 }
