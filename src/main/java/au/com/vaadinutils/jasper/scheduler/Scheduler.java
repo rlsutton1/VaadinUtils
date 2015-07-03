@@ -166,6 +166,7 @@ public class Scheduler implements Runnable
 
 	public void stop()
 	{
+		schedulerpool.shutdown();
 		future.cancel(true);
 
 	}
