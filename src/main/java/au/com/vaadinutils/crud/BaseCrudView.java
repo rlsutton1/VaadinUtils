@@ -174,7 +174,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 		// calling resetFilters here so the filters are in place when the page
 		// first loads
-		resetFilters();
+		resetFiltersWithoutChangeEvents();
 
 		initLayout();
 
@@ -213,8 +213,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				!getSecurityManager().canUserCreate() || disallowNew, this);
 
 		rightLayout.addComponent(buttonLayout);
-		// resetFilters();
-
 	}
 
 	protected void initializeEntityTable()
@@ -237,7 +235,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 */
 	public void enableDragAndDropOrdering(final SingularAttribute<E, Long> ordinalField)
 	{
-		container.sort(new Object[] { ordinalField.getName() }, new boolean[] { true });
+		container.sort(new Object[]
+		{ ordinalField.getName() }, new boolean[]
+		{ true });
 
 		this.entityTable.setDragMode(TableDragMode.ROW);
 		this.entityTable.setDropHandler(new DropHandler()
@@ -268,7 +268,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				int idx = container.indexOfId(targetId);
 				if (dl == VerticalDropLocation.BOTTOM)
 				{
-					//drop below so move the idx down one
+					// drop below so move the idx down one
 					idx++;
 				}
 
@@ -305,7 +305,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 				container.commit();
 				container.refresh();
-				container.sort(new Object[] { ordinalField.getName() }, new boolean[] { true });
+				container.sort(new Object[]
+				{ ordinalField.getName() }, new boolean[]
+				{ true });
 
 				// cause this crud to save, or if its a child cause the parent
 				// to save.
@@ -1383,7 +1385,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		{
 			ErrorWindow.showErrorWindow(e);
 		}
-
 	}
 
 	/**
@@ -1674,8 +1675,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				try
 				{
 					E previousEntity = getCurrent();
-					// searchField.setValue("");
-					// resetFilters();
 
 					createNewEntity(previousEntity);
 
@@ -1842,6 +1841,13 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		entityTable.select(entityTable.firstItemId());
 	}
 
+	protected void resetFiltersWithoutChangeEvents()
+	{
+			container.setFireContainerItemSetChangeEvents(false);
+			resetFilters();
+			container.setFireContainerItemSetChangeEvents(true);
+	}
+
 	/**
 	 * for child cruds, they overload this to ensure that the minimum necessary
 	 * filters are always applied.
@@ -1851,7 +1857,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		try
 		{
 			container.removeAllContainerFilters();
-			// ((EntityTable<E>) this.entityTable).refreshRowCache();
 		}
 		catch (Exception e)
 		{

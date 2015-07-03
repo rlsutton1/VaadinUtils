@@ -96,6 +96,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 	protected void init(Class<E> entityClass, JPAContainer<E> container, HeadingPropertySet<E> headings)
 	{
 
+		setBogusParentFilter();
 		super.init(entityClass, container, headings);
 		// ensure auto commit is off, so that child updates don't go to the db
 		// until the parent saves
@@ -105,6 +106,25 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 		// child cruds dont have save/cancel buttons
 		rightLayout.removeComponent(buttonLayout);
 
+	}
+
+	/**
+	 * Load the page with a bogus parent filter to prevent possible large
+	 * queries from being executed before a parent row is selected
+	 */
+	private void setBogusParentFilter()
+	{
+		P tmp;
+		try
+		{
+			tmp = parentType.newInstance();
+			tmp.setId(-1L);
+			parentFilter = new Compare.Equal(childKey, tmp);
+		}
+		catch (InstantiationException | IllegalAccessException e)
+		{
+			logger.error(e, e);
+		}
 	}
 
 	/**
@@ -175,7 +195,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 		// on a new parent, the parent id changes and the container becomes
 		// empty. so reset the parent filter and refresh the container
 		createParentFilter(parentCrud.getContainer().getItem(newParentId.getId()));
-		resetFilters();
+		resetFiltersWithoutChangeEvents();
 
 		// container.discard();
 		container.refresh();
@@ -450,7 +470,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 			inNew = true;
 			E previousEntity = getCurrent();
 			saveEditsToTemp();
-			resetFilters();
+			resetFiltersWithoutChangeEvents();
 			triggerFilter();
 
 			createNewEntity(previousEntity);
@@ -693,9 +713,8 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 			dirty = false;
 
 			Stopwatch timer = Stopwatch.createUnstarted();
-			;
 			timer.start();
-			resetFilters();
+			resetFiltersWithoutChangeEvents();
 			triggerFilter();
 			if (!isInitialised)
 			{
@@ -742,7 +761,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 		}
 		catch (Exception e)
 		{
-			ErrorWindow.showErrorWindow( e);
+			ErrorWindow.showErrorWindow(e);
 		}
 
 	}
@@ -814,10 +833,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 		try
 		{
 			container.removeAllContainerFilters();
-			if (parentFilter != null)
-			{
-				container.addContainerFilter(parentFilter);
-			}
+			container.addContainerFilter(parentFilter);
 		}
 		catch (Exception e)
 		{
