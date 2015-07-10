@@ -794,7 +794,7 @@ public class JpaDslBuilder<E>
 	{
 		return equal(field, value);
 	}
-
+	
 	public <J> Condition<E> eq(ListAttribute<E, J> field, J value)
 	{
 		return equal(field, value);

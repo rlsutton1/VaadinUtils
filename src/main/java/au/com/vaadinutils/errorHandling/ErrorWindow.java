@@ -54,9 +54,14 @@ public class ErrorWindow
 		});
 	}
 
+	ErrorWindow(boolean noUI)
+	{
+		
+	}
+	
 	public static void showErrorWindow(Throwable error)
 	{
-		new ErrorWindow().internalShowErrorWindow(error);
+		new ErrorWindow(true).internalShowErrorWindow(error);
 		
 	}
 

@@ -759,7 +759,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 */
 	protected void disallowNew(boolean disallow)
 	{
-		Preconditions.checkArgument(buttonLayout == null, "You must call disallowEdit before init");
+		Preconditions.checkArgument(buttonLayout == null, "You must call disallowNew before init");
 
 		this.disallowNew = disallow;
 		showNew(!disallow);

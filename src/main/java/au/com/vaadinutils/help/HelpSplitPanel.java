@@ -1,9 +1,9 @@
 package au.com.vaadinutils.help;
 
-import org.apache.log4j.Logger;
 import org.vaadin.johan.Toolbox;
 import org.vaadin.johan.Toolbox.ORIENTATION;
 
+import au.com.vaadinutils.errorHandling.ErrorWindow;
 import au.com.vaadinutils.user.UserSettingsStorage;
 import au.com.vaadinutils.user.UserSettingsStorageFactory;
 
@@ -38,15 +38,12 @@ public class HelpSplitPanel extends HorizontalSplitPanel implements View, HelpPa
 	private VerticalLayout helpPane;
 	private VerticalLayout helpHolder = new VerticalLayout();
 
-	transient Logger logger = Logger.getLogger(HelpSplitPanel.class);
-
 	HelpIndex index = HelpIndexFactory.getHelpIndex();
 
 	View component;
 	private Enum<?> currentHelpId;
 	private Button hideButton;
 	UserSettingsStorage userSettings = UserSettingsStorageFactory.getUserSettingsStorage();
-	private float lastSplitPosition;
 
 	public View getActiveView()
 	{
@@ -111,8 +108,6 @@ public class HelpSplitPanel extends HorizontalSplitPanel implements View, HelpPa
 			}
 		});
 
-		lastSplitPosition = HelpSplitPanel.this.getSplitPosition();
-
 	}
 
 	public View getView()
@@ -149,7 +144,6 @@ public class HelpSplitPanel extends HorizontalSplitPanel implements View, HelpPa
 		}
 		catch (Exception e)
 		{
-			logger.info(e);
 			userSettings.store("HelpWidth-" + helpId, "" + pos);
 		}
 
@@ -168,7 +162,14 @@ public class HelpSplitPanel extends HorizontalSplitPanel implements View, HelpPa
 	{
 		// allow the View we are wrapping to process the enter event in the
 		// normal way
-		component.enter(event);
+		try
+		{
+			component.enter(event);
+		}
+		catch (Exception e)
+		{
+			ErrorWindow.showErrorWindow(e);
+		}
 	}
 
 	public void setHelpPageId(Enum<?> helpId)
