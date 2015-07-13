@@ -132,6 +132,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	private Set<RowChangedListener<E>> rowChangedListeners = new CopyOnWriteArraySet<RowChangedListener<E>>();
 	private int minSearchTextLength = 0;
 	private HeadingPropertySet<E> headings;
+	private boolean dragAndDropOrderingEnabled = false;
+	private SingularAttribute<E, Long> ordinalField;
 
 	protected BaseCrudView()
 	{
@@ -235,10 +237,14 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 */
 	public void enableDragAndDropOrdering(final SingularAttribute<E, Long> ordinalField)
 	{
+		dragAndDropOrderingEnabled =true;
+		this.ordinalField = ordinalField;
+
 		container.sort(new Object[]
 		{ ordinalField.getName() }, new boolean[]
 		{ true });
 
+		
 		this.entityTable.setDragMode(TableDragMode.ROW);
 		this.entityTable.setDropHandler(new DropHandler()
 		{
@@ -546,9 +552,13 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		{
 			if (action.isDefault())
 			{
-				Preconditions.checkState(defaultAction == null, "Only one action may be marked as default: "
-						+ (defaultAction != null ? defaultAction.toString() : "") + " was already the default when "
-						+ action.toString() + " was found to also be default.");
+				if (defaultAction !=null)
+				{
+					String message = "Only one action may be marked as default: "
+								+  defaultAction.toString()  + " was already the default when "
+								+ action.toString() + " was found to also be default.";
+					throw new IllegalStateException(message);
+				}
 				defaultAction = action;
 			}
 			actionCombo.addItem(action);
@@ -588,7 +598,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			public void exec(BaseCrudView<E> crud, EntityItem<E> entity)
 			{
 
-				new ContainerCSVExport(getTitleText(), (Table) entityTable, headings);
+				new ContainerCSVExport<E>(getTitleText(), (Table) entityTable, headings);
 
 			}
 
@@ -1804,9 +1814,16 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 * @param newEntity
 	 */
 
+	@SuppressWarnings("unchecked")
 	protected void postNew(EntityItem<E> newEntity)
 	{
+		if (dragAndDropOrderingEnabled)
+		{
+			newEntity.getItemProperty(ordinalField.getName()).setValue(container.size()+1);
 
+		}
+		
+		
 	}
 
 	/**
