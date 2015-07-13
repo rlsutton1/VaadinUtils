@@ -53,6 +53,7 @@ import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.AbstractSelect.ItemCaptionMode;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomField;
 import com.vaadin.ui.DateField;
 import com.vaadin.ui.Field;
@@ -189,6 +190,13 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 		return field;
 	}
 
+	public TextArea bindTextAreaField(String fieldLabel, SingularAttribute<E,String> attribute, int rows)
+	{
+		TextArea field = bindTextAreaField(form, group, fieldLabel, attribute.getName(), rows);
+		this.fieldList.add(field);
+		return field;
+	}
+	
 	public TextArea bindTextAreaField(String fieldLabel, String fieldName, int rows)
 	{
 		TextArea field = bindTextAreaField(form, group, fieldLabel, fieldName, rows);
@@ -1265,6 +1273,12 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 	public <J extends CrudEntity> FormHelper<E>.TwinColSelectBuilder<J> getTwinColSelectBuilder(Class<J> j)
 	{
 		return new TwinColSelectBuilder<J>();
+	}
+
+	public void addComponent(Component component)
+	{
+		form.addComponent(component);
+		
 	}
 
 }
