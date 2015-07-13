@@ -5,6 +5,8 @@ import javax.persistence.EntityManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import au.com.vaadinutils.errorHandling.ErrorWindow;
+
 /**
  * The class is a place holder to allow access to an 'non-injected' entity
  * manager.
@@ -113,6 +115,12 @@ public enum EntityManagerProvider
 
 				em.getTransaction().commit();
 				return ret;
+			}
+			catch (Exception e)
+			{
+				// ensure we get the cause of an underlying constraint violation
+				ErrorWindow.showErrorWindow(e);
+				throw e;
 			}
 			finally
 			{
