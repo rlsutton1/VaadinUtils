@@ -18,6 +18,20 @@ public class SplitTextField extends TextField implements SplitField
 
 	}
 
+	/**
+	 * trim all leading and trailing white space from text feilds
+	 */
+	@Override
+	public String getValue()
+	{
+		String tmp = super.getValue();
+		if (tmp != null)
+		{
+			tmp = tmp.trim();
+		}
+		return tmp;
+	}
+
 	@Override
 	public void setVisible(boolean visible)
 	{
@@ -41,7 +55,7 @@ public class SplitTextField extends TextField implements SplitField
 	public void hideLabel()
 	{
 		setCaption(null);
-		
+
 	}
 
 }

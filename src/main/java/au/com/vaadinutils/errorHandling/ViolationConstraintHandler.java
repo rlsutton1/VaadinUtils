@@ -22,7 +22,7 @@ public class ViolationConstraintHandler
 	 * 
 	 * @param e
 	 */
-	static void handleConstraintViolationException(Throwable e)
+	static void expandException(Throwable e)
 	{
 		if (e instanceof RuntimeException && e.getCause() instanceof Buffered.SourceException)
 		{

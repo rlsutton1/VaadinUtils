@@ -70,7 +70,7 @@ public class ErrorWindow
 
 		try
 		{
-			ViolationConstraintHandler.handleConstraintViolationException(error);
+			ViolationConstraintHandler.expandException(error);
 		}
 		catch (Throwable e)
 		{
