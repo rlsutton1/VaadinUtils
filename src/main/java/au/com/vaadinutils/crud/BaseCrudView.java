@@ -237,14 +237,11 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 */
 	public void enableDragAndDropOrdering(final SingularAttribute<E, Long> ordinalField)
 	{
-		dragAndDropOrderingEnabled =true;
+		dragAndDropOrderingEnabled = true;
 		this.ordinalField = ordinalField;
 
-		container.sort(new Object[]
-		{ ordinalField.getName() }, new boolean[]
-		{ true });
+		container.sort(new Object[] { ordinalField.getName() }, new boolean[] { true });
 
-		
 		this.entityTable.setDragMode(TableDragMode.ROW);
 		this.entityTable.setDropHandler(new DropHandler()
 		{
@@ -311,9 +308,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 				container.commit();
 				container.refresh();
-				container.sort(new Object[]
-				{ ordinalField.getName() }, new boolean[]
-				{ true });
+				container.sort(new Object[] { ordinalField.getName() }, new boolean[] { true });
 
 				// cause this crud to save, or if its a child cause the parent
 				// to save.
@@ -483,7 +478,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		{
 			return ((Menus) annotation).menus()[0].display();
 		}
-
+		Exception e = new Exception("Override getTitleText() to set a custom title in "
+				+ this.getClass().getCanonicalName());
+		logger.error(e, e);
 		return "Override getTitleText() to set a custom title. " + this.getClass().getCanonicalName();
 	}
 
@@ -552,11 +549,10 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		{
 			if (action.isDefault())
 			{
-				if (defaultAction !=null)
+				if (defaultAction != null)
 				{
-					String message = "Only one action may be marked as default: "
-								+  defaultAction.toString()  + " was already the default when "
-								+ action.toString() + " was found to also be default.";
+					String message = "Only one action may be marked as default: " + defaultAction.toString()
+							+ " was already the default when " + action.toString() + " was found to also be default.";
 					throw new IllegalStateException(message);
 				}
 				defaultAction = action;
@@ -1315,7 +1311,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 					// If advanced search is active then it should be
 					// responsible
 					// for triggering the filter.
-					if (!advancedSearchOn)
+					if (triggerSearchOnTextChange())
 					{
 						searchFieldText = event.getText();
 						if (searchFieldText.length() >= minSearchTextLength)
@@ -1333,6 +1329,17 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		});
 
 		searchField.focus();
+	}
+
+	/**
+	 * override this method if you have searches to trigger when the user types
+	 * in the search field even if advanced search is on
+	 * 
+	 * @return
+	 */
+	protected Boolean triggerSearchOnTextChange()
+	{
+		return !advancedSearchOn;
 	}
 
 	/**
@@ -1819,11 +1826,10 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	{
 		if (dragAndDropOrderingEnabled)
 		{
-			newEntity.getItemProperty(ordinalField.getName()).setValue(container.size()+1);
+			newEntity.getItemProperty(ordinalField.getName()).setValue(container.size() + 1);
 
 		}
-		
-		
+
 	}
 
 	/**
@@ -1860,9 +1866,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 	protected void resetFiltersWithoutChangeEvents()
 	{
-			container.setFireContainerItemSetChangeEvents(false);
-			resetFilters();
-			container.setFireContainerItemSetChangeEvents(true);
+		container.setFireContainerItemSetChangeEvents(false);
+		resetFilters();
+		container.setFireContainerItemSetChangeEvents(true);
 	}
 
 	/**
