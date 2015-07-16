@@ -1856,12 +1856,24 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 */
 	public void reloadDataFromDB()
 	{
+		Object id = null;
+		if (entityTable.getCurrent() != null)
+		{
+			id = entityTable.getCurrent().getItemId();
+		}
 		EntityManagerProvider.getEntityManager().getTransaction().commit();
 		EntityManagerProvider.getEntityManager().getTransaction().begin();
 		EntityManagerProvider.getEntityManager().flush();
 		container.refresh();
 		entityTable.select(null);
-		entityTable.select(entityTable.firstItemId());
+		if (id == null)
+		{
+			entityTable.select(entityTable.firstItemId());
+		}
+		else
+		{
+			entityTable.select(id);
+		}
 	}
 
 	protected void resetFiltersWithoutChangeEvents()

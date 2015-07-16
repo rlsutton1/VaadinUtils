@@ -17,6 +17,7 @@ import org.apache.logging.log4j.Logger;
 
 import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.dao.Transaction;
+import au.com.vaadinutils.errorHandling.ErrorWindow;
 
 public class EntityManagerInjectorFilter implements Filter
 {
@@ -47,27 +48,7 @@ public class EntityManagerInjectorFilter implements Filter
 		}
 		catch (ConstraintViolationException e)
 		{
-
-			if (e.getCause() instanceof ConstraintViolationException)
-			{
-				ConstraintViolationException e2 = (ConstraintViolationException) e.getCause();
-
-				if (e2 != null)
-				{
-					for (ConstraintViolation<?> violation : e.getConstraintViolations())
-					{
-						StringBuilder sb = new StringBuilder();
-						sb.append("Constraint Violation: \n");
-						sb.append("Entity:" + violation.getRootBean());
-						sb.append("Error: " + violation.getMessage() + "\n");
-						sb.append(" on property: " + violation.getPropertyPath() + "\n");
-						sb.append("Constraint:" + violation.getMessageTemplate());
-
-						logger.error(sb.toString());
-					}
-
-				}
-			}
+			ErrorWindow.showErrorWindow(e);
 			throw e;
 		}
 		finally
