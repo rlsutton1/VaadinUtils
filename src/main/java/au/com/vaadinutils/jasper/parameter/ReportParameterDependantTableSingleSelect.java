@@ -83,6 +83,7 @@ abstract public class ReportParameterDependantTableSingleSelect< P extends CrudE
 				{
 					addContainerFilter(new Compare.Equal(getPrimaryKeyFieldName(), -1));
 				}
+				table.deselectAll();
 
 			}
 		};

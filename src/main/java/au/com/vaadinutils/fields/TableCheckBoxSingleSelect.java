@@ -297,6 +297,20 @@ public class TableCheckBoxSingleSelect extends Table
 
 	}
 
+	public void deselectAll()
+	{
+		if (selectedCheckBox != null)
+		{
+			selectedCheckBox.setValue(false);
+		}
+
+		selectedCheckBox = null;
+		selectedId = null;
+
+		notifyValueChange();
+
+	}
+
 	// public void addSelectionListener(SelectionListener listener)
 	// {
 	// markedIds.addSelectionListener(listener);

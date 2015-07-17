@@ -83,7 +83,8 @@ abstract public class ReportParameterDependantTable<P extends CrudEntity, T exte
 				{
 					addContainerFilter(new Compare.Equal(getPrimaryKeyFieldName(), -1));
 				}
-
+				
+				table.deselectAll();
 			}
 		};
 		addContainerFilter(new Compare.Equal(getPrimaryKeyFieldName(), -1));
