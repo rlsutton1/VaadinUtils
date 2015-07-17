@@ -12,8 +12,7 @@ import org.apache.logging.log4j.Logger;
 
 import au.com.vaadinutils.crud.CrudEntity;
 import au.com.vaadinutils.dao.JpaBaseDao;
-import au.com.vaadinutils.fields.SelectionListener;
-import au.com.vaadinutils.fields.TableCheckBoxSelect;
+import au.com.vaadinutils.fields.TableCheckBoxSingleSelect;
 import au.com.vaadinutils.jasper.scheduler.entities.DateParameterType;
 
 import com.vaadin.addon.jpacontainer.JPAContainer;
@@ -21,7 +20,6 @@ import com.vaadin.addon.jpacontainer.QueryModifierDelegate;
 import com.vaadin.addon.jpacontainer.fieldfactory.MultiSelectConverter;
 import com.vaadin.data.Container;
 import com.vaadin.data.Container.Filter;
-import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.Validator;
 import com.vaadin.data.util.filter.SimpleStringFilter;
@@ -29,20 +27,15 @@ import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
 import com.vaadin.server.ErrorMessage;
 import com.vaadin.ui.AbstractField;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.Table.ColumnHeaderMode;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
-public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<String> implements
-		ReportParameterSelectionListener<T>
+public class ReportParameterTableSingleSelect<T extends CrudEntity> extends ReportParameter<String> implements ReportParameterSelectionListener<T>
 {
 
-	protected TableCheckBoxSelect table;
+	protected TableCheckBoxSingleSelect table;
 	private Long defaultValue = null;
 	JPAContainer<T> container = null;
 	private VerticalLayout layout;
@@ -50,7 +43,7 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 	Logger logger = LogManager.getLogger();
 	private SingularAttribute<T, String> displayField;
 
-	public ReportParameterTable(String caption, String parameterName, Class<T> tableClass,
+	public ReportParameterTableSingleSelect(String caption, String parameterName, Class<T> tableClass,
 			SingularAttribute<T, String> displayField)
 	{
 		super(caption, parameterName);
@@ -59,8 +52,8 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 
 	}
 
-	public ReportParameterTable(String caption, String parameterName, Class<T> tableClass,
-			SingularAttribute<T, String> displayField, Long defaultValue)
+	public ReportParameterTableSingleSelect(String caption, String parameterName, Class<T> tableClass,
+			SingularAttribute<T, String> displayField,  Long defaultValue)
 	{
 		super(caption, parameterName);
 		init(caption, tableClass, displayField);
@@ -100,7 +93,7 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 			}
 		});
 
-		table = new TableCheckBoxSelect();
+		table = new TableCheckBoxSingleSelect();
 
 		table.setSizeFull();
 		// table.setHeight("150");
@@ -115,56 +108,13 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 		table.setColumnExpandRatio(displayField.getName(), 1);
 		table.setNewItemsAllowed(false);
 		table.setNullSelectionAllowed(false);
-		table.setMultiSelect(true);
 
-		CheckBox selectAll = new CheckBox("Select all");
-
-		selectAll.addValueChangeListener(new ValueChangeListener()
-		{
-
-			private static final long serialVersionUID = 3046649134868865285L;
-
-			@Override
-			public void valueChange(ValueChangeEvent event)
-			{
-				if ((Boolean) event.getProperty().getValue() == true)
-				{
-					table.selectAll();
-				}
-				else
-				{
-					table.deselectAll();
-				}
-
-			}
-		});
-
-		final Label selectionCount = new Label("0 selected");
-
+		
 		// removed for concertina
 		// layout.addComponent(new Label(caption));
 		layout.addComponent(searchText);
 		layout.addComponent(table);
-
-		HorizontalLayout selectionLayout = new HorizontalLayout();
-		selectionLayout.setHeight("30");
-		selectionLayout.setWidth("100%");
-		selectionLayout.addComponent(selectAll);
-		selectionLayout.addComponent(selectionCount);
-		selectionLayout.setComponentAlignment(selectAll, Alignment.MIDDLE_LEFT);
-		selectionLayout.setComponentAlignment(selectionCount, Alignment.MIDDLE_RIGHT);
-		layout.addComponent(selectionLayout);
-		table.addSelectionListener(new SelectionListener()
-		{
-
-			@Override
-			public void selectedItems(int count)
-			{
-				selectionCount.setValue("" + count + " selected");
-
-			}
-		});
-
+		
 		layout.setExpandRatio(table, 1);
 		// layout.setComponentAlignment(selectAll, Alignment.BOTTOM_RIGHT);
 
@@ -184,7 +134,7 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 	 */
 	protected JPAContainer<T> createContainer(Class<T> tableClass, final SingularAttribute<T, String> displayField)
 	{
-		JPAContainer<T> cont = container = JpaBaseDao.getGenericDao(tableClass).createVaadinContainer();
+		JPAContainer<T> cont = container =JpaBaseDao.getGenericDao(tableClass).createVaadinContainer();
 		cont.sort(new Object[] { displayField.getName() }, new boolean[] { true });
 
 		cont.setQueryModifierDelegate(getQueryModifierDelegate());
@@ -281,7 +231,7 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 				setValidateListenerComponentError(null);
 				table.setComponentError(null);
 				Collection<Long> ids = (Collection<Long>) table.getSelectedItems();
-				if (ids.size() == 0)
+				if (ids.size()==0)
 				{
 					ErrorMessage error = new ErrorMessage()
 					{
@@ -380,7 +330,7 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 		{
 			for (String param : parameters)
 			{
-				logger.error("Exception while getting value(s) for {}, thread{}", param, Thread.currentThread().getId());
+				logger.error("Exception while getting value(s) for {}, thread{}" , param,Thread.currentThread().getId());
 			}
 			throw new RuntimeException(e);
 		}

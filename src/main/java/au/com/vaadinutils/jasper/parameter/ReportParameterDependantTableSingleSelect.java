@@ -13,8 +13,8 @@ import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.filter.Compare;
 import com.vaadin.data.util.filter.Or;
 
-abstract public class ReportParameterDependantTable<P extends CrudEntity, T extends CrudEntity> extends
-		ReportParameterTable<T>
+abstract public class ReportParameterDependantTableSingleSelect< P extends CrudEntity, T extends CrudEntity> extends
+		ReportParameterTableSingleSelect<T>
 {
 	/**
 	 * extend this type when you need to do dependant selects between
@@ -26,7 +26,7 @@ abstract public class ReportParameterDependantTable<P extends CrudEntity, T exte
 	 * @param displayField
 	 * @param multiSelect
 	 */
-	public ReportParameterDependantTable(String caption, String parameterName, Class<T> tableClass,
+	public ReportParameterDependantTableSingleSelect(String caption, String parameterName, Class<T> tableClass,
 			SingularAttribute<T, String> displayField)
 	{
 		super(caption, parameterName, tableClass, displayField,  null);
@@ -87,7 +87,7 @@ abstract public class ReportParameterDependantTable<P extends CrudEntity, T exte
 			}
 		};
 		addContainerFilter(new Compare.Equal(getPrimaryKeyFieldName(), -1));
-		
+
 		parent.addSelectionListener(listener);
 
 	}

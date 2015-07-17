@@ -1,13 +1,8 @@
 package au.com.vaadinutils.fields;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.TreeSet;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import com.vaadin.data.Property;
 import com.vaadin.data.Validator.InvalidValueException;
@@ -15,21 +10,18 @@ import com.vaadin.server.ErrorMessage;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Table;
 
-public class TableCheckBoxSelect extends Table
+public class TableCheckBoxSingleSelect extends Table
 {
 
 	public static final String TABLE_CHECK_BOX_SELECT = "TableCheckBoxSelect";
 	private static final long serialVersionUID = -7559267854874304189L;
-	protected MarkedIds markedIds = new MarkedIds();
-	private boolean selectable = true;
 	private Set<ValueChangeListener> valueChangeListeners = new HashSet<ValueChangeListener>();
 	protected int containerSize = 0;
+	private Object selectedId;
 
-	Logger logger = LogManager.getLogger();
-
-	public TableCheckBoxSelect()
+	public TableCheckBoxSingleSelect()
 	{
-		initCheckboxMultiSelect();
+		init();
 		setImmediate(true);
 
 	}
@@ -37,43 +29,12 @@ public class TableCheckBoxSelect extends Table
 	/**
 	 * call this method after adding your custom fields
 	 */
-	public void initCheckboxMultiSelect()
+	public void init()
 	{
 
 		this.addGeneratedColumn(TABLE_CHECK_BOX_SELECT, getGenerator());
 		super.setMultiSelect(false);
 		super.setSelectable(false);
-
-	}
-
-	public void setMultiSelect(boolean multi)
-	{
-		if (!multi)
-		{
-			throw new RuntimeException(
-					"This class is broken in single select mode, actually the single select code has been removed.\n\n Use TableCheckBoxSingleSelect instead!!!!\n\n");
-		}
-
-	}
-
-	public void selectAll()
-	{
-		containerSize = getItemIds().size();
-		markedIds.clear(false, containerSize);
-
-		refreshRenderedCells();
-		refreshRowCache();
-		notifyValueChange();
-
-	}
-
-	public void deselectAll()
-	{
-		markedIds.clear(true, containerSize);
-
-		refreshRenderedCells();
-		refreshRowCache();
-		notifyValueChange();
 
 	}
 
@@ -99,6 +60,7 @@ public class TableCheckBoxSelect extends Table
 					@Override
 					public Object getValue()
 					{
+
 						return getSelectedItems();
 					}
 
@@ -138,10 +100,9 @@ public class TableCheckBoxSelect extends Table
 		{
 			cols.add(col);
 		}
-		if (selectable)
-		{
-			cols.add("");
-		}
+
+		cols.add("");
+
 		super.setColumnHeaders(cols.toArray(new String[] {}));
 
 	}
@@ -156,10 +117,9 @@ public class TableCheckBoxSelect extends Table
 			{
 				cols.add(col);
 			}
-			if (selectable)
-			{
-				cols.add(TABLE_CHECK_BOX_SELECT);
-			}
+
+			cols.add(TABLE_CHECK_BOX_SELECT);
+
 			super.setVisibleColumns(cols.toArray());
 		}
 		else
@@ -181,12 +141,9 @@ public class TableCheckBoxSelect extends Table
 		super.setValue(value);
 	}
 
-	@SuppressWarnings("unchecked")
 	public void setSelectedValue(Object value)
 	{
-		// super.setValue(newValue);
-		markedIds.clear(true, containerSize);
-		markedIds.addAll((Collection<Long>) value);
+		selectedId = value;
 
 		this.refreshRowCache();
 
@@ -195,49 +152,29 @@ public class TableCheckBoxSelect extends Table
 	@Override
 	public boolean isMultiSelect()
 	{
-		return true;
+		return false;
 	}
 
-	/**
-	 * use disableSelectable instead
-	 */
-	@Deprecated
 	@Override
 	public void setSelectable(boolean s)
 	{
-		throw new RuntimeException("Use disableSelectable instead");
-	}
-
-	public void disableSelectable()
-	{
-		selectable = false;
-		super.setSelectable(true);
-		removeGeneratedColumn(TABLE_CHECK_BOX_SELECT);
-
+		throw new RuntimeException("Dont call this!");
 	}
 
 	@Override
 	public boolean isSelectable()
 	{
-		return true;
+		return false;
 	}
 
 	public Object getSelectedItems()
 	{
-		if (selectable == false)
+		Set<Object> tmp = new HashSet<>();
+		if (selectedId != null)
 		{
-			return super.getValue();
+			tmp.add(selectedId);
 		}
-
-		if (markedIds.isTrackingSelected())
-		{
-			return markedIds.getIds();
-		}
-
-		TreeSet<Object> result = new TreeSet<Object>();
-		result.addAll(getContainerDataSource().getItemIds());
-		result.removeAll(markedIds.getIds());
-		return result;
+		return tmp;
 	}
 
 	@Override
@@ -256,11 +193,11 @@ public class TableCheckBoxSelect extends Table
 	public Object getValue()
 	{
 
-		TreeSet<Object> result = new TreeSet<Object>();
-
-		return result;
+		return null;
 
 	}
+
+	private CheckBox selectedCheckBox;
 
 	protected ColumnGenerator getGenerator()
 	{
@@ -277,13 +214,10 @@ public class TableCheckBoxSelect extends Table
 				checkbox.setWidth("25");
 				checkbox.setHeight("20");
 
-				// important that the following code is executed before the
-				// value change listener is added
-				boolean inList = markedIds.contains(itemId);
-				checkbox.setValue(inList);
-				if (!markedIds.isTrackingSelected())
+				checkbox.setValue(itemId == selectedId);
+				if (itemId == selectedId)
 				{
-					checkbox.setValue(!inList);
+					selectedCheckBox = checkbox;
 				}
 
 				checkbox.addValueChangeListener(new ValueChangeListener()
@@ -294,18 +228,21 @@ public class TableCheckBoxSelect extends Table
 					@Override
 					public void valueChange(Property.ValueChangeEvent event)
 					{
-
-						if ((Boolean) event.getProperty().getValue() == markedIds.isTrackingSelected())
+						if (selectedCheckBox != null)
 						{
-							markedIds.add(itemId);
+							selectedCheckBox.setValue(false);
+						}
+						if ((Boolean) event.getProperty().getValue() == true)
+						{
+							selectedId = itemId;
+							selectedCheckBox = checkbox;
 						}
 						else
 						{
-							markedIds.remove(itemId);
+							selectedCheckBox = null;
+							selectedId = null;
 						}
-
 						notifyValueChange();
-
 					}
 
 				});
@@ -360,9 +297,9 @@ public class TableCheckBoxSelect extends Table
 
 	}
 
-	public void addSelectionListener(SelectionListener listener)
-	{
-		markedIds.addSelectionListener(listener);
-
-	}
+	// public void addSelectionListener(SelectionListener listener)
+	// {
+	// markedIds.addSelectionListener(listener);
+	//
+	// }
 }
