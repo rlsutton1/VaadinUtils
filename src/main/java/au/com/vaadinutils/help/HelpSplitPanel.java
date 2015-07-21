@@ -18,6 +18,7 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
+import com.vaadin.ui.HasComponents.ComponentDetachEvent;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.HorizontalSplitPanel;
@@ -107,6 +108,7 @@ public class HelpSplitPanel extends HorizontalSplitPanel implements View, HelpPa
 
 			}
 		});
+		
 
 	}
 
@@ -383,5 +385,6 @@ public class HelpSplitPanel extends HorizontalSplitPanel implements View, HelpPa
 		throw new RuntimeException("This is the top level HelpPageListener, you cant set the HelpPageListener");
 
 	}
+
 
 }
