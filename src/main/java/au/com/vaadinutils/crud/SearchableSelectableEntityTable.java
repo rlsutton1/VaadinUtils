@@ -15,8 +15,6 @@ import au.com.vaadinutils.menu.Menus;
 import com.vaadin.data.Container;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Container.Filterable;
-import com.vaadin.data.Property.ValueChangeEvent;
-import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.converter.Converter;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
@@ -27,7 +25,7 @@ import com.vaadin.ui.AbstractTextField.TextChangeEventMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.CheckBox;
+import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table.ColumnGenerator;
@@ -35,6 +33,7 @@ import com.vaadin.ui.Table.TableDragMode;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Reindeer;
+import com.vaadin.ui.themes.ValoTheme;
 
 public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 {
@@ -46,14 +45,15 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 	protected TextField searchField = new TextField();
 	private AbstractLayout advancedSearchLayout;
 	private VerticalLayout searchBar;
-	private CheckBox advancedSearchCheckbox;
+	private Button advancedSearchCheckbox;
+	public boolean advancedSearchOn = false;
 	protected SelectableEntityTable<E> selectableTable;
 	protected Container.Filterable container;
 
 	public SearchableSelectableEntityTable(String uniqueId)
 	{
 		container = getContainer();
-		selectableTable = new SelectableEntityTable<E>(container, getHeadingPropertySet(),uniqueId);
+		selectableTable = new SelectableEntityTable<E>(container, getHeadingPropertySet(), uniqueId);
 		selectableTable.setSizeFull();
 
 		if (!getSecurityManager().canUserView())
@@ -64,7 +64,7 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 		}
 
 		AbstractLayout searchBar = buildSearchBar();
-		
+
 		Label title = new Label(getTitle());
 		title.setStyleName(Reindeer.LABEL_H1);
 		this.addComponent(title);
@@ -86,7 +86,7 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 		{
 			return ((Menu) annotation).display();
 		}
-		 annotation = this.getClass().getAnnotation(Menus.class);
+		annotation = this.getClass().getAnnotation(Menus.class);
 		if (annotation instanceof Menus)
 		{
 			return ((Menus) annotation).menus()[0].display();
@@ -94,7 +94,7 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 
 		return "Override getTitle() to set a custom title.";
 	}
-	
+
 	private CrudSecurityManager getSecurityManager()
 	{
 		return SecurityManagerFactoryProxy.getSecurityManager(this.getClass());
@@ -146,7 +146,6 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 		basicSearchLayout.setExpandRatio(searchField, 1.0f);
 		basicSearchLayout.setSpacing(true);
 
-
 		searchField.focus();
 
 		return searchBar;
@@ -190,24 +189,32 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 		advancedSearchLayout = getAdvancedSearchLayout();
 		if (advancedSearchLayout != null)
 		{
-			advancedSearchCheckbox = new CheckBox("Advanced");
+			advancedSearchCheckbox = new Button("Advanced");
+			advancedSearchOn = false;
 
 			advancedSearchCheckbox.setImmediate(true);
-			advancedSearchCheckbox.addValueChangeListener(new ValueChangeListener()
+			advancedSearchCheckbox.addClickListener(new ClickListener()
 			{
 
-				/**
-				 * 
-				 */
-				private static final long serialVersionUID = -4396098902592906470L;
+				private static final long serialVersionUID = 7777043506655571664L;
 
 				@Override
-				public void valueChange(ValueChangeEvent arg0)
+				public void buttonClick(ClickEvent event)
 				{
-					advancedSearchLayout.setVisible(advancedSearchCheckbox.getValue());
-					if (!advancedSearchCheckbox.getValue())
+					clearAdvancedFilters();
+					advancedSearchOn = !advancedSearchOn;
+					advancedSearchLayout.setVisible(advancedSearchOn);
+					if (!advancedSearchOn)
 					{
 						triggerFilter();
+					}
+					if (!advancedSearchOn)
+					{
+						advancedSearchCheckbox.removeStyleName(ValoTheme.BUTTON_FRIENDLY);
+					}
+					else
+					{
+						advancedSearchCheckbox.setStyleName(ValoTheme.BUTTON_FRIENDLY);
 					}
 
 				}
@@ -234,7 +241,9 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 
 	protected void triggerFilter(String searchText)
 	{
-		boolean advancedSearchActive = advancedSearchCheckbox != null && advancedSearchCheckbox.getValue();
+		// boolean advancedSearchActive = advancedSearchCheckbox != null &&
+		// advancedSearchCheckbox.getValue();
+		boolean advancedSearchActive = advancedSearchOn;
 		Filter filter = getContainerFilter(searchText, advancedSearchActive);
 		if (filter == null)
 			resetFilters();
@@ -297,61 +306,59 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 	public void removeAllContainerFilters()
 	{
 		container.removeAllContainerFilters();
-		
+
 	}
 
 	public void addContainerFilter(Filter filter)
 	{
 		container.addContainerFilter(filter);
-		
+
 	}
 
-	public void setConverter(String propertyId,
-			Converter<String, ?> converter)
+	public void setConverter(String propertyId, Converter<String, ?> converter)
 	{
-		selectableTable.setConverter(propertyId,converter);
-		
+		selectableTable.setConverter(propertyId, converter);
+
 	}
 
 	public void setSelected(Collection<Long> ids)
 	{
-	    selectableTable.setSelectedValue(ids);
-	    
+		selectableTable.setSelectedValue(ids);
+
 	}
 
 	public void setMultiSelect(boolean b)
 	{
 		selectableTable.setMultiSelect(true);
 
-	    
 	}
 
 	public void setDragMode(TableDragMode mode)
 	{
-	    selectableTable.setDragMode(mode);
+		selectableTable.setDragMode(mode);
 	}
 
 	public void setDropHandler(DropHandler dropHandler)
 	{
-	    selectableTable.setDropHandler(dropHandler);
-	    
+		selectableTable.setDropHandler(dropHandler);
+
 	}
 
 	public void deselectAll()
 	{
-	   selectableTable.deselectAll();
-	    
+		selectableTable.deselectAll();
+
 	}
 
 	public Object getSelectedItems()
 	{
-	   return  selectableTable.getSelectedItems();
+		return selectableTable.getSelectedItems();
 	}
 
 	public void setSearchFilterText(String text)
 	{
-	    searchField.setValue(text);
-	    triggerFilter(text);
+		searchField.setValue(text);
+		triggerFilter(text);
 	}
 
 }
