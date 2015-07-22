@@ -13,6 +13,7 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
@@ -605,7 +606,43 @@ public class JpaDslBuilder<E>
 		{
 			query.setFirstResult(startPosition);
 		}
-		return query.executeUpdate();
+		int result = query.executeUpdate();
+		entityManager.getEntityManagerFactory().getCache().evict(entityClass);
+		return result;
+
+	}
+
+	/**
+	 * WARNING, order will not be honoured by this method
+	 * 
+	 * @param attribute
+	 * @param value
+	 * 
+	 * @return
+	 */
+	public <F> int update(SingularAttribute<E, F> attribute,  F value)
+	{
+		Preconditions.checkArgument(orders.size() == 0, "Order is not supported for delete");
+		CriteriaUpdate<E> updateCriteria = builder.createCriteriaUpdate(entityClass);
+		root = updateCriteria.getRoot();
+		if (predicate != null)
+		{
+			updateCriteria.where(predicate);
+			updateCriteria.set(attribute, value);
+		}
+		Query query = entityManager.createQuery(updateCriteria);
+
+		if (limit != null)
+		{
+			query.setMaxResults(limit);
+		}
+		if (startPosition != null)
+		{
+			query.setFirstResult(startPosition);
+		}
+		int result = query.executeUpdate();
+		entityManager.getEntityManagerFactory().getCache().evict(entityClass);
+		return result;
 
 	}
 
@@ -794,7 +831,7 @@ public class JpaDslBuilder<E>
 	{
 		return equal(field, value);
 	}
-	
+
 	public <J> Condition<E> eq(ListAttribute<E, J> field, J value)
 	{
 		return equal(field, value);
