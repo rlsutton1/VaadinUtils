@@ -104,7 +104,10 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 		// container.setBuffered(true);
 
 		// child cruds dont have save/cancel buttons
-		rightLayout.removeComponent(buttonLayout);
+		if (buttonLayout != null)
+		{
+			rightLayout.removeComponent(buttonLayout);
+		}
 
 	}
 
