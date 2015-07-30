@@ -545,4 +545,8 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 		removeAllButton.setVisible(show);
 	}
 
+	public Collection<C> getSourceValue()
+	{
+		return sourceValue;
+	}
 }
