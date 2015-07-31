@@ -738,6 +738,10 @@ class JasperReportLayout extends VerticalLayout
 			public void poll(PollEvent event)
 			{
 
+				if (manager == null)
+				{
+					return;
+				}
 				ReportStatus status = manager.getStatus();
 				dialog.progress(0, 0, status.getStatus());
 				if (refreshDivider % 4 == 0)

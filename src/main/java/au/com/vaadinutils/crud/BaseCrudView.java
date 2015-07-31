@@ -1006,13 +1006,25 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		{
 			entityTable.select(entityTable.firstItemId());
 		}
-		container.commit();
 
-		EntityManagerProvider.getEntityManager().flush();
+		try
+		{
+			container.commit();
 
-		postDelete(deltedEntity);
+			EntityManagerProvider.getEntityManager().flush();
 
-		CrudEventDistributer.publishEvent(this, CrudEventType.DELETE, deltedEntity);
+			postDelete(deltedEntity);
+
+			CrudEventDistributer.publishEvent(this, CrudEventType.DELETE, deltedEntity);
+		}
+		catch (Exception e)
+		{
+			logger.error("Exception trying to delete {} from {}", entityId, entityClass.getCanonicalName());
+			logger.error(e, e);
+			reloadDataFromDB();
+			Notification.show("An error occurred deleting the record, you may have to delete it's children first",
+					Type.ERROR_MESSAGE);
+		}
 
 	}
 
