@@ -136,6 +136,21 @@ public class JpaDslBuilder<E>
 		};
 	}
 
+	public <L> Condition<E> equal(final SetAttribute<E, L> field, final L value)
+	{
+
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+				return builder.equal(root.get(field), value);
+			}
+
+		};
+	}
+
 	public <J, V> Condition<E> equal(final SingularAttribute<? super E, J> joinAttribute, final JoinType joinType,
 			final SingularAttribute<J, V> field, final V value)
 	{
@@ -153,6 +168,23 @@ public class JpaDslBuilder<E>
 	}
 
 	public <J, V> Condition<E> equal(final ListAttribute<? super E, J> joinAttribute, final JoinType joinType,
+			final SingularAttribute<J, V> field, final V value)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+				Join<E, J> join = getJoin(joinAttribute, joinType);
+				return builder.equal(join.get(field), value);
+			}
+
+		};
+
+	}
+
+	public <J, V> Condition<E> equal(final SetAttribute<? super E, J> joinAttribute, final JoinType joinType,
 			final SingularAttribute<J, V> field, final V value)
 	{
 		return new AbstractCondition<E>()
@@ -837,6 +869,11 @@ public class JpaDslBuilder<E>
 		return equal(field, value);
 	}
 
+	public <J> Condition<E> eq(SetAttribute<E, J> field, J value)
+	{
+		return equal(field, value);
+	}
+
 	public <J, V> Condition<E> eq(final SingularAttribute<? super E, J> joinAttribute, final JoinType joinType,
 			final SingularAttribute<J, V> field, final V value)
 	{
@@ -844,6 +881,12 @@ public class JpaDslBuilder<E>
 	}
 
 	public <J, V> Condition<E> eq(final ListAttribute<? super E, J> joinAttribute, final JoinType joinType,
+			final SingularAttribute<J, V> field, final V value)
+	{
+		return equal(joinAttribute, joinType, field, value);
+	}
+
+	public <J, V> Condition<E> eq(final SetAttribute<? super E, J> joinAttribute, final JoinType joinType,
 			final SingularAttribute<J, V> field, final V value)
 	{
 		return equal(joinAttribute, joinType, field, value);
