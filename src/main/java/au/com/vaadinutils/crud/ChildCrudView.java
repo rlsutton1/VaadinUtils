@@ -206,16 +206,15 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 		int changeInItems = numberOfChildren - container.getItemIds().size();
 		if (changeInItems != 0)
 		{
-			String message = "+" + changeInItems
-					+ ", The number of items in the container is not the same as it was before the refresh.";
-			message += " This is usually caused by a filter the eliminates a newly added child. An example of this is ";
-			message += " where a child crud is associated via a ManyToMany and the ManyToMany relationship is not yet updated and the ";
-			message += " filter therefore eliminates the new child. - see the above TODO.";
-			message += " I really want you to see this error! So I'm putting this Thread to sleep for a second.";
-
-			logger.error(message);
-			// I really want you to see this error!
-			Thread.sleep(1000);
+			// This is usually caused by a filter that eliminates a newly added
+			// child. An example of this is where a child crud is associated via
+			// a ManyToMany and the ManyToMany relationship is not yet updated
+			// and the filter therefore eliminates the new child. - see the
+			// above TODO.
+			// Another example is when resetFilter has been overridden and the
+			// resulting filters eliminate the new child
+			throw new IllegalStateException("+" + changeInItems
+					+ ", The number of items in the container is not the same as it was before the refresh.");
 		}
 		associateChildren(newParentId);
 		dirty = false;
