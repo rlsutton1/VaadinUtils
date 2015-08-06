@@ -147,6 +147,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 			selectedIdBeforeSave = getCurrent().getId();
 			currentGuid = getCurrent().getGuid();
 		}
+		resetFiltersWithoutChangeEvents();
 		saveEditsToTemp();
 		int numberOfChildren = 0;
 		for (Object id : container.getItemIds())
@@ -213,7 +214,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 			// above TODO.
 			// Another example is when resetFilter has been overridden and the
 			// resulting filters eliminate the new child
-			throw new IllegalStateException("+" + changeInItems
+			throw new IllegalStateException(changeInItems
 					+ ", The number of items in the container is not the same as it was before the refresh.");
 		}
 		associateChildren(newParentId);
