@@ -1370,7 +1370,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 */
 	protected void triggerFilter()
 	{
-		triggerFilter(searchField.getValue().trim());
+		triggerFilter(searchField.getValue());
 	}
 
 	int emptyFilterWarningCount = 3;
@@ -1379,7 +1379,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	{
 		boolean advancedSearchActive = advancedSearchOn;
 
-		Filter filter = getContainerFilter(searchText, advancedSearchActive);
+		Filter filter = getContainerFilter(searchText.trim(), advancedSearchActive);
 		if (filter == null && emptyFilterWarningCount-- > 0)
 		{
 			logger.warn("({}.java:1) getContainerFilter() returned NULL", this.getClass().getCanonicalName());
