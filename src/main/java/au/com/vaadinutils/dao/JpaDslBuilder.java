@@ -136,6 +136,21 @@ public class JpaDslBuilder<E>
 		};
 	}
 
+	public <L> Condition<E> equal(final SetAttribute<E, L> field, final L value)
+	{
+
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+				return builder.equal(root.get(field), value);
+			}
+
+		};
+	}
+
 	public <J, V> Condition<E> equal(final SingularAttribute<? super E, J> joinAttribute, final JoinType joinType,
 			final SingularAttribute<J, V> field, final V value)
 	{
@@ -153,6 +168,23 @@ public class JpaDslBuilder<E>
 	}
 
 	public <J, V> Condition<E> equal(final ListAttribute<? super E, J> joinAttribute, final JoinType joinType,
+			final SingularAttribute<J, V> field, final V value)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+				Join<E, J> join = getJoin(joinAttribute, joinType);
+				return builder.equal(join.get(field), value);
+			}
+
+		};
+
+	}
+
+	public <J, V> Condition<E> equal(final SetAttribute<? super E, J> joinAttribute, final JoinType joinType,
 			final SingularAttribute<J, V> field, final V value)
 	{
 		return new AbstractCondition<E>()
@@ -196,15 +228,15 @@ public class JpaDslBuilder<E>
 		return this;
 	}
 
-	public <L> JpaDslBuilder<E> fetch(ListAttribute<E, L> field, JoinType left)
+	public <L> JpaDslBuilder<E> fetch(ListAttribute<E, L> field, JoinType type)
 	{
-		root.fetch(field, JoinType.LEFT);
+		root.fetch(field, type);
 		return this;
 	}
 
-	public <L> JpaDslBuilder<E> fetch(SingularAttribute<E, L> field, JoinType left)
+	public <L> JpaDslBuilder<E> fetch(SingularAttribute<E, L> field, JoinType type)
 	{
-		root.fetch(field, JoinType.LEFT);
+		root.fetch(field, type);
 		return this;
 
 	}
@@ -653,7 +685,7 @@ public class JpaDslBuilder<E>
 		{
 			query.where(predicate);
 		}
-		query.select(builder.count(query.from(entityClass)));
+		query.select(builder.count(root));
 
 		return entityManager.createQuery(query).getSingleResult();
 	}
@@ -674,6 +706,21 @@ public class JpaDslBuilder<E>
 	{
 		this.startPosition = startPosition;
 		return this;
+	}
+
+	public <K> JoinBuilder<E, K> join(final SingularAttribute<? super E, K> attribute)
+	{
+		return new JoinBuilder<E, K>(attribute, JoinType.INNER);
+	}
+
+	public <K> JoinBuilder<E, K> join(final ListAttribute<? super E, K> attribute)
+	{
+		return new JoinBuilder<E, K>(attribute, JoinType.INNER);
+	}
+
+	public <K> JoinBuilder<E, K> join(final SetAttribute<? super E, K> attribute)
+	{
+		return new JoinBuilder<E, K>(attribute, JoinType.INNER);
 	}
 
 	public <K> JoinBuilder<E, K> join(final SingularAttribute<? super E, K> attribute, JoinType type)
@@ -837,6 +884,11 @@ public class JpaDslBuilder<E>
 		return equal(field, value);
 	}
 
+	public <J> Condition<E> eq(SetAttribute<E, J> field, J value)
+	{
+		return equal(field, value);
+	}
+
 	public <J, V> Condition<E> eq(final SingularAttribute<? super E, J> joinAttribute, final JoinType joinType,
 			final SingularAttribute<J, V> field, final V value)
 	{
@@ -844,6 +896,12 @@ public class JpaDslBuilder<E>
 	}
 
 	public <J, V> Condition<E> eq(final ListAttribute<? super E, J> joinAttribute, final JoinType joinType,
+			final SingularAttribute<J, V> field, final V value)
+	{
+		return equal(joinAttribute, joinType, field, value);
+	}
+
+	public <J, V> Condition<E> eq(final SetAttribute<? super E, J> joinAttribute, final JoinType joinType,
 			final SingularAttribute<J, V> field, final V value)
 	{
 		return equal(joinAttribute, joinType, field, value);

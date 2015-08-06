@@ -248,11 +248,21 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 				try
 				{
 					Long id = (Long) selectedCols.getValue();
-					beans.removeItem(id);
-					if (listener != null)
+
+					if (isRemoveAllowed())
 					{
-						listener.valueChanged(getFieldValue());
+
+						beans.removeItem(id);
+						if (listener != null)
+						{
+							listener.valueChanged(getFieldValue());
+						}
 					}
+					else
+					{
+						handleRemoveValidation();
+					}
+
 				}
 				catch (Exception e)
 				{
@@ -549,4 +559,20 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	{
 		return sourceValue;
 	}
+
+	public boolean isRemoveAllowed()
+	{
+		return true;
+	}
+
+	protected Table getSelectedCols()
+	{
+		return selectedCols;
+	}
+
+	public void handleRemoveValidation()
+	{
+
+	}
+
 }

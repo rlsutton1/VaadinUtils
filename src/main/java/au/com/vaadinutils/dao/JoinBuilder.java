@@ -109,6 +109,36 @@ public class JoinBuilder<  E, K>
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public <T> JoinBuilder<E, T> join(final SingularAttribute<K, T> attribute)
+	{
+
+		JoinBuilder<E, T> jb = new JoinBuilder<E, T>();
+		jb.joins.addAll(joins);
+		jb.joins.add(new JoinMetaDataSingular(attribute, JoinType.INNER));
+		return jb;
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public <T> JoinBuilder<E, T> join(final ListAttribute<K, T> attribute)
+	{
+
+		JoinBuilder<E, T> jb = new JoinBuilder<E, T>();
+		jb.joins.addAll(joins);
+		jb.joins.add(new JoinMetaDataList(attribute, JoinType.INNER));
+		return jb;
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public <T> JoinBuilder<E, T> join(final SetAttribute<K, T> attribute)
+	{
+
+		JoinBuilder<E, T> jb = new JoinBuilder<E, T>();
+		jb.joins.addAll(joins);
+		jb.joins.add(new JoinMetaDataSet(attribute, JoinType.INNER));
+		return jb;
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public <T> JoinBuilder<E, T> join(final ListAttribute<K, T> attribute, JoinType type)
 	{
 
