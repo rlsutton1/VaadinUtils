@@ -11,7 +11,7 @@ public class ErrorSettingsFactory
 		errorSettings.set(settings);
 	}
 
-	static ErrorSettings getErrorSettings()
+	public static ErrorSettings getErrorSettings()
 	{
 
 		errorSettings.compareAndSet(null, new DefaultErrorSettings());

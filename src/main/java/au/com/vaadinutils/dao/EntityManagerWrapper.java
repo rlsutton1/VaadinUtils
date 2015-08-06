@@ -172,7 +172,7 @@ public class EntityManagerWrapper implements EntityManager
 	logger.error("Thread: {} using entity Manager {}", Thread.currentThread().getId(), emid);
 
 	em.refresh(entity, lockMode);
-	;
+	
 
     }
 

@@ -510,12 +510,6 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		return createVaadinContainer();
 	}
 
-	@SuppressWarnings("unused")
-	private void oldCreateVaadinContainer()
-	{
-		JPAContainerFactory.makeBatchable(entityClass, entityManager);
-	}
-
 	public int deleteAll()
 	{
 		CriteriaBuilder builder = entityManager.getCriteriaBuilder();

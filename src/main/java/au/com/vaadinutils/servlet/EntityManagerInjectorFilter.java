@@ -9,11 +9,7 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.dao.Transaction;
@@ -21,7 +17,7 @@ import au.com.vaadinutils.errorHandling.ErrorWindow;
 
 public class EntityManagerInjectorFilter implements Filter
 {
-	private static  transient Logger logger   =  LogManager.getLogger(EntityManagerInjectorFilter.class);
+	//private static  transient Logger logger   =  LogManager.getLogger(EntityManagerInjectorFilter.class);
 
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException
@@ -55,8 +51,10 @@ public class EntityManagerInjectorFilter implements Filter
 		{
 
 			t.close();
+			
 			// Reset the entity manager
 			EntityManagerProvider.setCurrentEntityManager(null);
+			em.close();
 		}
 	}
 
