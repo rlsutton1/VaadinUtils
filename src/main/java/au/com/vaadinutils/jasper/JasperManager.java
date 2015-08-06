@@ -185,6 +185,11 @@ public class JasperManager implements Runnable
 	{
 
 		this.reportProperties = reportProperties;
+
+	}
+
+	private void compileReport()
+	{
 		try
 		{
 			String suppliedFileName = reportProperties.getReportFileName();
@@ -231,7 +236,6 @@ public class JasperManager implements Runnable
 			logger.error(e, e);
 			throw new RuntimeException("Bad report compilation");
 		}
-
 	}
 
 	/**
@@ -769,6 +773,13 @@ public class JasperManager implements Runnable
 			cleanupCallback = reportProperties.getCleanupCallback();
 			List<ReportParameter<?>> extraParams = reportProperties.prepareData(params,
 					reportProperties.getReportFileName(), cleanupCallback);
+
+			compileReport();
+			
+			if (reportProperties.getCustomReportParameterMap()!=null)
+			{
+				boundParams.putAll( reportProperties.getCustomReportParameterMap());
+			}
 
 			params.removeAll(extraParams);
 			params.addAll(extraParams);

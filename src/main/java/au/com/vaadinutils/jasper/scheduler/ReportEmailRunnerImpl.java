@@ -7,13 +7,12 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
 import javax.mail.internet.AddressException;
 
 import org.apache.commons.mail.EmailException;
-
-import com.google.common.base.Preconditions;
 
 import au.com.vaadinutils.jasper.AttachmentType;
 import au.com.vaadinutils.jasper.JasperEmailBuilder;
@@ -28,6 +27,8 @@ import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailRecipient;
 import au.com.vaadinutils.jasper.ui.CleanupCallback;
 import au.com.vaadinutils.jasper.ui.JasperReportProperties;
 import au.com.vaadinutils.jasper.ui.JasperReportPropertiesAlternateFile;
+
+import com.google.common.base.Preconditions;
 
 public class ReportEmailRunnerImpl implements ReportEmailRunner, JasperReportProperties
 {
@@ -125,6 +126,13 @@ public class ReportEmailRunnerImpl implements ReportEmailRunner, JasperReportPro
 
 		return params;
 	}
+	
+	@Override
+	public Map<String, Object> getCustomReportParameterMap()
+	{
+		return jasperReportProperties.getCustomReportParameterMap();
+	}
+
 
 	@Override
 	public String getReportTitle()
