@@ -643,6 +643,8 @@ class JasperReportLayout extends VerticalLayout
 					{
 						getDisplayPanel().setSource(resource);
 					}
+					UI.getCurrent().removePollListener(this);
+					
 				}
 
 			}

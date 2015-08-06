@@ -181,8 +181,13 @@ public class JasperManager implements Runnable
 	 */
 	public JasperManager(JasperReportProperties reportProperties)
 	{
-		
+
 		this.reportProperties = reportProperties;
+
+	}
+
+	private void compileReport()
+	{
 		try
 		{
 			String suppliedFileName = reportProperties.getReportFileName();
@@ -229,7 +234,6 @@ public class JasperManager implements Runnable
 			logger.error(e, e);
 			throw new RuntimeException("Bad report compilation");
 		}
-
 	}
 
 	/**
@@ -450,8 +454,7 @@ public class JasperManager implements Runnable
 					targetBand.addElement(labelElement);
 
 					JRDesignTextField valueElement = new JRDesignTextField();
-					valueElement.setExpression(new JRDesignExpression("$P{ParamDisplay-" + parameterName
-							+ "}"));
+					valueElement.setExpression(new JRDesignExpression("$P{ParamDisplay-" + parameterName + "}"));
 					valueElement.setWidth(400);
 					valueElement.setHeight(20);
 					valueElement.setBackcolor(new Color(208, 208, 208));
@@ -540,7 +543,8 @@ public class JasperManager implements Runnable
 			String strippedParameterName = parameterName;
 			if (strippedParameterName.startsWith("ReportParameter"))
 			{
-				strippedParameterName = strippedParameterName.substring("ReportParameter".length(), strippedParameterName.length());
+				strippedParameterName = strippedParameterName.substring("ReportParameter".length(),
+						strippedParameterName.length());
 			}
 
 			if (!paramExists(strippedParameterName))
@@ -754,7 +758,7 @@ public class JasperManager implements Runnable
 		jobQueue.add(queueEntry);
 
 		this.exportMethod = exportMethod;
-		thread = new Thread(this,"JasperManager");
+		thread = new Thread(this, "JasperManager");
 		thread.start();
 	}
 
@@ -778,8 +782,16 @@ public class JasperManager implements Runnable
 			reportProperties.initDBConnection();
 
 			cleanupCallback = reportProperties.getCleanupCallback();
-			List<ReportParameter<?>> extraParams = reportProperties.prepareData(params, reportProperties.getReportFileName(), cleanupCallback);
+			List<ReportParameter<?>> extraParams = reportProperties.prepareData(params,
+					reportProperties.getReportFileName(), cleanupCallback);
+
+			compileReport();
 			
+			if (reportProperties.getCustomReportParameterMap()!=null)
+			{
+				boundParams.putAll( reportProperties.getCustomReportParameterMap());
+			}
+
 			params.removeAll(extraParams);
 			params.addAll(extraParams);
 

@@ -7,8 +7,11 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import javax.mail.internet.AddressException;
+
+import net.sf.jasperreports.engine.JasperReport;
 
 import org.apache.commons.mail.EmailException;
 
@@ -124,6 +127,13 @@ public class ReportEmailRunnerImpl implements ReportEmailRunner, JasperReportPro
 
 		return params;
 	}
+	
+	@Override
+	public Map<String, Object> getCustomReportParameterMap()
+	{
+		return jasperReportProperties.getCustomReportParameterMap();
+	}
+
 
 	@Override
 	public String getReportTitle()

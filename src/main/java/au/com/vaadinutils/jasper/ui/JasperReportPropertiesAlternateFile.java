@@ -4,7 +4,9 @@ import java.io.File;
 import java.sql.Connection;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
+import net.sf.jasperreports.engine.JasperReport;
 import au.com.vaadinutils.jasper.JasperManager.OutputFormat;
 import au.com.vaadinutils.jasper.filter.ReportFilterUIBuilder;
 import au.com.vaadinutils.jasper.parameter.ReportParameter;
@@ -35,6 +37,12 @@ public class JasperReportPropertiesAlternateFile implements JasperReportProperti
 	{
 
 		return title;
+	}
+	
+	@Override
+	public Map<String, Object> getCustomReportParameterMap()
+	{
+		return reportPropertiesTemplate.getCustomReportParameterMap();
 	}
 
 	@Override

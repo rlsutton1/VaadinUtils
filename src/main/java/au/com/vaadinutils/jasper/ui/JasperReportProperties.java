@@ -4,6 +4,7 @@ import java.io.File;
 import java.sql.Connection;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import au.com.vaadinutils.jasper.JasperManager.OutputFormat;
 import au.com.vaadinutils.jasper.filter.ReportFilterUIBuilder;
@@ -212,5 +213,7 @@ public interface JasperReportProperties
 	 * @return
 	 */
 	public abstract Enum<?> getReportIdentifier();
+
+	public abstract Map<String, Object> getCustomReportParameterMap();
 
 }
