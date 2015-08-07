@@ -26,15 +26,11 @@ import org.vaadin.addons.lazyquerycontainer.EntityContainer;
 
 import com.google.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.JPAContainer;
-import com.vaadin.addon.jpacontainer.JPAContainerFactory;
 
 public class JpaBaseDao<E, K> implements Dao<E, K>
 {
 	protected Class<E> entityClass;
 
-	protected EntityManager entityManager;
-
-	
 	public interface Condition<E>
 	{
 
@@ -45,7 +41,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		Condition<E> or(Condition<E> c1);
 
 	}
-	
+
 	static public <E> JpaBaseDao<E, Long> getGenericDao(Class<E> class1)
 	{
 		return new JpaBaseDao<E, Long>(class1);
@@ -55,11 +51,6 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 	@SuppressWarnings("unchecked")
 	public JpaBaseDao()
 	{
-		this.entityManager = EntityManagerProvider.getEntityManager();
-		Preconditions
-				.checkNotNull(
-						this.entityManager,
-						"Entity manager has not been initialized, if you are using a worker thread you will have to call EntityManagerProvider.createEntityManager()");
 
 		// hack to get the derived classes Class type.
 		ParameterizedType genericSuperclass = (ParameterizedType) getClass().getGenericSuperclass();
@@ -68,37 +59,49 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		Preconditions.checkNotNull(this.entityClass);
 	}
 
-	@SuppressWarnings("unchecked")
-	public JpaBaseDao(EntityManager em)
+	/**
+	 * it's very important that we don't retain a reference to the
+	 * entitymanager, as when you instance this class and then use it in a
+	 * closure you will end up trying to access a closed entitymanager
+	 * 
+	 * @return
+	 */
+	private static EntityManager getEntityManager()
 	{
-		this.entityManager = em;
-		ParameterizedType genericSuperclass = (ParameterizedType) getClass().getGenericSuperclass();
-		this.entityClass = (Class<E>) genericSuperclass.getActualTypeArguments()[0];
+		EntityManager em = EntityManagerProvider.getEntityManager();
+
+		Preconditions
+				.checkNotNull(
+						em,
+						"Entity manager has not been initialized, if you are using a worker thread you will have to call EntityManagerProvider.createEntityManager()");
+
+		Preconditions.checkState(em.isOpen(),
+				"The entity manager is closed, this can happen if you instance this class "
+						+ "and then use it in a closure when the closure gets called on a "
+						+ "separate thread or servlet request");
+
+		return em;
+
 	}
 
 	public JpaBaseDao(Class<E> class1)
 	{
-		this.entityManager = EntityManagerProvider.getEntityManager();
-		Preconditions
-				.checkNotNull(
-						this.entityManager,
-						"Entity manager has not been initialized, if you are using a worker thread you will have to call EntityManagerProvider.createEntityManager()");
 		entityClass = class1;
 	}
 
 	public void persist(E entity)
 	{
-		entityManager.persist(entity);
+		getEntityManager().persist(entity);
 	}
 
 	public E merge(E entity)
 	{
-		return entityManager.merge(entity);
+		return getEntityManager().merge(entity);
 	}
 
 	public void remove(E entity)
 	{
-		entityManager.remove(entity);
+		getEntityManager().remove(entity);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -109,13 +112,13 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 	public E findById(K id)
 	{
-		return entityManager.find(entityClass, id);
+		return getEntityManager().find(entityClass, id);
 	}
 
 	protected E findSingleBySingleParameter(String queryName, SingularAttribute<E, String> paramName, String paramValue)
 	{
 		E entity = null;
-		Query query = entityManager.createNamedQuery(queryName);
+		Query query = getEntityManager().createNamedQuery(queryName);
 		query.setParameter(paramName.getName(), paramValue);
 		query.setMaxResults(1);
 		@SuppressWarnings("unchecked")
@@ -128,7 +131,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 	protected E findSingleBySingleParameter(String queryName, String paramName, String paramValue)
 	{
 		E entity = null;
-		Query query = entityManager.createNamedQuery(queryName);
+		Query query = getEntityManager().createNamedQuery(queryName);
 		query.setParameter(paramName, paramValue);
 		query.setMaxResults(1);
 		@SuppressWarnings("unchecked")
@@ -140,7 +143,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 	protected List<E> findListBySingleParameter(String queryName, String paramName, Object paramValue)
 	{
-		Query query = entityManager.createNamedQuery(queryName);
+		Query query = getEntityManager().createNamedQuery(queryName);
 		query.setParameter(paramName, paramValue);
 		@SuppressWarnings("unchecked")
 		List<E> entities = query.getResultList();
@@ -155,7 +158,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 	 */
 	protected List<E> findList(String queryName)
 	{
-		Query query = entityManager.createNamedQuery(queryName);
+		Query query = getEntityManager().createNamedQuery(queryName);
 		@SuppressWarnings("unchecked")
 		List<E> entities = query.getResultList();
 		return entities;
@@ -176,7 +179,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 	@Override
 	public List<E> findAll(SingularAttribute<E, ?> order[])
 	{
-		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+		CriteriaBuilder builder = getEntityManager().getCriteriaBuilder();
 
 		CriteriaQuery<E> criteria = builder.createQuery(entityClass);
 
@@ -192,7 +195,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 			}
 			criteria.orderBy(ordering);
 		}
-		List<E> results = entityManager.createQuery(criteria).getResultList();
+		List<E> results = getEntityManager().createQuery(criteria).getResultList();
 
 		return results;
 
@@ -216,7 +219,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 	{
 		Preconditions.checkArgument(order.length == sortAscending.length,
 				"Both arguments must have the same no. of array elements.");
-		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+		CriteriaBuilder builder = getEntityManager().getCriteriaBuilder();
 
 		CriteriaQuery<E> criteria = builder.createQuery(entityClass);
 
@@ -234,7 +237,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		}
 		criteria.orderBy(ordering);
 
-		List<E> results = entityManager.createQuery(criteria).getResultList();
+		List<E> results = getEntityManager().createQuery(criteria).getResultList();
 
 		return results;
 
@@ -261,7 +264,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 			Integer limit)
 	{
 
-		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+		CriteriaBuilder builder = getEntityManager().getCriteriaBuilder();
 
 		CriteriaQuery<E> criteria = builder.createQuery(entityClass);
 
@@ -273,7 +276,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 			criteria.orderBy(builder.asc(root.get(order)));
 		}
 
-		TypedQuery<E> query = entityManager.createQuery(criteria);
+		TypedQuery<E> query = getEntityManager().createQuery(criteria);
 		if (limit != null)
 		{
 			query = query.setMaxResults(limit);
@@ -286,7 +289,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 			SingularAttribute<E, SK> order)
 	{
 
-		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+		CriteriaBuilder builder = getEntityManager().getCriteriaBuilder();
 
 		CriteriaQuery<E> criteria = builder.createQuery(entityClass);
 
@@ -297,7 +300,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		{
 			criteria.orderBy(builder.asc(root.get(order)));
 		}
-		List<E> results = entityManager.createQuery(criteria).getResultList();
+		List<E> results = getEntityManager().createQuery(criteria).getResultList();
 
 		return results;
 
@@ -336,7 +339,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 	public <SK> List<E> findAllByAttributes(AttributesHashMap<E> attributes, SingularAttribute<E, SK> order)
 	{
 
-		final CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+		final CriteriaBuilder builder = getEntityManager().getCriteriaBuilder();
 
 		final CriteriaQuery<E> criteria = builder.createQuery(entityClass);
 
@@ -354,7 +357,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		{
 			criteria.orderBy(builder.asc(root.get(order)));
 		}
-		List<E> results = entityManager.createQuery(criteria).getResultList();
+		List<E> results = getEntityManager().createQuery(criteria).getResultList();
 
 		return results;
 	}
@@ -392,7 +395,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 	public <SK> List<E> findAllByAnyAttributes(AttributesHashMap<E> attributes, SingularAttribute<E, SK> order)
 	{
 
-		final CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+		final CriteriaBuilder builder = getEntityManager().getCriteriaBuilder();
 
 		final CriteriaQuery<E> criteria = builder.createQuery(entityClass);
 
@@ -410,7 +413,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		{
 			criteria.orderBy(builder.asc(root.get(order)));
 		}
-		List<E> results = entityManager.createQuery(criteria).getResultList();
+		List<E> results = getEntityManager().createQuery(criteria).getResultList();
 
 		return results;
 	}
@@ -424,13 +427,13 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 	 */
 	public <V> Long getCount(SingularAttribute<E, V> vKey, V value)
 	{
-		CriteriaBuilder qb = entityManager.getCriteriaBuilder();
+		CriteriaBuilder qb = getEntityManager().getCriteriaBuilder();
 		CriteriaQuery<Long> cq = qb.createQuery(Long.class);
 		Root<E> root = cq.from(entityClass);
 		cq.select(qb.count(root));
 		cq.where(qb.equal(root.get(vKey), value));
 
-		return entityManager.createQuery(cq).getSingleResult();
+		return getEntityManager().createQuery(cq).getSingleResult();
 	}
 
 	public JPAContainer<E> createVaadinContainer()
@@ -443,7 +446,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 	public EntityContainer<E> createLazyQueryContainer()
 	{
-		EntityManager em = EntityManagerProvider.getEntityManager();
+		EntityManager em = getEntityManager();
 		boolean compositeItmes = true;
 
 		boolean detachedEntities = true;
@@ -463,7 +466,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 	static public <T> SingularAttribute<T, Long> getIdField(Class<T> type)
 	{
-		Metamodel metaModel = EntityManagerProvider.getEntityManager().getMetamodel();
+		Metamodel metaModel = getEntityManager().getMetamodel();
 		EntityType<T> entityType = metaModel.entity(type);
 		return entityType.getDeclaredId(Long.class);
 	}
@@ -494,28 +497,28 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 	public void flushCache()
 	{
-		entityManager.getEntityManagerFactory().getCache().evict(entityClass);
+		getEntityManager().getEntityManagerFactory().getCache().evict(entityClass);
 
 	}
 
 	public JPAContainer<E> createVaadinContainerAndFlushCache(final int sizeLimit)
 	{
-		entityManager.getEntityManagerFactory().getCache().evict(entityClass);
+		getEntityManager().getEntityManagerFactory().getCache().evict(entityClass);
 		return createVaadinContainer(sizeLimit);
 	}
 
 	public JPAContainer<E> createVaadinContainerAndFlushCache()
 	{
-		entityManager.getEntityManagerFactory().getCache().evict(entityClass);
+		getEntityManager().getEntityManagerFactory().getCache().evict(entityClass);
 		return createVaadinContainer();
 	}
 
 	public int deleteAll()
 	{
-		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+		CriteriaBuilder builder = getEntityManager().getCriteriaBuilder();
 
 		CriteriaDelete<E> criteria = builder.createCriteriaDelete(entityClass);
-		int result = entityManager.createQuery(criteria).executeUpdate();
+		int result = getEntityManager().createQuery(criteria).executeUpdate();
 
 		return result;
 
@@ -524,7 +527,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 	public <V> int deleteAllByAttribute(SingularAttribute<E, V> vKey, V value)
 	{
 
-		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+		CriteriaBuilder builder = getEntityManager().getCriteriaBuilder();
 
 		CriteriaDelete<E> criteria = builder.createCriteriaDelete(entityClass);
 
@@ -532,7 +535,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 		criteria.where(builder.equal(root.get(vKey), value));
 
-		int result = entityManager.createQuery(criteria).executeUpdate();
+		int result = getEntityManager().createQuery(criteria).executeUpdate();
 
 		return result;
 
@@ -542,7 +545,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 			V value, JoinType joinType)
 	{
 
-		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+		CriteriaBuilder builder = getEntityManager().getCriteriaBuilder();
 
 		CriteriaQuery<E> criteria = builder.createQuery(entityClass);
 
@@ -552,14 +555,14 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 		criteria.where(builder.equal(join.get(vKey), value));
 
-		return entityManager.createQuery(criteria).getResultList();
+		return getEntityManager().createQuery(criteria).getResultList();
 
 	}
 
 	public <V, J> int deleteAllByAttributeJoin(SingularAttribute<J, V> vKey, V value, SingularAttribute<E, J> joinAttr)
 	{
 
-		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+		CriteriaBuilder builder = getEntityManager().getCriteriaBuilder();
 
 		CriteriaDelete<E> criteria = builder.createCriteriaDelete(entityClass);
 
@@ -569,8 +572,8 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 		criteria.where(builder.equal(join.get(vKey), value));
 
-		entityManager.getClass();
-		int result = entityManager.createQuery(criteria).executeUpdate();
+		getEntityManager().getClass();
+		int result = getEntityManager().createQuery(criteria).executeUpdate();
 
 		return result;
 
@@ -590,7 +593,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 			tableName = entityName;
 
 		String qry = "select count(" + entityName + ") from " + tableName + " " + entityName;
-		Query query = entityManager.createQuery(qry);
+		Query query = getEntityManager().createQuery(qry);
 		Number countResult = (Number) query.getSingleResult();
 		return countResult.longValue();
 
@@ -598,18 +601,18 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 	public void flush()
 	{
-		this.entityManager.flush();
+		getEntityManager().flush();
 
 	}
 
 	public void refresh(E entity)
 	{
-		this.entityManager.refresh(entity);
+		getEntityManager().refresh(entity);
 	}
 
 	public void detach(E entity)
 	{
-		this.entityManager.detach(entity);
+		getEntityManager().detach(entity);
 
 	}
 
@@ -617,20 +620,20 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 	{
 		return new FindBuilder();
 	}
-	
+
 	public JpaDslBuilder<E> find()
 	{
-		return new JpaDslBuilder<E>(entityManager, entityClass);
+		return new JpaDslBuilder<E>(entityClass);
 	}
 
 	public JpaDslBuilder<E> jpaContainerDelegate(CriteriaBuilder criteriaBuilder, CriteriaQuery<E> query)
 	{
-		return new JpaDslBuilder<E>( query,  entityClass,entityManager);
+		return new JpaDslBuilder<E>(query, entityClass);
 	}
-	
+
 	public class FindBuilder
 	{
-		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+		CriteriaBuilder builder = EntityManagerProvider.getEntityManager().getCriteriaBuilder();
 
 		CriteriaQuery<E> criteria = builder.createQuery(entityClass);
 		Root<E> root = criteria.from(entityClass);
@@ -760,7 +763,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 			{
 				criteria.where(filter);
 			}
-			TypedQuery<E> query = entityManager.createQuery(criteria);
+			TypedQuery<E> query = EntityManagerProvider.getEntityManager().createQuery(criteria);
 			if (limit != null)
 			{
 				query.setMaxResults(limit);

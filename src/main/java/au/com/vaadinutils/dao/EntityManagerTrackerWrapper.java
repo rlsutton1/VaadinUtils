@@ -395,7 +395,11 @@ public class EntityManagerTrackerWrapper implements EntityManager
 	@Override
 	public CriteriaBuilder getCriteriaBuilder()
 	{
-
+		if (closedAt!=null)
+		{
+			logger.error("Trying to getCriteriaBuilder");
+			logger.error(closedAt,closedAt);
+		}
 		return em.getCriteriaBuilder();
 	}
 

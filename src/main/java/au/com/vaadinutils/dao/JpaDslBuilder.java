@@ -38,15 +38,19 @@ public class JpaDslBuilder<E>
 	Predicate predicate = null;
 
 	private Integer startPosition = null;
-	private CriteriaQuery<E> criteria;
-	protected EntityManager entityManager;
+	protected CriteriaQuery<E> criteria;
 	protected Class<E> entityClass;
 
-	JpaDslBuilder(EntityManager entityManager, Class<E> entityClass)
+	/**
+	 * used to check that the entityManager doesn't shift under our feet!!!
+	 */
+	final private EntityManager dontUseThis = EntityManagerProvider.getEntityManager();
+
+	JpaDslBuilder(Class<E> entityClass)
 	{
-		this.entityManager = entityManager;
+
 		this.entityClass = entityClass;
-		builder = entityManager.getCriteriaBuilder();
+		builder = getEntityManager().getCriteriaBuilder();
 
 		criteria = builder.createQuery(entityClass);
 		root = criteria.from(entityClass);
@@ -54,9 +58,30 @@ public class JpaDslBuilder<E>
 
 	}
 
-	protected JpaDslBuilder()
+	/**
+	 * it's very important that we don't retain a reference to the
+	 * entitymanager, as when you instance this class and then use it in a
+	 * closure you will end up trying to access a closed entitymanager
+	 * 
+	 * @return
+	 */
+	protected EntityManager getEntityManager()
 	{
-		// TODO Auto-generated constructor stub
+		final EntityManager em = EntityManagerProvider.getEntityManager();
+		Preconditions.checkNotNull(em, "Entity manager has not been initialized, "
+				+ "if you are using a worker thread you will have to call "
+				+ "EntityManagerProvider.createEntityManager()");
+
+		Preconditions.checkState(dontUseThis == em,
+				"The entity manager has changed since this class was instanced, this is very bad. "
+						+ "This class should be instanced and used strickly within the scope of a "
+						+ "single request/entitymanager");
+
+		Preconditions.checkState(em.isOpen(),
+				"The entity manager is closed, this can happen if you instance this class "
+						+ "and then use it in a closure when the closure gets called on a "
+						+ "separate thread or servlet request");
+		return em;
 	}
 
 	/**
@@ -64,14 +89,13 @@ public class JpaDslBuilder<E>
 	 * 
 	 * @param query
 	 * @param entityClass
-	 * @param entityManager
 	 */
 	@SuppressWarnings("unchecked")
-	public JpaDslBuilder(CriteriaQuery<E> query, Class<E> entityClass, EntityManager entityManager)
+	public JpaDslBuilder(CriteriaQuery<E> query, Class<E> entityClass)
 	{
-		this.entityManager = entityManager;
+
 		this.entityClass = entityClass;
-		builder = entityManager.getCriteriaBuilder();
+		builder = getEntityManager().getCriteriaBuilder();
 
 		criteria = query;
 		root = (Root<E>) criteria.getRoots().iterator().next();
@@ -601,7 +625,7 @@ public class JpaDslBuilder<E>
 		{
 			criteria.distinct(true);
 		}
-		TypedQuery<E> query = entityManager.createQuery(criteria);
+		TypedQuery<E> query = getEntityManager().createQuery(criteria);
 
 		if (limit != null)
 		{
@@ -628,7 +652,7 @@ public class JpaDslBuilder<E>
 		{
 			deleteCriteria.where(predicate);
 		}
-		Query query = entityManager.createQuery(deleteCriteria);
+		Query query = getEntityManager().createQuery(deleteCriteria);
 
 		if (limit != null)
 		{
@@ -639,7 +663,7 @@ public class JpaDslBuilder<E>
 			query.setFirstResult(startPosition);
 		}
 		int result = query.executeUpdate();
-		entityManager.getEntityManagerFactory().getCache().evict(entityClass);
+		getEntityManager().getEntityManagerFactory().getCache().evict(entityClass);
 		return result;
 
 	}
@@ -652,7 +676,7 @@ public class JpaDslBuilder<E>
 	 * 
 	 * @return
 	 */
-	public <F> int update(SingularAttribute<E, F> attribute,  F value)
+	public <F> int update(SingularAttribute<E, F> attribute, F value)
 	{
 		Preconditions.checkArgument(orders.size() == 0, "Order is not supported for delete");
 		CriteriaUpdate<E> updateCriteria = builder.createCriteriaUpdate(entityClass);
@@ -662,7 +686,7 @@ public class JpaDslBuilder<E>
 			updateCriteria.where(predicate);
 			updateCriteria.set(attribute, value);
 		}
-		Query query = entityManager.createQuery(updateCriteria);
+		Query query = getEntityManager().createQuery(updateCriteria);
 
 		if (limit != null)
 		{
@@ -673,7 +697,7 @@ public class JpaDslBuilder<E>
 			query.setFirstResult(startPosition);
 		}
 		int result = query.executeUpdate();
-		entityManager.getEntityManagerFactory().getCache().evict(entityClass);
+		getEntityManager().getEntityManagerFactory().getCache().evict(entityClass);
 		return result;
 
 	}
@@ -687,7 +711,7 @@ public class JpaDslBuilder<E>
 		}
 		query.select(builder.count(root));
 
-		return entityManager.createQuery(query).getSingleResult();
+		return getEntityManager().createQuery(query).getSingleResult();
 	}
 
 	public Long countDistinct()
@@ -699,7 +723,7 @@ public class JpaDslBuilder<E>
 		}
 		query.select(builder.countDistinct(query.from(entityClass)));
 
-		return entityManager.createQuery(query).getSingleResult();
+		return getEntityManager().createQuery(query).getSingleResult();
 	}
 
 	public JpaDslBuilder<E> startPosition(int startPosition)
@@ -1059,7 +1083,7 @@ public class JpaDslBuilder<E>
 
 	public <J> JpaDslSubqueryBuilder<E, J> subQuery(Class<J> target)
 	{
-		return new JpaDslSubqueryBuilder<E, J>(entityManager, target, criteria, root);
+		return new JpaDslSubqueryBuilder<E, J>(target, criteria, root);
 	}
 
 	public JpaDslBuilder<E> distinct()

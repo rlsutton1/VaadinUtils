@@ -155,6 +155,7 @@ public enum EntityManagerProvider
 			throw new IllegalStateException("Context is not initialized yet.");
 		}
 
+		//EntityManager entityManager = new EntityManagerTrackerWrapper(INSTANCE.emf.createEntityManager());
 		EntityManager entityManager = INSTANCE.emf.createEntityManager();
 
 		return entityManager;
