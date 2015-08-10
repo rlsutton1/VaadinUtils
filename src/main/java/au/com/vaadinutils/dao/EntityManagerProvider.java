@@ -133,6 +133,36 @@ public enum EntityManagerProvider
 
 	}
 
+	public static Runnable setThreadLocalEntityManager(final Runnable runnable)
+	{
+		return new Runnable()
+		{
+
+			@Override
+			public void run()
+			{
+				try
+				{
+					setThreadLocalEntityManager(new EntityWorker<Void>()
+					{
+
+						@Override
+						public Void exec() throws Exception
+						{
+							runnable.run();
+							return null;
+						}
+					});
+				}
+				catch (Exception e)
+				{
+					logger.error(e, e);
+				}
+
+			}
+		};
+	}
+
 	/**
 	 * 
 	 * 
@@ -155,7 +185,8 @@ public enum EntityManagerProvider
 			throw new IllegalStateException("Context is not initialized yet.");
 		}
 
-		//EntityManager entityManager = new EntityManagerTrackerWrapper(INSTANCE.emf.createEntityManager());
+		// EntityManager entityManager = new
+		// EntityManagerTrackerWrapper(INSTANCE.emf.createEntityManager());
 		EntityManager entityManager = INSTANCE.emf.createEntityManager();
 
 		return entityManager;

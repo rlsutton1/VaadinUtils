@@ -6,9 +6,9 @@ import com.vaadin.server.StreamResource;
 public class StreamResourceWithContentLength extends StreamResource
 {
 
-	private ContenctLengthProviderStreamSource contentLengthProvider;
+	private ContentLengthProviderStreamSource contentLengthProvider;
 
-	public StreamResourceWithContentLength(ContenctLengthProviderStreamSource streamSource, String filename)
+	public StreamResourceWithContentLength(ContentLengthProviderStreamSource streamSource, String filename)
 	{
 		super(streamSource, filename);
 		this.contentLengthProvider = streamSource;

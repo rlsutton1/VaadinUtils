@@ -547,7 +547,7 @@ public class TimePicker extends HorizontalLayout implements Field
 	public void commit() throws SourceException, InvalidValueException
 	{
 
-		datasource.setValue((Date) getValue());
+		datasource.setValue(getValue());
 	}
 
 	@Override
@@ -573,7 +573,7 @@ public class TimePicker extends HorizontalLayout implements Field
 	@Override
 	public boolean isModified()
 	{
-		Date value = (Date) getValue();
+		Date value = getValue();
 		if (datasource == null)
 		{
 			return false;
