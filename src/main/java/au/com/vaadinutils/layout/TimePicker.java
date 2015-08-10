@@ -499,7 +499,7 @@ public class TimePicker extends HorizontalLayout implements Field
 				hour = 12;
 			}
 			final int minute = dateTime.get(Calendar.MINUTE);
-			final String amPm = dateTime.get(Calendar.HOUR_OF_DAY) <= 12 ? "AM" : "PM";
+			final String amPm = dateTime.get(Calendar.HOUR_OF_DAY) < 12 ? "AM" : "PM";
 			DecimalFormat df = new DecimalFormat("00");
 			return df.format(hour) + ":" + df.format(minute) + " " + amPm;
 		}
