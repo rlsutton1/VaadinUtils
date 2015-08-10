@@ -66,7 +66,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 	 * 
 	 * @return
 	 */
-	private static EntityManager getEntityManager()
+	protected static EntityManager getEntityManager()
 	{
 		EntityManager em = EntityManagerProvider.getEntityManager();
 
