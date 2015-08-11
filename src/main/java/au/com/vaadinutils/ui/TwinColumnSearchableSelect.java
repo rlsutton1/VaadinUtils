@@ -317,20 +317,18 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 					Long id = ids.get(0);
 					if (id != null)
 					{
-						JpaBaseDao<C, Long> dao = (JpaBaseDao<C, Long>) JpaBaseDao.getGenericDao(listField
-								.getDeclaringType().getJavaType());
-						C cust = dao.findById(id);
-						if (cust != null)
+						if (isPreAddActionRequired())
 						{
-							beans.addBean(cust);
-							if (listener != null)
-							{
-								listener.valueChanged(getFieldValue());
-							}
+							handlePreAddAction(id);
+						}
+						else
+						{
+							handleAddAction(id);
 						}
 					}
 				}
 			}
+
 		});
 
 		addAllButton.addClickListener(new ClickListener()
@@ -575,4 +573,28 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 
 	}
 
+	protected void handleAddAction(Long id)
+	{
+		JpaBaseDao<C, Long> dao = (JpaBaseDao<C, Long>) JpaBaseDao.getGenericDao(listField.getDeclaringType()
+				.getJavaType());
+		C cust = dao.findById(id);
+		if (cust != null)
+		{
+			beans.addBean(cust);
+			if (listener != null)
+			{
+				listener.valueChanged(getFieldValue());
+			}
+		}
+	}
+
+	public boolean isPreAddActionRequired()
+	{
+		return false;
+	}
+
+	public void handlePreAddAction(Long id)
+	{
+
+	}
 }
