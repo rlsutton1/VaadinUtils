@@ -721,21 +721,21 @@ public class JasperManager implements Runnable
 				@Override
 				public void failed(String string)
 				{
-					// TODO Auto-generated method stub
+					// noop
 
 				}
 
 				@Override
 				public void completed()
 				{
-					// TODO Auto-generated method stub
+					// noop
 
 				}
 
 				@Override
 				public void outputStreamReady()
 				{
-					// TODO Auto-generated method stub
+					// noop
 
 				}
 			};
