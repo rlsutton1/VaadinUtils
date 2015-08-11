@@ -81,7 +81,8 @@ public class EntityTable<E> extends Table implements EntityList<E>
 						}
 						else
 							EntityTable.this.rowChangeListener.rowChanged(null);
-					}else
+					}
+					else
 					{
 						logger.warn("no row change listener exists");
 					}
@@ -262,4 +263,28 @@ public class EntityTable<E> extends Table implements EntityList<E>
 
 	}
 
+	/**
+	 * When {@link #select(Object)} is called,
+	 * {@link RowChangeListener#allowRowChange(RowChangeCallback)} does not get
+	 * called. Call this method if you wish to check whether a row change is
+	 * allowed before selecting a new row.
+	 */
+	public void selectAndCheckRowChangeAllowed(final Object itemId)
+	{
+		if (EntityTable.this.rowChangeListener != null)
+		{
+			EntityTable.this.rowChangeListener.allowRowChange(new RowChangeCallback()
+			{
+				@Override
+				public void allowRowChange()
+				{
+					EntityTable.super.select(itemId);
+				}
+			});
+		}
+		else
+		{
+			select(itemId);
+		}
+	}
 }
