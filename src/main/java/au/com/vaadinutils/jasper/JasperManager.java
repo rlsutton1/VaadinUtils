@@ -5,8 +5,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
 import java.sql.Connection;
 import java.util.Collection;
 import java.util.HashMap;
@@ -22,6 +20,20 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import javax.activation.DataSource;
+import javax.persistence.EntityGraph;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
+import javax.persistence.FlushModeType;
+import javax.persistence.LockModeType;
+import javax.persistence.Query;
+import javax.persistence.StoredProcedureQuery;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaDelete;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.CriteriaUpdate;
+import javax.persistence.metamodel.Metamodel;
 
 import net.sf.jasperreports.engine.JRAbstractExporter;
 import net.sf.jasperreports.engine.JRBand;
@@ -61,6 +73,8 @@ import org.apache.commons.mail.ByteArrayDataSource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import au.com.vaadinutils.dao.EntityManagerProvider;
+import au.com.vaadinutils.dao.EntityWorker;
 import au.com.vaadinutils.jasper.parameter.ReportChooser;
 import au.com.vaadinutils.jasper.parameter.ReportParameter;
 import au.com.vaadinutils.jasper.servlet.VaadinJasperPrintServlet;
@@ -774,7 +788,17 @@ public class JasperManager implements Runnable
 			List<ReportParameter<?>> extraParams = reportProperties.prepareData(params,
 					reportProperties.getReportFileName(), cleanupCallback);
 
-			compileReport();
+			EntityManagerProvider.setThreadLocalEntityManager(new EntityWorker<Void>()
+			{
+
+				@Override
+				public Void exec() throws Exception
+				{
+					compileReport();
+					return null;
+				}
+			});
+			
 			
 			if (reportProperties.getCustomReportParameterMap()!=null)
 			{
