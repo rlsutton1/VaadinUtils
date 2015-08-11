@@ -73,6 +73,10 @@ public enum EntityManagerProvider
 		else
 		{
 			logger.debug("Setting entity manager for thread {}", Thread.currentThread().getId());
+			if (INSTANCE.entityManagerThreadLocal.get() != null)
+			{
+				logger.error("Setting the entitymanager but the entityManager is already Set.");
+			}
 
 		}
 		INSTANCE.entityManagerThreadLocal.set(em);
@@ -187,7 +191,7 @@ public enum EntityManagerProvider
 
 		// EntityManager entityManager = new
 		// EntityManagerTrackerWrapper(INSTANCE.emf.createEntityManager());
-		EntityManager entityManager = INSTANCE.emf.createEntityManager();
+		EntityManager entityManager = new EntityManagerTrackerWrapper(INSTANCE.emf.createEntityManager());
 
 		return entityManager;
 

@@ -131,9 +131,9 @@ public class ChildJasperReportProperties implements JasperReportProperties
 	}
 
 	@Override
-	public String generateDynamicHeaderImage(int pageWidth, String reportTitle)
+	public String generateDynamicHeaderImage(int pageWidth,int height, String reportTitle)
 	{
-		return this.parentReportProperties.generateDynamicHeaderImage(pageWidth, reportTitle);
+		return this.parentReportProperties.generateDynamicHeaderImage(pageWidth,height, reportTitle);
 	}
 
 	@Override

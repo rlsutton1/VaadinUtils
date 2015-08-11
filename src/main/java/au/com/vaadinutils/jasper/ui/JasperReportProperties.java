@@ -176,11 +176,12 @@ public interface JasperReportProperties
 	 * 
 	 * 
 	 * @param pageWidth
+	 * @param height 
 	 * @param reportTitle
 	 *            TODO
 	 * @return
 	 */
-	public abstract String generateDynamicHeaderImage(int pageWidth, String reportTitle);
+	public abstract String generateDynamicHeaderImage(int pageWidth, int height, String reportTitle);
 
 	/**
 	 * reports will be recompiled on every run if true

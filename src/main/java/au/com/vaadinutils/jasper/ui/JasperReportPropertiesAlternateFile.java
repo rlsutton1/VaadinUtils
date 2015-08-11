@@ -86,9 +86,9 @@ public class JasperReportPropertiesAlternateFile implements JasperReportProperti
 	}
 
 	@Override
-	public String generateDynamicHeaderImage(int pageWidth, String reportTitle)
+	public String generateDynamicHeaderImage(int pageWidth,int height, String reportTitle)
 	{
-		return reportPropertiesTemplate.generateDynamicHeaderImage(pageWidth, reportTitle);
+		return reportPropertiesTemplate.generateDynamicHeaderImage(pageWidth, height,reportTitle);
 	}
 
 	@Override

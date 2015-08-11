@@ -379,9 +379,12 @@ public class JasperManager implements Runnable
 				String expr = im.getExpression().getText();
 				if (expr.contains("logo.png"))
 				{
-					String fileName = reportProperties.generateDynamicHeaderImage(designFile.getPageWidth()
-							- (margin * 2), reportProperties.getReportTitle());
-					im.setWidth(designFile.getPageWidth() - (margin * 2));
+					int height = 140;
+					final int imageWidth = designFile.getPageWidth() - (margin * 2);
+					String fileName = reportProperties.generateDynamicHeaderImage(imageWidth,height, reportProperties.getReportTitle());
+					im.setWidth(imageWidth);
+					//im.setHeight(height);
+					im.setX(-8);
 
 					expr = expr.replace("logo.png", fileName);
 					im.setExpression(new JRDesignExpression(expr));

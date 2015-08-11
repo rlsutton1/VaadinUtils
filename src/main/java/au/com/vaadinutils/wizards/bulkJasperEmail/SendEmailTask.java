@@ -215,7 +215,7 @@ public class SendEmailTask extends ProgressBarTask<JasperTransmission> implement
 	}
 
 	@Override
-	public String generateDynamicHeaderImage(int pageWidth, String reportTitle)
+	public String generateDynamicHeaderImage(int pageWidth,int height, String reportTitle)
 	{
 		
 		return null;

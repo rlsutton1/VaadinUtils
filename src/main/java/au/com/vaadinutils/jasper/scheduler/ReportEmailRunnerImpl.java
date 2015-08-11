@@ -218,9 +218,9 @@ public class ReportEmailRunnerImpl implements ReportEmailRunner, JasperReportPro
 	}
 
 	@Override
-	public String generateDynamicHeaderImage(int pageWidth, String reportTitle)
+	public String generateDynamicHeaderImage(int pageWidth,int height, String reportTitle)
 	{
-		return jasperReportProperties.generateDynamicHeaderImage(pageWidth, reportTitle);
+		return jasperReportProperties.generateDynamicHeaderImage(pageWidth,height, reportTitle);
 	}
 
 	@Override

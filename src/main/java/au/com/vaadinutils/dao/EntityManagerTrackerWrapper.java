@@ -54,7 +54,7 @@ public class EntityManagerTrackerWrapper implements EntityManager
 				ErrorWindow.showErrorWindow(created);
 			}
 		};
-		future =scheduler.scheduleAtFixedRate(runnable, 10, 10, TimeUnit.MINUTES);
+		future =scheduler.scheduleAtFixedRate(runnable, 40, 40, TimeUnit.SECONDS);
 	}
 
 	@Override
