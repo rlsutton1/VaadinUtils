@@ -736,6 +736,7 @@ class JasperReportLayout extends VerticalLayout
 
 			private static final long serialVersionUID = -5641305025399715756L;
 
+			@SuppressWarnings("unchecked")
 			@Override
 			public void poll(PollEvent event)
 			{

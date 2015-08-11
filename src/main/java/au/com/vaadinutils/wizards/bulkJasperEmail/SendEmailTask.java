@@ -160,14 +160,14 @@ public class SendEmailTask extends ProgressBarTask<JasperTransmission> implement
 	@Override
 	public Map<String, Object> getCustomReportParameterMap()
 	{
-		throw new RuntimeException("Not implemented, maybe you should implement this method here?");
+		return  null;
 
 	}
 
 	@Override
 	public ReportFilterUIBuilder getFilterBuilder()
 	{
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -175,49 +175,49 @@ public class SendEmailTask extends ProgressBarTask<JasperTransmission> implement
 	public List<ReportParameter<?>> prepareData(Collection<ReportParameter<?>> params,String reportFilename, 
 			CleanupCallback cleanupCallback) throws Exception
 	{
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
 	@Override
 	public void prepareForOutputFormat(OutputFormat outputFormat)
 	{
-		// TODO Auto-generated method stub
+		
 
 	}
 
 	@Override
 	public void closeDBConnection()
 	{
-		// TODO Auto-generated method stub
+		
 
 	}
 
 	@Override
 	public void initDBConnection()
 	{
-		// TODO Auto-generated method stub
+		
 
 	}
 
 	@Override
 	public OutputFormat getDefaultFormat()
 	{
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
 	@Override
 	public CleanupCallback getCleanupCallback()
 	{
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
 	@Override
 	public String generateDynamicHeaderImage(int pageWidth, String reportTitle)
 	{
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -230,63 +230,63 @@ public class SendEmailTask extends ProgressBarTask<JasperTransmission> implement
 	@Override
 	public String getReportFileName()
 	{
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
 	@Override
 	public String getReportTitle()
 	{
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
 	@Override
 	public String getHeaderFooterTemplateName()
 	{
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
 	@Override
 	public String getUsername()
 	{
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
 	@Override
 	public Connection getConnection()
 	{
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
 	@Override
 	public File getReportFolder()
 	{
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
 	@Override
 	public Class<? extends JasperReportProperties> getReportClass()
 	{
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
 	@Override
 	public String getUserEmailAddress()
 	{
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
 	@Override
 	public Enum<?> getReportIdentifier()
 	{
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 }
