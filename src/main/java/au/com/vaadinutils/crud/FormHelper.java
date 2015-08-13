@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -45,10 +46,12 @@ import com.google.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.fieldfactory.SingleSelectConverter;
 import com.vaadin.data.Container;
+import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.shared.ui.datefield.Resolution;
 import com.vaadin.ui.AbstractComponent;
+import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.AbstractSelect.ItemCaptionMode;
 import com.vaadin.ui.CheckBox;
@@ -72,6 +75,7 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 	ArrayList<AbstractComponent> fieldList = new ArrayList<AbstractComponent>();
 	private AbstractLayout form;
 	private ValidatingFieldGroup<E> group;
+	private Set<ValueChangeListener> valueChangeListeners = new LinkedHashSet<>();
 
 	static transient Logger logger = LogManager.getLogger(FormHelper.class);
 
@@ -84,6 +88,27 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 		// "ValidatingFieldGroup can not be null");
 		this.form = form;
 		this.group = group;
+	}
+
+	/**
+	 * The added value change listener will get added to every component that's
+	 * created with the FormHelper
+	 *
+	 * @param listener
+	 *            the value change listener
+	 */
+	public void addValueChangeListener(ValueChangeListener listener)
+	{
+		valueChangeListeners.add(listener);
+	}
+
+	@SuppressWarnings("rawtypes")
+	private void addValueChangeListeners(AbstractField c)
+	{
+		for (ValueChangeListener listener : valueChangeListeners)
+		{
+			c.addValueChangeListener(listener);
+		}
 	}
 
 	public <M> TextField bindTextField(AbstractLayout form, ValidatingFieldGroup<E> group, String fieldLabel,
@@ -146,6 +171,7 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 		field.setImmediate(true);
 		field.setNullRepresentation("");
 		field.setNullSettingAllowed(false);
+		addValueChangeListeners(field);
 		doBinding(group, fieldName, field);
 		form.addComponent(field);
 		return field;
@@ -177,6 +203,7 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 		field.setImmediate(true);
 		field.setNullRepresentation("");
 		field.setNullSettingAllowed(false);
+		addValueChangeListeners(field);
 		doBinding(group, fieldName, field);
 		form.addComponent(field);
 		return field;
@@ -190,13 +217,13 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 		return field;
 	}
 
-	public TextArea bindTextAreaField(String fieldLabel, SingularAttribute<E,String> attribute, int rows)
+	public TextArea bindTextAreaField(String fieldLabel, SingularAttribute<E, String> attribute, int rows)
 	{
 		TextArea field = bindTextAreaField(form, group, fieldLabel, attribute.getName(), rows);
 		this.fieldList.add(field);
 		return field;
 	}
-	
+
 	public TextArea bindTextAreaField(String fieldLabel, String fieldName, int rows)
 	{
 		TextArea field = bindTextAreaField(form, group, fieldLabel, fieldName, rows);
@@ -220,6 +247,7 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 		field.setWidth("100%");
 		field.setImmediate(true);
 		field.setNullRepresentation("");
+		addValueChangeListeners(field);
 		doBinding(group, fieldName, field);
 		form.addComponent(field);
 		return field;
@@ -258,6 +286,7 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 
 		field.setImmediate(true);
 		field.setWidth("100%");
+		addValueChangeListeners(field);
 		doBinding(group, fieldName, field);
 		form.addComponent(field);
 		return field;
@@ -325,6 +354,7 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 		field.setTextInputAllowed(true);
 		field.setWidth(STANDARD_COMBO_WIDTH);
 		field.setImmediate(true);
+		addValueChangeListeners(field);
 		doBinding(group, fieldName, field);
 
 		form.addComponent(field);
@@ -360,9 +390,8 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 		CheckBox field = new SplitCheckBox(fieldLabel);
 		field.setWidth("100%");
 		field.setImmediate(true);
-
+		addValueChangeListeners(field);
 		doBinding(group, fieldName, field);
-
 		form.addComponent(field);
 		return field;
 	}
@@ -399,6 +428,7 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 		field.setWidth(STANDARD_COMBO_WIDTH);
 		field.setImmediate(true);
 		form.addComponent(field);
+		addValueChangeListeners(field);
 		doBinding(group, fieldName, field);
 		return field;
 	}
@@ -603,6 +633,7 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 			component.setTextInputAllowed(true);
 			component.setWidth(STANDARD_COMBO_WIDTH);
 			component.setImmediate(true);
+			addValueChangeListeners(component);
 			if (group != null)
 			{
 				Collection<? extends Object> ids = null;
@@ -612,8 +643,8 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 				else if (group.getItemDataSource() != null)
 					ids = group.getItemDataSource().getItemPropertyIds();
 
-				Preconditions.checkNotNull(ids ,
-						"The group must have either a Container or an ItemDataSource attached.");
+				Preconditions
+						.checkNotNull(ids, "The group must have either a Container or an ItemDataSource attached.");
 
 				Preconditions.checkState(ids.contains(field),
 						field + " is not valid, valid listFieldNames are " + ids.toString());
@@ -968,6 +999,7 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 			component.setImmediate(true);
 			component.setNullSelectionAllowed(true);
 			component.setBuffered(true);
+			addValueChangeListeners(component);
 
 			if (group != null)
 			{
@@ -1107,6 +1139,7 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 		SplitEditorField field = new SplitEditorField(readonly);
 		field.setWidth("100%");
 		field.setImmediate(true);
+		addValueChangeListeners(field);
 		doBinding(group, fieldName, field);
 		form.addComponent(field);
 		return field;
@@ -1233,6 +1266,7 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 		SplitEditorField field = new SplitEditorField(readonly, configModifier);
 		field.setWidth("100%");
 		field.setImmediate(true);
+		addValueChangeListeners(field);
 		doBinding(group, fieldName, field);
 		form.addComponent(field);
 		return field;
@@ -1278,7 +1312,7 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 	public void addComponent(Component component)
 	{
 		form.addComponent(component);
-		
+
 	}
 
 }

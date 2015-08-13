@@ -6,8 +6,9 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
-import java.util.List;
+import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -50,8 +51,8 @@ public class TimePicker extends HorizontalLayout implements Field
 	private int tabIndex;
 	private boolean isBuffered;
 	private Validator timeValidator;
-	List<Validator> validators = new LinkedList<>();
-	List<ValueChangeListener> listeners = new LinkedList<>();
+	Set<Validator> validators = new LinkedHashSet<>();
+	Set<ValueChangeListener> listeners = new LinkedHashSet<>();
 
 	private Button pickerButton;
 
