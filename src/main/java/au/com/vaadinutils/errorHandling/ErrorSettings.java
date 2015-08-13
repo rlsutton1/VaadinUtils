@@ -19,4 +19,6 @@ public interface ErrorSettings
 
 	String getBuildVersion();
 
+	String getUserEmail();
+
 }

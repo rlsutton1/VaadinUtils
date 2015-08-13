@@ -56,13 +56,13 @@ public class ErrorWindow
 
 	ErrorWindow(boolean noUI)
 	{
-		
+
 	}
-	
+
 	public static void showErrorWindow(Throwable error)
 	{
 		new ErrorWindow(true).internalShowErrorWindow(error);
-		
+
 	}
 
 	private void internalShowErrorWindow(Throwable error)
@@ -175,9 +175,9 @@ public class ErrorWindow
 							supportEmail,
 							subject,
 							subject + "\n\nTime: " + time.toString() + "\n\nView: " + viewClass + "\n\nUser: "
-									+ getUserName() + "\n\n" + "Version: " + getBuildVersion() + "\n\n" + "User notes:"
-									+ notes.getValue() + "\n\n" + finalTrace, ErrorWindow.this.stream,
-							ErrorWindow.this.filename, ErrorWindow.this.MIMEType);
+									+ getUserName() + " " + getUserEmail() + "\n\n" + "Version: " + getBuildVersion()
+									+ "\n\n" + "User notes:" + notes.getValue() + "\n\n" + finalTrace,
+							ErrorWindow.this.stream, ErrorWindow.this.filename, ErrorWindow.this.MIMEType);
 				}
 				catch (Exception e)
 				{
@@ -311,7 +311,7 @@ public class ErrorWindow
 		uploadStatus.setValue(message);
 	}
 
-	private static String getViewName()
+	private String getViewName()
 	{
 		try
 		{
@@ -324,7 +324,7 @@ public class ErrorWindow
 		return "Error getting View name";
 	}
 
-	private static String getSupportCompanyName()
+	private String getSupportCompanyName()
 	{
 		try
 		{
@@ -337,7 +337,7 @@ public class ErrorWindow
 		return "Error getting Support Company Name";
 	}
 
-	private static String getTargetEmailAddress()
+	private String getTargetEmailAddress()
 	{
 		try
 		{
@@ -350,7 +350,20 @@ public class ErrorWindow
 		return "Error getting Target Email Address";
 	}
 
-	private static String getBuildVersion()
+	private String getUserEmail()
+	{
+		try
+		{
+			return ErrorSettingsFactory.getErrorSettings().getUserEmail();
+		}
+		catch (Exception e)
+		{
+			logger.error(e, e);
+		}
+		return "Error getting user email";
+	}
+
+	private String getBuildVersion()
 	{
 		try
 		{
@@ -363,7 +376,7 @@ public class ErrorWindow
 		return "Error getting build Version";
 	}
 
-	private static String getUserName()
+	private String getUserName()
 	{
 		try
 		{
@@ -376,7 +389,7 @@ public class ErrorWindow
 		return "Error getting user name";
 	}
 
-	private static String getSystemName()
+	private String getSystemName()
 	{
 		try
 		{

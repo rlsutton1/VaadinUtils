@@ -49,5 +49,12 @@ public class DefaultErrorSettings implements ErrorSettings
 		return "Target email address not set, call ErrorSettingsFactory.setErrorSettings and implement appropriate settings";
 	}
 
+	@Override
+	public String getUserEmail()
+	{
+		return "User email address not set, call ErrorSettingsFactory.getUserEmail and implement appropriate settings";
+
+	}
+
 	
 }
