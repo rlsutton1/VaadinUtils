@@ -7,6 +7,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.persistence.EntityGraph;
 import javax.persistence.EntityManager;
@@ -32,29 +33,36 @@ public class EntityManagerTrackerWrapper implements EntityManager
 {
 	final private EntityManager em;
 
-	Exception created = new Exception("Unclosed Entity Manager created here at "+new Date());
-	
+	Exception created = new Exception("Unclosed Entity Manager created here at " + new Date());
+
 	private static ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-	
+
 	Logger logger = LogManager.getLogger();
 
 	private ScheduledFuture<?> future;
 
+	private static final AtomicLong idSeed = new AtomicLong();
+
+	private final Long id;
 	private Exception closedAt;
 
 	EntityManagerTrackerWrapper(EntityManager em)
 	{
+
+		id = idSeed.incrementAndGet();
+		logger.error("Created entityManager {}", id);
 		this.em = em;
-		Runnable runnable= new Runnable()
+		Runnable runnable = new Runnable()
 		{
-			
+
 			@Override
 			public void run()
 			{
 				ErrorWindow.showErrorWindow(created);
 			}
 		};
-		future =scheduler.scheduleAtFixedRate(runnable, 40, 40, TimeUnit.SECONDS);
+		future = scheduler.scheduleAtFixedRate(runnable, 40, 40, TimeUnit.SECONDS);
+
 	}
 
 	@Override
@@ -82,10 +90,10 @@ public class EntityManagerTrackerWrapper implements EntityManager
 	@Override
 	public <T> T find(Class<T> entityClass, Object primaryKey)
 	{
-		if (closedAt!=null)
+		if (closedAt != null)
 		{
-			logger.error("Trying to look up {} {}",entityClass,primaryKey);
-			logger.error(closedAt,closedAt);
+			logger.error("Trying to look up {} {}", entityClass, primaryKey);
+			logger.error(closedAt, closedAt);
 		}
 		return em.find(entityClass, primaryKey);
 	}
@@ -178,7 +186,6 @@ public class EntityManagerTrackerWrapper implements EntityManager
 	{
 
 		em.refresh(entity, lockMode);
-		
 
 	}
 
@@ -365,9 +372,23 @@ public class EntityManagerTrackerWrapper implements EntityManager
 	@Override
 	public void close()
 	{
+		logger.error("Closed entityManager {}", id);
+
 		future.cancel(false);
-		closedAt = new Exception("Closed here at "+new Date());
-		em.close();
+		closedAt = new Exception("Closed here at " + new Date());
+		if (em.getTransaction().isActive())
+		{
+			logger.error("Transaction is still active at close");
+			em.getTransaction().commit();
+		}
+		try
+		{
+			em.close();
+		}
+		catch (Throwable e)
+		{
+			logger.error(e, e);
+		}
 
 	}
 
@@ -395,10 +416,10 @@ public class EntityManagerTrackerWrapper implements EntityManager
 	@Override
 	public CriteriaBuilder getCriteriaBuilder()
 	{
-		if (closedAt!=null)
+		if (closedAt != null)
 		{
 			logger.error("Trying to getCriteriaBuilder");
-			logger.error(closedAt,closedAt);
+			logger.error(closedAt, closedAt);
 		}
 		return em.getCriteriaBuilder();
 	}

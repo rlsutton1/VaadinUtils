@@ -191,7 +191,7 @@ public enum EntityManagerProvider
 
 		// EntityManager entityManager = new
 		// EntityManagerTrackerWrapper(INSTANCE.emf.createEntityManager());
-		EntityManager entityManager = new EntityManagerTrackerWrapper(INSTANCE.emf.createEntityManager());
+		EntityManager entityManager = INSTANCE.emf.createEntityManager();
 
 		return entityManager;
 
