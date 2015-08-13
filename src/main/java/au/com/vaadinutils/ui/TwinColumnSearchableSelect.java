@@ -49,7 +49,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	private String itemLabel;
 
 	private Collection<C> sourceValue;
-	private Table selectedCols;
+	protected Table selectedCols;
 	Logger logger = LogManager.getLogger();
 	private BeanContainer<Long, C> beans;
 	private JPAContainer<C> availableContainer;
@@ -108,13 +108,16 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 					listField.getDeclaringType().getJavaType(),
 					Arrays.toString(selectedCols.getContainerPropertyIds().toArray()));
 		}
+
 		selectedCols.setVisibleColumns(itemLabel);
 		selectedCols.setColumnHeaders(fieldName);
+
 		selectedCols.setSizeFull();
 		selectedCols.setHeight("200");
 		selectedCols.setSelectable(true);
 		createAvailableTable();
 
+		addSelectedColumnTooltip();
 		addNewButton.setVisible(false);
 	}
 
@@ -597,4 +600,15 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	{
 
 	}
+
+	protected void addSelectedColumnTooltip()
+	{
+
+	}
+
+	public void refreshSelectedColumn()
+	{
+		selectedCols.refreshRowCache();
+	}
+
 }
