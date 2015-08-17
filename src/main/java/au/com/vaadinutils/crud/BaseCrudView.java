@@ -1556,7 +1556,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		}
 		for (Entry<String, Long> time : times.entrySet())
 		{
-			logger.info("{}: {}ms", time.getKey(), time.getValue());
+			logger.debug("{}: {}ms", time.getKey(), time.getValue());
 		}
 
 	}

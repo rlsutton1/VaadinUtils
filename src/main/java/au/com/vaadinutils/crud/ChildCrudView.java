@@ -610,7 +610,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 			}
 			catch (InvalidValueException e)
 			{
-				handleInvalidValueException((InvalidValueException) e);
+				handleInvalidValueException(e);
 			}
 			catch (CommitException e)
 			{
@@ -692,7 +692,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 
 			if (item != null && item.getEntity() != null)
 			{
-				logger.info("Parent Row Changed {} {}", item.getEntity().getId(), item.getEntity().getName());
+				logger.debug("Parent Row Changed {} {}", item.getEntity().getId(), item.getEntity().getName());
 			}
 
 			searchField.setValue("");
@@ -728,7 +728,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 				// so we'll simulate one!
 				rowChanged(entityTable.getCurrent());
 			}
-			logger.info("Child crud load {} took {}", this.getClass().getSimpleName(),
+			logger.debug("Child crud load {} took {}", this.getClass().getSimpleName(),
 					timer.elapsed(TimeUnit.MILLISECONDS));
 
 			Object id = entityTable.firstItemId();

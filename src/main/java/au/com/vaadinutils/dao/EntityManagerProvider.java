@@ -107,7 +107,7 @@ public enum EntityManagerProvider
 	{
 		if (getEntityManager() == null)
 		{
-			EntityManager em = createEntityManager();
+			final EntityManager em = createEntityManager();
 
 			try
 			{
