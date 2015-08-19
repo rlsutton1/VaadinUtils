@@ -1216,17 +1216,14 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	{
 		// don't really need an AtomicReference, just using it as a mutable
 		// final variable to be used in the callback
-		final AtomicReference<E> newEntity = new AtomicReference<E>();
+		final AtomicReference<E> entityReference = new AtomicReference<E>();
 
 		// call back to collect the id of the new record when the container
 		// fires the ItemSetChangeEvent
-		ItemSetChangeListener tmp = new ItemSetChangeListener()
+		ItemSetChangeListener tempListener = new ItemSetChangeListener()
 		{
 
-			/**
-			 * 
-			 */
-			private static final long serialVersionUID = 9132090066374531277L;
+			private static final long serialVersionUID = 8086546233136795406L;
 
 			@Override
 			public void containerItemSetChange(ItemSetChangeEvent event)
@@ -1241,21 +1238,28 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 					if (affectedEntities.size() > 0)
 					{
 						@SuppressWarnings("unchecked")
-						E id = (E) affectedEntities.toArray()[0];
-						newEntity.set(id);
+						E entity = (E) affectedEntities.toArray()[0];
+						entityReference.set(entity);
 
 					}
 				}
 			}
 		};
 
+		LinkedList<ItemSetChangeListener> listeners = null;
 		try
 		{
-			// add the listener
-			container.addItemSetChangeListener(tmp);
+			// get existing listeners and remove them
+			listeners = container.getItemSetChangeListeners();
+			for (ItemSetChangeListener listener : listeners)
+			{
+				container.removeItemSetChangeListener(listener);
+			}
+			// add the temp listener
+			container.addItemSetChangeListener(tempListener);
 			// call commit
 			container.commit();
-			newEntity.set(EntityManagerProvider.getEntityManager().merge(newEntity.get()));
+			entityReference.set(EntityManagerProvider.getEntityManager().merge(entityReference.get()));
 		}
 		catch (Exception e)
 		{
@@ -1263,12 +1267,17 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		}
 		finally
 		{
-			// detach the listener
-			container.removeItemSetChangeListener(tmp);
+			// detach the temp listener
+			container.removeItemSetChangeListener(tempListener);
+			// restore the existing listeners
+			for (ItemSetChangeListener listener : listeners)
+			{
+				container.addItemSetChangeListener(listener);
+			}
 		}
 
 		// return the entity
-		return newEntity.get();
+		return entityReference.get();
 	}
 
 	/**
