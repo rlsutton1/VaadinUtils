@@ -107,7 +107,10 @@ public class ErrorWindow
 				id += "at " + trace.getClassName() + "." + trace.getMethodName() + "(" + trace.getFileName() + ":"
 						+ trace.getLineNumber() + ")\n";
 			}
-			id = "" + id.hashCode();
+			// prevent hashcode being negative
+			Long hashId = new Long(id.hashCode()) + new Long(Integer.MAX_VALUE);
+			id = "" + hashId;
+
 		}
 
 		final String finalId = id;
