@@ -3,6 +3,9 @@ package au.com.vaadinutils.crud;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeEvent;
@@ -17,6 +20,8 @@ public class ValidatingFieldGroup<E> extends FieldGroup
 	private static final long serialVersionUID = 1L;
 	private final Class<E> entityClass;
 	private JPAContainer<E> container;
+	
+	Logger logger = LogManager.getLogger();
 
 	public ValidatingFieldGroup(JPAContainer<E> container, Class<E> entityClass)
 	{
@@ -140,8 +145,8 @@ public class ValidatingFieldGroup<E> extends FieldGroup
 		{
 			if (field.isModified())
 			{
-				System.out.println("8234873: Dirty: " + field.getCaption());
-				System.out.println("Dirty value: " + field.getValue());
+				logger.warn("8234873: Dirty: " + field.getCaption());
+				logger.warn("Dirty value: " + field.getValue());
 
 				return true;
 			}

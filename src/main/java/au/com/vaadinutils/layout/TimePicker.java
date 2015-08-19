@@ -6,6 +6,9 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.vaadin.data.Property;
 import com.vaadin.data.Validator;
 import com.vaadin.data.Validator.InvalidValueException;
@@ -46,6 +49,8 @@ public class TimePicker extends HorizontalLayout implements Field
 	private int tabIndex;
 	private boolean isBuffered;
 	private Validator validator;
+	
+	Logger logger = LogManager.getLogger();
 
 	public TimePicker(String title)
 	{
@@ -514,7 +519,7 @@ public class TimePicker extends HorizontalLayout implements Field
 		}
 		displayTime.setValue(getValueAsString());
 		field.setValue(getValueAsString());
-		System.out.println("set to " + getValueAsString());
+		logger.info("set to " + getValueAsString());
 	}
 
 	private void setNewValue()

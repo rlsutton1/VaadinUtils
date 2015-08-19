@@ -688,6 +688,12 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		splitPanel.setSplitPosition(pos);
 	}
 
+	public void setSplitPosition(float pos, Unit unit)
+	{
+		splitPanel.setSplitPosition(pos, unit);
+
+	}
+
 	private void initButtons()
 	{
 		newButton.addClickListener(new ClickEventLogged.ClickListener()
@@ -885,9 +891,10 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		// JPAContainer will only save nested properties if the relationship has
 		// cascade merge.
 
-		// ALSO an entity in a child crud must NOT have cascade Persist on, as the
+		// ALSO an entity in a child crud must NOT have cascade Persist on, as
+		// the
 		// cascade will cause changes to be lost
-		
+
 		// not quite a paradox?
 
 		boolean selected = false;
@@ -1211,7 +1218,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	{
 		return searchFilterText;
 	}
-	
+
 	protected void setSearchFieldText(String text)
 	{
 		searchField.setValue(text);
@@ -1675,5 +1682,11 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		EntityManagerProvider.getEntityManager().getTransaction().begin();
 		EntityManagerProvider.getEntityManager().flush();
 		container.refresh();
+	}
+
+	public void lockSplitPosition()
+	{
+		splitPanel.setLocked();
+		
 	}
 }

@@ -2,6 +2,8 @@ package au.com.vaadinutils.crud;
 
 
 import com.vaadin.addon.jpacontainer.EntityItem;
+import com.vaadin.data.util.converter.Converter;
+import com.vaadin.data.util.converter.StringToDateConverter;
 import com.vaadin.event.dd.DropHandler;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Table.ColumnGenerator;
@@ -40,4 +42,6 @@ public interface EntityList<E> extends Component
 	public void setDropHandler(DropHandler dropHandler);
 
 	public void setVisibleColumns(Object... visibleColumns);
+
+	public void setConverter(Object propertyId, Converter<String, ?> converter) ;
 }

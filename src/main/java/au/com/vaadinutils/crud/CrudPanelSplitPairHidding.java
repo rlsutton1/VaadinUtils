@@ -64,5 +64,12 @@ public class CrudPanelSplitPairHidding extends VerticalLayout implements CrudPan
 		
 	}
 
+	@Override
+	public void setSplitPosition(float pos, Unit unit)
+	{
+		
+		
+	}
+
 	
 }
