@@ -240,7 +240,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		dragAndDropOrderingEnabled = true;
 		this.ordinalField = ordinalField;
 
-		container.sort(new Object[] { ordinalField.getName() }, new boolean[] { true });
+		container.sort(new Object[]
+		{ ordinalField.getName() }, new boolean[]
+		{ true });
 
 		this.entityTable.setDragMode(TableDragMode.ROW);
 		this.entityTable.setDropHandler(new DropHandler()
@@ -308,7 +310,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 				container.commit();
 				container.refresh();
-				container.sort(new Object[] { ordinalField.getName() }, new boolean[] { true });
+				container.sort(new Object[]
+				{ ordinalField.getName() }, new boolean[]
+				{ true });
 
 				// cause this crud to save, or if its a child cause the parent
 				// to save.
@@ -1117,9 +1121,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 			newEntity = EntityManagerProvider.merge(newEntity);
 			postSaveAction(newEntity);
-			EntityManagerProvider.getEntityManager().flush();
 
-			container.refreshItem(newEntity.getId());
+			reloadDataFromDB(newEntity.getId());
+
 			CrudEventDistributer.publishEvent(this, eventType, newEntity);
 
 			if (eventType == CrudEventType.CREATE)
@@ -1862,29 +1866,49 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 * after making changes via JPA, to get the crud to see the changes call
 	 * this method if needed.
 	 * 
-	 * beware it is a costly opperation.
+	 * beware it is a costly operation.
 	 * 
-	 * commit the transaction and flush to db, then refresh the container
+	 * commit the transaction, then refresh the container
 	 */
 	public void reloadDataFromDB()
 	{
-		Object id = null;
+		Object selectedId = null;
 		if (entityTable.getCurrent() != null)
 		{
-			id = entityTable.getCurrent().getItemId();
+			selectedId = entityTable.getCurrent().getItemId();
 		}
 		EntityManagerProvider.getEntityManager().getTransaction().commit();
 		EntityManagerProvider.getEntityManager().getTransaction().begin();
-		EntityManagerProvider.getEntityManager().flush();
 		container.refresh();
 		entityTable.select(null);
-		if (id == null)
+		if (selectedId == null)
 		{
 			entityTable.select(entityTable.firstItemId());
 		}
 		else
 		{
-			entityTable.select(id);
+			entityTable.select(selectedId);
+		}
+	}
+
+	public void reloadDataFromDB(Long itemId)
+	{
+		Object selectedId = null;
+		if (entityTable.getCurrent() != null)
+		{
+			selectedId = entityTable.getCurrent().getItemId();
+		}
+		EntityManagerProvider.getEntityManager().getTransaction().commit();
+		EntityManagerProvider.getEntityManager().getTransaction().begin();
+		container.refreshItem(itemId);
+		entityTable.select(null);
+		if (selectedId == null)
+		{
+			entityTable.select(entityTable.firstItemId());
+		}
+		else
+		{
+			entityTable.select(selectedId);
 		}
 	}
 
