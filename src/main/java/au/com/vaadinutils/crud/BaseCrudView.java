@@ -1121,6 +1121,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 			newEntity = EntityManagerProvider.merge(newEntity);
 			postSaveAction(newEntity);
+			EntityManagerProvider.getEntityManager().flush();
 
 			reloadDataFromDB(newEntity.getId());
 
