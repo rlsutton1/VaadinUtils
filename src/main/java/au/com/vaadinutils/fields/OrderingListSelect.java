@@ -66,7 +66,10 @@ public class OrderingListSelect<T> extends CustomComponent
 			@Override
 			public void buttonClick(ClickEvent event)
 			{
-				moveItem((Long) listSelect.getValue(), Direction.UP);
+				if (listSelect != null && !listSelect.isEmpty())
+				{
+					moveItem((Long) listSelect.getValue(), Direction.UP);
+				}
 			}
 		});
 
@@ -76,7 +79,10 @@ public class OrderingListSelect<T> extends CustomComponent
 			@Override
 			public void buttonClick(ClickEvent event)
 			{
-				moveItem((Long) listSelect.getValue(), Direction.DOWN);
+				if (listSelect != null && !listSelect.isEmpty())
+				{
+					moveItem((Long) listSelect.getValue(), Direction.DOWN);
+				}
 			}
 		});
 	}
@@ -97,6 +103,9 @@ public class OrderingListSelect<T> extends CustomComponent
 			listSelect.addItem(pk);
 			listSelect.setItemCaption(pk, caption);
 		}
+
+		listSelect.setWidth("300");
+
 	}
 
 	private void moveItem(Long selectedPk, Direction direction)
