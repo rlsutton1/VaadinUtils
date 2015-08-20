@@ -104,7 +104,7 @@ public class JpaDslBuilder<E>
 		};
 	}
 
-	public <L> Condition<E> equal(final SingularAttribute<E, L> field, final L value)
+	public <L> Condition<E> equal(final SingularAttribute<? super E, L> field, final L value)
 	{
 
 		return new AbstractCondition<E>()
@@ -718,7 +718,7 @@ public class JpaDslBuilder<E>
 		return lessThan(field, value);
 	}
 
-	public <J> Condition<E> eq(SingularAttribute<E, J> field, J value)
+	public <J> Condition<E> eq(SingularAttribute<? super E, J> field, J value)
 	{
 		return equal(field, value);
 	}
