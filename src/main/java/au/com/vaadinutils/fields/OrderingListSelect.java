@@ -62,7 +62,6 @@ public class OrderingListSelect<T> extends CustomComponent
 	{
 		upButton.addClickListener(new ClickListener()
 		{
-
 			@Override
 			public void buttonClick(ClickEvent event)
 			{
@@ -75,7 +74,6 @@ public class OrderingListSelect<T> extends CustomComponent
 
 		downButton.addClickListener(new ClickListener()
 		{
-
 			@Override
 			public void buttonClick(ClickEvent event)
 			{
