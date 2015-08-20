@@ -62,21 +62,25 @@ public class OrderingListSelect<T> extends CustomComponent
 	{
 		upButton.addClickListener(new ClickListener()
 		{
-
 			@Override
 			public void buttonClick(ClickEvent event)
 			{
-				moveItem((Long) listSelect.getValue(), Direction.UP);
+				if (listSelect != null && !listSelect.isEmpty())
+				{
+					moveItem((Long) listSelect.getValue(), Direction.UP);
+				}
 			}
 		});
 
 		downButton.addClickListener(new ClickListener()
 		{
-
 			@Override
 			public void buttonClick(ClickEvent event)
 			{
-				moveItem((Long) listSelect.getValue(), Direction.DOWN);
+				if (listSelect != null && !listSelect.isEmpty())
+				{
+					moveItem((Long) listSelect.getValue(), Direction.DOWN);
+				}
 			}
 		});
 	}
@@ -97,6 +101,9 @@ public class OrderingListSelect<T> extends CustomComponent
 			listSelect.addItem(pk);
 			listSelect.setItemCaption(pk, caption);
 		}
+
+		listSelect.setWidth("300");
+
 	}
 
 	private void moveItem(Long selectedPk, Direction direction)
