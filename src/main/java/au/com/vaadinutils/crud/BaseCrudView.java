@@ -1185,7 +1185,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		{
 			Filter filter = getContainerFilter(searchText, advancedSearchActive);
 			applyFilter(filter);
-			logger.warn("({}.java:1) getCotainerFilter() returned NULL", this.getClass().getCanonicalName());
+			logger.debug("({}.java:1) getCotainerFilter() returned NULL", this.getClass().getCanonicalName());
 
 		}
 		else

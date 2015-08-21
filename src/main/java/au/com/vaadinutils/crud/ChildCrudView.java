@@ -1,7 +1,6 @@
 package au.com.vaadinutils.crud;
 
 import java.util.Collection;
-import java.util.concurrent.ExecutionException;
 
 import javax.persistence.PersistenceException;
 import javax.persistence.metamodel.SingularAttribute;
@@ -9,7 +8,6 @@ import javax.validation.ConstraintViolationException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.vaadin.dialogs.ConfirmDialog;
 
 import au.com.vaadinutils.dao.EntityManagerProvider;
 
@@ -28,7 +26,6 @@ import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.data.util.filter.Compare;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.UI;
 import com.vaadin.ui.Notification.Type;
 
 /**
@@ -443,7 +440,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 				saving = true;
 				// if a row is saved in the childCrud, then it is dirty for the
 				// purposes of the parent crud
-				if (newEntity !=null && entityTable.getCurrent()!= null && (fieldGroup.isModified() || areNonFieldGroupFieldsDirty()))
+				if ((newEntity !=null || entityTable.getCurrent()!= null) && (fieldGroup.isModified() || areNonFieldGroupFieldsDirty()))
 				{
 					dirty = true;
 					commitFieldGroup();
