@@ -1247,11 +1247,10 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			}
 		};
 
-		LinkedList<ItemSetChangeListener> listeners = null;
+		final LinkedList<ItemSetChangeListener> listeners = new LinkedList<>(container.getItemSetChangeListeners());
 		try
 		{
 			// get existing listeners and remove them
-			listeners = container.getItemSetChangeListeners();
 			for (ItemSetChangeListener listener : listeners)
 			{
 				container.removeItemSetChangeListener(listener);
