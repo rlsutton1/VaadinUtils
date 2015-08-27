@@ -240,7 +240,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		dragAndDropOrderingEnabled = true;
 		this.ordinalField = ordinalField;
 
-		container.sort(new Object[] { ordinalField.getName() }, new boolean[] { true });
+		container.sort(new Object[]
+		{ ordinalField.getName() }, new boolean[]
+		{ true });
 
 		this.entityTable.setDragMode(TableDragMode.ROW);
 		this.entityTable.setDropHandler(new DropHandler()
@@ -308,7 +310,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 				container.commit();
 				container.refresh();
-				container.sort(new Object[] { ordinalField.getName() }, new boolean[] { true });
+				container.sort(new Object[]
+				{ ordinalField.getName() }, new boolean[]
+				{ true });
 
 				// cause this crud to save, or if its a child cause the parent
 				// to save.
@@ -1119,7 +1123,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			postSaveAction(newEntity);
 			EntityManagerProvider.getEntityManager().flush();
 
-			container.refreshItem(newEntity.getId());
+			reloadDataFromDB(newEntity.getId());
+
 			CrudEventDistributer.publishEvent(this, eventType, newEntity);
 
 			if (eventType == CrudEventType.CREATE)
@@ -1212,17 +1217,14 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	{
 		// don't really need an AtomicReference, just using it as a mutable
 		// final variable to be used in the callback
-		final AtomicReference<E> newEntity = new AtomicReference<E>();
+		final AtomicReference<E> entityReference = new AtomicReference<E>();
 
 		// call back to collect the id of the new record when the container
 		// fires the ItemSetChangeEvent
-		ItemSetChangeListener tmp = new ItemSetChangeListener()
+		ItemSetChangeListener tempListener = new ItemSetChangeListener()
 		{
 
-			/**
-			 * 
-			 */
-			private static final long serialVersionUID = 9132090066374531277L;
+			private static final long serialVersionUID = 8086546233136795406L;
 
 			@Override
 			public void containerItemSetChange(ItemSetChangeEvent event)
@@ -1237,21 +1239,27 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 					if (affectedEntities.size() > 0)
 					{
 						@SuppressWarnings("unchecked")
-						E id = (E) affectedEntities.toArray()[0];
-						newEntity.set(id);
+						E entity = (E) affectedEntities.toArray()[0];
+						entityReference.set(entity);
 
 					}
 				}
 			}
 		};
 
+		final LinkedList<ItemSetChangeListener> listeners = new LinkedList<>(container.getItemSetChangeListeners());
 		try
 		{
-			// add the listener
-			container.addItemSetChangeListener(tmp);
+			// get existing listeners and remove them
+			for (ItemSetChangeListener listener : listeners)
+			{
+				container.removeItemSetChangeListener(listener);
+			}
+			// add the temp listener
+			container.addItemSetChangeListener(tempListener);
 			// call commit
 			container.commit();
-			newEntity.set(EntityManagerProvider.getEntityManager().merge(newEntity.get()));
+			entityReference.set(EntityManagerProvider.getEntityManager().merge(entityReference.get()));
 		}
 		catch (Exception e)
 		{
@@ -1259,12 +1267,17 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		}
 		finally
 		{
-			// detach the listener
-			container.removeItemSetChangeListener(tmp);
+			// detach the temp listener
+			container.removeItemSetChangeListener(tempListener);
+			// restore the existing listeners
+			for (ItemSetChangeListener listener : listeners)
+			{
+				container.addItemSetChangeListener(listener);
+			}
 		}
 
 		// return the entity
-		return newEntity.get();
+		return entityReference.get();
 	}
 
 	/**
@@ -1862,29 +1875,49 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 * after making changes via JPA, to get the crud to see the changes call
 	 * this method if needed.
 	 * 
-	 * beware it is a costly opperation.
+	 * beware it is a costly operation.
 	 * 
-	 * commit the transaction and flush to db, then refresh the container
+	 * commit the transaction, then refresh the container
 	 */
 	public void reloadDataFromDB()
 	{
-		Object id = null;
+		Object selectedId = null;
 		if (entityTable.getCurrent() != null)
 		{
-			id = entityTable.getCurrent().getItemId();
+			selectedId = entityTable.getCurrent().getItemId();
 		}
 		EntityManagerProvider.getEntityManager().getTransaction().commit();
 		EntityManagerProvider.getEntityManager().getTransaction().begin();
-		EntityManagerProvider.getEntityManager().flush();
 		container.refresh();
 		entityTable.select(null);
-		if (id == null)
+		if (selectedId == null)
 		{
 			entityTable.select(entityTable.firstItemId());
 		}
 		else
 		{
-			entityTable.select(id);
+			entityTable.select(selectedId);
+		}
+	}
+
+	public void reloadDataFromDB(Long itemId)
+	{
+		Object selectedId = null;
+		if (entityTable.getCurrent() != null)
+		{
+			selectedId = entityTable.getCurrent().getItemId();
+		}
+		EntityManagerProvider.getEntityManager().getTransaction().commit();
+		EntityManagerProvider.getEntityManager().getTransaction().begin();
+		container.refreshItem(itemId);
+		entityTable.select(null);
+		if (selectedId == null)
+		{
+			entityTable.select(entityTable.firstItemId());
+		}
+		else
+		{
+			entityTable.select(selectedId);
 		}
 	}
 
