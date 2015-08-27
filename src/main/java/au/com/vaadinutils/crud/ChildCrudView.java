@@ -292,17 +292,32 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 			}
 		};
 
+		final LinkedList<ItemSetChangeListener> listeners = new LinkedList<>(container.getItemSetChangeListeners());
 		try
 		{
-			// add the listener
+			// get existing listeners and remove them
+			for (ItemSetChangeListener listener : listeners)
+			{
+				container.removeItemSetChangeListener(listener);
+			}
+			// add the hook listener
 			container.addItemSetChangeListener(tmp);
 			// call commit
 			container.commit();
 		}
+		catch (Exception e)
+		{
+			ErrorWindow.showErrorWindow(e);
+		}
 		finally
 		{
-			// detach the listener
+			// detach the hook listener
 			container.removeItemSetChangeListener(tmp);
+			// restore the existing listeners
+			for (ItemSetChangeListener listener : listeners)
+			{
+				container.addItemSetChangeListener(listener);
+			}
 		}
 
 	}
