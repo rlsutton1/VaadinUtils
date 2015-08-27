@@ -19,6 +19,8 @@ import com.vaadin.ui.Field;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.NativeButton;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
@@ -28,6 +30,9 @@ import com.vaadin.ui.themes.Reindeer;
 @SuppressWarnings("rawtypes")
 public class TimePicker24 extends HorizontalLayout implements Field
 {
+
+	protected static final String TIME_FORMAT = "HH:mm a";
+	protected static final String TIME_FORMAT2 = "HH:mma";
 
 	private static final String PM = "pm";
 	private static final String AM = "am";
@@ -90,6 +95,33 @@ public class TimePicker24 extends HorizontalLayout implements Field
 		displayTime.addValidator(validator);
 		field.addValidator(validator);
 
+		field.addValueChangeListener(new ValueChangeListener()
+		{
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void valueChange(com.vaadin.data.Property.ValueChangeEvent event)
+			{
+
+				if (event.getProperty().getValue() != null)
+				{
+					try
+					{
+						final Date parsedDate = parseDate((String) event.getProperty().getValue());
+						if (parsedDate != null)
+						{
+							setValue(parsedDate);
+						}
+					}
+					catch (InvalidValueException e)
+					{
+						Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
+					}
+				}
+			}
+		});
+
 		this.title = title;
 
 		CssLayout hl = new CssLayout();
@@ -115,6 +147,31 @@ public class TimePicker24 extends HorizontalLayout implements Field
 			}
 		});
 		addComponent(hl);
+	}
+
+	protected Date parseDate(String value)
+	{
+		if (value == null || value.equals(EMPTY))
+		{
+			return null;
+		}
+		SimpleDateFormat sdf = new SimpleDateFormat(TIME_FORMAT);
+		try
+		{
+			return sdf.parse(value);
+		}
+		catch (ParseException e)
+		{
+			sdf = new SimpleDateFormat(TIME_FORMAT2);
+			try
+			{
+				return sdf.parse(value);
+			}
+			catch (ParseException e2)
+			{
+				throw new InvalidValueException("Time format is " + TIME_FORMAT);
+			}
+		}
 	}
 
 	@Override
@@ -400,11 +457,11 @@ public class TimePicker24 extends HorizontalLayout implements Field
 		}
 	}
 
-//	public void addChangedHandler(ChangedHandler pChangedHandler)
-//	{
-//		this.changedHandler = pChangedHandler;
-//
-//	}
+	// public void addChangedHandler(ChangedHandler pChangedHandler)
+	// {
+	// this.changedHandler = pChangedHandler;
+	//
+	// }
 
 	public void clearValue()
 	{
@@ -699,7 +756,7 @@ public class TimePicker24 extends HorizontalLayout implements Field
 	{
 		return requiredErrorMessage;
 	}
-	
+
 	@Override
 	public boolean isEmpty()
 	{
@@ -711,7 +768,7 @@ public class TimePicker24 extends HorizontalLayout implements Field
 	public void clear()
 	{
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

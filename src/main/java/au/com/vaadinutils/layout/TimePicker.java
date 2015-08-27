@@ -25,6 +25,8 @@ import com.vaadin.ui.Field;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.NativeButton;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
@@ -79,7 +81,7 @@ public class TimePicker extends HorizontalLayout implements Field<Date>
 
 		};
 		buildUI(title);
-		
+
 	}
 
 	protected void buildUI(String title)
@@ -101,6 +103,21 @@ public class TimePicker extends HorizontalLayout implements Field<Date>
 			public void valueChange(com.vaadin.data.Property.ValueChangeEvent event)
 			{
 				TimePicker.this.valueChange(event);
+				if (event.getProperty().getValue() != null)
+				{
+					try
+					{
+						final Date parsedDate = parseDate((String) event.getProperty().getValue());
+						if (parsedDate != null)
+						{
+							setValue(parsedDate);
+						}
+					}
+					catch (InvalidValueException e)
+					{
+						Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
+					}
+				}
 			}
 		});
 
