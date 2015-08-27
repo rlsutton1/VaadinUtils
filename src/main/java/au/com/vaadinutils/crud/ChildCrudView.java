@@ -20,6 +20,7 @@ import com.google.common.base.Stopwatch;
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.EntityItemProperty;
 import com.vaadin.addon.jpacontainer.EntityProviderChangeEvent;
+import com.vaadin.addon.jpacontainer.EntityProviderChangeEvent.EntitiesAddedEvent;
 import com.vaadin.addon.jpacontainer.EntityProviderChangeEvent.EntitiesRemovedEvent;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.JPAContainer.ProviderChangedEvent;
@@ -264,10 +265,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 		ItemSetChangeListener tmp = new ItemSetChangeListener()
 		{
 
-			/**
-			 * 
-			 */
-			private static final long serialVersionUID = 9132090066374531277L;
+			private static final long serialVersionUID = -4893881323343394274L;
 
 			@Override
 			public void containerItemSetChange(ItemSetChangeEvent event)
@@ -278,6 +276,13 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 					ProviderChangedEvent pce = (ProviderChangedEvent) event;
 					@SuppressWarnings("unchecked")
 					EntityProviderChangeEvent<E> changeEvent = pce.getChangeEvent();
+
+					if (changeEvent instanceof EntitiesAddedEvent)
+					{
+						Collection<E> affectedEntities = changeEvent.getAffectedEntities();
+						eventHandler.entitiesAdded(affectedEntities);
+					}
+
 					if (changeEvent instanceof EntitiesRemovedEvent)
 					{
 						Collection<E> affectedEntitys = changeEvent.getAffectedEntities();
@@ -285,7 +290,6 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 					}
 				}
 			}
-
 		};
 
 		try
@@ -919,6 +923,11 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 	{
 		return new ChildCrudEventHandler<E>()
 		{
+			@Override
+			public void entitiesAdded(Collection<E> entities)
+			{
+			}
+
 			@Override
 			public void entitiesDeleted(Collection<E> entities)
 			{
