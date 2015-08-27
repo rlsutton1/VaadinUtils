@@ -122,9 +122,23 @@ public class ErrorWindow
 				+ error, error);
 		logger.error("Reference: " + reference + " " + cause, cause);
 
-		if (UI.getCurrent() != null)
+		if (UI.getCurrent() != null && UI.getCurrent().getSession().hasLock())
 		{
 			displayVaadinErrorWindow(causeClass, id, time, finalId, finalTrace, reference);
+		}
+		else
+		{
+			try
+			{
+				final String supportEmail = getTargetEmailAddress();
+
+				generateEmail(time, finalId, finalTrace, reference, "Error not displayed to user", supportEmail);
+			}
+			catch (Exception e)
+			{
+				logger.error(e, e);
+			}
+
 		}
 	}
 
@@ -166,21 +180,7 @@ public class ErrorWindow
 			{
 				try
 				{
-					logger.error("Reference: " + reference + " " + notes.getValue());
-
-					String subject = "";
-					String companyName = getSystemName();
-					subject += "Error: " + finalId + " " + companyName + " ref: " + reference;
-
-					String viewClass = getViewName();
-
-					ErrorSettingsFactory.getErrorSettings().sendEmail(
-							supportEmail,
-							subject,
-							subject + "\n\nTime: " + time.toString() + "\n\nView: " + viewClass + "\n\nUser: "
-									+ getUserName() + " " + getUserEmail() + "\n\n" + "Version: " + getBuildVersion()
-									+ "\n\n" + "User notes:" + notes.getValue() + "\n\n" + finalTrace,
-							ErrorWindow.this.stream, ErrorWindow.this.filename, ErrorWindow.this.MIMEType);
+					generateEmail(time, finalId, finalTrace, reference, notes.getValue(), supportEmail);
 				}
 				catch (Exception e)
 				{
@@ -212,6 +212,26 @@ public class ErrorWindow
 
 		// Do the default error handling (optional)
 		// doDefault(event);
+	}
+
+	private void generateEmail(final Date time, final String finalId, final String finalTrace, final String reference,
+			final String notes, final String supportEmail)
+	{
+		logger.error("Reference: " + reference + " " + notes);
+
+		String subject = "";
+		String companyName = getSystemName();
+		subject += "Error: " + finalId + " " + companyName + " ref: " + reference;
+
+		String viewClass = getViewName();
+
+		ErrorSettingsFactory.getErrorSettings().sendEmail(
+				supportEmail,
+				subject,
+				subject + "\n\nTime: " + time.toString() + "\n\nView: " + viewClass + "\n\nUser: " + getUserName()
+						+ " " + getUserEmail() + "\n\n" + "Version: " + getBuildVersion() + "\n\n" + "User notes:"
+						+ notes + "\n\n" + finalTrace, ErrorWindow.this.stream, ErrorWindow.this.filename,
+				ErrorWindow.this.MIMEType);
 	}
 
 	private ByteArrayOutputStream stream = null;

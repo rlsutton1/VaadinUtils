@@ -32,39 +32,34 @@ import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.Reindeer;
 
 @SuppressWarnings("rawtypes")
-public class TimePicker extends HorizontalLayout implements Field
+public class TimePicker extends HorizontalLayout implements Field<Date>
 {
-	private static final String TIME_FORMAT = "HH:mm a";
-	private static final String TIME_FORMAT2 = "HH:mma";
+	protected static final String TIME_FORMAT = "HH:mm a";
+	protected static final String TIME_FORMAT2 = "HH:mma";
 	private static final long serialVersionUID = 1826417125815798837L;
-	private static final String EMPTY = "--:--";
+	protected static final String EMPTY = "--:--";
 	String headerColor = "#B2D7FF";
-	final private TextField displayTime = new TextField();
-	private Calendar dateTime = Calendar.getInstance();
+	protected TextField displayTime = new TextField();
+	protected Calendar dateTime = Calendar.getInstance();
 	boolean isSet = false;
-	private ChangedHandler changedHandler;
+	protected ChangedHandler changedHandler;
 	private String title;
-	private TextField field;
+	protected TextField field;
 	private Property<Date> datasource;
 	// private boolean isRequired;
 	private String requiredErrorMessage;
 	private int tabIndex;
 	private boolean isBuffered;
-	private Validator timeValidator;
+	protected Validator timeValidator;
 	Set<Validator> validators = new LinkedHashSet<>();
 	Set<ValueChangeListener> listeners = new LinkedHashSet<>();
 
-	private Button pickerButton;
+	protected Button pickerButton;
 
-	@SuppressWarnings("serial")
 	public TimePicker(String title)
 	{
-
 		setCaption(title);
-		field = new TextField();
-		field.setWidth("125");
-		field.setImmediate(true);
-		displayTime.setImmediate(true);
+		this.title = title;
 		timeValidator = new Validator()
 		{
 
@@ -83,10 +78,24 @@ public class TimePicker extends HorizontalLayout implements Field
 			}
 
 		};
+		buildUI(title);
+		
+	}
+
+	protected void buildUI(String title)
+	{
+
+		field = new TextField();
+		field.setWidth("125");
+		field.setImmediate(true);
+		displayTime.setImmediate(true);
+
 		displayTime.addValidator(timeValidator);
 		field.addValidator(timeValidator);
 		field.addValueChangeListener(new ValueChangeListener()
 		{
+
+			private static final long serialVersionUID = 1L;
 
 			@Override
 			public void valueChange(com.vaadin.data.Property.ValueChangeEvent event)
@@ -130,7 +139,7 @@ public class TimePicker extends HorizontalLayout implements Field
 		super.setReadOnly(readOnly);
 	}
 
-	private Date parseDate(String value)
+	protected Date parseDate(String value)
 	{
 		if (value == null || value.equals(EMPTY))
 		{
@@ -250,8 +259,8 @@ public class TimePicker extends HorizontalLayout implements Field
 		addMinuteButtons(minuteButtonPanel, 2, 4);
 
 		HorizontalLayout amPmHourWrapper = new HorizontalLayout();
-		amPmHourWrapper.addComponent(amPmPanel);
 		amPmHourWrapper.addComponent(hourPanel);
+		amPmHourWrapper.addComponent(amPmPanel);
 		hourPanelLabelWrapper.addComponent(amPmHourWrapper);
 
 		layout.addComponent(hourPanelLabelWrapper);
@@ -339,10 +348,9 @@ public class TimePicker extends HorizontalLayout implements Field
 
 	}
 
-	private void addMinuteButtons(HorizontalLayout minuteButtonPanel, int rows, int cols)
+	protected void addMinuteButtons(HorizontalLayout minuteButtonPanel, int rows, int cols)
 	{
-		String[] numbers = new String[]
-		{ "00", "10", "15", "20", "30", "40", "45", "50" };
+		String[] numbers = new String[] { "00", "10", "15", "20", "30", "40", "45", "50" };
 		for (int col = 0; col < cols; col++)
 		{
 			VerticalLayout rowsLayout = new VerticalLayout();
@@ -381,10 +389,9 @@ public class TimePicker extends HorizontalLayout implements Field
 		}
 	}
 
-	private void addHourButtons(HorizontalLayout hourButtonPanel, int rows, int cols)
+	protected void addHourButtons(HorizontalLayout hourButtonPanel, int rows, int cols)
 	{
-		int[] numbers = new int[]
-		{ 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
+		int[] numbers = new int[] { 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
 		for (int col = 0; col < cols; col++)
 		{
 			VerticalLayout rowsLayout = new VerticalLayout();
@@ -417,7 +424,7 @@ public class TimePicker extends HorizontalLayout implements Field
 		}
 	}
 
-	private void addAmPmButtons(VerticalLayout amPmButtonPanel)
+	protected void addAmPmButtons(VerticalLayout amPmButtonPanel)
 	{
 		final NativeButton am = new NativeButton("AM");
 		final NativeButton pm = new NativeButton("PM");
@@ -482,7 +489,7 @@ public class TimePicker extends HorizontalLayout implements Field
 		internalSetReadonlyFieldValue(EMPTY);
 	}
 
-	private void internalSetReadonlyFieldValue(String value)
+	protected void internalSetReadonlyFieldValue(String value)
 	{
 		boolean isRo = field.isReadOnly();
 		field.setReadOnly(false);
@@ -522,7 +529,7 @@ public class TimePicker extends HorizontalLayout implements Field
 		}
 	}
 
-	private void setNewValue()
+	protected void setNewValue()
 	{
 		displayTime.setValue(getValueAsString());
 		internalSetReadonlyFieldValue(getValueAsString());
@@ -683,14 +690,14 @@ public class TimePicker extends HorizontalLayout implements Field
 	}
 
 	@Override
-	public void setValue(Object newValue)
+	public void setValue(Date newValue)
 	{
-		setValues((Date) newValue);
+		setValues(newValue);
 
 	}
 
 	@Override
-	public Class getType()
+	public Class<Date> getType()
 	{
 
 		return Date.class;
@@ -787,7 +794,7 @@ public class TimePicker extends HorizontalLayout implements Field
 	{
 		return requiredErrorMessage;
 	}
-	
+
 	@Override
 	public boolean isEmpty()
 	{
@@ -799,7 +806,7 @@ public class TimePicker extends HorizontalLayout implements Field
 	public void clear()
 	{
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

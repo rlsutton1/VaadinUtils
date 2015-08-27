@@ -1109,6 +1109,12 @@ public class JpaDslBuilder<E>
 	{
 		return builder.concat(trim, string);
 	}
+	
+	public Expression<String> asString(SingularAttribute<E, ?> field)
+	{
+		
+		return root.get(field).as(String.class);
+	}
 
 	public Expression<String> concat(Expression<String> concat, Expression<String> trim)
 	{
@@ -1154,6 +1160,23 @@ public class JpaDslBuilder<E>
 
 			}
 		};
+	}
+
+	public <V extends Comparable<? super V>> Condition<E> greaterThan(final SingularAttribute<E, V> field,
+			final V value)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+
+				return builder.greaterThan(root.get(field), value);
+			}
+
+		};
+
 	}
 
 }
