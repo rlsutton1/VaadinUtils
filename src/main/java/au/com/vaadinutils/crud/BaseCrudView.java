@@ -711,12 +711,16 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		return advancedSearchLayout;
 	}
 
-	public void showAdvancedSearch()
+	public void showAdvancedSearch(boolean lockAdvancedSearch)
 	{
 		advancedSearchOn = true;
 		advancedSearchLayout.setVisible(advancedSearchOn);
 		advancedSearchCheckbox.setStyleName(ValoTheme.BUTTON_FRIENDLY);
-
+		
+		if (lockAdvancedSearch)
+		{
+			advancedSearchCheckbox.setVisible(false);
+		}
 	}
 
 	protected AbstractLayout getAdvancedSearchLayout()
