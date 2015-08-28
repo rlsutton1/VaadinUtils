@@ -371,4 +371,9 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 		return new SelectableEntityTable<E>(container, getHeadingPropertySet(), uniqueId);
 	}
 
+	public VerticalLayout getSearchBar()
+	{
+		return searchBar;
+	}
+
 }
