@@ -25,8 +25,6 @@ import com.vaadin.ui.Field;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.NativeButton;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
@@ -36,8 +34,8 @@ import com.vaadin.ui.themes.Reindeer;
 @SuppressWarnings("rawtypes")
 public class TimePicker extends HorizontalLayout implements Field<Date>
 {
-	protected static final String TIME_FORMAT = "HH:mm a";
-	protected static final String TIME_FORMAT2 = "HH:mma";
+	protected static final String TIME_FORMAT = "hh:mm a";
+	protected static final String TIME_FORMAT2 = "hh:mma";
 	private static final long serialVersionUID = 1826417125815798837L;
 	protected static final String EMPTY = "--:--";
 	String headerColor = "#B2D7FF";
@@ -103,21 +101,6 @@ public class TimePicker extends HorizontalLayout implements Field<Date>
 			public void valueChange(com.vaadin.data.Property.ValueChangeEvent event)
 			{
 				TimePicker.this.valueChange(event);
-				if (event.getProperty().getValue() != null)
-				{
-					try
-					{
-						final Date parsedDate = parseDate((String) event.getProperty().getValue());
-						if (parsedDate != null)
-						{
-							setValue(parsedDate);
-						}
-					}
-					catch (InvalidValueException e)
-					{
-						Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
-					}
-				}
 			}
 		});
 
@@ -221,6 +204,25 @@ public class TimePicker extends HorizontalLayout implements Field<Date>
 		layout.setStyleName(Reindeer.BUTTON_SMALL);
 
 		displayTime.setWidth("100");
+
+		displayTime.addValueChangeListener(new ValueChangeListener()
+		{
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void valueChange(com.vaadin.data.Property.ValueChangeEvent event)
+			{
+				final Date parsedDate = parseDate((String) event.getProperty().getValue());
+				if (parsedDate != null)
+				{
+					dateTime.set(Calendar.HOUR_OF_DAY, parsedDate.getHours());
+					dateTime.set(Calendar.MINUTE, parsedDate.getMinutes());
+					isSet = true;
+					setNewValue();
+				}
+			}
+		});
 
 		VerticalLayout hourPanelLabelWrapper = new VerticalLayout();
 
@@ -367,7 +369,8 @@ public class TimePicker extends HorizontalLayout implements Field<Date>
 
 	protected void addMinuteButtons(HorizontalLayout minuteButtonPanel, int rows, int cols)
 	{
-		String[] numbers = new String[] { "00", "10", "15", "20", "30", "40", "45", "50" };
+		String[] numbers = new String[]
+		{ "00", "10", "15", "20", "30", "40", "45", "50" };
 		for (int col = 0; col < cols; col++)
 		{
 			VerticalLayout rowsLayout = new VerticalLayout();
@@ -408,7 +411,8 @@ public class TimePicker extends HorizontalLayout implements Field<Date>
 
 	protected void addHourButtons(HorizontalLayout hourButtonPanel, int rows, int cols)
 	{
-		int[] numbers = new int[] { 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
+		int[] numbers = new int[]
+		{ 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
 		for (int col = 0; col < cols; col++)
 		{
 			VerticalLayout rowsLayout = new VerticalLayout();
@@ -473,9 +477,6 @@ public class TimePicker extends HorizontalLayout implements Field<Date>
 		pm.addClickListener(new ClickListener()
 		{
 
-			/**
-			 * 
-			 */
 			private static final long serialVersionUID = 1L;
 
 			@Override
