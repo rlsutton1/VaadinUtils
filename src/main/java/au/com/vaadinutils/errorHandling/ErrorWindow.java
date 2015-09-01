@@ -132,7 +132,8 @@ public class ErrorWindow
 			{
 				final String supportEmail = getTargetEmailAddress();
 
-				generateEmail(time, finalId, finalTrace, reference, "Error not displayed to user", supportEmail);
+				generateEmail(time, finalId, finalTrace, reference, "Error not displayed to user", supportEmail, "",
+						"", "");
 			}
 			catch (Exception e)
 			{
@@ -180,7 +181,8 @@ public class ErrorWindow
 			{
 				try
 				{
-					generateEmail(time, finalId, finalTrace, reference, notes.getValue(), supportEmail);
+					generateEmail(time, finalId, finalTrace, reference, notes.getValue(), supportEmail, getViewName(),
+							getUserName(), getUserEmail());
 				}
 				catch (Exception e)
 				{
@@ -215,7 +217,7 @@ public class ErrorWindow
 	}
 
 	private void generateEmail(final Date time, final String finalId, final String finalTrace, final String reference,
-			final String notes, final String supportEmail)
+			final String notes, final String supportEmail, String viewClass, String user, String userEmail)
 	{
 		logger.error("Reference: " + reference + " " + notes);
 
@@ -223,14 +225,12 @@ public class ErrorWindow
 		String companyName = getSystemName();
 		subject += "Error: " + finalId + " " + companyName + " ref: " + reference;
 
-		String viewClass = getViewName();
-
 		ErrorSettingsFactory.getErrorSettings().sendEmail(
 				supportEmail,
 				subject,
-				subject + "\n\nTime: " + time.toString() + "\n\nView: " + viewClass + "\n\nUser: " + getUserName()
-						+ " " + getUserEmail() + "\n\n" + "Version: " + getBuildVersion() + "\n\n" + "User notes:"
-						+ notes + "\n\n" + finalTrace, ErrorWindow.this.stream, ErrorWindow.this.filename,
+				subject + "\n\nTime: " + time.toString() + "\n\nView: " + viewClass + "\n\nUser: " + user + " "
+						+ userEmail + "\n\n" + "Version: " + getBuildVersion() + "\n\n" + "User notes:" + notes
+						+ "\n\n" + finalTrace, ErrorWindow.this.stream, ErrorWindow.this.filename,
 				ErrorWindow.this.MIMEType);
 	}
 
