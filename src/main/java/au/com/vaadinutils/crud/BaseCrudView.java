@@ -2064,4 +2064,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		return dirty;
 	}
 
+	public BaseCrudSaveCancelButtonTray getButtonLayout()
+	{
+		return buttonLayout;
+	}
+
 }
