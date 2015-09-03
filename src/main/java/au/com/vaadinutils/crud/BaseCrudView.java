@@ -716,7 +716,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		advancedSearchOn = true;
 		advancedSearchLayout.setVisible(advancedSearchOn);
 		advancedSearchCheckbox.setStyleName(ValoTheme.BUTTON_FRIENDLY);
-		
+
 		if (lockAdvancedSearch)
 		{
 			advancedSearchCheckbox.setVisible(false);
@@ -1251,7 +1251,14 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			}
 		};
 
-		final LinkedList<ItemSetChangeListener> listeners = new LinkedList<>(container.getItemSetChangeListeners());
+		// Only remove the listeners if we are editing an existing entity. If it
+		// is a new entity then we need the listeners to update components with
+		// the new entity.
+		final LinkedList<ItemSetChangeListener> listeners = new LinkedList<>();
+		if (newEntity == null)
+		{
+			listeners.addAll(container.getItemSetChangeListeners());
+		}
 		try
 		{
 			// get existing listeners and remove them
