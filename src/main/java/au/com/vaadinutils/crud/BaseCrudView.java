@@ -2076,4 +2076,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		return buttonLayout;
 	}
 
+	public EntityList<E> getEntityTable()
+	{
+		return entityTable;
+	}
+
 }
