@@ -88,4 +88,14 @@ public class BaseCrudSaveCancelButtonTray extends HorizontalLayout
 
 	}
 
+	public Button getSaveButton()
+	{
+		return saveButton;
+	}
+
+	public Button getCancelButton()
+	{
+		return cancelButton;
+	}
+
 }

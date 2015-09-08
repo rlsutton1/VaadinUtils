@@ -2081,4 +2081,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		return entityTable;
 	}
 
+	public ValidatingFieldGroup<E> getFieldGroup()
+	{
+		return fieldGroup;
+	}
+
 }
