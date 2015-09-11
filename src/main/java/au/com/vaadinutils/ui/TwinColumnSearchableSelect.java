@@ -77,6 +77,24 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	public TwinColumnSearchableSelect(String fieldName, SingularAttribute<C, ?> listField)
 	{
 		this(fieldName, listField, null);
+		availableContainer.sort(new Object[]
+		{ listField.getName() }, new boolean[]
+		{ true });
+		selectedCols.sort(new Object[]
+		{ listField.getName() }, new boolean[]
+		{ true });
+	}
+
+	public TwinColumnSearchableSelect(String fieldName, SingularAttribute<C, ?> listField, boolean isAscending)
+	{
+		this(fieldName, listField, null);
+		availableContainer.sort(new Object[]
+		{ listField.getName() }, new boolean[]
+		{ isAscending });
+		selectedCols.sort(new Object[]
+		{ listField.getName() }, new boolean[]
+		{ isAscending });
+
 	}
 
 	public TwinColumnSearchableSelect(String fieldName, SingularAttribute<C, ?> listField, String itemLabel)
@@ -91,9 +109,6 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 		beanIdField = type.getDeclaredId(Long.class);
 		availableContainer = JpaBaseDao.getGenericDao(listField.getDeclaringType().getJavaType())
 				.createVaadinContainer();
-		availableContainer.sort(new Object[]
-		{ listField.getName() }, new boolean[]
-		{ true });
 
 		if (itemLabel == null)
 		{
