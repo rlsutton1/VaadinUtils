@@ -80,18 +80,12 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 		availableContainer.sort(new Object[]
 		{ listField.getName() }, new boolean[]
 		{ true });
-		selectedCols.sort(new Object[]
-		{ listField.getName() }, new boolean[]
-		{ true });
 	}
 
 	public TwinColumnSearchableSelect(String fieldName, SingularAttribute<C, ?> listField, boolean isAscending)
 	{
 		this(fieldName, listField, null);
 		availableContainer.sort(new Object[]
-		{ listField.getName() }, new boolean[]
-		{ isAscending });
-		selectedCols.sort(new Object[]
 		{ listField.getName() }, new boolean[]
 		{ isAscending });
 
@@ -116,6 +110,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 		}
 		this.itemLabel = itemLabel;
 		selectedCols = new Table();
+
 		selectedCols.setContainerDataSource(createBeanContainer());
 		if (!selectedCols.getContainerPropertyIds().contains(itemLabel))
 		{
@@ -275,6 +270,8 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 						{
 							listener.valueChanged(getFieldValue());
 						}
+
+						postRemoveAction();
 					}
 					else
 					{
@@ -343,6 +340,8 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 						{
 							handleAddAction(id);
 						}
+
+						postAddAction();
 					}
 				}
 			}
@@ -416,6 +415,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	private BeanContainer<Long, C> createBeanContainer()
 	{
 		beans.setBeanIdProperty(beanIdField.getName());
+
 		return beans;
 
 	}
@@ -626,4 +626,24 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 		selectedCols.refreshRowCache();
 	}
 
+	protected void postRemoveAction()
+	{
+
+	}
+
+	protected void postAddAction()
+	{
+
+	}
+
+	protected JPAContainer<C> getAvailableContainer()
+	{
+
+		return availableContainer;
+	}
+
+	protected void resetAvailableContainer(JPAContainer<C> newContainer)
+	{
+		this.availableContainer = newContainer;
+	}
 }
