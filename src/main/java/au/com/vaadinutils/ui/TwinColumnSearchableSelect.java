@@ -66,6 +66,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	private CreateNewCallback<C> createNewCallback;
 	@SuppressWarnings("rawtypes")
 	private Class<? extends Collection> valueClass;
+	private boolean isAscending;
 
 	/**
 	 * Unfortunately TwinColumnSelect wont work with large sets, it isn't
@@ -80,6 +81,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 		availableContainer.sort(new Object[]
 		{ listField.getName() }, new boolean[]
 		{ true });
+		this.isAscending = true;
 	}
 
 	public TwinColumnSearchableSelect(String fieldName, SingularAttribute<C, ?> listField, boolean isAscending)
@@ -88,7 +90,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 		availableContainer.sort(new Object[]
 		{ listField.getName() }, new boolean[]
 		{ isAscending });
-
+		this.isAscending = isAscending;
 	}
 
 	public TwinColumnSearchableSelect(String fieldName, SingularAttribute<C, ?> listField, String itemLabel)
@@ -415,7 +417,6 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	private BeanContainer<Long, C> createBeanContainer()
 	{
 		beans.setBeanIdProperty(beanIdField.getName());
-
 		return beans;
 
 	}
@@ -496,6 +497,9 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 			beans.addAll(newValue);
 		}
 		sourceValue = (Collection<C>) getConvertedValue();
+		beans.sort(new Object[]
+		{ listField.getName() }, new boolean[]
+		{ isAscending });
 	}
 
 	@SuppressWarnings("unchecked")
@@ -535,6 +539,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 				selected.add(beans.getItem(id).getBean());
 			}
 		}
+
 		return selected;
 
 	}
