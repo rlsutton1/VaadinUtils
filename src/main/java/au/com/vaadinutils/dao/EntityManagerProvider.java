@@ -1,6 +1,7 @@
 package au.com.vaadinutils.dao;
 
 import javax.persistence.EntityManager;
+import javax.validation.ConstraintViolationException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -120,7 +121,7 @@ public enum EntityManagerProvider
 				em.getTransaction().commit();
 				return ret;
 			}
-			catch (Exception e)
+			catch (ConstraintViolationException e)
 			{
 				// ensure we get the cause of an underlying constraint violation
 				ErrorWindow.showErrorWindow(e);

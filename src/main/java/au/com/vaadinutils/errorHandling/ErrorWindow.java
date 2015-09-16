@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.util.Date;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -37,6 +38,14 @@ public class ErrorWindow
 	private Label uploadStatus = new Label("&nbsp;", ContentMode.HTML);
 
 	static Logger logger = LogManager.getLogger();
+
+	/**
+	 * throttle for sending emails about errors the user hasn't seen.
+	 * 
+	 * Allow busting to 20 emails in a minute, over the long term limit to 1
+	 * email per minute
+	 */
+	final static ErrorRateController emailRateController = new ErrorRateController(20, 1, TimeUnit.MINUTES);
 
 	public ErrorWindow()
 	{
@@ -122,21 +131,42 @@ public class ErrorWindow
 				+ error, error);
 		logger.error("Reference: " + reference + " " + cause, cause);
 
-		if (UI.getCurrent() != null && UI.getCurrent().getSession().hasLock())
+		final String finalCauseClass = causeClass;
+
+		if (UI.getCurrent() != null)
 		{
-			displayVaadinErrorWindow(causeClass, id, time, finalId, finalTrace, reference);
+			UI.getCurrent().access(new Runnable()
+			{
+
+				@Override
+				public void run()
+				{
+					displayVaadinErrorWindow(finalCauseClass, finalId, time, finalId, finalTrace, reference);
+
+				}
+			});
 		}
 		else
 		{
-			try
+			// limit the number of errors that can be emailed without human
+			// action.
+			if (emailRateController.acquire())
 			{
-				final String supportEmail = getTargetEmailAddress();
+				try
+				{
+					final String supportEmail = getTargetEmailAddress();
 
-				generateEmail(time, finalId, finalTrace, reference, "Error not displayed to user", supportEmail);
+					generateEmail(time, finalId, finalTrace, reference, "Error not displayed to user", supportEmail,
+							"", "", "");
+				}
+				catch (Exception e)
+				{
+					logger.error(e, e);
+				}
 			}
-			catch (Exception e)
+			else
 			{
-				logger.error(e, e);
+				logger.error("Not sending error email");
 			}
 
 		}
@@ -180,7 +210,8 @@ public class ErrorWindow
 			{
 				try
 				{
-					generateEmail(time, finalId, finalTrace, reference, notes.getValue(), supportEmail);
+					generateEmail(time, finalId, finalTrace, reference, notes.getValue(), supportEmail, getViewName(),
+							getUserName(), getUserEmail());
 				}
 				catch (Exception e)
 				{
@@ -215,7 +246,7 @@ public class ErrorWindow
 	}
 
 	private void generateEmail(final Date time, final String finalId, final String finalTrace, final String reference,
-			final String notes, final String supportEmail)
+			final String notes, final String supportEmail, String viewClass, String user, String userEmail)
 	{
 		logger.error("Reference: " + reference + " " + notes);
 
@@ -223,14 +254,12 @@ public class ErrorWindow
 		String companyName = getSystemName();
 		subject += "Error: " + finalId + " " + companyName + " ref: " + reference;
 
-		String viewClass = getViewName();
-
 		ErrorSettingsFactory.getErrorSettings().sendEmail(
 				supportEmail,
 				subject,
-				subject + "\n\nTime: " + time.toString() + "\n\nView: " + viewClass + "\n\nUser: " + getUserName()
-						+ " " + getUserEmail() + "\n\n" + "Version: " + getBuildVersion() + "\n\n" + "User notes:"
-						+ notes + "\n\n" + finalTrace, ErrorWindow.this.stream, ErrorWindow.this.filename,
+				subject + "\n\nTime: " + time.toString() + "\n\nView: " + viewClass + "\n\nUser: " + user + " "
+						+ userEmail + "\n\n" + "Version: " + getBuildVersion() + "\n\n" + "User notes:" + notes
+						+ "\n\n" + finalTrace, ErrorWindow.this.stream, ErrorWindow.this.filename,
 				ErrorWindow.this.MIMEType);
 	}
 

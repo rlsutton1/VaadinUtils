@@ -132,6 +132,14 @@ public class HeadingPropertySet<E>
 
 		}
 
+		public <T extends Object> Builder<E> addColumn(String heading, String headingPropertyId,
+				int width)
+		{
+			cols.add(new HeadingToPropertyId<E>(heading, headingPropertyId, null).setWidth(width));
+			return this;
+
+		}
+		
 		public <T extends Object> Builder<E> addColumn(String heading, SingularAttribute<E, T> headingPropertyId,
 				int width)
 		{
