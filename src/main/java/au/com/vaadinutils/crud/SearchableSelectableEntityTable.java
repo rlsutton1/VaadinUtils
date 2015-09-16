@@ -50,9 +50,8 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 	protected SelectableEntityTable<E> selectableTable;
 	protected Container.Filterable container;
 	private String uniqueId;
-	
-	private String filterString="";
 
+	private String filterString = "";
 
 	public SearchableSelectableEntityTable(String uniqueId)
 	{
@@ -133,7 +132,7 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 		searchField.addTextChangeListener(new TextChangeListener()
 		{
 			private static final long serialVersionUID = 1L;
-	
+
 			public void textChange(final TextChangeEvent event)
 			{
 				filterString = event.getText().trim();
@@ -376,4 +375,8 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 		return searchBar;
 	}
 
+	public SelectableEntityTable<E> getTable()
+	{
+		return selectableTable;
+	}
 }
