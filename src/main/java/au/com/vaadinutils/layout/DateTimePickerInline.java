@@ -121,7 +121,7 @@ public class DateTimePickerInline extends TimePicker
 		}
 		catch (Exception e)
 		{
-			logger.error(e);
+			logger.warn(e);
 			clearValue();
 		}
 
