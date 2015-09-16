@@ -36,6 +36,11 @@ public class ClickableLabel extends VerticalLayout
 	public void setContentMode(ContentMode contentMode)
 	{
 		label.setContentMode(contentMode);
-		
+
+	}
+
+	public String getValue()
+	{
+		return label.getValue() != null ? label.getValue() : "";
 	}
 }
