@@ -20,6 +20,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.examples.HtmlToPlainText;
 
 import au.com.bytecode.opencsv.CSVWriter;
+import au.com.vaadinutils.fields.ClickableLabel;
 import au.com.vaadinutils.jasper.AttachmentType;
 import au.com.vaadinutils.util.PipedOutputStreamWrapper;
 
@@ -160,6 +161,7 @@ public class ContainerCSVExport<E>
 		int i = 0;
 		for (Object propertyId : properties)
 		{
+			@SuppressWarnings("rawtypes")
 			final Property itemProperty = item.getItemProperty(propertyId);
 			if (itemProperty != null && itemProperty.getValue() != null)
 			{
@@ -170,12 +172,10 @@ public class ContainerCSVExport<E>
 					if (value instanceof Label)
 					{
 						value = new HtmlToPlainText().getPlainText(Jsoup.parse(((Label) value).getValue()));
-						// value = ((Label) value).getValue();
 					}
 					if (value instanceof AbstractLayout)
 					{
 						value = new HtmlToPlainText().getPlainText(Jsoup.parse(itemProperty.getValue().toString()));
-						// value = itemProperty.getValue().toString();
 					}
 					values[i++] = value.toString();
 				}
@@ -186,7 +186,41 @@ public class ContainerCSVExport<E>
 			}
 			else
 			{
-				values[i++] = "";
+				ColumnGenerator generator = table.getColumnGenerator(propertyId);
+				if (generator != null)
+				{
+					Object value = generator.generateCell(table, id, propertyId);
+					if (value != null)
+					{
+						if (value instanceof ClickableLabel)
+						{
+							value = new HtmlToPlainText()
+									.getPlainText(Jsoup.parse(((ClickableLabel) value).getValue()));
+						}
+
+						if (value instanceof Label)
+						{
+							value = new HtmlToPlainText().getPlainText(Jsoup.parse(((Label) value).getValue()));
+							// value = ((Label) value).getValue();
+						}
+						
+						if (value instanceof AbstractLayout)
+						{
+							value = new HtmlToPlainText().getPlainText(Jsoup.parse(value.toString()));
+						}
+
+						values[i++] = value.toString();
+					}
+					else
+					{
+						values[i++] = "";
+					}
+
+				}
+				else
+				{
+					values[i++] = "";
+				}
 			}
 		}
 
