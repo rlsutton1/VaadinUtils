@@ -16,6 +16,8 @@ import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jsoup.Jsoup;
+import org.jsoup.examples.HtmlToPlainText;
 
 import au.com.bytecode.opencsv.CSVWriter;
 import au.com.vaadinutils.jasper.AttachmentType;
@@ -167,11 +169,13 @@ public class ContainerCSVExport<E>
 					Object value = generator.generateCell(table, id, propertyId);
 					if (value instanceof Label)
 					{
-						value = ((Label) value).getValue();
+						value = new HtmlToPlainText().getPlainText(Jsoup.parse(((Label) value).getValue()));
+						// value = ((Label) value).getValue();
 					}
 					if (value instanceof AbstractLayout)
 					{
-						value = itemProperty.getValue().toString();
+						value = new HtmlToPlainText().getPlainText(Jsoup.parse(itemProperty.getValue().toString()));
+						// value = itemProperty.getValue().toString();
 					}
 					values[i++] = value.toString();
 				}
@@ -201,7 +205,8 @@ public class ContainerCSVExport<E>
 
 	private void writeHeaders(CSVWriter writer, List<String> headers)
 	{
-		writer.writeNext(headers.toArray(new String[] {}));
+		writer.writeNext(headers.toArray(new String[]
+		{}));
 	}
 
 	/**
