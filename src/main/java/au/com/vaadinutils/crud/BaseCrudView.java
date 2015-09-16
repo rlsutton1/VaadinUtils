@@ -711,12 +711,16 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		return advancedSearchLayout;
 	}
 
-	public void showAdvancedSearch()
+	public void showAdvancedSearch(boolean lockAdvancedSearch)
 	{
 		advancedSearchOn = true;
 		advancedSearchLayout.setVisible(advancedSearchOn);
 		advancedSearchCheckbox.setStyleName(ValoTheme.BUTTON_FRIENDLY);
 
+		if (lockAdvancedSearch)
+		{
+			advancedSearchCheckbox.setVisible(false);
+		}
 	}
 
 	protected AbstractLayout getAdvancedSearchLayout()
@@ -1247,7 +1251,14 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			}
 		};
 
-		final LinkedList<ItemSetChangeListener> listeners = new LinkedList<>(container.getItemSetChangeListeners());
+		// Only remove the listeners if we are editing an existing entity. If it
+		// is a new entity then we need the listeners to update components with
+		// the new entity.
+		final LinkedList<ItemSetChangeListener> listeners = new LinkedList<>();
+		if (newEntity == null)
+		{
+			listeners.addAll(container.getItemSetChangeListeners());
+		}
 		try
 		{
 			// get existing listeners and remove them
@@ -2058,6 +2069,21 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			dirty |= child.isDirty();
 		}
 		return dirty;
+	}
+
+	public BaseCrudSaveCancelButtonTray getButtonLayout()
+	{
+		return buttonLayout;
+	}
+
+	public EntityList<E> getEntityTable()
+	{
+		return entityTable;
+	}
+
+	public ValidatingFieldGroup<E> getFieldGroup()
+	{
+		return fieldGroup;
 	}
 
 }

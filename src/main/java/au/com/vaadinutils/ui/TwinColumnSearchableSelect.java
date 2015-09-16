@@ -66,6 +66,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	private CreateNewCallback<C> createNewCallback;
 	@SuppressWarnings("rawtypes")
 	private Class<? extends Collection> valueClass;
+	private boolean isAscending;
 
 	/**
 	 * Unfortunately TwinColumnSelect wont work with large sets, it isn't
@@ -77,6 +78,19 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	public TwinColumnSearchableSelect(String fieldName, SingularAttribute<C, ?> listField)
 	{
 		this(fieldName, listField, null);
+		availableContainer.sort(new Object[]
+		{ listField.getName() }, new boolean[]
+		{ true });
+		this.isAscending = true;
+	}
+
+	public TwinColumnSearchableSelect(String fieldName, SingularAttribute<C, ?> listField, boolean isAscending)
+	{
+		this(fieldName, listField, null);
+		availableContainer.sort(new Object[]
+		{ listField.getName() }, new boolean[]
+		{ isAscending });
+		this.isAscending = isAscending;
 	}
 
 	public TwinColumnSearchableSelect(String fieldName, SingularAttribute<C, ?> listField, String itemLabel)
@@ -91,9 +105,6 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 		beanIdField = type.getDeclaredId(Long.class);
 		availableContainer = JpaBaseDao.getGenericDao(listField.getDeclaringType().getJavaType())
 				.createVaadinContainer();
-		availableContainer.sort(new Object[]
-		{ listField.getName() }, new boolean[]
-		{ true });
 
 		if (itemLabel == null)
 		{
@@ -101,6 +112,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 		}
 		this.itemLabel = itemLabel;
 		selectedCols = new Table();
+
 		selectedCols.setContainerDataSource(createBeanContainer());
 		if (!selectedCols.getContainerPropertyIds().contains(itemLabel))
 		{
@@ -260,6 +272,8 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 						{
 							listener.valueChanged(getFieldValue());
 						}
+
+						postRemoveAction();
 					}
 					else
 					{
@@ -328,6 +342,8 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 						{
 							handleAddAction(id);
 						}
+
+						postAddAction();
 					}
 				}
 			}
@@ -481,6 +497,9 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 			beans.addAll(newValue);
 		}
 		sourceValue = (Collection<C>) getConvertedValue();
+		beans.sort(new Object[]
+		{ listField.getName() }, new boolean[]
+		{ isAscending });
 	}
 
 	@SuppressWarnings("unchecked")
@@ -520,6 +539,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 				selected.add(beans.getItem(id).getBean());
 			}
 		}
+
 		return selected;
 
 	}
@@ -611,4 +631,24 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 		selectedCols.refreshRowCache();
 	}
 
+	protected void postRemoveAction()
+	{
+
+	}
+
+	protected void postAddAction()
+	{
+
+	}
+
+	protected JPAContainer<C> getAvailableContainer()
+	{
+
+		return availableContainer;
+	}
+
+	protected void resetAvailableContainer(JPAContainer<C> newContainer)
+	{
+		this.availableContainer = newContainer;
+	}
 }
