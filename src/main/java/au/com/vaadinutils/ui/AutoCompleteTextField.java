@@ -129,4 +129,9 @@ public class AutoCompleteTextField<E> extends TextField
 	{
 		options.put(option, optionLabel);
 	}
+	
+	public void hideAutoComplete()
+	{
+		contextMenu.hide();
+	}
 }
