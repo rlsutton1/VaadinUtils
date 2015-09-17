@@ -20,7 +20,7 @@ public class AutoCompleteTextField<E> extends TextField
 
 	private AutoCompeleteQueryListener<E> listener;
 
-	Map<String, E> options = new LinkedHashMap<>();
+	Map<E, String> options = new LinkedHashMap<>();
 
 	private AutoCompleteOptionSelected<E> optionListener;
 
@@ -89,16 +89,16 @@ public class AutoCompleteTextField<E> extends TextField
 		contextMenu.removeAllItems();
 		contextMenu.open(this);
 
-		for (final Entry<String, E> option : options.entrySet())
+		for (final Entry<E, String> option : options.entrySet())
 		{
-			ContextMenuItem menuItem = contextMenu.addItem(option.getKey());
+			ContextMenuItem menuItem = contextMenu.addItem(option.getValue());
 			menuItem.addItemClickListener(new ContextMenuItemClickListener()
 			{
 
 				@Override
 				public void contextMenuItemClicked(ContextMenuItemClickEvent event)
 				{
-					optionListener.optionSelected(AutoCompleteTextField.this, option.getValue());
+					optionListener.optionSelected(AutoCompleteTextField.this, option.getKey());
 				}
 			});
 		}
@@ -127,6 +127,6 @@ public class AutoCompleteTextField<E> extends TextField
 
 	public void addOption(E option, String optionLabel)
 	{
-		options.put(optionLabel, option);
+		options.put(option, optionLabel);
 	}
 }
