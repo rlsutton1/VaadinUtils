@@ -43,7 +43,7 @@ public class UniqueFieldValidator<E extends CrudEntity, F> implements Validator
 	@Override
 	public void validate(Object value) throws InvalidValueException
 	{
-		if (value != null)
+		if (value != null && !("".equals(value.toString())))
 		{
 
 			JpaBaseDao<E, Long> dao = new JpaBaseDao<E, Long>(table);
@@ -51,7 +51,7 @@ public class UniqueFieldValidator<E extends CrudEntity, F> implements Validator
 			List<E> matches = dao.findAllByAttribute(matchField, (F) value, null);
 			for (E message : matches)
 			{
-				if (crud!=null && crud.getCurrent() != null && !message.getId().equals(crud.getCurrent().getId()))
+				if (crud != null && crud.getCurrent() != null && !message.getId().equals(crud.getCurrent().getId()))
 				{
 					logger.error(warningMessage);
 					throw new InvalidValueException(warningMessage);

@@ -2121,4 +2121,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		searchButton.setVisible(!dynamicSearch);
 	}
 
+	public EntityItem<E> getNewEntity()
+	{
+		return newEntity;
+	}
+
 }
