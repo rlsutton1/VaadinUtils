@@ -130,6 +130,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	private Label actionLabel;
 	private boolean noEditor;
 	public boolean advancedSearchOn = false;
+	private boolean triggerFilterOnClear = true;
 	private Button advancedSearchCheckbox;
 	private Set<RowChangedListener<E>> rowChangedListeners = new CopyOnWriteArraySet<RowChangedListener<E>>();
 	private int minSearchTextLength = 0;
@@ -686,7 +687,10 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			{
 				searchField.setValue("");
 				clearAdvancedFilters();
-				triggerFilter();
+				if (triggerFilterOnClear)
+				{
+					triggerFilter();
+				}
 
 			}
 
@@ -2126,4 +2130,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		return newEntity;
 	}
 
+	public void setTriggerFilterOnClear(boolean triggerFilterOnClear)
+	{
+		this.triggerFilterOnClear = triggerFilterOnClear;
+	}
 }
