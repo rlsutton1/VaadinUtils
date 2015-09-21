@@ -3,10 +3,14 @@ package au.com.vaadinutils.crud;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -620,9 +624,7 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 
 			ContainerAdaptor<L> adaptor = ContainerAdaptorFactory.getAdaptor(container);
 			if (adaptor.getSortableContainerPropertyIds().contains(listField))
-				adaptor.sort(new String[]
-				{ listField }, new boolean[]
-				{ true });
+				adaptor.sort(new String[] { listField }, new boolean[] { true });
 
 			component.setItemCaptionPropertyId(listField);
 			component.setContainerDataSource(container);
@@ -774,8 +776,7 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 		private AbstractLayout builderForm;
 		private boolean multiSelect = false;
 
-		@SuppressWarnings(
-		{ "unchecked", "rawtypes" })
+		@SuppressWarnings({ "unchecked", "rawtypes" })
 		public SplitListSelect build()
 		{
 			Preconditions.checkNotNull(label, "label may not be null");
@@ -806,9 +807,7 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 					+ " is not valid, valid listFields are " + container.getContainerPropertyIds().toString());
 
 			if (container.getSortableContainerPropertyIds().contains(listField))
-				container.sort(new String[]
-				{ listField }, new boolean[]
-				{ true });
+				container.sort(new String[] { listField }, new boolean[] { true });
 
 			component.setContainerDataSource(container);
 
@@ -953,8 +952,7 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 		private String leftColumnCaption = "Available";
 		private String rightColumnCaption = "Selected";
 
-		@SuppressWarnings(
-		{ "unchecked", "rawtypes" })
+		@SuppressWarnings({ "unchecked", "rawtypes" })
 		public SplitTwinColSelect build()
 		{
 			Preconditions.checkNotNull(label, "label may not be null");
@@ -988,9 +986,7 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 
 			ContainerAdaptor<L> adaptor = ContainerAdaptorFactory.getAdaptor(container);
 			if (adaptor.getSortableContainerPropertyIds().contains(listField))
-				adaptor.sort(new String[]
-				{ listField }, new boolean[]
-				{ true });
+				adaptor.sort(new String[] { listField }, new boolean[] { true });
 
 			component.setContainerDataSource(container);
 			component.setConverter(new MultiSelectConverter(component, Set.class));
@@ -1207,6 +1203,29 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 		return container;
 	}
 
+	static public <Q extends CrudEntity> Container createContainerFromEntities(String fieldName, Collection<Q> list)
+	{
+		LinkedHashMap<Q, String> enumMap = new LinkedHashMap<Q, String>();
+
+		List<Q> sortedList = new LinkedList<>();
+		sortedList.addAll(list);
+		Collections.sort(sortedList, new Comparator<Q>()
+		{
+			@Override
+			public int compare(Q arg0, Q arg1)
+			{
+				return arg0.getName().compareToIgnoreCase(arg1.getName());
+			}
+		});
+
+		for (Q value : sortedList)
+		{
+			enumMap.put(value, value.getName());
+		}
+
+		return createContainerFromMap(fieldName, enumMap);
+	}
+
 	public ArrayList<AbstractComponent> getFieldList()
 	{
 		return this.fieldList;
@@ -1284,8 +1303,7 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 
 	}
 
-	@SuppressWarnings(
-	{ "rawtypes", "unchecked" })
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	static public <J extends CrudEntity> FormHelper<?>.ListSelectBuilder<J> getListSelectBuilder(AbstractLayout form,
 			Class<J> j)
 	{
@@ -1294,8 +1312,7 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 
 	}
 
-	@SuppressWarnings(
-	{ "rawtypes", "unchecked" })
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	static public <J extends CrudEntity> FormHelper<?>.EntityFieldBuilder<J> getEntityFieldBuilder(AbstractLayout form,
 			Class<J> j)
 	{

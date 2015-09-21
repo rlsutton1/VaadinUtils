@@ -2,6 +2,7 @@ package au.com.vaadinutils.errorHandling;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
+import java.net.SocketException;
 import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -149,8 +150,8 @@ public class ErrorWindow
 		else
 		{
 			// limit the number of errors that can be emailed without human
-			// action.
-			if (emailRateController.acquire())
+			// action. also suppress some types of errors
+			if (emailRateController.acquire() && !(cause instanceof SocketException))
 			{
 				try
 				{

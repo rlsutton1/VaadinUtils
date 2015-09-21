@@ -49,6 +49,27 @@ public class JpaDslSubqueryBuilder<P, E> extends JpaDslBuilder<E>
 			}
 		};
 	}
+	
+	/**
+	 * join on parent.child = child
+	 * 
+	 * @param parentAttrib
+	 * @return
+	 */
+	public AbstractCondition<E> joinParentQueryOnParentAttrib(final SetAttribute<P, E> parentAttrib)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+				return builder.equal(parentRoot.get(parentAttrib), root);
+
+			}
+		};
+	}
+
 
 	/**
 	 * join on parent = child.parent
@@ -57,6 +78,26 @@ public class JpaDslSubqueryBuilder<P, E> extends JpaDslBuilder<E>
 	 * @return
 	 */
 	public AbstractCondition<E> joinParentQueryOnSubAttrib(final SingularAttribute<E, P> subQueryAttrib)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+				return builder.equal(parentRoot, root.get(subQueryAttrib));
+
+			}
+		};
+	}
+	
+	/**
+	 * join on parent = child.parent
+	 * 
+	 * @param parentAttrib
+	 * @return
+	 */
+	public AbstractCondition<E> joinParentQueryOnSubAttrib(final SetAttribute<E, P> subQueryAttrib)
 	{
 		return new AbstractCondition<E>()
 		{

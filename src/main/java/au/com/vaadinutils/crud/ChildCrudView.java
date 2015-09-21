@@ -603,7 +603,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 				{
 					if (getCurrent() != null)
 					{
-						logger.warn("There are no dirty fields, not saving record {} {}", getCurrent().getClass()
+						logger.info("There are no dirty fields, not saving record {} {}", getCurrent().getClass()
 								.getSimpleName(), getCurrent());
 					}
 				}

@@ -829,7 +829,7 @@ public class JpaDslBuilder<E>
 			}
 		};
 	}
-
+	
 	public <V> Condition<E> in(final SetAttribute<E, V> agents, final V agent)
 	{
 		return new AbstractCondition<E>()
