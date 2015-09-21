@@ -96,6 +96,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	protected TextField searchField = new TextField();
 	protected Button newButton = new Button("New");
 	protected Button applyButton = new Button("Apply");
+	protected Button searchButton = new Button("Search");
+	private boolean dynamicSearch = true;
 	protected Class<E> entityClass;
 
 	protected ValidatingFieldGroup<E> fieldGroup;
@@ -128,6 +130,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	private Label actionLabel;
 	private boolean noEditor;
 	public boolean advancedSearchOn = false;
+	private boolean triggerFilterOnClear = true;
 	private Button advancedSearchCheckbox;
 	private Set<RowChangedListener<E>> rowChangedListeners = new CopyOnWriteArraySet<RowChangedListener<E>>();
 	private int minSearchTextLength = 0;
@@ -644,6 +647,30 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			((HorizontalLayout) group).setExpandRatio(searchField, 1);
 		}
 
+		group.addComponent(searchButton);
+		searchButton.addClickListener(new ClickListener()
+		{
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void buttonClick(ClickEvent event)
+			{
+				triggerFilter();
+			}
+		});
+		searchButton.setVisible(!dynamicSearch);
+		final OnEnterKeyHandler onEnterKeyHandler = new OnEnterKeyHandler()
+		{
+			@Override
+			public void enterKeyPressed()
+			{
+				if (!dynamicSearch)
+				{
+					searchButton.click();
+				}
+			}
+		};
+		onEnterKeyHandler.attachTo(searchField);
 	}
 
 	private Button createClearButton()
@@ -660,7 +687,10 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			{
 				searchField.setValue("");
 				clearAdvancedFilters();
-				triggerFilter();
+				if (triggerFilterOnClear)
+				{
+					triggerFilter();
+				}
 
 			}
 
@@ -689,7 +719,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 					clearAdvancedFilters();
 					advancedSearchOn = !advancedSearchOn;
 					advancedSearchLayout.setVisible(advancedSearchOn);
-					if (!advancedSearchOn)
+					if (!advancedSearchOn && dynamicSearch)
 					{
 						triggerFilter();
 					}
@@ -1183,9 +1213,12 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 	}
 
+	/**
+	 * Override this method if you need to modify filters to allow a newly
+	 * created record to be shown
+	 */
 	protected void addFilterToShowNewRow(E id)
 	{
-		// TODO Auto-generated method stub
 
 	}
 
@@ -1350,7 +1383,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 					if (triggerSearchOnTextChange())
 					{
 						searchFieldText = event.getText();
-						if (searchFieldText.length() >= minSearchTextLength)
+						if (dynamicSearch && searchFieldText.length() >= minSearchTextLength)
 						{
 							triggerFilter(searchFieldText);
 						}
@@ -2086,4 +2119,19 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		return fieldGroup;
 	}
 
+	public void setDynamicSearch(boolean dynamicSearch)
+	{
+		this.dynamicSearch = dynamicSearch;
+		searchButton.setVisible(!dynamicSearch);
+	}
+
+	public EntityItem<E> getNewEntity()
+	{
+		return newEntity;
+	}
+
+	public void setTriggerFilterOnClear(boolean triggerFilterOnClear)
+	{
+		this.triggerFilterOnClear = triggerFilterOnClear;
+	}
 }
