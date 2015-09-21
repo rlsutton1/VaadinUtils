@@ -719,7 +719,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 					clearAdvancedFilters();
 					advancedSearchOn = !advancedSearchOn;
 					advancedSearchLayout.setVisible(advancedSearchOn);
-					if (!advancedSearchOn)
+					if (!advancedSearchOn && dynamicSearch)
 					{
 						triggerFilter();
 					}
