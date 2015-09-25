@@ -346,6 +346,10 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 						postAddAction();
 					}
 				}
+
+				beans.sort(new Object[]
+				{ listField.getName() }, new boolean[]
+				{ isAscending });
 			}
 
 		});
