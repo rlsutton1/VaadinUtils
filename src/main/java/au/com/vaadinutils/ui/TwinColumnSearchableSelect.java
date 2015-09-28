@@ -655,4 +655,9 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	{
 		this.availableContainer = newContainer;
 	}
+	
+	public void setSelectedColumnHeader(String header)
+	{
+		this.selectedCols.setColumnHeaders(header);
+	}
 }
