@@ -1,6 +1,7 @@
 package au.com.vaadinutils.jasper.parameter;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.metamodel.SingularAttribute;
@@ -16,6 +17,7 @@ import com.vaadin.data.util.filter.Or;
 abstract public class ReportParameterDependantTable<P extends CrudEntity, T extends CrudEntity> extends
 		ReportParameterTable<T>
 {
+
 	/**
 	 * extend this type when you need to do dependant selects between
 	 * ReportParameterTable types.
@@ -29,7 +31,7 @@ abstract public class ReportParameterDependantTable<P extends CrudEntity, T exte
 	public ReportParameterDependantTable(String caption, String parameterName, Class<T> tableClass,
 			SingularAttribute<T, String> displayField)
 	{
-		super(caption, parameterName, tableClass, displayField,  null);
+		super(caption, parameterName, tableClass, displayField, null);
 
 	}
 
@@ -59,19 +61,28 @@ abstract public class ReportParameterDependantTable<P extends CrudEntity, T exte
 				if (selectedIds.size() > 0)
 				{
 					Filter filter = null;
+					Set<Long> ids = new HashSet<>();
 					for (Long parentId : selectedIds)
 					{
 						for (Long id : mapParentIdToPrimaryKey(parentId))
 						{
-							filtersAdded = true;
-							if (filter == null)
+							if (id != null)
 							{
-								filter = new Compare.Equal(getPrimaryKeyFieldName(), id);
+								ids.add(id);
 							}
-							else
-							{
-								filter = new Or(filter, new Compare.Equal(getPrimaryKeyFieldName(), id));
-							}
+						}
+					}
+					// set filters on de-duped id list
+					for (Long id : ids)
+					{
+						filtersAdded = true;
+						if (filter == null)
+						{
+							filter = new Compare.Equal(getPrimaryKeyFieldName(), id);
+						}
+						else
+						{
+							filter = new Or(filter, new Compare.Equal(getPrimaryKeyFieldName(), id));
 						}
 					}
 					if (filter != null)
@@ -83,12 +94,12 @@ abstract public class ReportParameterDependantTable<P extends CrudEntity, T exte
 				{
 					addContainerFilter(new Compare.Equal(getPrimaryKeyFieldName(), -1));
 				}
-				
+
 				table.deselectAll();
 			}
 		};
 		addContainerFilter(new Compare.Equal(getPrimaryKeyFieldName(), -1));
-		
+
 		parent.addSelectionListener(listener);
 
 	}
