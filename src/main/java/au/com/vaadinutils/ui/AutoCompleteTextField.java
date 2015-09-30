@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.vaadin.peter.contextmenu.ContextMenu;
+import org.vaadin.peter.contextmenu.ContextMenu.ContextMenuClosedEvent;
+import org.vaadin.peter.contextmenu.ContextMenu.ContextMenuClosedListener;
 import org.vaadin.peter.contextmenu.ContextMenu.ContextMenuItem;
 import org.vaadin.peter.contextmenu.ContextMenu.ContextMenuItemClickEvent;
 import org.vaadin.peter.contextmenu.ContextMenu.ContextMenuItemClickListener;
@@ -19,12 +21,10 @@ public class AutoCompleteTextField<E> extends TextField
 	private static final long serialVersionUID = 1L;
 
 	private AutoCompeleteQueryListener<E> listener;
-
-	Map<E, String> options = new LinkedHashMap<>();
-
+	private Map<E, String> options = new LinkedHashMap<>();
 	private AutoCompleteOptionSelected<E> optionListener;
-
 	private ContextMenu contextMenu;
+	private boolean isContextMenuOpen = false;
 
 	/**
 	 * <pre>
@@ -54,15 +54,19 @@ public class AutoCompleteTextField<E> extends TextField
 	 * 	});
 	 * }
 	 * </pre>
+	 * 
+	 * The ContextMenu is removed from the parent after each interaction to
+	 * allow the default context menu to still work for copy/paste. However
+	 * there is an issue with the ContextMenuClosedEvent firing before the
+	 * ContextMenuItemClickEvent. This means that the ContextMenu can't be
+	 * removed from the parent in onContextMenuClosed, otherwise
+	 * contextMenuItemClicked is never entered. The effect of this is that the
+	 * default context menu stops working if the user clicks out of the auto
+	 * complete context menu without selecting anything.
 	 */
 
 	public AutoCompleteTextField()
 	{
-
-		contextMenu = new ContextMenu();
-		contextMenu.setAsContextMenuOf(this);
-		contextMenu.setOpenAutomatically(false);
-
 		setTextChangeEventMode(TextChangeEventMode.LAZY);
 		setImmediate(true);
 		addTextChangeListener(new TextChangeListener()
@@ -72,22 +76,49 @@ public class AutoCompleteTextField<E> extends TextField
 			public void textChange(final TextChangeEvent event)
 			{
 				options.clear();
+
 				if (listener != null)
 				{
 					listener.handleQuery(AutoCompleteTextField.this, event.getText());
 				}
-				showOptionMenu();
+
+				if (!options.isEmpty())
+				{
+					createContextMenu();
+					showOptionMenu();
+				}
 			}
-
 		});
+	}
 
+	private void createContextMenu()
+	{
+		// Don't create a new context menu if the existing one is still open
+		if (isContextMenuOpen)
+			return;
+
+		// Create a new ContextMenu as each instance can only be added and
+		// removed from a parent once
+		contextMenu = new ContextMenu();
+		contextMenu.setAsContextMenuOf(this);
+		contextMenu.setOpenAutomatically(false);
+
+		contextMenu.addContextMenuCloseListener(new ContextMenuClosedListener()
+		{
+
+			@Override
+			public void onContextMenuClosed(ContextMenuClosedEvent event)
+			{
+				isContextMenuOpen = false;
+			}
+		});
 	}
 
 	private void showOptionMenu()
 	{
-
 		contextMenu.removeAllItems();
 		contextMenu.open(this);
+		isContextMenuOpen = true;
 
 		for (final Entry<E, String> option : options.entrySet())
 		{
@@ -99,10 +130,13 @@ public class AutoCompleteTextField<E> extends TextField
 				public void contextMenuItemClicked(ContextMenuItemClickEvent event)
 				{
 					optionListener.optionSelected(AutoCompleteTextField.this, option.getKey());
+
+					// Remove the context menu when it gets closed to allow the
+					// default context menu to still be available
+					contextMenu.remove();
 				}
 			});
 		}
-
 	}
 
 	public void setOptionSelectionListener(AutoCompleteOptionSelected<E> listener)
@@ -129,7 +163,7 @@ public class AutoCompleteTextField<E> extends TextField
 	{
 		options.put(option, optionLabel);
 	}
-	
+
 	public void hideAutoComplete()
 	{
 		contextMenu.hide();
