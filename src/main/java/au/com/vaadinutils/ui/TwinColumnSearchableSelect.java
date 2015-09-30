@@ -346,6 +346,10 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 						postAddAction();
 					}
 				}
+
+				beans.sort(new Object[]
+				{ listField.getName() }, new boolean[]
+				{ isAscending });
 			}
 
 		});
@@ -650,5 +654,10 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	protected void resetAvailableContainer(JPAContainer<C> newContainer)
 	{
 		this.availableContainer = newContainer;
+	}
+	
+	public void setSelectedColumnHeader(String header)
+	{
+		this.selectedCols.setColumnHeaders(header);
 	}
 }
