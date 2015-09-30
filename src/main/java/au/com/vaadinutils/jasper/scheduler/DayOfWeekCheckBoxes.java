@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.joda.time.DateTimeConstants;
+
 import com.vaadin.data.Property;
 import com.vaadin.data.Validator;
 import com.vaadin.data.Validator.InvalidValueException;
@@ -23,12 +25,16 @@ public class DayOfWeekCheckBoxes extends HorizontalLayout implements Field<Strin
 
 	private boolean required;
 
+	/**
+	 * days of week as per DateTimeConstants mon = 1 , sun = 7
+	 */
+
 	public DayOfWeekCheckBoxes()
 	{
 		setSpacing(true);
 		setSizeFull();
-		String days1[] = new String[] { "Sun", "Mon", "Tue", "Wed", "Thur", "Fri", "Sat" };
-		int ctr = 0;
+		String days1[] = new String[] { "Mon", "Tue", "Wed", "Thur", "Fri", "Sat", "Sun" };
+		int ctr = 1;
 		for (String day : days1)
 		{
 			CheckBox dayCheck = new CheckBox(day);
@@ -128,7 +134,7 @@ public class DayOfWeekCheckBoxes extends HorizontalLayout implements Field<Strin
 	@Override
 	public void validate() throws InvalidValueException
 	{
-		if (isVisible() && getValue().length()==0)
+		if (isVisible() && getValue().length() == 0)
 		{
 			throw new InvalidValueException("You must select at least one day");
 		}
@@ -151,7 +157,7 @@ public class DayOfWeekCheckBoxes extends HorizontalLayout implements Field<Strin
 	public String getValue()
 	{
 		String value = "";
-		int i = 0;
+		int i = 1;
 		for (CheckBox box : boxes)
 		{
 			if (box.getValue())
@@ -180,7 +186,10 @@ public class DayOfWeekCheckBoxes extends HorizontalLayout implements Field<Strin
 			for (String value : values)
 			{
 				int index = Integer.parseInt(value);
-				boxes.get(index).setValue(true);
+				if (index > 0)
+				{
+					boxes.get(index - 1).setValue(true);
+				}
 			}
 		}
 
@@ -233,8 +242,10 @@ public class DayOfWeekCheckBoxes extends HorizontalLayout implements Field<Strin
 	public void setPropertyDataSource(@SuppressWarnings("rawtypes") Property newDataSource)
 	{
 		datasource = newDataSource;
-		if (datasource !=null){
-		setValue(datasource.getValue());}
+		if (datasource != null)
+		{
+			setValue(datasource.getValue());
+		}
 		else
 		{
 			setValue(null);
@@ -286,7 +297,7 @@ public class DayOfWeekCheckBoxes extends HorizontalLayout implements Field<Strin
 	{
 		return "You must select at least one day";
 	}
-	
+
 	@Override
 	public boolean isEmpty()
 	{
@@ -298,7 +309,7 @@ public class DayOfWeekCheckBoxes extends HorizontalLayout implements Field<Strin
 	public void clear()
 	{
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }
