@@ -131,7 +131,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	private boolean noEditor;
 	public boolean advancedSearchOn = false;
 	private boolean triggerFilterOnClear = true;
-	private Button advancedSearchCheckbox;
+	private Button advancedSearchButton;
 	private Set<RowChangedListener<E>> rowChangedListeners = new CopyOnWriteArraySet<RowChangedListener<E>>();
 	private int minSearchTextLength = 0;
 	private HeadingPropertySet<E> headings;
@@ -632,7 +632,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		AbstractLayout advancedSearch = buildAdvancedSearch();
 		if (advancedSearch != null)
 		{
-			group.addComponent(advancedSearchCheckbox);
+			group.addComponent(advancedSearchButton);
 		}
 
 		Button clear = createClearButton();
@@ -704,11 +704,11 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		if (advancedSearchLayout != null)
 		{
 
-			advancedSearchCheckbox = new Button("Advanced");
+			advancedSearchButton = new Button("Advanced");
 			advancedSearchOn = false;
 
-			advancedSearchCheckbox.setImmediate(true);
-			advancedSearchCheckbox.addClickListener(new ClickListener()
+			advancedSearchButton.setImmediate(true);
+			advancedSearchButton.addClickListener(new ClickListener()
 			{
 
 				private static final long serialVersionUID = 7777043506655571664L;
@@ -725,11 +725,11 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 					}
 					if (!advancedSearchOn)
 					{
-						advancedSearchCheckbox.removeStyleName(ValoTheme.BUTTON_FRIENDLY);
+						advancedSearchButton.removeStyleName(ValoTheme.BUTTON_FRIENDLY);
 					}
 					else
 					{
-						advancedSearchCheckbox.setStyleName(ValoTheme.BUTTON_FRIENDLY);
+						advancedSearchButton.setStyleName(ValoTheme.BUTTON_FRIENDLY);
 					}
 
 				}
@@ -745,11 +745,11 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	{
 		advancedSearchOn = true;
 		advancedSearchLayout.setVisible(advancedSearchOn);
-		advancedSearchCheckbox.setStyleName(ValoTheme.BUTTON_FRIENDLY);
+		advancedSearchButton.setStyleName(ValoTheme.BUTTON_FRIENDLY);
 
 		if (lockAdvancedSearch)
 		{
-			advancedSearchCheckbox.setVisible(false);
+			advancedSearchButton.setVisible(false);
 		}
 	}
 
