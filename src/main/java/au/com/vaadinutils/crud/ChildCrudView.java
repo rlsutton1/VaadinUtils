@@ -384,7 +384,6 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 		entityTable.select(null);
 		entityTable.select(previousItemId);
 
-		postChildDelete(entityId);
 
 		dirty = true;
 		JpaBaseDao<E, Long> dao = new JpaBaseDao<E, Long>(entityClass);
@@ -392,6 +391,8 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 		EntityManagerProvider.remove(entity);
 		parentCrud.reloadDataFromDB();
 		reloadDataFromDB();
+
+		postChildDelete(entityId);
 
 	}
 

@@ -120,7 +120,7 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 
 				final Label label = new Label("<font color='green'>Scheduled</font>");
 				label.setContentMode(ContentMode.HTML);
-				if (schedule.getReportLog() != null && schedule.getReportLog().length() > 0)
+				if (schedule.getReportLog() != null && schedule.getReportLog().length() > 0 && !schedule.equals(Scheduler.REPORT_SUCCESSFULLY_RUN))
 				{
 					label.setValue("<font color='red'><b>Error</b></font>");
 				}
@@ -174,7 +174,7 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 		((EntityTable<ReportEmailScheduleEntity>) this.entityTable).refreshRowCache();
 	}
 
-	protected ReportEmailScheduleEntity preNew() throws InstantiationException, IllegalAccessException
+	protected ReportEmailScheduleEntity preNew()
 	{
 		return scheduleCreater.create();
 	}
@@ -656,7 +656,7 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 				{
 					// merge date & time
 					Date startDate = updater.startDateField.getValue();
-					Date startTime = (Date) updater.startTimePicker.getValue();
+					Date startTime = updater.startTimePicker.getValue();
 
 					Calendar startDateCal = Calendar.getInstance();
 					startDateCal.setTime(startDate);
@@ -671,7 +671,7 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 
 					// merge date & time
 					Date endDate = updater.endDateField.getValue();
-					Date endTime = (Date) updater.endTimePicker.getValue();
+					Date endTime = updater.endTimePicker.getValue();
 
 					Calendar endDateCal = Calendar.getInstance();
 					endDateCal.setTime(endDate);

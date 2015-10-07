@@ -21,6 +21,8 @@ import au.com.vaadinutils.jasper.scheduler.entities.ScheduleMode;
 
 public class Scheduler implements Runnable
 {
+	public  static final String REPORT_SUCCESSFULLY_RUN = "Report successfully run";
+
 	Logger logger = LogManager.getLogger();
 
 	final private ReportEmailScheduleProvider scheduleProvider;
@@ -115,7 +117,7 @@ public class Scheduler implements Runnable
 						{
 							if (reportRunner.runReport(schedule, nextScheduledTime, emailSettings))
 							{
-								schedule.setLastRuntime(now.toDate(), "Report successfully run");
+								schedule.setLastRuntime(now.toDate(), REPORT_SUCCESSFULLY_RUN);
 								if (schedule.getScheduleMode() == ScheduleMode.ONE_TIME)
 								{
 									scheduleProvider.delete(schedule);
