@@ -120,7 +120,7 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 
 				final Label label = new Label("<font color='green'>Scheduled</font>");
 				label.setContentMode(ContentMode.HTML);
-				if (schedule.getReportLog() != null && schedule.getReportLog().length() > 0 && !schedule.equals(Scheduler.REPORT_SUCCESSFULLY_RUN))
+				if (schedule.getReportLog() != null && schedule.getReportLog().length() > 0 && !schedule.getReportLog().equals(Scheduler.REPORT_SUCCESSFULLY_RUN))
 				{
 					label.setValue("<font color='red'><b>Error</b></font>");
 				}
