@@ -15,6 +15,7 @@ public class ClickableLabel extends VerticalLayout
 	public ClickableLabel()
 	{
 		this(null);
+		setImmediate(true);
 	}
 
 	public ClickableLabel(String value)
