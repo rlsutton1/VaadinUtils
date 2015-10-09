@@ -6,6 +6,7 @@ import java.util.Date;
 import org.joda.time.DateTime;
 
 import com.vaadin.data.Property;
+import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.HorizontalLayout;
@@ -104,6 +105,16 @@ public class DateTimePickerInline extends TimePicker
 		addComponent(vl);
 	}
 
+	@Override
+	public void validate() throws InvalidValueException
+	{
+		super.validate();
+		displayTime.validate();
+		field.validate();
+		
+
+	}
+	
 	@SuppressWarnings("deprecation")
 	private VerticalLayout buildInline()
 	{
