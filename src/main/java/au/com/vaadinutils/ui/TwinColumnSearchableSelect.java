@@ -482,6 +482,8 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 		// hide the add/remove and available list
 		addButton.setVisible(!b);
 		removeButton.setVisible(!b);
+		addAllButton.setVisible(!b);
+		removeAllButton.setVisible(!b);
 		available.setVisible(!b);
 	}
 

@@ -166,6 +166,7 @@ public class AutoCompleteTextField<E> extends TextField
 
 	public void hideAutoComplete()
 	{
-		contextMenu.hide();
+		if (contextMenu != null)
+			contextMenu.hide();
 	}
 }
