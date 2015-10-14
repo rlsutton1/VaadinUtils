@@ -67,6 +67,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	@SuppressWarnings("rawtypes")
 	private Class<? extends Collection> valueClass;
 	private boolean isAscending;
+	private boolean showAddRemoveAll;
 
 	/**
 	 * Unfortunately TwinColumnSelect wont work with large sets, it isn't
@@ -482,8 +483,11 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 		// hide the add/remove and available list
 		addButton.setVisible(!b);
 		removeButton.setVisible(!b);
-		addAllButton.setVisible(!b);
-		removeAllButton.setVisible(!b);
+		if (showAddRemoveAll)
+		{
+			addAllButton.setVisible(!b);
+			removeAllButton.setVisible(!b);
+		}
 		available.setVisible(!b);
 	}
 
@@ -578,6 +582,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	 */
 	public void showAddAndRemoveAllButtons(boolean show)
 	{
+		showAddRemoveAll = false;
 		addAllButton.setVisible(show);
 		removeAllButton.setVisible(show);
 	}
@@ -657,7 +662,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	{
 		this.availableContainer = newContainer;
 	}
-	
+
 	public void setSelectedColumnHeader(String header)
 	{
 		this.selectedCols.setColumnHeaders(header);
