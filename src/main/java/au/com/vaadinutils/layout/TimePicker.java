@@ -369,8 +369,7 @@ public class TimePicker extends HorizontalLayout implements Field<Date>
 
 	protected void addMinuteButtons(HorizontalLayout minuteButtonPanel, int rows, int cols)
 	{
-		String[] numbers = new String[]
-		{ "00", "10", "15", "20", "30", "40", "45", "50" };
+		String[] numbers = new String[] { "00", "10", "15", "20", "30", "40", "45", "50" };
 		for (int col = 0; col < cols; col++)
 		{
 			VerticalLayout rowsLayout = new VerticalLayout();
@@ -411,8 +410,7 @@ public class TimePicker extends HorizontalLayout implements Field<Date>
 
 	protected void addHourButtons(HorizontalLayout hourButtonPanel, int rows, int cols)
 	{
-		int[] numbers = new int[]
-		{ 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
+		int[] numbers = new int[] { 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
 		for (int col = 0; col < cols; col++)
 		{
 			VerticalLayout rowsLayout = new VerticalLayout();
@@ -434,8 +432,16 @@ public class TimePicker extends HorizontalLayout implements Field<Date>
 					@Override
 					public void buttonClick(ClickEvent event)
 					{
+						int hourToSet = Integer.parseInt(button.getCaption());
 						String title = button.getCaption();
-						dateTime.set(Calendar.HOUR, Integer.parseInt(title));
+						hourToSet %= 12;
+						if (dateTime.get(Calendar.HOUR_OF_DAY) >= 12)
+						{
+							hourToSet += 12;
+						}
+
+						dateTime.set(Calendar.HOUR_OF_DAY, hourToSet);
+
 						isSet = true;
 						setNewValue();
 					}
