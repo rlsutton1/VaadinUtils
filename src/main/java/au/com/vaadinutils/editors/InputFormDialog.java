@@ -7,7 +7,6 @@ import org.apache.logging.log4j.Logger;
 
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.event.ShortcutAction.KeyCode;
-import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -125,6 +124,11 @@ public class InputFormDialog extends Window
 		buttons.removeComponent(cancelButton);
 	}
 
+	public void setButtonsSpacing(boolean spacing)
+	{
+		buttons.setSpacing(spacing);
+	}
+
 	public void setOkButtonLabel(String label)
 	{
 		ok.setCaption(label);
@@ -139,4 +143,5 @@ public class InputFormDialog extends Window
 	{
 		ok.setVisible(show);
 	}
+
 }
