@@ -84,7 +84,21 @@ public class HeadingPropertySet<E>
 		{
 			cols.add(new HeadingToPropertyId<E>(heading, headingPropertyId, null).setHidden());
 			return this;
+		}
 
+		public <T extends Object> Builder<E> addGeneratedHiddenColumn(String heading,
+				SingularAttribute<E, T> headingPropertyId, ColumnGenerator columnGenerator)
+		{
+			cols.add(new HeadingToPropertyId<E>(heading, headingPropertyId.getName(), columnGenerator).setHidden());
+			return this;
+		}
+
+		public <T extends Object> Builder<E> addGeneratedHiddenColumn(String heading,
+				SingularAttribute<E, T> headingPropertyId, ColumnGenerator columnGenerator, int width)
+		{
+			cols.add(new HeadingToPropertyId<E>(heading, headingPropertyId.getName(), columnGenerator).setWidth(width)
+					.setHidden());
+			return this;
 		}
 
 		public Builder<E> addGeneratedHiddenColumn(String heading, ColumnGenerator columnGenerator)
@@ -132,14 +146,13 @@ public class HeadingPropertySet<E>
 
 		}
 
-		public <T extends Object> Builder<E> addColumn(String heading, String headingPropertyId,
-				int width)
+		public <T extends Object> Builder<E> addColumn(String heading, String headingPropertyId, int width)
 		{
 			cols.add(new HeadingToPropertyId<E>(heading, headingPropertyId, null).setWidth(width));
 			return this;
 
 		}
-		
+
 		public <T extends Object> Builder<E> addColumn(String heading, SingularAttribute<E, T> headingPropertyId,
 				int width)
 		{
