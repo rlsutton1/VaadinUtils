@@ -291,6 +291,21 @@ public class JpaDslBuilder<E>
 
 	}
 
+	public <L> Condition<E> isNull(final JoinBuilder<E, L> join)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+				return builder.isNull(getJoin(join));
+			}
+
+		};
+
+	}
+
 	public <J> Condition<E> joinLike(final SingularAttribute<E, J> joinAttribute, final JoinType joinType,
 			final SingularAttribute<J, String> field, final String value)
 	{
@@ -661,6 +676,23 @@ public class JpaDslBuilder<E>
 				return root.get(agents).in(agent);
 			}
 		};
+	}
+
+	public <V, K> Condition<E> in(final JoinBuilder<E, V> joinBuilder, final SingularAttribute<V, K> field,
+			final Collection<K> value)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+
+				return getJoin(joinBuilder).get(field).in(value);
+			}
+
+		};
+
 	}
 
 	public Condition<E> gtEq(SingularAttribute<E, Date> field, Date value)
