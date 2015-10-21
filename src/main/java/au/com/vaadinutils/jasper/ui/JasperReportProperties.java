@@ -223,4 +223,6 @@ public interface JasperReportProperties
 
 	public abstract Map<String, Object> getCustomReportParameterMap();
 
+	public abstract String getDynamicJrxmlFileName();
+
 }

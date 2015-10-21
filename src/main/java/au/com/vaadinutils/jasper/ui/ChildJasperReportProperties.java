@@ -161,4 +161,10 @@ public class ChildJasperReportProperties implements JasperReportProperties
 		return this.parentReportProperties.getReportIdentifier();
 	}
 
+	@Override
+	public String getDynamicJrxmlFileName()
+	{
+		return null;
+	}
+
 }

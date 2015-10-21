@@ -28,8 +28,11 @@ public class JasperReportPropertiesAlternateFile implements JasperReportProperti
 	@Override
 	public String getReportFileName()
 	{
-
+		if (reportPropertiesTemplate.getDynamicJrxmlFileName() !=null){
+			return reportPropertiesTemplate.getDynamicJrxmlFileName();
+		}
 		return reportFileName;
+		
 	}
 
 	@Override
@@ -143,5 +146,11 @@ public class JasperReportPropertiesAlternateFile implements JasperReportProperti
 	public Enum<?> getReportIdentifier()
 	{
 		return reportPropertiesTemplate.getReportIdentifier();
+	}
+
+	@Override
+	public String getDynamicJrxmlFileName()
+	{
+		return null;
 	}
 }
