@@ -253,4 +253,11 @@ public class ReportEmailRunnerImpl implements ReportEmailRunner, JasperReportPro
 	{
 		return jasperReportProperties.getReportIdentifier();
 	}
+	
+
+	@Override
+	public String getDynamicJrxmlFileName()
+	{
+		return null;
+	}
 }
