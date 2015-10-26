@@ -58,8 +58,8 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 		this.uniqueId = uniqueId;
 		container = getContainer();
 		selectableTable = new SelectableEntityTable<E>(container, getHeadingPropertySet(), uniqueId);
-		selectableTable.setSizeUndefined();
-
+		selectableTable.setSizeFull();
+		this.setSizeFull();
 		if (!getSecurityManager().canUserView())
 		{
 			this.setSizeFull();
