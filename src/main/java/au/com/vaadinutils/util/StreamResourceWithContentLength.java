@@ -25,12 +25,15 @@ public class StreamResourceWithContentLength extends StreamResource
 			return null;
 		}
 		long contentLength = contentLengthProvider.getContentLength();
-		final DownloadStream ds = new DownloadStream(ss.getStream(), getMIMEType(), getFilename());
+		final PartialDownloadStream ds = new PartialDownloadStream(ss.getStream(), getMIMEType(), getFilename());
+		ds.setContentLength(contentLength);
 		ds.setParameter("Content-Length", String.valueOf(contentLength));
 		ds.setBufferSize(getBufferSize());
 		ds.setCacheTime(getCacheTime());
 		return ds;
 	}
+	
+	
 
 	
 
