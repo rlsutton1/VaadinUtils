@@ -21,6 +21,7 @@ import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.EntityItemProperty;
 import com.vaadin.addon.jpacontainer.EntityProviderChangeEvent;
 import com.vaadin.addon.jpacontainer.EntityProviderChangeEvent.EntitiesAddedEvent;
+import com.vaadin.addon.jpacontainer.EntityProviderChangeEvent.EntitiesUpdatedEvent;
 import com.vaadin.addon.jpacontainer.EntityProviderChangeEvent.EntitiesRemovedEvent;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.JPAContainer.ProviderChangedEvent;
@@ -281,6 +282,12 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 					{
 						Collection<E> affectedEntities = changeEvent.getAffectedEntities();
 						eventHandler.entitiesAdded(affectedEntities);
+					}
+
+					if (changeEvent instanceof EntitiesUpdatedEvent)
+					{
+						Collection<E> affectedEntities = changeEvent.getAffectedEntities();
+						eventHandler.entitiesUpdated(affectedEntities);
 					}
 
 					if (changeEvent instanceof EntitiesRemovedEvent)
@@ -941,6 +948,11 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 		{
 			@Override
 			public void entitiesAdded(Collection<E> entities)
+			{
+			}
+
+			@Override
+			public void entitiesUpdated(Collection<E> entities)
 			{
 			}
 
