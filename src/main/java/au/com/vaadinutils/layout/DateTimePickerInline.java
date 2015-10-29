@@ -1,6 +1,7 @@
 package au.com.vaadinutils.layout;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 import org.joda.time.DateTime;
@@ -79,6 +80,15 @@ public class DateTimePickerInline extends TimePicker
 				}else
 				{
 					midnightLabel.setValue("");
+				}
+				
+				final Date parsedDate = parseDate((String) event.getProperty().getValue());
+				if (parsedDate != null)
+				{
+					dateTime.set(Calendar.HOUR_OF_DAY, parsedDate.getHours());
+					dateTime.set(Calendar.MINUTE, parsedDate.getMinutes());
+					isSet = true;
+					setNewValue();
 				}
 				
 			}
