@@ -253,6 +253,7 @@ public class ErrorWindow
 
 		logger.error("Reference: " + reference + " " + notes);
 		final String buildVersion = getBuildVersion();
+		final String companyName = getSystemName();
 		Runnable runner = new Runnable()
 		{
 
@@ -260,7 +261,6 @@ public class ErrorWindow
 			public void run()
 			{
 				String subject = "";
-				String companyName = getSystemName();
 				subject += "Error: " + finalId + " " + companyName + " ref: " + reference;
 
 				ErrorSettingsFactory.getErrorSettings().sendEmail(
@@ -273,8 +273,8 @@ public class ErrorWindow
 
 			}
 		};
-		
-		new Thread(runner,"Send Error Email").start();
+
+		new Thread(runner, "Send Error Email").start();
 	}
 
 	private ByteArrayOutputStream stream = null;
