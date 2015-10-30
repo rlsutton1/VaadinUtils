@@ -24,7 +24,7 @@ public class DateTimePickerInline extends TimePicker
 	InlineDateField datePicker;
 
 	SimpleDateFormat dateFormatter = new SimpleDateFormat("EEE yyyy/MM/dd");
-	
+
 	public DateTimePickerInline(String title)
 	{
 		super(title);
@@ -36,27 +36,27 @@ public class DateTimePickerInline extends TimePicker
 		datePicker = new InlineDateField(title + " Date");
 		datePicker.setDateFormat("yyyy/MM/dd");
 		datePicker.setValue(new Date());
-		
+
 		final Label displayDate = new Label();
-		
+
 		datePicker.addValueChangeListener(new ValueChangeListener()
 		{
-			
+
 			private static final long serialVersionUID = 1L;
 
 			@Override
 			public void valueChange(Property.ValueChangeEvent event)
 			{
 				final Date date = (Date) event.getProperty().getValue();
-				
+
 				displayDate.setValue(dateFormatter.format(date));
-				
+
 			}
 		});
 
 		final Label midnightLabel = new Label();
 		midnightLabel.setContentMode(ContentMode.HTML);
-		
+
 		field = new TextField();
 		field.setWidth("125");
 		field.setImmediate(true);
@@ -77,40 +77,47 @@ public class DateTimePickerInline extends TimePicker
 				if (hour == 0)
 				{
 					midnightLabel.setValue("<font color='red'><b>Midnight</b></font>");
-				}else
+				}
+				else
 				{
 					midnightLabel.setValue("");
 				}
-				
-				final Date parsedDate = parseDate((String) event.getProperty().getValue());
-				if (parsedDate != null)
+				try
 				{
-					dateTime.set(Calendar.HOUR_OF_DAY, parsedDate.getHours());
-					dateTime.set(Calendar.MINUTE, parsedDate.getMinutes());
-					isSet = true;
-					setNewValue();
+					final Date parsedDate = parseDate((String) event.getProperty().getValue());
+					if (parsedDate != null)
+					{
+						dateTime.set(Calendar.HOUR_OF_DAY, parsedDate.getHours());
+						dateTime.set(Calendar.MINUTE, parsedDate.getMinutes());
+						isSet = true;
+						setNewValue();
+					}
 				}
-				
+				catch (InvalidValueException e)
+				{
+					logger.info(e);
+					// the validator will handle this
+				}
+
 			}
 		});
-		
+
 		field.setCaption(null);
 		datePicker.setCaption(null);
 
 		VerticalLayout vl = new VerticalLayout();
 
-	
 		vl.addComponent(datePicker);
 
 		vl.addComponent(displayDate);
-		
+
 		HorizontalLayout timeFieldLayout = new HorizontalLayout();
 		timeFieldLayout.setSpacing(true);
 		timeFieldLayout.addComponent(field);
 		timeFieldLayout.addComponent(midnightLabel);
 		timeFieldLayout.setComponentAlignment(midnightLabel, Alignment.MIDDLE_LEFT);
 		vl.addComponent(timeFieldLayout);
-		
+
 		vl.addComponent(buildInline());
 		addComponent(vl);
 	}
@@ -121,10 +128,9 @@ public class DateTimePickerInline extends TimePicker
 		super.validate();
 		displayTime.validate();
 		field.validate();
-		
 
 	}
-	
+
 	@SuppressWarnings("deprecation")
 	private VerticalLayout buildInline()
 	{
@@ -222,7 +228,7 @@ public class DateTimePickerInline extends TimePicker
 		return layout;
 
 	}
-	
+
 	@Override
 	public Date getValue()
 	{
@@ -232,9 +238,9 @@ public class DateTimePickerInline extends TimePicker
 			value = dateTime.getTime();
 		}
 		DateTime date = new DateTime(datePicker.getValue());
-		return new DateTime(value).withYear(date.getYear()).withMonthOfYear(date.getMonthOfYear()).withDayOfMonth(date.getDayOfMonth()).toDate();
+		return new DateTime(value).withYear(date.getYear()).withMonthOfYear(date.getMonthOfYear())
+				.withDayOfMonth(date.getDayOfMonth()).toDate();
 
-		
 	}
 
 	public void setValues(Date date)
