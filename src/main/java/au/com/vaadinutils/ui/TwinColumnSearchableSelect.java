@@ -53,7 +53,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	Logger logger = LogManager.getLogger();
 	private BeanContainer<Long, C> beans;
 	private JPAContainer<C> availableContainer;
-	private SearchableSelectableEntityTable<C> available;
+	protected SearchableSelectableEntityTable<C> available;
 	private SingularAttribute<C, Long> beanIdField;
 	private Button addButton = new Button("<");
 	private Button removeButton = new Button(">");
