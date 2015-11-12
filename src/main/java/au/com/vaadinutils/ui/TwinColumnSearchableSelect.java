@@ -45,14 +45,14 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 {
 
 	private static final long serialVersionUID = -4316521010865902678L;
+	private Logger logger = LogManager.getLogger();
 	private SingularAttribute<C, ?> listField;
 	private String itemLabel;
 
-	private Collection<C> sourceValue;
+	protected Collection<C> sourceValue;
 	protected Table selectedCols;
-	Logger logger = LogManager.getLogger();
-	private BeanContainer<Long, C> beans;
-	private JPAContainer<C> availableContainer;
+	protected BeanContainer<Long, C> beans;
+	protected JPAContainer<C> availableContainer;
 	protected SearchableSelectableEntityTable<C> available;
 	private SingularAttribute<C, Long> beanIdField;
 	private Button addButton = new Button("<");

@@ -116,7 +116,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	/* User interface components are stored in session. */
 	protected EntityList<E> entityTable;
 	protected VerticalLayout rightLayout;
-	private Component editor;
+	protected Component editor;
 	protected CrudPanelPair splitPanel;
 	protected BaseCrudSaveCancelButtonTray buttonLayout;
 	protected AbstractLayout advancedSearchLayout;
