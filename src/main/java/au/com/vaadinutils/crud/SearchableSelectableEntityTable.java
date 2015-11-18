@@ -379,4 +379,10 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 	{
 		return selectableTable;
 	}
+
+	public void selectAll()
+	{
+		selectableTable.selectAll();
+		
+	}
 }
