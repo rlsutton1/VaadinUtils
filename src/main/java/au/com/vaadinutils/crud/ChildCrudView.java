@@ -882,7 +882,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 		boolean ret = false;
 		// call the super to see if the fields are dirty and then also check
 		// that records haven't been added or removed
-		ret = super.isDirty() || dirty || inNew;
+		ret = super.isDirty() || dirty || inNew || areNonFieldGroupFieldsDirty();
 
 		return ret;
 
