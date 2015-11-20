@@ -34,6 +34,8 @@ public class TableCheckBoxSelect extends Table
 		initCheckboxMultiSelect();
 		setImmediate(true);
 
+		setId("TableCheckBoxSelect");
+
 	}
 
 	/**
@@ -160,7 +162,7 @@ public class TableCheckBoxSelect extends Table
 			}
 			if (selectable)
 			{
-				cols.add(0,TABLE_CHECK_BOX_SELECT);
+				cols.add(0, TABLE_CHECK_BOX_SELECT);
 			}
 			Set<Object> uniqueCols = new LinkedHashSet<>();
 			uniqueCols.addAll(cols);
@@ -286,6 +288,7 @@ public class TableCheckBoxSelect extends Table
 				// value change listener is added
 				boolean inList = markedIds.contains(itemId);
 				checkbox.setValue(inList);
+				checkbox.setId("checkboxSelect");
 				if (!markedIds.isTrackingSelected())
 				{
 					checkbox.setValue(!inList);

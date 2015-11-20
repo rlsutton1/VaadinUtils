@@ -175,6 +175,7 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 		field.setImmediate(true);
 		field.setNullRepresentation("");
 		field.setNullSettingAllowed(false);
+		field.setId(fieldLabel);
 		addValueChangeListeners(field);
 		doBinding(group, fieldName, field);
 		form.addComponent(field);
@@ -358,6 +359,7 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 		field.setTextInputAllowed(true);
 		field.setWidth(STANDARD_COMBO_WIDTH);
 		field.setImmediate(true);
+		field.setId(fieldLabel);
 		addValueChangeListeners(field);
 		doBinding(group, fieldName, field);
 
@@ -609,6 +611,7 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 			}
 			component.setCaption(label);
 			component.setItemCaptionMode(ItemCaptionMode.PROPERTY);
+			component.setId(label);
 
 			if (container == null)
 			{
