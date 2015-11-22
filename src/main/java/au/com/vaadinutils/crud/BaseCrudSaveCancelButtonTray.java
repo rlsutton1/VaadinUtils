@@ -19,7 +19,7 @@ public class BaseCrudSaveCancelButtonTray extends HorizontalLayout
 	private Button saveButton = new Button("Save");
 	private Button cancelButton = new Button("Cancel");
 
-	BaseCrudSaveCancelButtonTray(boolean disallowEdit, boolean disallowNew, final ButtonListener listener)
+	public BaseCrudSaveCancelButtonTray(boolean disallowEdit, boolean disallowNew, final ButtonListener listener)
 	{
 		this.disallowEdit = disallowEdit;
 		this.disallowNew = disallowNew;
