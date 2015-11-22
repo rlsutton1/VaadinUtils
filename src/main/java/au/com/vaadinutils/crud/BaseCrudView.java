@@ -116,7 +116,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	/* User interface components are stored in session. */
 	protected EntityList<E> entityTable;
 	protected VerticalLayout rightLayout;
-	private Component editor;
+	protected Component editor;
 	protected CrudPanelPair splitPanel;
 	protected BaseCrudSaveCancelButtonTray buttonLayout;
 	protected AbstractLayout advancedSearchLayout;
@@ -173,6 +173,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 		this.headings = headings;
 		entityTable = getTable(container, headings);
+		entityTable.setId("CrudTable-"+this.getClass().getSimpleName());
 		entityTable.setRowChangeListener(this);
 		entityTable.setSortEnabled(true);
 		entityTable.setColumnCollapsingAllowed(true);
@@ -429,7 +430,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		{
 			mainEditPanel.setVisible(true);
 			mainEditPanel.setSizeFull();
-			mainEditPanel.setId("MailEditPanel");
+			mainEditPanel.setId("EditPanel-"+this.getClass().getSimpleName());
 			scroll.setSizeFull();
 			scroll.setContent(mainEditPanel);
 			rightLayout.addComponent(scroll);
@@ -528,6 +529,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 		addCrudActions();
 		group.addComponent(applyButton);
+		applyButton.setId("applyButton");
 
 		newButton.setCaption(getNewButtonLabel());
 		newButton.setId("CrudNewButton");

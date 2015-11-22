@@ -3,6 +3,8 @@ package au.com.vaadinutils.fields;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -31,6 +33,8 @@ public class TableCheckBoxSelect extends Table
 	{
 		initCheckboxMultiSelect();
 		setImmediate(true);
+
+		setId("TableCheckBoxSelect");
 
 	}
 
@@ -151,16 +155,19 @@ public class TableCheckBoxSelect extends Table
 	{
 		if (visibleColumns.length > 0)
 		{
-			Set<Object> cols = new LinkedHashSet<Object>();
+			List<Object> cols = new LinkedList<Object>();
 			for (Object col : visibleColumns)
 			{
 				cols.add(col);
 			}
 			if (selectable)
 			{
-				cols.add(TABLE_CHECK_BOX_SELECT);
+				cols.add(0, TABLE_CHECK_BOX_SELECT);
 			}
-			super.setVisibleColumns(cols.toArray());
+			Set<Object> uniqueCols = new LinkedHashSet<>();
+			uniqueCols.addAll(cols);
+			super.setVisibleColumns(uniqueCols.toArray());
+			setColumnWidth(TABLE_CHECK_BOX_SELECT, 50);
 		}
 		else
 		{
@@ -281,6 +288,7 @@ public class TableCheckBoxSelect extends Table
 				// value change listener is added
 				boolean inList = markedIds.contains(itemId);
 				checkbox.setValue(inList);
+				checkbox.setId("checkboxSelect");
 				if (!markedIds.isTrackingSelected())
 				{
 					checkbox.setValue(!inList);

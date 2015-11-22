@@ -45,24 +45,24 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 {
 
 	private static final long serialVersionUID = -4316521010865902678L;
+	private Logger logger = LogManager.getLogger();
 	private SingularAttribute<C, ?> listField;
 	private String itemLabel;
 
-	private Collection<C> sourceValue;
+	protected Collection<C> sourceValue;
 	protected Table selectedCols;
-	Logger logger = LogManager.getLogger();
-	private BeanContainer<Long, C> beans;
-	private JPAContainer<C> availableContainer;
+	protected BeanContainer<Long, C> beans;
+	protected JPAContainer<C> availableContainer;
 	protected SearchableSelectableEntityTable<C> available;
 	private SingularAttribute<C, Long> beanIdField;
-	private Button addButton = new Button("<");
-	private Button removeButton = new Button(">");
-	private Button removeAllButton = new Button(">>");
-	private Button addAllButton = new Button("<<");
-	private Filter baselineFilter;
-	private HorizontalLayout mainLayout;
-	private ValueChangeListener<C> listener;
-	private Button addNewButton = new Button(FontAwesome.PLUS);
+	protected Button addButton = new Button("<");
+	protected Button removeButton = new Button(">");
+	protected Button removeAllButton = new Button(">>");
+	protected Button addAllButton = new Button("<<");
+	protected Filter baselineFilter;
+	protected HorizontalLayout mainLayout;
+	protected ValueChangeListener<C> listener;
+	protected Button addNewButton = new Button(FontAwesome.PLUS);
 	private CreateNewCallback<C> createNewCallback;
 	@SuppressWarnings("rawtypes")
 	private Class<? extends Collection> valueClass;
@@ -253,161 +253,17 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 		layout.setWidth("50");
 		layout.setHeight("100");
 
-		removeButton.addClickListener(new ClickListener()
-		{
-
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void buttonClick(ClickEvent event)
-			{
-				try
-				{
-					Long id = (Long) selectedCols.getValue();
-
-					if (isRemoveAllowed())
-					{
-
-						beans.removeItem(id);
-						if (listener != null)
-						{
-							listener.valueChanged(getFieldValue());
-						}
-
-						postRemoveAction();
-					}
-					else
-					{
-						handleRemoveValidation();
-					}
-
-				}
-				catch (Exception e)
-				{
-					logger.error(e, e);
-				}
-
-			}
-		});
+		removeButton.addClickListener(removeClickListener());
 		removeButton.setHeight("50");
 
-		removeAllButton.addClickListener(new ClickListener()
-		{
-
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void buttonClick(ClickEvent event)
-			{
-				try
-				{
-					beans.removeAllItems();
-					if (listener != null)
-					{
-						listener.valueChanged(getFieldValue());
-					}
-				}
-				catch (Exception e)
-				{
-					logger.error(e, e);
-				}
-
-			}
-		});
+		removeAllButton.addClickListener(removeAllClickListener());
 		removeAllButton.setHeight("50");
 
-		addButton.addClickListener(new ClickListener()
-		{
+		addButton.addClickListener(addClickListener());
 
-			/**
-	     * 
-	     */
-			private static final long serialVersionUID = 1L;
+		addAllButton.addClickListener(addAllClickListener());
 
-			@SuppressWarnings("unchecked")
-			@Override
-			public void buttonClick(ClickEvent event)
-			{
-				List<Long> ids = new LinkedList<>();
-				ids.addAll((Collection<? extends Long>) available.getSelectedItems());
-				if (ids.size() > 0)
-				{
-					Long id = ids.get(0);
-					if (id != null)
-					{
-						if (isPreAddActionRequired())
-						{
-							handlePreAddAction(id);
-						}
-						else
-						{
-							handleAddAction(id);
-						}
-
-						postAddAction();
-					}
-				}
-
-				beans.sort(new Object[]
-				{ listField.getName() }, new boolean[]
-				{ isAscending });
-			}
-
-		});
-
-		addAllButton.addClickListener(new ClickListener()
-		{
-
-			/**
-	     * 
-	     */
-			private static final long serialVersionUID = 1L;
-
-			@SuppressWarnings("unchecked")
-			@Override
-			public void buttonClick(ClickEvent event)
-			{
-				beans.removeAllItems();
-				List<Long> ids = new LinkedList<>();
-				ids.addAll((Collection<? extends Long>) available.getContainer().getItemIds());
-
-				for (Long id : ids)
-				{
-					JpaBaseDao<C, Long> dao = (JpaBaseDao<C, Long>) JpaBaseDao.getGenericDao(listField
-							.getDeclaringType().getJavaType());
-					C cust = dao.findById(id);
-					if (cust != null)
-					{
-						beans.addBean(cust);
-						if (listener != null)
-						{
-							listener.valueChanged(getFieldValue());
-						}
-					}
-				}
-
-			}
-		});
-
-		addNewButton.addClickListener(new ClickListener()
-		{
-
-			private static final long serialVersionUID = 173977618488084577L;
-
-			@Override
-			public void buttonClick(ClickEvent event)
-			{
-				createNewCallback.createNew(new RefreshCallback()
-				{
-					@Override
-					public void refresh()
-					{
-						availableContainer.refresh();
-					}
-				});
-
-			}
-		});
+		addNewButton.addClickListener(addNewClickListener());
 
 		layout.addComponent(removeButton);
 		layout.addComponent(addButton);
@@ -667,4 +523,159 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	{
 		this.selectedCols.setColumnHeaders(header);
 	}
+
+	protected ClickListener addAllClickListener()
+	{
+		return new ClickListener()
+		{
+			private static final long serialVersionUID = 1L;
+
+			@SuppressWarnings("unchecked")
+			@Override
+			public void buttonClick(ClickEvent event)
+			{
+				beans.removeAllItems();
+				List<Long> ids = new LinkedList<>();
+				ids.addAll((Collection<? extends Long>) available.getContainer().getItemIds());
+
+				for (Long id : ids)
+				{
+					JpaBaseDao<C, Long> dao = (JpaBaseDao<C, Long>) JpaBaseDao.getGenericDao(listField
+							.getDeclaringType().getJavaType());
+					C cust = dao.findById(id);
+					if (cust != null)
+					{
+						beans.addBean(cust);
+						if (listener != null)
+						{
+							listener.valueChanged(getFieldValue());
+						}
+					}
+				}
+
+			}
+		};
+	}
+
+	protected ClickListener addClickListener()
+	{
+		return new ClickListener()
+		{
+			private static final long serialVersionUID = 1L;
+
+			@SuppressWarnings("unchecked")
+			@Override
+			public void buttonClick(ClickEvent event)
+			{
+				List<Long> ids = new LinkedList<>();
+				ids.addAll((Collection<? extends Long>) available.getSelectedItems());
+				if (ids.size() > 0)
+				{
+					Long id = ids.get(0);
+					if (id != null)
+					{
+						if (isPreAddActionRequired())
+						{
+							handlePreAddAction(id);
+						}
+						else
+						{
+							handleAddAction(id);
+						}
+
+						postAddAction();
+					}
+				}
+
+				beans.sort(new Object[]
+				{ listField.getName() }, new boolean[]
+				{ isAscending });
+			}
+		};
+	}
+
+	protected ClickListener addNewClickListener()
+	{
+		return new ClickListener()
+		{
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void buttonClick(ClickEvent event)
+			{
+				createNewCallback.createNew(new RefreshCallback()
+				{
+					@Override
+					public void refresh()
+					{
+						availableContainer.refresh();
+					}
+				});
+			}
+		};
+	}
+
+	protected ClickListener removeClickListener()
+	{
+		return new ClickListener()
+		{
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void buttonClick(ClickEvent event)
+			{
+				try
+				{
+					Long id = (Long) selectedCols.getValue();
+
+					if (isRemoveAllowed())
+					{
+						beans.removeItem(id);
+						if (listener != null)
+						{
+							listener.valueChanged(getFieldValue());
+						}
+
+						postRemoveAction();
+					}
+					else
+					{
+						handleRemoveValidation();
+					}
+
+				}
+				catch (Exception e)
+				{
+					logger.error(e, e);
+				}
+
+			}
+		};
+	}
+
+	protected ClickListener removeAllClickListener()
+	{
+		return new ClickListener()
+		{
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void buttonClick(ClickEvent event)
+			{
+				try
+				{
+					beans.removeAllItems();
+					if (listener != null)
+					{
+						listener.valueChanged(getFieldValue());
+					}
+				}
+				catch (Exception e)
+				{
+					logger.error(e, e);
+				}
+			}
+		};
+	}
+
 }
