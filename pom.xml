@@ -5,6 +5,7 @@
 	<artifactId>VaadinUtils</artifactId>
 	<version>0.1.2</version>
 
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<vaadin.version>7.4.5</vaadin.version>

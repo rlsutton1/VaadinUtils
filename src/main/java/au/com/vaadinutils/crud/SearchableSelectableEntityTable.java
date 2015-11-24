@@ -58,8 +58,8 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 		this.uniqueId = uniqueId;
 		container = getContainer();
 		selectableTable = new SelectableEntityTable<E>(container, getHeadingPropertySet(), uniqueId);
-		selectableTable.setSizeUndefined();
-
+		selectableTable.setSizeFull();
+		this.setSizeFull();
 		if (!getSecurityManager().canUserView())
 		{
 			this.setSizeFull();
@@ -127,6 +127,7 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 		}
 
 		searchField.setInputPrompt("Search");
+		searchField.setId("searchField");
 		searchField.setTextChangeEventMode(TextChangeEventMode.LAZY);
 		searchField.setImmediate(true);
 		searchField.addTextChangeListener(new TextChangeListener()
@@ -378,5 +379,11 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 	public SelectableEntityTable<E> getTable()
 	{
 		return selectableTable;
+	}
+
+	public void selectAll()
+	{
+		selectableTable.selectAll();
+		
 	}
 }

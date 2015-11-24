@@ -829,7 +829,7 @@ public class JpaDslBuilder<E>
 			}
 		};
 	}
-	
+
 	public <V> Condition<E> in(final SetAttribute<E, V> agents, final V agent)
 	{
 		return new AbstractCondition<E>()
@@ -1109,10 +1109,10 @@ public class JpaDslBuilder<E>
 	{
 		return builder.concat(trim, string);
 	}
-	
+
 	public Expression<String> asString(SingularAttribute<E, ?> field)
 	{
-		
+
 		return root.get(field).as(String.class);
 	}
 
@@ -1162,8 +1162,7 @@ public class JpaDslBuilder<E>
 		};
 	}
 
-	public <V extends Comparable<? super V>> Condition<E> greaterThan(final SingularAttribute<E, V> field,
-			final V value)
+	public <V extends Comparable<? super V>> Condition<E> greaterThan(final SingularAttribute<E, V> field, final V value)
 	{
 		return new AbstractCondition<E>()
 		{
@@ -1178,5 +1177,6 @@ public class JpaDslBuilder<E>
 		};
 
 	}
+
 
 }

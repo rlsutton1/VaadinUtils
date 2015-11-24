@@ -247,21 +247,34 @@ public class ErrorWindow
 	}
 
 	private void generateEmail(final Date time, final String finalId, final String finalTrace, final String reference,
-			final String notes, final String supportEmail, String viewClass, String user, String userEmail)
+			final String notes, final String supportEmail, final String viewClass, final String user,
+			final String userEmail)
 	{
+
 		logger.error("Reference: " + reference + " " + notes);
+		final String buildVersion = getBuildVersion();
+		final String companyName = getSystemName();
+		Runnable runner = new Runnable()
+		{
 
-		String subject = "";
-		String companyName = getSystemName();
-		subject += "Error: " + finalId + " " + companyName + " ref: " + reference;
+			@Override
+			public void run()
+			{
+				String subject = "";
+				subject += "Error: " + finalId + " " + companyName + " ref: " + reference;
 
-		ErrorSettingsFactory.getErrorSettings().sendEmail(
-				supportEmail,
-				subject,
-				subject + "\n\nTime: " + time.toString() + "\n\nView: " + viewClass + "\n\nUser: " + user + " "
-						+ userEmail + "\n\n" + "Version: " + getBuildVersion() + "\n\n" + "User notes:" + notes
-						+ "\n\n" + finalTrace, ErrorWindow.this.stream, ErrorWindow.this.filename,
-				ErrorWindow.this.MIMEType);
+				ErrorSettingsFactory.getErrorSettings().sendEmail(
+						supportEmail,
+						subject,
+						subject + "\n\nTime: " + time.toString() + "\n\nView: " + viewClass + "\n\nUser: " + user + " "
+								+ userEmail + "\n\n" + "Version: " + buildVersion + "\n\n" + "User notes:" + notes
+								+ "\n\n" + finalTrace, ErrorWindow.this.stream, ErrorWindow.this.filename,
+						ErrorWindow.this.MIMEType);
+
+			}
+		};
+
+		new Thread(runner, "Send Error Email").start();
 	}
 
 	private ByteArrayOutputStream stream = null;

@@ -520,6 +520,8 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		CriteriaDelete<E> criteria = builder.createCriteriaDelete(entityClass);
 		int result = getEntityManager().createQuery(criteria).executeUpdate();
 
+		flushCache();
+		
 		return result;
 
 	}

@@ -98,6 +98,7 @@ public class JasperReportEmailWindow extends Window
 		message = new TextArea("Message");
 		message.setValue(reportProperties.getReportTitle() + " report is attached");
 		message.setSizeFull();
+		message.setMaxLength(1023);
 		layout.addComponent(message);
 
 		HorizontalLayout buttonLayout = new HorizontalLayout();

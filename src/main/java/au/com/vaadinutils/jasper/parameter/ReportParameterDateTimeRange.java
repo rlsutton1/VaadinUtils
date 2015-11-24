@@ -108,8 +108,8 @@ public class ReportParameterDateTimeRange extends ReportParameter<String>
 				{
 					throw new InvalidValueException("Start date is invalid");
 				}
-				
-				if (((Date) value).after(endfield.getValue()))
+
+				if (endfield.getValue() != null && ((Date) value).after(endfield.getValue()))
 				{
 					throw new InvalidValueException("Start date must be before the end date");
 				}
@@ -127,8 +127,8 @@ public class ReportParameterDateTimeRange extends ReportParameter<String>
 				{
 					throw new InvalidValueException("End date is invalid");
 				}
-				
-				if (((Date) value).before(startfield.getValue()))
+
+				if (startfield.getValue() != null && ((Date) value).before(startfield.getValue()))
 				{
 					throw new InvalidValueException("Start date must be before the end date");
 				}
