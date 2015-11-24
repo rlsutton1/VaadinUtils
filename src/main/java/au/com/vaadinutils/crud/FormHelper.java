@@ -200,6 +200,14 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 		this.fieldList.add(field);
 		return field;
 	}
+	
+	public <M> PasswordField bindPasswordField( String fieldLabel,
+			SingularAttribute<E, M> member)
+	{
+		PasswordField field = bindPasswordField(form, group, fieldLabel, (member != null ? member.getName() : null));
+		this.fieldList.add(field);
+		return field;
+	}
 
 	public PasswordField bindPasswordField(AbstractLayout form, FieldGroup group, String fieldLabel, String fieldName)
 	{
