@@ -7,6 +7,14 @@ import java.util.List;
 
 import javax.mail.internet.InternetAddress;
 
+import com.vaadin.addon.jpacontainer.JPAContainer;
+import com.vaadin.data.Container.Filter;
+import com.vaadin.data.util.filter.Compare;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Notification.Type;
+import com.vaadin.ui.UI;
+import com.vaadin.ui.Window;
+
 import au.com.vaadinutils.help.HelpSplitPanel;
 import au.com.vaadinutils.jasper.parameter.ReportParameter;
 import au.com.vaadinutils.jasper.scheduler.entities.DateParameterOffsetType;
@@ -17,14 +25,6 @@ import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailScheduledDatePara
 import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailSender;
 import au.com.vaadinutils.jasper.scheduler.entities.ScheduleMode;
 import au.com.vaadinutils.jasper.ui.JasperReportProperties;
-
-import com.vaadin.addon.jpacontainer.JPAContainer;
-import com.vaadin.data.Container.Filter;
-import com.vaadin.data.util.filter.Compare;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.Notification.Type;
-import com.vaadin.ui.UI;
-import com.vaadin.ui.Window;
 
 public class JasperReportSchedulerWindow extends Window
 {
