@@ -80,7 +80,7 @@ public class EntityManagerInjectorFilter implements Filter
 		}
 		finally
 		{
-
+			
 			t.close();
 			// Reset the entity manager
 			EntityManagerProvider.setCurrentEntityManager(null);

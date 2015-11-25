@@ -113,6 +113,10 @@ public enum EntityManagerProvider
 			}
 			finally
 			{
+				if (em.getTransaction().isActive())
+				{
+					em.getTransaction().rollback();
+				}
 				setCurrentEntityManager(null);
 				em.close();
 			}
