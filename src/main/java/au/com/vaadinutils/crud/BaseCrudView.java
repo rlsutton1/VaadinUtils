@@ -77,8 +77,8 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
-public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout implements RowChangeListener<E>,
-		Selected<E>, DirtyListener, ButtonListener
+public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
+		implements RowChangeListener<E>, Selected<E>, DirtyListener, ButtonListener
 {
 
 	private static transient Logger logger = LogManager.getLogger(BaseCrudView.class);
@@ -161,7 +161,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		}
 		catch (Exception e)
 		{
-			logger.error(" ******* when constructing a jpaContainer for use with the BaseCrudView use JPAContainerFactory.makeBatchable ****** ");
+			logger.error(
+					" ******* when constructing a jpaContainer for use with the BaseCrudView use JPAContainerFactory.makeBatchable ****** ");
 			logger.error(e, e);
 			throw new RuntimeException(e);
 		}
@@ -173,7 +174,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 		this.headings = headings;
 		entityTable = getTable(container, headings);
-		entityTable.setId("CrudTable-"+this.getClass().getSimpleName());
+		entityTable.setId("CrudTable-" + this.getClass().getSimpleName());
 		entityTable.setRowChangeListener(this);
 		entityTable.setSortEnabled(true);
 		entityTable.setColumnCollapsingAllowed(true);
@@ -430,7 +431,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		{
 			mainEditPanel.setVisible(true);
 			mainEditPanel.setSizeFull();
-			mainEditPanel.setId("EditPanel-"+this.getClass().getSimpleName());
+			mainEditPanel.setId("EditPanel-" + this.getClass().getSimpleName());
 			scroll.setSizeFull();
 			scroll.setContent(mainEditPanel);
 			rightLayout.addComponent(scroll);
@@ -439,8 +440,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			rightLayout.setId("rightLayout");
 
 			editor = buildEditor(fieldGroup);
-			Preconditions.checkNotNull(
-					editor,
+			Preconditions.checkNotNull(editor,
 					"Your editor implementation returned null!, you better create an editor. "
 							+ entityClass.getSimpleName());
 			mainEditPanel.addComponent(editor);
@@ -486,8 +486,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		{
 			return ((Menus) annotation).menus()[0].display();
 		}
-		Exception e = new Exception("Override getTitleText() to set a custom title in "
-				+ this.getClass().getCanonicalName());
+		Exception e = new Exception(
+				"Override getTitleText() to set a custom title in " + this.getClass().getCanonicalName());
 		logger.error(e, e);
 		return "Override getTitleText() to set a custom title. " + this.getClass().getCanonicalName();
 	}
@@ -1152,8 +1152,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 			// children may have been added to the parent, evict the parent from
 			// the JPA cache so it will get updated
-			EntityManagerProvider.getEntityManager().getEntityManagerFactory().getCache()
-					.evict(entityClass, newEntity.getId());
+			EntityManagerProvider.getEntityManager().getEntityManagerFactory().getCache().evict(entityClass,
+					newEntity.getId());
 
 			newEntity = EntityManagerProvider.merge(newEntity);
 			postSaveAction(newEntity);
@@ -1493,9 +1493,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	}
 
 	@Override
-	/** Called when the currently selected row in the 
-	 *  table part of this view has changed.
-	 *  We use this to update the editor's current item.
+	/**
+	 * Called when the currently selected row in the table part of this view has
+	 * changed. We use this to update the editor's current item.
 	 */
 	public void allowRowChange(final RowChangeCallback callback)
 	{
@@ -1508,52 +1508,49 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 		if (fieldGroup.isModified() || newEntity != null || dirty)
 		{
-			ConfirmDialog
-					.show(UI.getCurrent(),
-							"Discard changes?",
-							"You have unsaved changes for this record. Continuing will result in those changes being discarded. ",
-							"Continue", "Cancel", new ConfirmDialog.Listener()
+			ConfirmDialog.show(UI.getCurrent(), "Discard changes?",
+					"You have unsaved changes for this record. Continuing will result in those changes being discarded. ",
+					"Continue", "Cancel", new ConfirmDialog.Listener()
+					{
+						private static final long serialVersionUID = 1L;
+
+						public void onClose(ConfirmDialog dialog)
+						{
+							if (dialog.isConfirmed())
 							{
-								private static final long serialVersionUID = 1L;
+								/*
+								 * When an entity is selected from the list, we
+								 * want to show that in our editor on the right.
+								 * This is nicely done by the FieldGroup that
+								 * binds all the fields to the corresponding
+								 * Properties in our entity at once.
+								 */
+								fieldGroup.discard();
 
-								public void onClose(ConfirmDialog dialog)
+								for (ChildCrudListener<E> child : childCrudListeners)
 								{
-									if (dialog.isConfirmed())
-									{
-										/*
-										 * When an entity is selected from the
-										 * list, we want to show that in our
-										 * editor on the right. This is nicely
-										 * done by the FieldGroup that binds all
-										 * the fields to the corresponding
-										 * Properties in our entity at once.
-										 */
-										fieldGroup.discard();
-
-										for (ChildCrudListener<E> child : childCrudListeners)
-										{
-											child.discard();
-										}
-
-										if (restoreDelete)
-										{
-											activateEditMode(false);
-											restoreDelete = false;
-										}
-
-										newEntity = null;
-
-										callback.allowRowChange();
-
-									}
-									else
-									{
-										// User did not confirm so don't allow
-										// the change.
-
-									}
+									child.discard();
 								}
-							});
+
+								if (restoreDelete)
+								{
+									activateEditMode(false);
+									restoreDelete = false;
+								}
+
+								newEntity = null;
+
+								callback.allowRowChange();
+
+							}
+							else
+							{
+								// User did not confirm so don't allow
+								// the change.
+
+							}
+						}
+					});
 		}
 		else
 		{
@@ -1572,11 +1569,12 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	}
 
 	@Override
-	/** Called when the currently selected row in the 
-	 *  table part of this view has changed.
-	 *  We use this to update the editor's current item.
-	 *  
-	 *  @item the item that is now selected. This may be null if selection has been lost.
+	/**
+	 * Called when the currently selected row in the table part of this view has
+	 * changed. We use this to update the editor's current item.
+	 * 
+	 * @item the item that is now selected. This may be null if selection has
+	 *       been lost.
 	 */
 	public void rowChanged(EntityItem<E> item)
 	{
@@ -1618,6 +1616,47 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			logger.debug("{}: {}ms", time.getKey(), time.getValue());
 		}
 
+		if (allowCurrentRowEdit(item))
+		{
+			if (this.getButtonLayout() != null)
+			{
+				if (this.getButtonLayout().getCancelButton() != null)
+					this.getButtonLayout().getCancelButton().setEnabled(true);
+				if (this.getButtonLayout().getSaveButton() != null)
+					this.getButtonLayout().getSaveButton().setEnabled(true);
+			}
+			
+			if (this.applyButton != null)
+				this.applyButton.setEnabled(true);
+		}
+		else
+		{
+			if (this.getButtonLayout() != null)
+			{
+				if (this.getButtonLayout().getCancelButton() != null)
+					this.getButtonLayout().getCancelButton().setEnabled(false);
+				if (this.getButtonLayout().getSaveButton() != null)
+					this.getButtonLayout().getSaveButton().setEnabled(false);
+			}
+			
+			// TODO: we shouldn't be removing the apply button but rather just the Delete
+			// action. 
+			if (this.applyButton != null)
+				this.applyButton.setEnabled(false);
+
+		}
+	}
+
+	/**
+	 * Overload this method to control if a specific row is editable. By default
+	 * all rows are editable. This method is called each time the row changes.
+	 * 
+	 * @param item
+	 * @return true if the row should be editable by the user.
+	 */
+	protected boolean allowCurrentRowEdit(EntityItem<E> item)
+	{
+		return true;
 	}
 
 	protected void showNoSelectionMessage()
@@ -1847,8 +1886,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				ret = field.getCaption() + "\n\n" + message;
 				logger.warn(
 						"Invalid Field...\n caption:'{}'\n type:{}\n fieldNumber: {}\n value: '{}'\n crud: {} ({})\n {}\n",
-						field.getCaption(), field.getClass().getSimpleName(), ctr, field.getValue(), this.getClass()
-								.getCanonicalName(), this.getClass().getSimpleName() + ".java:1", message);
+						field.getCaption(), field.getClass().getSimpleName(), ctr, field.getValue(),
+						this.getClass().getCanonicalName(), this.getClass().getSimpleName() + ".java:1", message);
 				Component childField = field;
 
 				for (int i = 0; i < 10; i++)
