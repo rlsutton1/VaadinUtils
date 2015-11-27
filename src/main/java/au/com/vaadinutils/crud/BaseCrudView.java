@@ -532,7 +532,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		applyButton.setId("applyButton");
 
 		newButton.setCaption(getNewButtonLabel());
-		newButton.setId("CrudNewButton");
+		newButton.setId("CrudNewButton-"+getNewButtonLabel());
 		actionLayout.addComponent(newButton);
 
 		// tweak the alignments.
