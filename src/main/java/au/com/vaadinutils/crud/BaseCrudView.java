@@ -429,7 +429,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		{
 			mainEditPanel.setVisible(true);
 			mainEditPanel.setSizeFull();
-			mainEditPanel.setId("MailEditPanel");
+			mainEditPanel.setId("MainEditPanel");
 			scroll.setSizeFull();
 			scroll.setContent(mainEditPanel);
 			rightLayout.addComponent(scroll);
@@ -523,6 +523,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		actionCombo.setWidth("160");
 		actionCombo.setNullSelectionAllowed(false);
 		actionCombo.setTextInputAllowed(false);
+		actionCombo.setId("ActionCombo");
 
 		group.addComponent(actionCombo);
 
