@@ -389,7 +389,11 @@ class JasperReportLayout extends VerticalLayout
 		ScheduleIconBuilder iconBuilder = new ScheduleIconBuilder();
 
 		String baseIconFileName = "Call Calendar_32";
-		String path = VaadinServlet.getCurrent().getServletContext().getRealPath("templates/images/seanau/");
+		String path = VaadinServlet.getCurrent().getServletContext().getRealPath("images/seanau/");
+		
+		// HACK: added this as the lack of a leading slash causes it to return null in scoutmaster but didn't know if adding the slash would break existing code.
+		if (path == null)
+			path = VaadinServlet.getCurrent().getServletContext().getRealPath("/images/seanau/");
 		String targetFileName = baseIconFileName + "-" + count + ".png";
 		iconBuilder.buildLogo(count.intValue(), new File(path), baseIconFileName + ".png", targetFileName);
 
