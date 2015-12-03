@@ -14,12 +14,6 @@ import javax.persistence.metamodel.SingularAttribute;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import au.com.vaadinutils.crud.CrudEntity;
-import au.com.vaadinutils.crud.HeadingPropertySet;
-import au.com.vaadinutils.crud.SearchableSelectableEntityTable;
-import au.com.vaadinutils.dao.EntityManagerProvider;
-import au.com.vaadinutils.dao.JpaBaseDao;
-
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.util.DefaultQueryModifierDelegate;
 import com.vaadin.data.Buffered;
@@ -40,6 +34,12 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.ColumnGenerator;
 import com.vaadin.ui.VerticalLayout;
+
+import au.com.vaadinutils.crud.CrudEntity;
+import au.com.vaadinutils.crud.HeadingPropertySet;
+import au.com.vaadinutils.crud.SearchableSelectableEntityTable;
+import au.com.vaadinutils.dao.EntityManagerProvider;
+import au.com.vaadinutils.dao.JpaBaseDao;
 
 public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomField<Collection<C>>
 {
@@ -72,7 +72,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	/**
 	 * Unfortunately TwinColumnSelect wont work with large sets, it isn't
 	 * searchable and it doesn't lazy load, it also isn't sortable.
-	 * 
+	 *
 	 * Hopefully I'll address all of these issues here.
 	 */
 
@@ -196,8 +196,8 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 		{
 
 			/**
-	     * 
-	     */
+			*
+			*/
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -368,6 +368,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 		{ isAscending });
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public Collection<C> getValue()
 	{
@@ -380,12 +381,14 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 		return (Collection<C>) getConvertedValue();
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public Collection<C> getInternalValue()
 	{
 		return (Collection<C>) getConvertedValue();
 	}
 
+	@Override
 	public Object getConvertedValue()
 	{
 		Collection<C> selected;
@@ -414,7 +417,12 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	@Override
 	public Class<? extends Collection<C>> getType()
 	{
-		return (Class<? extends Collection<C>>) Collection.class;
+		// Had to remove this as maven can't compile it.
+		// return (Class<? extends Collection<C>>) a.getClass();
+
+		Set<C> c = new HashSet<>();
+
+		return (Class<? extends Collection<C>>) c.getClass();
 	}
 
 	public void setFilter(Filter filter)
@@ -433,7 +441,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 
 	/**
 	 * defaults to true (visible)
-	 * 
+	 *
 	 * @param show
 	 */
 	public void showAddAndRemoveAllButtons(boolean show)
@@ -465,8 +473,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 
 	protected void handleAddAction(Long id)
 	{
-		JpaBaseDao<C, Long> dao = (JpaBaseDao<C, Long>) JpaBaseDao.getGenericDao(listField.getDeclaringType()
-				.getJavaType());
+		JpaBaseDao<C, Long> dao = JpaBaseDao.getGenericDao(listField.getDeclaringType().getJavaType());
 		C cust = dao.findById(id);
 		if (cust != null)
 		{
@@ -540,8 +547,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 
 				for (Long id : ids)
 				{
-					JpaBaseDao<C, Long> dao = (JpaBaseDao<C, Long>) JpaBaseDao.getGenericDao(listField
-							.getDeclaringType().getJavaType());
+					JpaBaseDao<C, Long> dao = JpaBaseDao.getGenericDao(listField.getDeclaringType().getJavaType());
 					C cust = dao.findById(id);
 					if (cust != null)
 					{
