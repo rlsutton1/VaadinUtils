@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -239,6 +240,22 @@ public class JpaDslBuilder<E>
 
 		};
 	}
+	
+	public <J> Condition<E> lessThanOrEqualTo(final JoinBuilder<E, J> join, final SingularAttribute<J, Date> field, final Date value)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+
+				return builder.lessThanOrEqualTo(join.getJoin(root).get(field), value);
+			}
+
+		};
+	}
+
 
 	/**
 	 * specify that JPA should fetch child entities in a single query!
@@ -685,6 +702,44 @@ public class JpaDslBuilder<E>
 		{
 			updateCriteria.where(predicate);
 			updateCriteria.set(attribute, value);
+		}
+		Query query = getEntityManager().createQuery(updateCriteria);
+
+		if (limit != null)
+		{
+			query.setMaxResults(limit);
+		}
+		if (startPosition != null)
+		{
+			query.setFirstResult(startPosition);
+		}
+		int result = query.executeUpdate();
+		getEntityManager().getEntityManagerFactory().getCache().evict(entityClass);
+		return result;
+
+	}
+	
+	/**
+	 * WARNING, order will not be honoured by this method
+	 * 
+	 * @param attribute
+	 * @param value
+	 * 
+	 * @return
+	 */
+	public <F extends Object> int update(Map<SingularAttribute<E,F> , F > updatemap)
+	{
+		Preconditions.checkArgument(orders.size() == 0, "Order is not supported for delete");
+		CriteriaUpdate<E> updateCriteria = builder.createCriteriaUpdate(entityClass);
+		root = updateCriteria.getRoot();
+		if (predicate != null)
+		{
+			updateCriteria.where(predicate);
+			for (Entry<SingularAttribute<E, F>, F> update:updatemap.entrySet())
+			{
+				updateCriteria.set(update.getKey(), update.getValue());
+			}
+			
 		}
 		Query query = getEntityManager().createQuery(updateCriteria);
 

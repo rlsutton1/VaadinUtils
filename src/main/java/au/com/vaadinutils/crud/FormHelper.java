@@ -216,6 +216,7 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 		field.setImmediate(true);
 		field.setNullRepresentation("");
 		field.setNullSettingAllowed(false);
+		field.setId(fieldLabel);
 		addValueChangeListeners(field);
 		doBinding(group, fieldName, field);
 		form.addComponent(field);
