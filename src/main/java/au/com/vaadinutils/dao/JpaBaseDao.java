@@ -63,17 +63,15 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 	 * it's very important that we don't retain a reference to the
 	 * entitymanager, as when you instance this class and then use it in a
 	 * closure you will end up trying to access a closed entitymanager
-	 * 
+	 *
 	 * @return
 	 */
 	protected static EntityManager getEntityManager()
 	{
 		EntityManager em = EntityManagerProvider.getEntityManager();
 
-		Preconditions
-				.checkNotNull(
-						em,
-						"Entity manager has not been initialized, if you are using a worker thread you will have to call EntityManagerProvider.createEntityManager()");
+		Preconditions.checkNotNull(em,
+				"Entity manager has not been initialized, if you are using a worker thread you will have to call EntityManagerProvider.createEntityManager()");
 
 		Preconditions.checkState(em.isOpen(),
 				"The entity manager is closed, this can happen if you instance this class "
@@ -89,19 +87,23 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		entityClass = class1;
 	}
 
+	@Override
 	public void persist(E entity)
 	{
 		getEntityManager().persist(entity);
 	}
 
+	@Override
 	public E merge(E entity)
 	{
 		return getEntityManager().merge(entity);
 	}
 
+	@Override
 	public void remove(E entity)
 	{
 		getEntityManager().remove(entity);
+
 	}
 
 	@SuppressWarnings("unchecked")
@@ -110,6 +112,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		return findById((K) new Long(id));
 	}
 
+	@Override
 	public E findById(K id)
 	{
 		return getEntityManager().find(entityClass, id);
@@ -152,7 +155,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 	/**
 	 * Runs the given query returning all entities that matched by the query.
-	 * 
+	 *
 	 * @param queryName
 	 * @return
 	 */
@@ -172,7 +175,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 	/**
 	 * Returns all rows ordered by the given set of entity attribues.
-	 * 
+	 *
 	 * You may pass in an array of attributes and a order by clause will be
 	 * added for each attribute in turn e.g. order by order[0], order[1] ....
 	 */
@@ -203,17 +206,17 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 	/**
 	 * Returns all rows ordered by the given set of entity attribues.
-	 * 
+	 *
 	 * @param order
 	 *            You may pass in an array of attributes and a order by clause
 	 *            will be added for each attribute in turn e.g. order by
 	 *            order[0], order[1] ....
-	 * 
+	 *
 	 * @param sortAscending
 	 *            An array of booleans that must be the same size as the order.
 	 *            The sort array controls whether each attribute will be sorted
 	 *            ascending or descending.
-	 * 
+	 *
 	 */
 	public List<E> findAll(SingularAttribute<E, ?> order[], boolean sortAscending[])
 	{
@@ -420,7 +423,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 	/**
 	 * get count of entity with a simple criteria
-	 * 
+	 *
 	 * @param vKey
 	 * @param value
 	 * @return
@@ -521,7 +524,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		int result = getEntityManager().createQuery(criteria).executeUpdate();
 
 		flushCache();
-		
+
 		return result;
 
 	}
@@ -647,7 +650,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 		/**
 		 * specify that JPA should fetch child entities in a single query!
-		 * 
+		 *
 		 * @param field
 		 * @return
 		 */
