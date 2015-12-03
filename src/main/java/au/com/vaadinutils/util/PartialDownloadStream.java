@@ -3,7 +3,6 @@ package au.com.vaadinutils.util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.SocketException;
 import java.util.Iterator;
 
 import javax.servlet.http.HttpServletResponse;
@@ -29,6 +28,7 @@ public class PartialDownloadStream extends DownloadStream
 		// TODO Auto-generated constructor stub
 	}
 
+	@Override
 	public void writeResponse(VaadinRequest request, VaadinResponse response) throws IOException
 	{
 		if (getParameter("Location") != null)
@@ -106,8 +106,8 @@ public class PartialDownloadStream extends DownloadStream
 				}
 				if (start != null && end == null)
 				{
-					response.setHeader("Content-Range", "bytes " + start + "-" + (contentLength - 1) + "/"
-							+ (contentLength));
+					response.setHeader("Content-Range",
+							"bytes " + start + "-" + (contentLength - 1) + "/" + (contentLength));
 					response.setHeader("Content-Length", String.valueOf(contentLength - start));
 
 				}
@@ -157,7 +157,8 @@ public class PartialDownloadStream extends DownloadStream
 				{
 					logger.error("Error {}", (contentLength - (start)) - totalWritten);
 				}
-			}catch(Exception e)
+			}
+			catch (Exception e)
 			{
 				logger.error(e);
 			}
@@ -172,7 +173,7 @@ public class PartialDownloadStream extends DownloadStream
 	/**
 	 * Helper method that tries to close an output stream and ignores any
 	 * exceptions.
-	 * 
+	 *
 	 * @param out
 	 *            the output stream to close, <code>null</code> is also
 	 *            supported
@@ -196,7 +197,7 @@ public class PartialDownloadStream extends DownloadStream
 	/**
 	 * Helper method that tries to close an input stream and ignores any
 	 * exceptions.
-	 * 
+	 *
 	 * @param in
 	 *            the input stream to close, <code>null</code> is also supported
 	 */
