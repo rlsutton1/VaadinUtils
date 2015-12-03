@@ -11,18 +11,14 @@ import javax.validation.ConstraintViolationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import au.com.vaadinutils.dao.EntityManagerProvider;
-import au.com.vaadinutils.dao.JpaBaseDao;
-import au.com.vaadinutils.errorHandling.ErrorWindow;
-
 import com.google.common.base.Preconditions;
 import com.google.common.base.Stopwatch;
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.EntityItemProperty;
 import com.vaadin.addon.jpacontainer.EntityProviderChangeEvent;
 import com.vaadin.addon.jpacontainer.EntityProviderChangeEvent.EntitiesAddedEvent;
-import com.vaadin.addon.jpacontainer.EntityProviderChangeEvent.EntitiesUpdatedEvent;
 import com.vaadin.addon.jpacontainer.EntityProviderChangeEvent.EntitiesRemovedEvent;
+import com.vaadin.addon.jpacontainer.EntityProviderChangeEvent.EntitiesUpdatedEvent;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.JPAContainer.ProviderChangedEvent;
 import com.vaadin.data.Container.Filter;
@@ -35,16 +31,21 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 
+import au.com.vaadinutils.dao.EntityManagerProvider;
+import au.com.vaadinutils.dao.JpaBaseDao;
+import au.com.vaadinutils.errorHandling.ErrorWindow;
+
 /**
  * child crud does not support nesting.
- * 
+ *
  * @author rsutton
- * 
- * @param <P>
+ *
+ * @param
+ * 			<P>
  * @param <E>
  */
-public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEntity> extends BaseCrudView<E> implements
-		ChildCrudListener<P>
+public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEntity> extends BaseCrudView<E>
+		implements ChildCrudListener<P>
 {
 
 	private static final long serialVersionUID = -7756584349283089830L;
@@ -61,7 +62,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 	private Class<E> childType;
 
 	/**
-	 * 
+	 *
 	 * @param parentKey
 	 *            - this will usually be the primary key of the parent table
 	 * @param childKey
@@ -90,6 +91,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 		this.childKey = childKey;
 		this.parentType = parentType;
 		this.parentCrud = parent;
+		this.childType = childType;
 		// setMargin(true);
 
 	}
@@ -135,7 +137,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 	/**
 	 * this method is invoked when the parent saves, signalling the children
 	 * that they too should save.
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@SuppressWarnings("unchecked")
@@ -176,7 +178,8 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 					}
 					else
 					{
-						logger.warn("Child key type is not the same as the Parent type, if it's an ID thats probably ok?");
+						logger.warn(
+								"Child key type is not the same as the Parent type, if it's an ID thats probably ok?");
 						// special handling when the child key is an id(Long)
 						// rather than an entity.
 						item.getItemProperty(childKey).setValue(translateParentId(newParentId.getId()));
@@ -238,7 +241,8 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 				}
 				else
 				{
-					logger.warn("Unable to locate newly created child entity, will not be able to select it for the user.");
+					logger.warn(
+							"Unable to locate newly created child entity, will not be able to select it for the user.");
 				}
 			}
 		}
@@ -247,14 +251,14 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 
 	/**
 	 * return the singluarAttribute for the guid field of the child entity
-	 * 
+	 *
 	 * @return
 	 */
 	abstract public SingularAttribute<E, String> getGuidAttribute();
 
 	/**
 	 * commits the container and retrieves the new recordid
-	 * 
+	 *
 	 * we have to hook the ItemSetChangeListener to be able to get the database
 	 * id of a new record.
 	 */
@@ -332,7 +336,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 	/**
 	 * EventHandler is the preferred integration point for classes extending
 	 * ChildCrudView as it makes them less tightly coupled.
-	 * 
+	 *
 	 * @param eventHandler
 	 */
 	public void setEventHandler(ChildCrudEventHandler<E> eventHandler)
@@ -391,7 +395,6 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 		entityTable.select(null);
 		entityTable.select(previousItemId);
 
-
 		dirty = true;
 		JpaBaseDao<E, Long> dao = new JpaBaseDao<E, Long>(entityClass);
 		E entity = dao.findById((Long) entityId);
@@ -406,7 +409,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 	/**
 	 * Called just before a child entity is deleted so that a derived class can
 	 * inject some logic just before the delete occurs.
-	 * 
+	 *
 	 * @param entityId
 	 */
 	protected void preChildDelete(Object entityId)
@@ -416,13 +419,14 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 	/**
 	 * Called just after a child entity is deleted so that a derived class can
 	 * inject some logic just after the delete occurs.
-	 * 
+	 *
 	 * @param entityId
 	 */
 	protected void postChildDelete(Object entityId)
 	{
 	}
 
+	@Override
 	public void validateFieldz()
 	{
 		try
@@ -570,6 +574,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 	 */
 	boolean saving = false;
 
+	@Override
 	public void saveEditsToTemp()
 	{
 		if (saving == false)
@@ -611,8 +616,8 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 				{
 					if (getCurrent() != null)
 					{
-						logger.info("There are no dirty fields, not saving record {} {}", getCurrent().getClass()
-								.getSimpleName(), getCurrent());
+						logger.info("There are no dirty fields, not saving record {} {}",
+								getCurrent().getClass().getSimpleName(), getCurrent());
 					}
 				}
 
@@ -677,16 +682,16 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 	}
 
 	/**
-	 * 
-	 * 
+	 *
+	 *
 	 * When adding fields to a layout that need to be committed, but are not
 	 * part of the field group, override this method to let the crud know that a
 	 * commit should be performed.
-	 * 
+	 *
 	 * This is required because committing on a child crud is not explicit -no
 	 * save button is available, the need to save is determined based on if the
 	 * fields are dirty.
-	 * 
+	 *
 	 * @return
 	 */
 	protected boolean areNonFieldGroupFieldsDirty()
@@ -702,6 +707,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 
 	private boolean isInitialised = false;
 
+	@Override
 	protected void initializeEntityTable()
 	{
 		// do nothing, this will be done when the parent selects the first row!
@@ -835,7 +841,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 	 * the id (Long) of the parent will need to be translated into an entity for
 	 * the filtering. an implementing class must implement this method and
 	 * return an instance of the Parent class (P) with it's id set (parentId2)
-	 * 
+	 *
 	 * @param parentId2
 	 * @return
 	 * @throws IllegalAccessException
@@ -849,8 +855,8 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 		P tmp = parentType.newInstance();
 		Preconditions.checkNotNull(tmp, "failed to create instance of " + entityClass.getCanonicalName());
 		tmp.setId((Long) parentId2);
-		Preconditions.checkArgument(tmp.getId() != null, "setId or getId has not been implemented correctly by "
-				+ entityClass.getCanonicalName());
+		Preconditions.checkArgument(tmp.getId() != null,
+				"setId or getId has not been implemented correctly by " + entityClass.getCanonicalName());
 		Preconditions.checkArgument(tmp.getId().equals(parentId2),
 				"setId or getId has not been implemented correctly by " + entityClass.getCanonicalName());
 		return tmp;
@@ -893,6 +899,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 		return parentId;
 	}
 
+	@Override
 	protected Component getTitle()
 	{
 		// no title in child cruds
@@ -939,7 +946,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 
 	/**
 	 * noop event handler
-	 * 
+	 *
 	 * @return
 	 */
 	private ChildCrudEventHandler<E> getNullEventHandler()
@@ -963,6 +970,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 		};
 	}
 
+	@Override
 	protected String getNewButtonLabel()
 	{
 		return getNewButtonActionLabel();
@@ -971,7 +979,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 	/**
 	 * it gets confusing with multiple new buttons that appear when using nested
 	 * cruds, so provide a label like "New Goal" to ease the confusion
-	 * 
+	 *
 	 * @return
 	 */
 	public abstract String getNewButtonActionLabel();
