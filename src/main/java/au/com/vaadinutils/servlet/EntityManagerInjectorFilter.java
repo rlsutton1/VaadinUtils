@@ -54,6 +54,10 @@ public class EntityManagerInjectorFilter implements Filter
 			
 			// Reset the entity manager
 			EntityManagerProvider.setCurrentEntityManager(null);
+			if (em.getTransaction().isActive())
+			{
+				em.getTransaction().rollback();
+			}
 			em.close();
 		}
 	}

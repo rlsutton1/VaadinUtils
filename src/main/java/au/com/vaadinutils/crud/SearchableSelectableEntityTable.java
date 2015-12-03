@@ -127,6 +127,7 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 		}
 
 		searchField.setInputPrompt("Search");
+		searchField.setId("searchField");
 		searchField.setTextChangeEventMode(TextChangeEventMode.LAZY);
 		searchField.setImmediate(true);
 		searchField.addTextChangeListener(new TextChangeListener()
@@ -378,5 +379,11 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 	public SelectableEntityTable<E> getTable()
 	{
 		return selectableTable;
+	}
+
+	public void selectAll()
+	{
+		selectableTable.selectAll();
+		
 	}
 }

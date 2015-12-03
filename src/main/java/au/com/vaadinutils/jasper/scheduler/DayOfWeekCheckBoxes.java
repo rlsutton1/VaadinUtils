@@ -4,8 +4,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.joda.time.DateTimeConstants;
-
 import com.vaadin.data.Property;
 import com.vaadin.data.Validator;
 import com.vaadin.data.Validator.InvalidValueException;

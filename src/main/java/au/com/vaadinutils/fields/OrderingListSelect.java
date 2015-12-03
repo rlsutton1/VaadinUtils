@@ -6,6 +6,7 @@ import java.util.List;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
+import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -32,6 +33,7 @@ public class OrderingListSelect<T> extends CustomComponent
 	private String captionProperty;
 	private String sortProperty;
 	private boolean modified = false;
+	protected ValueChangeListener listener;
 
 	public OrderingListSelect(String caption)
 	{
@@ -108,6 +110,11 @@ public class OrderingListSelect<T> extends CustomComponent
 
 	private void moveItem(Long selectedPk, Direction direction)
 	{
+		if (listener != null)
+		{
+			listSelect.addValueChangeListener(listener);
+		}
+
 		// Work out the corresponding item in our internal list
 		int index = getIndex(selectedPk);
 
@@ -125,7 +132,7 @@ public class OrderingListSelect<T> extends CustomComponent
 			newIndex = index == listItems.size() ? index : ++index;
 		}
 		listItems.add(newIndex, movedItem);
-//		movedItem.setId(newIndex);
+		// movedItem.setId(newIndex);
 
 		// Repopulate the list select based on the new order
 		listSelect.removeAllItems();
@@ -227,14 +234,20 @@ public class OrderingListSelect<T> extends CustomComponent
 	{
 		listSelect.setNullSelectionAllowed(b);
 	}
-	
+
 	public void setModified(boolean modified)
 	{
 		this.modified = modified;
 	}
-	
+
 	public boolean isModified()
 	{
 		return modified;
 	}
+
+	public void addValueChangeListener(ValueChangeListener listener)
+	{
+		this.listener = listener;
+	}
+
 }

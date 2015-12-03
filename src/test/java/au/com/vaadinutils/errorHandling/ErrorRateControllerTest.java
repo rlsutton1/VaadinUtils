@@ -31,7 +31,6 @@ public class ErrorRateControllerTest
 	public void testBurst() throws InterruptedException
 	{
 		ErrorRateController errorRateController = new ErrorRateController(BURST, RATE, TimeUnit.SECONDS);
-		Stopwatch timer = Stopwatch.createStarted();
 		int counter = runRateTest(errorRateController, 0);
 		Thread.sleep(2000);
 		counter += runRateTest(errorRateController, 0);

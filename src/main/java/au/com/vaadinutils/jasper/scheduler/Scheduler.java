@@ -99,7 +99,6 @@ public class Scheduler implements Runnable
 
 					try
 					{
-						boolean deleted = false;
 						DateTime now = new DateTime();
 
 						Date nextScheduledTime = schedule.getNextScheduledTime();
@@ -121,7 +120,6 @@ public class Scheduler implements Runnable
 								if (schedule.getScheduleMode() == ScheduleMode.ONE_TIME)
 								{
 									scheduleProvider.delete(schedule);
-									deleted = true;
 								}
 								else
 								{

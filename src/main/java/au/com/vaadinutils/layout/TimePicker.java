@@ -433,7 +433,6 @@ public class TimePicker extends HorizontalLayout implements Field<Date>
 					public void buttonClick(ClickEvent event)
 					{
 						int hourToSet = Integer.parseInt(button.getCaption());
-						String title = button.getCaption();
 						hourToSet %= 12;
 						if (dateTime.get(Calendar.HOUR_OF_DAY) >= 12)
 						{

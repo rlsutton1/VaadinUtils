@@ -1,6 +1,5 @@
 package au.com.vaadinutils.servlet;
 
-
 /**
  * Designed to inject the EntityManager into requests that arrive via websockets (Vaadin Push) as these
  * do not go through the standard servlet filter mechanism.

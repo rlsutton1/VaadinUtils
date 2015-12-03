@@ -37,7 +37,7 @@ public abstract class JasperReportView extends HorizontalLayout implements View
 		Preconditions.checkState(report != null);
 		
 		this.setSizeFull();
-		report.initScreen(new MainReportSplitPanel(235));
+		report.initScreen(new MainReportResizableSplitPanel(235));
 		this.addComponent(report);
 
 	}
