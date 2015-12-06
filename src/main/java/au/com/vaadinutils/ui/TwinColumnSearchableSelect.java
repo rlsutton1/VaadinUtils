@@ -79,6 +79,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	public TwinColumnSearchableSelect(String fieldName, SingularAttribute<C, ?> listField)
 	{
 		this(fieldName, listField, null);
+		
 		availableContainer.sort(new Object[]
 		{ listField.getName() }, new boolean[]
 		{ true });
@@ -415,14 +416,13 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Class<? extends Collection<C>> getType()
+	public Class<Collection<C>> getType()
 	{
 		// Had to remove this as maven can't compile it.
 		// return (Class<? extends Collection<C>>) a.getClass();
 
-		Set<C> c = new HashSet<>();
 
-		return (Class<? extends Collection<C>>) c.getClass();
+		return (Class<Collection<C>>) (Class<?>) Collection.class;
 	}
 
 	public void setFilter(Filter filter)
