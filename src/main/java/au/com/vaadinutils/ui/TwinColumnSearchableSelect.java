@@ -14,6 +14,13 @@ import javax.persistence.metamodel.SingularAttribute;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import au.com.vaadinutils.crud.CrudEntity;
+import au.com.vaadinutils.crud.HeadingPropertySet;
+import au.com.vaadinutils.crud.SearchableSelectableEntityTable;
+import au.com.vaadinutils.dao.EntityManagerProvider;
+import au.com.vaadinutils.dao.JpaBaseDao;
+
+import com.google.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.util.DefaultQueryModifierDelegate;
 import com.vaadin.data.Buffered;
@@ -34,12 +41,6 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.ColumnGenerator;
 import com.vaadin.ui.VerticalLayout;
-
-import au.com.vaadinutils.crud.CrudEntity;
-import au.com.vaadinutils.crud.HeadingPropertySet;
-import au.com.vaadinutils.crud.SearchableSelectableEntityTable;
-import au.com.vaadinutils.dao.EntityManagerProvider;
-import au.com.vaadinutils.dao.JpaBaseDao;
 
 public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomField<Collection<C>>
 {
@@ -323,9 +324,11 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	public boolean isModified()
 	{
 		Collection<C> convertedValue = (Collection<C>) getConvertedValue();
-		if ((sourceValue == null || sourceValue.size() == 0) && (convertedValue != null && convertedValue.size() > 0))
+		Preconditions.checkNotNull(convertedValue,"If you look at getConvertedValue, you'll see convertedValue can never be null");
+		
+		if ((sourceValue == null || sourceValue.size() == 0) && ( convertedValue.size() > 0))
 			return true;
-		if ((sourceValue == null || sourceValue.size() == 0) && (convertedValue == null || convertedValue.size() == 0))
+		if ((sourceValue == null || sourceValue.size() == 0) && ( convertedValue.size() == 0))
 			return false;
 		boolean equal = convertedValue.containsAll(sourceValue) && sourceValue.containsAll(convertedValue);
 		return !equal;
@@ -401,6 +404,10 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 		{
 			selected = new HashSet<>();
 		}
+
+		// Just to be clear that this method will NEVER return null
+		Preconditions.checkNotNull(selected,"If you look at getConvertedValue, you'll see this can never be null");
+
 
 		if (beans != null)
 		{
