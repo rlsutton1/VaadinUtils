@@ -93,7 +93,7 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 
 		HeadingPropertySet<ReportEmailScheduleEntity> headings = new HeadingPropertySet.Builder<ReportEmailScheduleEntity>()
 
-		.addGeneratedColumn("Status", getStatusColumnGenerator())
+				.addGeneratedColumn("Status", getStatusColumnGenerator())
 				.addColumn("Report", ReportEmailScheduleEntity_.reportTitle)
 				.addColumn("Subject", ReportEmailScheduleEntity_.subject)
 				.addColumn("Owner", ReportEmailScheduleEntity_.sender)
@@ -120,7 +120,7 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 
 				final Label label = new Label("<font color='green'>Scheduled</font>");
 				label.setContentMode(ContentMode.HTML);
-				if (schedule.getReportLog() != null && schedule.getReportLog().length() > 0 && !schedule.getReportLog().equals(Scheduler.REPORT_SUCCESSFULLY_RUN))
+				if (schedule.getReportLog() != null && schedule.getReportLog().length() > 0	&& !schedule.getReportLog().equals(Scheduler.REPORT_SUCCESSFULLY_RUN))
 				{
 					label.setValue("<font color='red'><b>Error</b></font>");
 				}
@@ -145,7 +145,7 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 
 		HeadingPropertySet<ReportEmailScheduleEntity> headings = new HeadingPropertySet.Builder<ReportEmailScheduleEntity>()
 
-		.addColumn("Report", ReportEmailScheduleEntity_.reportTitle)
+				.addColumn("Report", ReportEmailScheduleEntity_.reportTitle)
 				.addColumn("Subject", ReportEmailScheduleEntity_.subject)
 				.addColumn("Owner", ReportEmailScheduleEntity_.sender)
 				.addColumn("Next Run", ReportEmailScheduleEntity_.nextScheduledTime)
@@ -164,6 +164,7 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 
 	}
 
+	@Override
 	protected void resetFilters()
 	{
 		container.removeAllContainerFilters();
@@ -179,24 +180,25 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 		return scheduleCreater.create();
 	}
 
-	
 	@Override
-	protected ReportEmailScheduleEntity preNew(ReportEmailScheduleEntity previousEntity) throws InstantiationException,
-			IllegalAccessException
+	protected ReportEmailScheduleEntity preNew(ReportEmailScheduleEntity previousEntity)
+			throws InstantiationException, IllegalAccessException
 	{
 		return scheduleCreater.create();
 	}
+
+	@Override
 	@SuppressWarnings("unchecked")
 	protected void postNew(EntityItem<ReportEmailScheduleEntity> newEntity)
 	{
 		try
 		{
-			
+
 			EntityManagerProvider.persist(newEntity.getEntity().getSender());
 			EntityManagerProvider.getEntityManager().flush();
 
 			// set the sender
-			Long newId =newEntity.getEntity().getSender().getId();
+			Long newId = newEntity.getEntity().getSender().getId();
 
 			JPAContainer<ReportEmailSender> ds = (JPAContainer<ReportEmailSender>) sender.getContainerDataSource();
 			ds.refresh();
@@ -212,34 +214,38 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 		}
 	}
 
-//	private Long createSender(ReportEmailScheduleEntity reportEmailScheduleEntity) throws AddressException
-//	{
-//		ReportEmailSender senderEntity =null;
-//		if (reportEmailScheduleEntity.hasSenderEmailAddress())
-//		{
-//			JpaBaseDao<ReportEmailSender, Long> dao = JpaBaseDao.getGenericDao(ReportEmailSender.class);
-//			AttributesHashMap<ReportEmailSender> attributes = new AttributesHashMap<>();
-//			String emailAddress = reportEmailScheduleEntity.getSendersEmailAddress().toString();
-//
-//			String username = reportEmailScheduleEntity.getSendersUsername();
-//			attributes.safePut(ReportEmailSender_.username, username);
-//			attributes.safePut(ReportEmailSender_.emailAddress, emailAddress);
-//
-//			senderEntity = dao.findOneByAttributes(attributes);
-//	
-//		}
-//		if (senderEntity == null)
-//		{
-//			senderEntity = new ReportEmailSender();
-//			scheduleCreater.create()
-//			senderEntity.setUserName(username);
-//			senderEntity.setEmailAddress(emailAddress);
-//			EntityManagerProvider.persist(senderEntity);
-//			EntityManagerProvider.getEntityManager().flush();
-//		}
-//		return senderEntity.getId();
-//
-//	}
+	// private Long createSender(ReportEmailScheduleEntity
+	// reportEmailScheduleEntity) throws AddressException
+	// {
+	// ReportEmailSender senderEntity =null;
+	// if (reportEmailScheduleEntity.hasSenderEmailAddress())
+	// {
+	// JpaBaseDao<ReportEmailSender, Long> dao =
+	// JpaBaseDao.getGenericDao(ReportEmailSender.class);
+	// AttributesHashMap<ReportEmailSender> attributes = new
+	// AttributesHashMap<>();
+	// String emailAddress =
+	// reportEmailScheduleEntity.getSendersEmailAddress().toString();
+	//
+	// String username = reportEmailScheduleEntity.getSendersUsername();
+	// attributes.safePut(ReportEmailSender_.username, username);
+	// attributes.safePut(ReportEmailSender_.emailAddress, emailAddress);
+	//
+	// senderEntity = dao.findOneByAttributes(attributes);
+	//
+	// }
+	// if (senderEntity == null)
+	// {
+	// senderEntity = new ReportEmailSender();
+	// scheduleCreater.create()
+	// senderEntity.setUserName(username);
+	// senderEntity.setEmailAddress(emailAddress);
+	// EntityManagerProvider.persist(senderEntity);
+	// EntityManagerProvider.getEntityManager().flush();
+	// }
+	// return senderEntity.getId();
+	//
+	// }
 
 	public JPAContainer<ReportEmailScheduleEntity> makeJPAContainer()
 	{
@@ -249,6 +255,7 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 
 	private static final long serialVersionUID = 1L;
 
+	@Override
 	@SuppressWarnings("deprecation")
 	public TabSheet buildEditor(ValidatingFieldGroup<ReportEmailScheduleEntity> validatingFieldGroup)
 	{
@@ -308,8 +315,8 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 
 	}
 
-	private void buildScheduleTab(ValidatingFieldGroup<ReportEmailScheduleEntity> validatingFieldGroup,
-			FormLayout main, FormHelper<ReportEmailScheduleEntity> helper)
+	private void buildScheduleTab(ValidatingFieldGroup<ReportEmailScheduleEntity> validatingFieldGroup, FormLayout main,
+			FormHelper<ReportEmailScheduleEntity> helper)
 	{
 
 		helper.bindBooleanField(main, validatingFieldGroup, "Enabled", ReportEmailScheduleEntity_.enabled);
@@ -364,33 +371,33 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 
 				switch (mode)
 				{
-				case ONE_TIME:
-					oneTime.setRequired(true);
-					oneTime.setVisible(true);
-					timeOfDay.setVisible(false);
-					dayLayout.setVisible(false);
-					dayOfMonth.setVisible(false);
+					case ONE_TIME:
+						oneTime.setRequired(true);
+						oneTime.setVisible(true);
+						timeOfDay.setVisible(false);
+						dayLayout.setVisible(false);
+						dayOfMonth.setVisible(false);
 
-					break;
-				case DAY_OF_MONTH:
-					oneTime.setVisible(false);
-					timeOfDay.setVisible(true);
-					dayLayout.setVisible(false);
-					dayOfMonth.setVisible(true);
-					break;
-				case DAY_OF_WEEK:
-					oneTime.setVisible(false);
-					timeOfDay.setVisible(true);
-					dayLayout.setVisible(true);
-					dayLayout.setRequired(true);
-					dayOfMonth.setVisible(false);
-					break;
-				case EVERY_DAY:
-					oneTime.setVisible(false);
-					timeOfDay.setVisible(true);
-					dayLayout.setVisible(false);
-					dayOfMonth.setVisible(false);
-					break;
+						break;
+					case DAY_OF_MONTH:
+						oneTime.setVisible(false);
+						timeOfDay.setVisible(true);
+						dayLayout.setVisible(false);
+						dayOfMonth.setVisible(true);
+						break;
+					case DAY_OF_WEEK:
+						oneTime.setVisible(false);
+						timeOfDay.setVisible(true);
+						dayLayout.setVisible(true);
+						dayLayout.setRequired(true);
+						dayOfMonth.setVisible(false);
+						break;
+					case EVERY_DAY:
+						oneTime.setVisible(false);
+						timeOfDay.setVisible(true);
+						dayLayout.setVisible(false);
+						dayOfMonth.setVisible(false);
+						break;
 
 				}
 
@@ -399,11 +406,12 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 	}
 
 	@Override
-	/** Called when the currently selected row in the 
-	 *  table part of this view has changed.
-	 *  We use this to update the editor's current item.
-	 *  
-	 *  @item the item that is now selected. This may be null if selection has been lost.
+	/**
+	 * Called when the currently selected row in the table part of this view has
+	 * changed. We use this to update the editor's current item.
+	 *
+	 * @item the item that is now selected. This may be null if selection has
+	 *       been lost.
 	 */
 	public void rowChanged(EntityItem<ReportEmailScheduleEntity> item)
 	{
@@ -643,6 +651,7 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 	/**
 	 * called after a record has been committed to the database
 	 */
+	@Override
 	protected void postSaveAction(ReportEmailScheduleEntity entityItem)
 	{
 		removeDeletedRecipients(entityItem);
@@ -748,7 +757,8 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 				ReportEmailParameterEntity reportEmailParameterEntity = new ReportEmailParameterEntity();
 				reportEmailParameterEntity.setLabel(bParam.getLabel());
 
-				String[] names = bParam.getParameterNames().toArray(new String[] {});
+				String[] names = bParam.getParameterNames().toArray(new String[]
+				{});
 				reportEmailParameterEntity.setName(names[0]);
 				reportEmailParameterEntity.setValue((String) bParam.getValue(names[0]),
 						bParam.getDisplayValue(names[0]));
@@ -790,7 +800,8 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 	protected Filter getContainerFilter(String filterText, boolean advancedSearchActive)
 	{
 		Filter filter = null;
-		String[] searchFields = new String[] { ReportEmailScheduleEntity_.subject.getName() };
+		String[] searchFields = new String[]
+		{ ReportEmailScheduleEntity_.subject.getName() };
 		for (String property : searchFields)
 		{
 			if (filter == null)
@@ -805,9 +816,10 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 
 	/**
 	 * Overload this method to provide cross-field (form level) validation.
-	 * 
+	 *
 	 * @return
 	 */
+	@Override
 	protected void formValidate() throws InvalidValueException
 	{
 		if (builder != null)
