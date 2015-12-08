@@ -107,7 +107,35 @@ public class ContainerCSVExport<E>
 				}
 				finally
 				{
-					window.close();
+					Runnable runner = new Runnable()
+					{
+
+						@Override
+						public void run()
+						{
+							try
+							{
+								Thread.sleep(500);
+
+								UI.getCurrent().access(new Runnable()
+								{
+
+									@Override
+									public void run()
+									{
+										window.close();
+
+									}
+								});
+							}
+							catch (InterruptedException e)
+							{
+								logger.error(e, e);
+							}
+
+						}
+					};
+					new Thread(runner, "Dialog closer").start();
 				}
 				return null;
 			}
@@ -203,18 +231,17 @@ public class ContainerCSVExport<E>
 							value = new HtmlToPlainText().getPlainText(Jsoup.parse(((Label) value).getValue()));
 							// value = ((Label) value).getValue();
 						}
-						
+
 						if (value instanceof AbstractLayout)
 						{
 							value = new HtmlToPlainText().getPlainText(Jsoup.parse(value.toString()));
 						}
-
-						values[i++] = value.toString();
 					}
-					else
+					if (value == null)
 					{
-						values[i++] = "";
+						value = "";
 					}
+					values[i++] = value.toString();
 
 				}
 				else
@@ -239,8 +266,7 @@ public class ContainerCSVExport<E>
 
 	private void writeHeaders(CSVWriter writer, List<String> headers)
 	{
-		writer.writeNext(headers.toArray(new String[]
-		{}));
+		writer.writeNext(headers.toArray(new String[] {}));
 	}
 
 	/**

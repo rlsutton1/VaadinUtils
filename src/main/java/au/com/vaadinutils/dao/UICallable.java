@@ -17,37 +17,14 @@ import com.vaadin.ui.UI;
 public abstract class UICallable<T> implements Callable<T>
 {
 
-	final private UI ui;
+	final private UI ui = UI.getCurrent();
 	Logger logger = LogManager.getLogger();
-
-	public UICallable(UI ui)
-	{
-		this.ui = ui;
-	}
 
 	@Override
 	public T call()
 	{
-		T result = null;
-		try
-		{
-			result = EntityManagerProvider.setThreadLocalEntityManager(new EntityWorker<T>()
-			{
 
-				@Override
-				public T exec() throws Exception
-				{
-					return run(ui);
-				}
-
-			});
-		}
-		catch (Exception e)
-		{
-
-			logger.error(e, e);
-		}
-		return result;
+		return run(ui);
 
 	}
 

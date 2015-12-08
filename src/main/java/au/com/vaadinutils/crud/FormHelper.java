@@ -1004,6 +1004,7 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 			component.setConverter(new MultiSelectConverter(component, Set.class));
 
 			component.setWidth("100%");
+			component.setId(label);
 			component.setImmediate(true);
 			component.setNullSelectionAllowed(true);
 			component.setBuffered(true);

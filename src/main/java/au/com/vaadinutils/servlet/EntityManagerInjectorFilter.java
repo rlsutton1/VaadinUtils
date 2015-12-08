@@ -17,7 +17,8 @@ import au.com.vaadinutils.errorHandling.ErrorWindow;
 
 public class EntityManagerInjectorFilter implements Filter
 {
-	//private static  transient Logger logger   =  LogManager.getLogger(EntityManagerInjectorFilter.class);
+	// private static transient Logger logger =
+	// LogManager.getLogger(EntityManagerInjectorFilter.class);
 
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException
@@ -35,7 +36,6 @@ public class EntityManagerInjectorFilter implements Filter
 		{
 			// Create and set the entity manager
 			EntityManagerProvider.setCurrentEntityManager(em);
-			
 
 			// Handle the request
 			filterChain.doFilter(servletRequest, servletResponse);
@@ -50,15 +50,22 @@ public class EntityManagerInjectorFilter implements Filter
 		finally
 		{
 
-			t.close();
-			
-			// Reset the entity manager
-			EntityManagerProvider.setCurrentEntityManager(null);
-			if (em.getTransaction().isActive())
+			try
 			{
-				em.getTransaction().rollback();
+				t.close();
+
+				// Reset the entity manager
+				if (em.getTransaction().isActive())
+				{
+					em.getTransaction().rollback();
+				}
+				em.close();
 			}
-			em.close();
+			finally
+			{
+				EntityManagerProvider.setCurrentEntityManager(null);
+			}
+
 		}
 	}
 
