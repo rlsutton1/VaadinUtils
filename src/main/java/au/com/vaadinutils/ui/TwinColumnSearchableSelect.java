@@ -79,7 +79,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	public TwinColumnSearchableSelect(String fieldName, SingularAttribute<C, ?> listField)
 	{
 		this(fieldName, listField, null);
-		
+
 		availableContainer.sort(new Object[]
 		{ listField.getName() }, new boolean[]
 		{ true });
@@ -421,7 +421,6 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 		// Had to remove this as maven can't compile it.
 		// return (Class<? extends Collection<C>>) a.getClass();
 
-
 		return (Class<Collection<C>>) (Class<?>) Collection.class;
 	}
 
@@ -524,6 +523,15 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	protected void resetAvailableContainer(JPAContainer<C> newContainer)
 	{
 		this.availableContainer = newContainer;
+	}
+
+	public void resetSelected()
+	{
+		beans.removeAllItems();
+		if (listener != null)
+		{
+			listener.valueChanged(getFieldValue());
+		}
 	}
 
 	public void setSelectedColumnHeader(String header)
@@ -683,5 +691,4 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 			}
 		};
 	}
-
 }
