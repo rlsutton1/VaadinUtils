@@ -950,7 +950,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			private EntityRunnable invokeAction(final Object entityId, final ConfirmDialog pleaseWaitMessage,
 					final CrudAction<E> action)
 			{
-				final EntityRunnable runner = new EntityRunnable(UI.getCurrent())
+				final EntityRunnable runner = new EntityRunnable()
 				{
 
 					@Override
