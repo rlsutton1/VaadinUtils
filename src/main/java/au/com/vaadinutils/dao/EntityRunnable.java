@@ -8,7 +8,7 @@ import com.vaadin.ui.UI;
 public abstract class EntityRunnable implements Runnable
 {
 
-	final private UI ui;
+	final protected UI ui;
 	Logger logger = LogManager.getLogger();
 
 	public EntityRunnable()
