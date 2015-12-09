@@ -940,6 +940,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 					final EntityRunnable runner = invokeAction(entityId, pleaseWaitMessage, action);
 					exec.schedule(runner, 1, TimeUnit.SECONDS);
 					exec.shutdown();
+					UI.getCurrent().setPollInterval(500);
 				}
 				else
 				{
@@ -954,24 +955,30 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				{
 
 					@Override
-					public void run(UI ui)
+					public void run(final UI ui)
 					{
-						
+
 						UI.getCurrent().access(new Runnable()
 						{
 
 							@Override
 							public void run()
 							{
-								EntityItem<E> entity = container.getItem(entityId);
+								try
+								{
+									EntityItem<E> entity = container.getItem(entityId);
 
-								if (interceptAction(action, entity))
-									action.exec(BaseCrudView.this, entity);
-								container.commit();
-								container.refreshItem(entity.getItemId());
-								// actionCombo.select(actionCombo.getNullSelectionItemId());
-								pleaseWaitMessage.close();
-
+									if (interceptAction(action, entity))
+										action.exec(BaseCrudView.this, entity);
+									container.commit();
+									container.refreshItem(entity.getItemId());
+									// actionCombo.select(actionCombo.getNullSelectionItemId());
+								}
+								finally
+								{
+									pleaseWaitMessage.close();
+									ui.setPollInterval(-1);
+								}
 							}
 						});
 
