@@ -14,5 +14,7 @@ public interface CrudAction<E extends CrudEntity> extends Serializable
 	 */
 	public boolean isDefault();
 	
+	public boolean showPreparingDialog();
+	
 	void exec(BaseCrudView<E> crud, EntityItem<E> entity);
 }
