@@ -161,12 +161,18 @@ public enum EntityManagerProvider
 			{
 				try
 				{
-					if (em.getTransaction().isActive())
+					try
 					{
-						logger.error("Rolling back transaction");
-						em.getTransaction().rollback();
+						if (em.getTransaction().isActive())
+						{
+							logger.error("Rolling back transaction");
+							em.getTransaction().rollback();
+						}
 					}
-					em.close();
+					finally
+					{
+						em.close();
+					}
 				}
 				finally
 				{

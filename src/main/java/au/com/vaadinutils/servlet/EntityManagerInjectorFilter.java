@@ -2,23 +2,22 @@ package au.com.vaadinutils.servlet;
 
 import java.io.IOException;
 
-import javax.persistence.EntityManager;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.validation.ConstraintViolationException;
+
+import org.apache.logging.log4j.LogManager;
 
 import au.com.vaadinutils.dao.EntityManagerProvider;
-import au.com.vaadinutils.dao.Transaction;
-import au.com.vaadinutils.errorHandling.ErrorWindow;
+import au.com.vaadinutils.dao.EntityWorker;
 
 public class EntityManagerInjectorFilter implements Filter
 {
 	// private static transient Logger logger =
-	// LogManager.getLogger(EntityManagerInjectorFilter.class);
+	org.apache.logging.log4j.Logger logger = LogManager.getLogger();
 
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException
@@ -26,46 +25,25 @@ public class EntityManagerInjectorFilter implements Filter
 	}
 
 	@Override
-	public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
-			throws IOException, ServletException
+	public void doFilter(final ServletRequest servletRequest, final ServletResponse servletResponse,
+			final FilterChain filterChain) throws IOException, ServletException
 	{
-		EntityManager em = EntityManagerProvider.createEntityManager();
-
-		Transaction t = new Transaction(em);
 		try
 		{
-			// Create and set the entity manager
-			EntityManagerProvider.setCurrentEntityManager(em);
-
-			// Handle the request
-			filterChain.doFilter(servletRequest, servletResponse);
-
-			t.commit();
-		}
-		catch (ConstraintViolationException e)
-		{
-			ErrorWindow.showErrorWindow(e);
-			throw e;
-		}
-		finally
-		{
-
-			try
+			EntityManagerProvider.setThreadLocalEntityManager(new EntityWorker<Void>()
 			{
-				t.close();
 
-				// Reset the entity manager
-				if (em.getTransaction().isActive())
+				@Override
+				public Void exec() throws Exception
 				{
-					em.getTransaction().rollback();
+					filterChain.doFilter(servletRequest, servletResponse);
+					return null;
 				}
-				em.close();
-			}
-			finally
-			{
-				EntityManagerProvider.setCurrentEntityManager(null);
-			}
-
+			});
+		}
+		catch (Exception e1)
+		{
+			logger.error(e1, e1);
 		}
 	}
 

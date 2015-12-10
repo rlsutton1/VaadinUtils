@@ -935,6 +935,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				final CrudAction<E> action = (CrudAction<E>) actionCombo.getValue();
 				if (action != null)
 				{
+					// we have to delay, because if we try to close the window before it's created - that won't work.
 					final ScheduledExecutorService exec = Executors.newScheduledThreadPool(1);
 
 					final EntityRunnable runner = invokeAction(entityId, pleaseWaitMessage, action);
