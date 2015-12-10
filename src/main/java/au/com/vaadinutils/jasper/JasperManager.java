@@ -676,7 +676,32 @@ public class JasperManager implements Runnable
 			throws InterruptedException
 	{
 
-		exportAsync(exportMethod, params, null);
+		final CountDownLatch latch = new CountDownLatch(1);
+		exportAsync(exportMethod, params, new JasperProgressListener()
+		{
+			
+			@Override
+			public void outputStreamReady()
+			{
+				latch.countDown();
+				
+			}
+			
+			@Override
+			public void failed(String string)
+			{
+				latch.countDown();
+				
+			}
+			
+			@Override
+			public void completed()
+			{
+				latch.countDown();
+				
+			}
+		});
+		latch.await();
 		InputStream stream = getStream();
 		// completeBarrier.await();
 		return new RenderedReport(stream, imagesrcs, exportMethod);
