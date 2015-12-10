@@ -119,4 +119,10 @@ public class CrudActionDelete<E extends CrudEntity> implements CrudAction<E>
 	{
 		this.isDefault = isDefault;
 	}
+
+	@Override
+	public boolean showPreparingDialog()
+	{
+		return false;
+	}
 }

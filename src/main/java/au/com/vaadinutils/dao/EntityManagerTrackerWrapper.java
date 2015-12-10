@@ -402,7 +402,7 @@ public class EntityManagerTrackerWrapper implements EntityManager
 	@Override
 	public EntityTransaction getTransaction()
 	{
-
+		logger.error("Get Transaction Called");
 		return em.getTransaction();
 	}
 

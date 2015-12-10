@@ -599,11 +599,15 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			}
 
 			@Override
+			public boolean showPreparingDialog()
+			{
+				return true;
+			}
+
+			@Override
 			public void exec(BaseCrudView<E> crud, EntityItem<E> entity)
 			{
-
 				new ContainerCSVExport<E>(getTitleText(), (Table) entityTable, headings);
-
 			}
 
 			@Override
@@ -916,36 +920,50 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			@Override
 			public void clicked(ClickEvent event)
 			{
-
 				final Object entityId = entityTable.getValue();
 				if (entityId != null)
 				{
-					performActionWithWaitDialog(entityId);
-
+					@SuppressWarnings("unchecked")
+					CrudAction<E> action = (CrudAction<E>) actionCombo.getValue();
+					if (action != null)
+					{
+						if (action.showPreparingDialog())
+							performActionWithWaitDialog(entityId, action);
+						else
+							performAction(entityId, action);
+					}
+					else
+						Notification.show("Please select an Action first.");
 				}
 				else
 					Notification.show("Please select record first.");
 			}
 
-			private void performActionWithWaitDialog(final Object entityId)
+			private void performAction(final Object entityId, final CrudAction<E> action)
+			{
+				EntityItem<E> entity = container.getItem(entityId);
+
+				if (interceptAction(action, entity))
+					action.exec(BaseCrudView.this, entity);
+				container.commit();
+				container.refreshItem(entity.getItemId());
+				// actionCombo.select(actionCombo.getNullSelectionItemId());
+			}
+
+			private void performActionWithWaitDialog(final Object entityId, final CrudAction<E> action)
 			{
 				final ConfirmDialog pleaseWaitMessage = createPleaseWaitDialog();
 
-				@SuppressWarnings("unchecked")
-				final CrudAction<E> action = (CrudAction<E>) actionCombo.getValue();
 				if (action != null)
 				{
-					// we have to delay, because if we try to close the window before it's created - that won't work.
+					// we have to delay, because if we try to close the window
+					// before it's created - that won't work.
 					final ScheduledExecutorService exec = Executors.newScheduledThreadPool(1);
 
 					final EntityRunnable runner = invokeAction(entityId, pleaseWaitMessage, action);
 					exec.schedule(runner, 1, TimeUnit.SECONDS);
 					exec.shutdown();
 					UI.getCurrent().setPollInterval(500);
-				}
-				else
-				{
-					Notification.show("Please select an Action first.");
 				}
 			}
 
