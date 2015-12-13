@@ -7,6 +7,7 @@ import org.apache.logging.log4j.Logger;
 
 import au.com.vaadinutils.crud.CrudEntity;
 import au.com.vaadinutils.dao.JpaBaseDao;
+import au.com.vaadinutils.dao.JpaBaseDao.Condition;
 import au.com.vaadinutils.dao.JpaDslBuilder;
 
 import com.vaadin.data.Validator;
@@ -46,8 +47,12 @@ public class UniqueFieldValidatorJPA<E extends CrudEntity, UNIQUE_FIELD_TYPE, FI
 
 			JpaDslBuilder<E> q = new JpaBaseDao<E, Long>(table).find();
 
-			Long count = q.where(q.eq(filterAttribute, filterValue).and(q.eq(matchField, (UNIQUE_FIELD_TYPE) value)))
-					.count();
+			Condition<E> criteria = q.eq(matchField, (UNIQUE_FIELD_TYPE) value);
+			if (filterAttribute != null && filterValue != null)
+			{
+				criteria = criteria.and(q.eq(filterAttribute, filterValue));
+			}
+			Long count = q.where(criteria).count();
 			if (count > 0)
 			{
 				throw new InvalidValueException(warningMessage);

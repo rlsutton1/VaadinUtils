@@ -793,7 +793,6 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 		{
 			Preconditions.checkNotNull(label, "label may not be null");
 			Preconditions.checkNotNull(listField, "colField Property may not be null");
-			Preconditions.checkNotNull(field, "Field may not be null");
 			if (builderForm == null)
 			{
 				builderForm = form;
@@ -838,7 +837,7 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 			component.setImmediate(true);
 			component.setNullSelectionAllowed(false);
 
-			if (group != null)
+			if (group != null && field !=null)
 			{
 				Preconditions.checkState(group.getContainer().getContainerPropertyIds().contains(field), field
 						+ " is not valid, valid listFieldNames are "
