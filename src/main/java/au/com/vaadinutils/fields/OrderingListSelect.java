@@ -22,7 +22,7 @@ public class OrderingListSelect<T> extends CustomComponent
 	public enum Direction
 	{
 		UP, DOWN
-	};
+	}
 
 	private ListSelect listSelect;
 	private Button upButton;

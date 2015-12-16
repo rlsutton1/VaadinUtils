@@ -37,12 +37,13 @@ public class ContainerAdaptorEntity<E extends CrudEntity> implements ContainerAd
     {
 	if (container.getItemIds().contains(id))
 	{
-	    return container.getEntity((Object) id);
+	    return container.getEntity(id);
 	}
 	return null;
     }
 
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public Collection<Object> getSortableContainerPropertyIds()
     {
 	return (Collection<Object>) container.getSortableContainerPropertyIds();

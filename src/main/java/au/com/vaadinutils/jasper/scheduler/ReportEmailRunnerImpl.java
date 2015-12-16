@@ -13,8 +13,6 @@ import javax.mail.internet.AddressException;
 
 import org.apache.commons.mail.EmailException;
 
-import com.google.common.base.Preconditions;
-
 import au.com.vaadinutils.jasper.AttachmentType;
 import au.com.vaadinutils.jasper.JasperEmailBuilder;
 import au.com.vaadinutils.jasper.JasperEmailSettings;
@@ -28,6 +26,8 @@ import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailRecipient;
 import au.com.vaadinutils.jasper.ui.CleanupCallback;
 import au.com.vaadinutils.jasper.ui.JasperReportProperties;
 import au.com.vaadinutils.jasper.ui.JasperReportPropertiesAlternateFile;
+
+import com.google.common.base.Preconditions;
 
 public class ReportEmailRunnerImpl implements ReportEmailRunner, JasperReportProperties
 {

@@ -11,6 +11,10 @@ import javax.validation.ConstraintViolationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import au.com.vaadinutils.dao.EntityManagerProvider;
+import au.com.vaadinutils.dao.JpaBaseDao;
+import au.com.vaadinutils.errorHandling.ErrorWindow;
+
 import com.google.common.base.Preconditions;
 import com.google.common.base.Stopwatch;
 import com.vaadin.addon.jpacontainer.EntityItem;
@@ -30,10 +34,6 @@ import com.vaadin.data.util.filter.Compare;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
-
-import au.com.vaadinutils.dao.EntityManagerProvider;
-import au.com.vaadinutils.dao.JpaBaseDao;
-import au.com.vaadinutils.errorHandling.ErrorWindow;
 
 /**
  * child crud does not support nesting.

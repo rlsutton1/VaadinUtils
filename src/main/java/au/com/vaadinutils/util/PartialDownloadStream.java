@@ -18,6 +18,8 @@ import com.vaadin.server.VaadinResponse;
 public class PartialDownloadStream extends DownloadStream
 {
 
+	private static final long serialVersionUID = 1L;
+
 	private long contentLength;
 
 	Logger logger = LogManager.getLogger();
@@ -62,112 +64,109 @@ public class PartialDownloadStream extends DownloadStream
 			return;
 		}
 
-		if (data != null)
+		OutputStream out = null;
+		try
 		{
+			// Sets content type
+			response.setContentType(getContentType());
 
-			OutputStream out = null;
-			try
+			// Sets cache headers
+			response.setCacheTime(getCacheTime());
+
+			// suggest local filename from DownloadStream if
+			// Content-Disposition
+			// not explicitly set
+			String contentDispositionValue = getParameter("Content-Disposition");
+			if (contentDispositionValue == null)
 			{
-				// Sets content type
-				response.setContentType(getContentType());
+				contentDispositionValue = "filename=\"" + getFileName() + "\"";
+				response.setHeader("Content-Disposition", contentDispositionValue);
+			}
 
-				// Sets cache headers
-				response.setCacheTime(getCacheTime());
-
-				// suggest local filename from DownloadStream if
-				// Content-Disposition
-				// not explicitly set
-				String contentDispositionValue = getParameter("Content-Disposition");
-				if (contentDispositionValue == null)
+			// Copy download stream parameters directly
+			// to HTTP headers.
+			final Iterator<String> i = getParameterNames();
+			if (i != null)
+			{
+				while (i.hasNext())
 				{
-					contentDispositionValue = "filename=\"" + getFileName() + "\"";
-					response.setHeader("Content-Disposition", contentDispositionValue);
-				}
-
-				// Copy download stream parameters directly
-				// to HTTP headers.
-				final Iterator<String> i = getParameterNames();
-				if (i != null)
-				{
-					while (i.hasNext())
-					{
-						final String param = i.next();
-						response.setHeader(param, getParameter(param));
-					}
-				}
-
-				// Content-Range: bytes 42-1233/1234
-				if (start != null && end != null)
-				{
-					logger.warn("untested, may be broken");
-					response.setHeader("Content-Range", "bytes " + start + "-" + end + "/" + (contentLength));
-					response.setHeader("Content-Length", String.valueOf(end - start));
-
-				}
-				if (start != null && end == null)
-				{
-					response.setHeader("Content-Range",
-							"bytes " + start + "-" + (contentLength - 1) + "/" + (contentLength));
-					response.setHeader("Content-Length", String.valueOf(contentLength - start));
-
-				}
-
-				int bufferSize = getBufferSize();
-				if (bufferSize <= 0 || bufferSize > Constants.MAX_BUFFER_SIZE)
-				{
-					bufferSize = Constants.DEFAULT_BUFFER_SIZE;
-				}
-
-				final byte[] buffer = new byte[bufferSize];
-				int bytesRead = 0;
-
-				out = response.getOutputStream();
-
-				if (start == null)
-				{
-					start = 0;
-				}
-
-				long totalWritten = 0;
-				long counter = 0;
-				while ((bytesRead = data.read(buffer)) > 0)
-				{
-
-					int bufferStart = 0;
-					int bufferEnd = bytesRead;
-					if (counter + bytesRead >= start)
-					{
-						if (counter < start && counter + bytesRead >= start)
-						{
-							bufferStart = (int) (start - counter);
-						}
-
-						out.write(buffer, bufferStart, bufferEnd);
-
-						totalWritten += bufferEnd - bufferStart;
-						if (totalWritten >= buffer.length)
-						{
-							// Avoid chunked encoding for small resources
-							out.flush();
-						}
-					}
-					counter += bytesRead;
-				}
-				if (totalWritten != contentLength - (start))
-				{
-					logger.error("Error {}", (contentLength - (start)) - totalWritten);
+					final String param = i.next();
+					response.setHeader(param, getParameter(param));
 				}
 			}
-			catch (Exception e)
+
+			// Content-Range: bytes 42-1233/1234
+			if (start != null && end != null)
 			{
-				logger.error(e);
+				logger.warn("untested, may be broken");
+				response.setHeader("Content-Range", "bytes " + start + "-" + end + "/" + (contentLength));
+				response.setHeader("Content-Length", String.valueOf(end - start));
+
 			}
-			finally
+			if (start != null && end == null)
 			{
-				tryToCloseStream(out);
-				tryToCloseStream(data);
+				response.setHeader("Content-Range", "bytes " + start + "-" + (contentLength - 1) + "/"
+						+ (contentLength));
+				response.setHeader("Content-Length", String.valueOf(contentLength - start));
+
+			}
+
+			int bufferSize = getBufferSize();
+			if (bufferSize <= 0 || bufferSize > Constants.MAX_BUFFER_SIZE)
+			{
+				bufferSize = Constants.DEFAULT_BUFFER_SIZE;
+			}
+
+			final byte[] buffer = new byte[bufferSize];
+			int bytesRead = 0;
+
+			out = response.getOutputStream();
+
+			if (start == null)
+			{
+				start = 0;
+			}
+
+			long totalWritten = 0;
+			long counter = 0;
+			while ((bytesRead = data.read(buffer)) > 0)
+			{
+
+				int bufferStart = 0;
+				int bufferEnd = bytesRead;
+				if (counter + bytesRead >= start)
+				{
+					if (counter < start && counter + bytesRead >= start)
+					{
+						bufferStart = (int) (start - counter);
+					}
+
+					out.write(buffer, bufferStart, bufferEnd);
+
+					totalWritten += bufferEnd - bufferStart;
+					if (totalWritten >= buffer.length)
+					{
+						// Avoid chunked encoding for small resources
+						out.flush();
+					}
+				}
+				counter += bytesRead;
+			}
+			if (totalWritten != contentLength - (start))
+			{
+				logger.error("Error {}", (contentLength - (start)) - totalWritten);
 			}
 		}
+		catch (Exception e)
+		{
+			logger.error(e);
+		}
+		finally
+		{
+			tryToCloseStream(out);
+			tryToCloseStream(data);
+		}
+
 	}
 
 	/**

@@ -52,7 +52,6 @@ public class ScheduleCalcTest
 	{
 		SimpleDateFormat sdf = new SimpleDateFormat("yy/MM/dd HH:mm:ss");
 		Date scheduledTime = sdf.parse("14/05/29 09:30:00");
-		@SuppressWarnings("unused")
 		String daysOfMonth = "1,3,5"; // mon, wed & fri
 
 		ReportEmailSchedule schedule = new DayOfMonthSchedule(scheduledTime, 29);

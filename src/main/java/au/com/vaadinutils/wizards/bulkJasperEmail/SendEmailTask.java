@@ -1,7 +1,6 @@
 package au.com.vaadinutils.wizards.bulkJasperEmail;
 
 import java.io.File;
-import java.io.IOException;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,7 +13,6 @@ import org.apache.logging.log4j.Logger;
 
 import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.dao.EntityWorker;
-import au.com.vaadinutils.dao.Transaction;
 import au.com.vaadinutils.jasper.AttachmentType;
 import au.com.vaadinutils.jasper.JasperEmailBuilder;
 import au.com.vaadinutils.jasper.JasperManager;

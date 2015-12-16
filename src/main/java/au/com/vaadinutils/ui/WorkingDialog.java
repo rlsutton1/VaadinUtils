@@ -1,5 +1,11 @@
 package au.com.vaadinutils.ui;
 
+import au.com.vaadinutils.dao.EntityRunnable;
+import au.com.vaadinutils.listener.CancelListener;
+import au.com.vaadinutils.listener.ClickEventLogged;
+import au.com.vaadinutils.listener.CompleteListener;
+import au.com.vaadinutils.listener.ProgressListener;
+
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -11,12 +17,6 @@ import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
-
-import au.com.vaadinutils.dao.EntityRunnable;
-import au.com.vaadinutils.listener.CancelListener;
-import au.com.vaadinutils.listener.ClickEventLogged;
-import au.com.vaadinutils.listener.CompleteListener;
-import au.com.vaadinutils.listener.ProgressListener;
 
 /**
  * Displays a dialog designed to be shown when a long running task is in

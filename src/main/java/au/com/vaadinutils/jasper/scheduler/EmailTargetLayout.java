@@ -6,6 +6,11 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import au.com.vaadinutils.dao.JpaBaseDao;
+import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailRecipient;
+import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailRecipientVisibility;
+import au.com.vaadinutils.validator.EmailValidator;
+
 import com.vaadin.data.Item;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.ui.AbstractSelect.NewItemHandler;
@@ -16,11 +21,6 @@ import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Reindeer;
-
-import au.com.vaadinutils.dao.JpaBaseDao;
-import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailRecipient;
-import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailRecipientVisibility;
-import au.com.vaadinutils.validator.EmailValidator;
 
 public class EmailTargetLayout extends VerticalLayout
 {
