@@ -836,6 +836,7 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 			component.setWidth("100%");
 			component.setImmediate(true);
 			component.setNullSelectionAllowed(false);
+			component.setId(label);
 
 			if (group != null && field !=null)
 			{

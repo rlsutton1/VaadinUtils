@@ -38,6 +38,26 @@ public class UniqueFieldValidatorJPA<E extends CrudEntity, UNIQUE_FIELD_TYPE, FI
 
 	}
 
+	public UniqueFieldValidatorJPA(SingularAttribute<E, UNIQUE_FIELD_TYPE> matchField, String warningMessage,
+			SingularAttribute<E, FILTER_FIELD_TYPE> filterAttribute,final FILTER_FIELD_TYPE filterValue)
+	{
+		this.table = matchField.getDeclaringType().getJavaType();
+		this.matchField = matchField;
+
+		this.warningMessage = warningMessage;
+		this.filterAttribute = filterAttribute;
+		this.filterCallback =new FilterValueCallback<FILTER_FIELD_TYPE>()
+		{
+
+			@Override
+			public FILTER_FIELD_TYPE getValue()
+			{
+				return filterValue;
+			}
+		};
+
+	}
+
 	
 
 	@SuppressWarnings("unchecked")
