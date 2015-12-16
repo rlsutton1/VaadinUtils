@@ -24,19 +24,21 @@ public class UniqueFieldValidatorJPA<E extends CrudEntity, UNIQUE_FIELD_TYPE, FI
 	transient Logger logger = LogManager.getLogger(UniqueFieldValidatorJPA.class);
 	private String warningMessage;
 	private SingularAttribute<E, FILTER_FIELD_TYPE> filterAttribute;
-	private FILTER_FIELD_TYPE filterValue;
+	private FilterValueCallback<FILTER_FIELD_TYPE> filterCallback;
 
 	public UniqueFieldValidatorJPA(SingularAttribute<E, UNIQUE_FIELD_TYPE> matchField, String warningMessage,
-			SingularAttribute<E, FILTER_FIELD_TYPE> filterAttribute, FILTER_FIELD_TYPE filterValue)
+			SingularAttribute<E, FILTER_FIELD_TYPE> filterAttribute, FilterValueCallback<FILTER_FIELD_TYPE> callback)
 	{
 		this.table = matchField.getDeclaringType().getJavaType();
 		this.matchField = matchField;
 
 		this.warningMessage = warningMessage;
 		this.filterAttribute = filterAttribute;
-		this.filterValue = filterValue;
+		this.filterCallback =callback;
 
 	}
+
+	
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -48,9 +50,9 @@ public class UniqueFieldValidatorJPA<E extends CrudEntity, UNIQUE_FIELD_TYPE, FI
 			JpaDslBuilder<E> q = new JpaBaseDao<E, Long>(table).find();
 
 			Condition<E> criteria = q.eq(matchField, (UNIQUE_FIELD_TYPE) value);
-			if (filterAttribute != null && filterValue != null)
+			if (filterAttribute != null && filterCallback.getValue() != null)
 			{
-				criteria = criteria.and(q.eq(filterAttribute, filterValue));
+				criteria = criteria.and(q.eq(filterAttribute, filterCallback.getValue()));
 			}
 			Long count = q.where(criteria).count();
 			if (count > 0)
