@@ -18,8 +18,10 @@ import com.vaadin.data.Container.Filterable;
 import com.vaadin.data.util.converter.Converter;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
+import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ItemClickEvent.ItemClickListener;
 import com.vaadin.event.dd.DropHandler;
+import com.vaadin.shared.MouseEventDetails.MouseButton;
 import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.AbstractTextField.TextChangeEventMode;
 import com.vaadin.ui.Alignment;
@@ -75,7 +77,29 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 		this.addComponent(searchBar);
 		this.addComponent(selectableTable);
 		this.setExpandRatio(selectableTable, 1);
+		addRightClickSelect();
 		triggerFilter();
+	}
+
+	/**
+	 * Adds a listener to select the right clicked item in the table. This is
+	 * needed by ContextMenus.
+	 */
+	private void addRightClickSelect()
+	{
+		selectableTable.addItemClickListener(new ItemClickListener()
+		{
+			private static final long serialVersionUID = 1L;
+
+			@SuppressWarnings("deprecation")
+			public void itemClick(ItemClickEvent event)
+			{
+				if (event.getButton() == MouseButton.RIGHT)
+				{
+					selectableTable.setValue(event.getItemId());
+				}
+			}
+		});
 	}
 
 	abstract public HeadingPropertySet<E> getHeadingPropertySet();
@@ -384,6 +408,5 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 	public void selectAll()
 	{
 		selectableTable.selectAll();
-		
 	}
 }
