@@ -14,14 +14,19 @@ public class TableContextMenu extends ContextMenu
 {
 	private static final long serialVersionUID = 1L;
 
+	private TableContextMenuEvents events;
+
 	/**
 	 * Assigns this as the context menu of given table. Allows context menu to
 	 * appear only on certain parts of the table.
 	 *
 	 * @param table
-	 * @param onRow show context menu when row is clicked
-	 * @param onHeader show context menu when header is clicked
-	 * @param onFooter show context menu when footer is clicked
+	 * @param onRow
+	 *            show context menu when row is clicked
+	 * @param onHeader
+	 *            show context menu when header is clicked
+	 * @param onFooter
+	 *            show context menu when footer is clicked
 	 */
 	public void setAsTableContextMenu(final Table table, final boolean onRow, final boolean onHeader,
 			final boolean onFooter)
@@ -41,6 +46,7 @@ public class TableContextMenu extends ContextMenu
 				{
 					if (event.getButton() == MouseButton.RIGHT)
 					{
+						events.preContextMenuOpen();
 						fireEvent(new ContextMenuOpenedOnTableRowEvent(TableContextMenu.this, table, event.getItemId(),
 								event.getPropertyId()));
 						open(event.getClientX(), event.getClientY());
@@ -60,6 +66,7 @@ public class TableContextMenu extends ContextMenu
 				{
 					if (event.getButton() == MouseButton.RIGHT)
 					{
+						events.preContextMenuOpen();
 						fireEvent(new ContextMenuOpenedOnTableHeaderEvent(TableContextMenu.this, table, event
 								.getPropertyId()));
 						open(event.getClientX(), event.getClientY());
@@ -79,6 +86,7 @@ public class TableContextMenu extends ContextMenu
 				{
 					if (event.getButton() == MouseButton.RIGHT)
 					{
+						events.preContextMenuOpen();
 						fireEvent(new ContextMenuOpenedOnTableHeaderEvent(TableContextMenu.this, table, event
 								.getPropertyId()));
 						open(event.getClientX(), event.getClientY());
@@ -86,5 +94,10 @@ public class TableContextMenu extends ContextMenu
 				}
 			});
 		}
+	}
+
+	public void setEvents(TableContextMenuEvents events)
+	{
+		this.events = events;
 	}
 }
