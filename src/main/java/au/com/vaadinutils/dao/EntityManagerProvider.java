@@ -282,12 +282,17 @@ public enum EntityManagerProvider
 
 	}
 
-	static ThreadLocal<List<Runnable>> afterTransactionActions = new ThreadLocal<>();
+	private static ThreadLocal<List<Runnable>> afterTransactionActions = new ThreadLocal<>();
 
 	/**
-	 * the runnable will be called after the entityManager is destroyed
-	 * 
+	 * Adds a runnable to the list of Actions that will be performed after the
+	 * entity manager for this thread has been cleared.
+	 *
+	 * NOTE: as the EM has been cleared the Runnable must NOT try any database
+	 * operations as they will fail.
+	 *
 	 * @param runnable
+	 *            The Action to run when the em is cleared.
 	 */
 	public static void performAfterTransactionCompletes(Runnable runnable)
 	{
