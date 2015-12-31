@@ -11,35 +11,35 @@ import au.com.vaadinutils.errorHandling.ErrorWindow;
 /**
  * The class is a place holder to allow access to an 'non-injected' entity
  * manager.
- * 
+ *
  * You need to initialise this Provider during application startup by calling
  * setEntityManagerFactory.
- * 
- * The for each request you need to inject a thread local EntityManager by
+ *
+ * Then for each request you need to inject a thread local EntityManager by
  * calling setCurrentEntityManager and then clearing it when the request
  * completes by calling setCurrentEntityManager with a null.
- * 
+ *
  * You should also wrap the entity in a Transaction block before calling
  * setCurrentEntityManager.
- * 
+ *
  * e.g.
- * 
+ *
  * EntityManager em = EntityManagerProvider.createEntityManager(); Transaction t
  * = null; Transaction t = new Transaction(em); try { // Create and set the
  * entity manager EntityManagerProvider.setCurrentEntityManager(em);
- * 
+ *
  * // Handle the request filterChain.doFilter(servletRequest, servletResponse);
- * 
+ *
  * t.commit(); } finally { if (t!= null) t.close(); // Reset the entity manager
  * EntityManagerProvider.setCurrentEntityManager(null); } }
- * 
- * 
+ *
+ *
  * You can use the @Link au.com.vaadinutils.filter.EntityManagerInjectorFilter
  * and @Link au.com.vaadinutils.filter.AtmosphereFilter to do the injection or
  * make up your own methods.
- * 
+ *
  * @author bsutton
- * 
+ *
  */
 public enum EntityManagerProvider
 {
@@ -52,7 +52,7 @@ public enum EntityManagerProvider
 
 	/**
 	 * Get the entity manager attached to this thread.
-	 * 
+	 *
 	 * @return
 	 */
 	public static EntityManager getEntityManager()
@@ -62,7 +62,7 @@ public enum EntityManagerProvider
 
 	/**
 	 * Set an entity manager for this thread.
-	 * 
+	 *
 	 * @param em
 	 */
 	public static void setCurrentEntityManager(EntityManager em)
@@ -87,9 +87,9 @@ public enum EntityManagerProvider
 	 * Call this method to initialise the EntityManagerProvider so that it can
 	 * hand out EntityManagers to worker threads. Dont forget to close the
 	 * entitymanager
-	 * 
+	 *
 	 * This should normally be called from a servlet Context Listener.
-	 * 
+	 *
 	 * @param emf
 	 */
 	public static void setEntityManagerFactory(javax.persistence.EntityManagerFactory emf)
@@ -99,7 +99,7 @@ public enum EntityManagerProvider
 
 	/**
 	 * T return type from EntityWorker.
-	 * 
+	 *
 	 * @param worker
 	 * @return
 	 * @throws Exception
@@ -174,8 +174,8 @@ public enum EntityManagerProvider
 	}
 
 	/**
-	 * 
-	 * 
+	 *
+	 *
 	 * If you have a worker thread then it won't have access to a thread local
 	 * entity manager (as they are injected by the servlet request filters
 	 * mentioned above. <br>
@@ -184,8 +184,8 @@ public enum EntityManagerProvider
 	 * <br>
 	 * Otherwise you need to call this method to get an entity manager. You will
 	 * also need to call close when done
-	 * 
-	 * 
+	 *
+	 *
 	 * @return
 	 */
 	public static EntityManager createEntityManager()
@@ -208,7 +208,7 @@ public enum EntityManagerProvider
 
 	/**
 	 * convienece method
-	 * 
+	 *
 	 * @param entity
 	 */
 	public static <T> T merge(T entity)
