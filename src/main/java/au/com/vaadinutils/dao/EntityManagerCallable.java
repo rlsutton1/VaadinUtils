@@ -25,14 +25,18 @@ public abstract class EntityManagerCallable<T> implements Callable<T>
 		this.ui = ui;
 	}
 
+	/**
+	 * throws Exception allows the call method to throw an exception. 
+	 * The exception is chained from any exception thrown in the enclosed thread.
+	 */
 	@Override
-	public T call()
+	public T call() throws Exception
 	{
 
 		return run(ui);
 
 	}
 
-	protected abstract T run(UI ui);
+	protected abstract T run(UI ui) throws Exception;
 
 }
