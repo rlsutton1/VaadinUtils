@@ -14,13 +14,13 @@ import com.vaadin.ui.UI;
  *
  * @param <T>
  */
-public abstract class UICallable<T> implements Callable<T>
+public abstract class EntityManagerCallable<T> implements Callable<T>
 {
 
 	final private UI ui;
 	Logger logger = LogManager.getLogger();
 
-	public UICallable(UI ui)
+	public EntityManagerCallable(UI ui)
 	{
 		this.ui = ui;
 	}

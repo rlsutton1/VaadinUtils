@@ -5,7 +5,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.vaadin.ui.UI;
 
-public abstract class EntityRunnable implements Runnable
+public abstract class EntityManagerRunnable implements Runnable
 {
 
 	final private UI ui;
@@ -13,7 +13,7 @@ public abstract class EntityRunnable implements Runnable
 
 
 
-	public EntityRunnable(UI ui)
+	public EntityManagerRunnable(UI ui)
 	{
 		this.ui  =ui;
 	}
