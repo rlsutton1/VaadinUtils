@@ -5,9 +5,8 @@ import com.vaadin.ui.Label;
 
 public class SplitDateField extends DateField implements SplitField
 {
-
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 8992992230293865429L;
 	private Label label;
@@ -37,10 +36,11 @@ public class SplitDateField extends DateField implements SplitField
 	{
 		return label.getValue();
 	}
+
 	@Override
 	public void hideLabel()
 	{
 		setCaption(null);
-		
+
 	}
 }
