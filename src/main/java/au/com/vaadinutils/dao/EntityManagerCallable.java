@@ -17,7 +17,7 @@ import com.vaadin.ui.UI;
 public abstract class EntityManagerCallable<T> implements Callable<T>
 {
 
-	final private UI ui = UI.getCurrent();
+	final private UI ui;
 	Logger logger = LogManager.getLogger();
 
 	public EntityManagerCallable(UI ui)
