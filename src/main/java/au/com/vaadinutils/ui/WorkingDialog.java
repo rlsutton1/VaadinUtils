@@ -12,7 +12,7 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
-import au.com.vaadinutils.dao.EntityRunnable;
+import au.com.vaadinutils.dao.EntityManagerRunnable;
 import au.com.vaadinutils.listener.CancelListener;
 import au.com.vaadinutils.listener.ClickEventLogged;
 import au.com.vaadinutils.listener.CompleteListener;
@@ -156,7 +156,7 @@ public class WorkingDialog extends Window implements ProgressListener<String>
 	 *            finished.
 	 */
 
-	public void setWorker(EntityRunnable runnable, CompleteListener listener)
+	public void setWorker(EntityManagerRunnable runnable, CompleteListener listener)
 	{
 		this.completeListener = listener;
 
@@ -168,10 +168,10 @@ public class WorkingDialog extends Window implements ProgressListener<String>
 	class Worker implements Runnable
 	{
 
-		private EntityRunnable runnable;
+		private EntityManagerRunnable runnable;
 		private WorkingDialog parent;
 
-		Worker(WorkingDialog parent, EntityRunnable runnable)
+		Worker(WorkingDialog parent, EntityManagerRunnable runnable)
 		{
 			this.parent = parent;
 			this.runnable = runnable;
