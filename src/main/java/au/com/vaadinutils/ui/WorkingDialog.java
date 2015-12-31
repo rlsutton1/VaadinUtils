@@ -12,6 +12,12 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
+import au.com.vaadinutils.dao.EntityManagerRunnable;
+import au.com.vaadinutils.listener.CancelListener;
+import au.com.vaadinutils.listener.ClickEventLogged;
+import au.com.vaadinutils.listener.CompleteListener;
+import au.com.vaadinutils.listener.ProgressListener;
+
 /**
  * Displays a dialog designed to be shown when a long running task is in
  * progress.
