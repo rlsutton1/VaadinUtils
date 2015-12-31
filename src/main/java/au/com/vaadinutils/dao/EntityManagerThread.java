@@ -29,8 +29,8 @@ public class EntityManagerThread<T>
 
 	/**
 	 * Create an thread with a copy of the current threads UI (because you can't
-	 * get the UI from within the new thread), inject an entity manager and then
-	 * executes the callable on the new thread.
+	 * get the UI from within the new thread), inject an entity manager and
+	 * starts a JPA Transaction then executes the callable on the new thread.
 	 *
 	 * The callable can optionally return a result of type T which can be
 	 * retrieved by calling get().
@@ -38,7 +38,7 @@ public class EntityManagerThread<T>
 	 * @param ui
 	 * @param callable
 	 */
-	public EntityManagerThread(UICallable<T> callable)
+	public EntityManagerThread(EntityManagerCallable<T> callable)
 	{
 		this.callable = callable;
 
@@ -75,7 +75,8 @@ public class EntityManagerThread<T>
 	}
 
 	/**
-	 * Injects an entity manager and then runs your callable.
+	 * Injects an entity manager and starts a JPA Transaction and then runs your
+	 * callable.
 	 *
 	 * The callable can optionally return a result of type T which can be
 	 * retrieved by calling get().
