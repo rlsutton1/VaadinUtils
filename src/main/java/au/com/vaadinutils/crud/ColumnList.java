@@ -9,7 +9,7 @@ public class ColumnList
 {
 	List<SingularAttribute<? extends Object, ? extends Object>> columns = new ArrayList<SingularAttribute<? extends Object, ? extends Object>>();
 
-	public ColumnList(SingularAttribute<? extends Object, ? extends Object>... columns)
+	public ColumnList(@SuppressWarnings("unchecked") SingularAttribute<? extends Object, ? extends Object>... columns)
 	{
 		for (SingularAttribute<? extends Object, ? extends Object> column : columns)
 		{

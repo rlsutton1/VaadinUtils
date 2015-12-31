@@ -14,6 +14,13 @@ import javax.persistence.metamodel.SingularAttribute;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import au.com.vaadinutils.crud.CrudEntity;
+import au.com.vaadinutils.crud.HeadingPropertySet;
+import au.com.vaadinutils.crud.SearchableSelectableEntityTable;
+import au.com.vaadinutils.dao.EntityManagerProvider;
+import au.com.vaadinutils.dao.JpaBaseDao;
+
+import com.google.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.util.DefaultQueryModifierDelegate;
 import com.vaadin.data.Buffered;
@@ -34,12 +41,6 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.ColumnGenerator;
 import com.vaadin.ui.VerticalLayout;
-
-import au.com.vaadinutils.crud.CrudEntity;
-import au.com.vaadinutils.crud.HeadingPropertySet;
-import au.com.vaadinutils.crud.SearchableSelectableEntityTable;
-import au.com.vaadinutils.dao.EntityManagerProvider;
-import au.com.vaadinutils.dao.JpaBaseDao;
 
 public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomField<Collection<C>>
 {
@@ -79,7 +80,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	public TwinColumnSearchableSelect(String fieldName, SingularAttribute<C, ?> listField)
 	{
 		this(fieldName, listField, null);
-		
+
 		availableContainer.sort(new Object[]
 		{ listField.getName() }, new boolean[]
 		{ true });
@@ -129,6 +130,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 		selectedCols.setSizeFull();
 		selectedCols.setHeight("200");
 		selectedCols.setSelectable(true);
+		selectedCols.setMultiSelect(true);
 		createAvailableTable();
 
 		addSelectedColumnTooltip();
@@ -323,9 +325,12 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	public boolean isModified()
 	{
 		Collection<C> convertedValue = (Collection<C>) getConvertedValue();
-		if ((sourceValue == null || sourceValue.size() == 0) && (convertedValue != null && convertedValue.size() > 0))
+		Preconditions.checkNotNull(convertedValue,
+				"If you look at getConvertedValue, you'll see convertedValue can never be null");
+
+		if ((sourceValue == null || sourceValue.size() == 0) && (convertedValue.size() > 0))
 			return true;
-		if ((sourceValue == null || sourceValue.size() == 0) && (convertedValue == null || convertedValue.size() == 0))
+		if ((sourceValue == null || sourceValue.size() == 0) && (convertedValue.size() == 0))
 			return false;
 		boolean equal = convertedValue.containsAll(sourceValue) && sourceValue.containsAll(convertedValue);
 		return !equal;
@@ -402,6 +407,9 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 			selected = new HashSet<>();
 		}
 
+		// Just to be clear that this method will NEVER return null
+		Preconditions.checkNotNull(selected, "If you look at getConvertedValue, you'll see this can never be null");
+
 		if (beans != null)
 		{
 			for (Long id : beans.getItemIds())
@@ -420,7 +428,6 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	{
 		// Had to remove this as maven can't compile it.
 		// return (Class<? extends Collection<C>>) a.getClass();
-
 
 		return (Class<Collection<C>>) (Class<?>) Collection.class;
 	}
@@ -526,6 +533,15 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 		this.availableContainer = newContainer;
 	}
 
+	public void resetSelected()
+	{
+		beans.removeAllItems();
+		if (listener != null)
+		{
+			listener.valueChanged(getFieldValue());
+		}
+	}
+
 	public void setSelectedColumnHeader(String header)
 	{
 		this.selectedCols.setColumnHeaders(header);
@@ -577,19 +593,21 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 				ids.addAll((Collection<? extends Long>) available.getSelectedItems());
 				if (ids.size() > 0)
 				{
-					Long id = ids.get(0);
-					if (id != null)
+					for (Long id : ids)
 					{
-						if (isPreAddActionRequired())
+						if (id != null)
 						{
-							handlePreAddAction(id);
-						}
-						else
-						{
-							handleAddAction(id);
-						}
+							if (isPreAddActionRequired())
+							{
+								handlePreAddAction(id);
+							}
+							else
+							{
+								handleAddAction(id);
+							}
 
-						postAddAction();
+							postAddAction();
+						}
 					}
 				}
 
@@ -627,26 +645,31 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 		{
 			private static final long serialVersionUID = 1L;
 
+			@SuppressWarnings("unchecked")
 			@Override
 			public void buttonClick(ClickEvent event)
 			{
 				try
 				{
-					Long id = (Long) selectedCols.getValue();
+					final List<Long> ids = new LinkedList<>();
+					ids.addAll((Collection<? extends Long>) selectedCols.getValue());
 
-					if (isRemoveAllowed())
+					for (Long id : ids)
 					{
-						beans.removeItem(id);
-						if (listener != null)
+						if (isRemoveAllowed())
 						{
-							listener.valueChanged(getFieldValue());
-						}
+							beans.removeItem(id);
+							if (listener != null)
+							{
+								listener.valueChanged(getFieldValue());
+							}
 
-						postRemoveAction();
-					}
-					else
-					{
-						handleRemoveValidation();
+							postRemoveAction();
+						}
+						else
+						{
+							handleRemoveValidation();
+						}
 					}
 
 				}
@@ -683,5 +706,4 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 			}
 		};
 	}
-
 }

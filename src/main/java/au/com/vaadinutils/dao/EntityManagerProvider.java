@@ -1,5 +1,8 @@
 package au.com.vaadinutils.dao;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.validation.ConstraintViolationException;
 
@@ -81,6 +84,33 @@ public enum EntityManagerProvider
 
 		}
 		INSTANCE.entityManagerThreadLocal.set(em);
+
+		if (em == null)
+		{
+			try
+			{
+				List<Runnable> actions = afterTransactionActions.get();
+				if (actions != null)
+				{
+					for (Runnable action : actions)
+					{
+						try
+						{
+							action.run();
+						}
+						catch (Throwable e)
+						{
+							logger.error(e, e);
+						}
+					}
+				}
+			}
+			finally
+			{
+				afterTransactionActions.set(null);
+			}
+		}
+
 	}
 
 	/**
@@ -129,13 +159,25 @@ public enum EntityManagerProvider
 			}
 			finally
 			{
-				setCurrentEntityManager(null);
-				if (em.getTransaction().isActive())
+				try
 				{
-					logger.error("Rolling back transaction");
-					em.getTransaction().rollback();
+					try
+					{
+						if (em.getTransaction().isActive())
+						{
+							logger.error("Rolling back transaction");
+							em.getTransaction().rollback();
+						}
+					}
+					finally
+					{
+						em.close();
+					}
 				}
-				em.close();
+				finally
+				{
+					setCurrentEntityManager(null);
+				}
 			}
 		}
 		// there was already an active entity manager, so just use it!
@@ -237,6 +279,25 @@ public enum EntityManagerProvider
 	public static <T> void detach(T record)
 	{
 		getEntityManager().detach(record);
+
+	}
+
+	static ThreadLocal<List<Runnable>> afterTransactionActions = new ThreadLocal<>();
+
+	/**
+	 * the runnable will be called after the entityManager is destroyed
+	 * 
+	 * @param runnable
+	 */
+	public static void performAfterTransactionCompletes(Runnable runnable)
+	{
+		List<Runnable> actionList = afterTransactionActions.get();
+		if (actionList == null)
+		{
+			actionList = new LinkedList<>();
+			afterTransactionActions.set(actionList);
+		}
+		actionList.add(runnable);
 
 	}
 

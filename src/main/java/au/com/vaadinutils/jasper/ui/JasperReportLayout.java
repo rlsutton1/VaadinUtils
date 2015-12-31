@@ -11,6 +11,26 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import au.com.vaadinutils.dao.JpaBaseDao;
+import au.com.vaadinutils.jasper.JasperManager;
+import au.com.vaadinutils.jasper.JasperManager.OutputFormat;
+import au.com.vaadinutils.jasper.JasperProgressListener;
+import au.com.vaadinutils.jasper.QueueEntry;
+import au.com.vaadinutils.jasper.ReportStatus;
+import au.com.vaadinutils.jasper.filter.ExpanderComponent;
+import au.com.vaadinutils.jasper.filter.ReportFilterUIBuilder;
+import au.com.vaadinutils.jasper.parameter.ReportChooser;
+import au.com.vaadinutils.jasper.parameter.ReportParameter;
+import au.com.vaadinutils.jasper.parameter.ReportParameterConstant;
+import au.com.vaadinutils.jasper.scheduler.JasperReportEmailWindow;
+import au.com.vaadinutils.jasper.scheduler.JasperReportSchedulerWindow;
+import au.com.vaadinutils.jasper.scheduler.ScheduleIconBuilder;
+import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailScheduleEntity;
+import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailScheduleEntity_;
+import au.com.vaadinutils.listener.CancelListener;
+import au.com.vaadinutils.listener.ClickEventLogged;
+import au.com.vaadinutils.ui.WorkingDialog;
+
 import com.google.common.base.Preconditions;
 import com.vaadin.data.Item;
 import com.vaadin.event.UIEvents.PollEvent;
@@ -38,25 +58,6 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Reindeer;
 
-import au.com.vaadinutils.dao.JpaBaseDao;
-import au.com.vaadinutils.jasper.JasperManager;
-import au.com.vaadinutils.jasper.JasperManager.OutputFormat;
-import au.com.vaadinutils.jasper.JasperProgressListener;
-import au.com.vaadinutils.jasper.QueueEntry;
-import au.com.vaadinutils.jasper.ReportStatus;
-import au.com.vaadinutils.jasper.filter.ExpanderComponent;
-import au.com.vaadinutils.jasper.filter.ReportFilterUIBuilder;
-import au.com.vaadinutils.jasper.parameter.ReportChooser;
-import au.com.vaadinutils.jasper.parameter.ReportParameter;
-import au.com.vaadinutils.jasper.parameter.ReportParameterConstant;
-import au.com.vaadinutils.jasper.scheduler.JasperReportEmailWindow;
-import au.com.vaadinutils.jasper.scheduler.JasperReportSchedulerWindow;
-import au.com.vaadinutils.jasper.scheduler.ScheduleIconBuilder;
-import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailScheduleEntity;
-import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailScheduleEntity_;
-import au.com.vaadinutils.listener.CancelListener;
-import au.com.vaadinutils.listener.ClickEventLogged;
-import au.com.vaadinutils.ui.WorkingDialog;
 import elemental.json.JsonArray;
 import elemental.json.JsonObject;
 
@@ -389,7 +390,7 @@ class JasperReportLayout extends VerticalLayout
 		ScheduleIconBuilder iconBuilder = new ScheduleIconBuilder();
 
 		String baseIconFileName = "Call Calendar_32";
-		String path = VaadinServlet.getCurrent().getServletContext().getRealPath("images/seanau/");
+		String path = VaadinServlet.getCurrent().getServletContext().getRealPath("templates/images/seanau/");
 		
 		// HACK: added this as the lack of a leading slash causes it to return null in scoutmaster but didn't know if adding the slash would break existing code.
 		if (path == null)

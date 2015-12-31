@@ -1,5 +1,6 @@
 package au.com.vaadinutils.fields;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -146,7 +147,8 @@ public class TableCheckBoxSelect extends Table
 		{
 			cols.add("");
 		}
-		super.setColumnHeaders(cols.toArray(new String[] {}));
+		super.setColumnHeaders(cols.toArray(new String[]
+		{}));
 
 	}
 
@@ -185,7 +187,9 @@ public class TableCheckBoxSelect extends Table
 	@Deprecated
 	public void setValue(Object value)
 	{
-		super.setValue(value);
+		final ArrayList<Object> v = new ArrayList<>(1);
+		v.add(value);
+		super.setValue(v);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -262,11 +266,7 @@ public class TableCheckBoxSelect extends Table
 	@Override
 	public Object getValue()
 	{
-
-		TreeSet<Object> result = new TreeSet<Object>();
-
-		return result;
-
+		return super.getValue();
 	}
 
 	protected ColumnGenerator getGenerator()

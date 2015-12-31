@@ -26,6 +26,7 @@ public class CookieButton extends Button
 		this.onText = onText;
 		this.offText = offText;
 		setCaption(offText);
+		setId(offText);
 		addClickListener(new ClickListener()
 		{
 
@@ -46,6 +47,7 @@ public class CookieButton extends Button
 		if (on)
 		{
 			setCaption(offText);
+			setId(offText);
 			userSettings.store(cookiePath, ON_STATE);
 			callback.on();
 
@@ -53,6 +55,7 @@ public class CookieButton extends Button
 		else
 		{
 			setCaption(onText);
+			setId(onText);
 			userSettings.store(cookiePath, OFF_STATE);
 			callback.off();
 

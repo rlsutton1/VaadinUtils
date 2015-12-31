@@ -45,6 +45,7 @@ public class JoinBuilder<  E, K>
 		{
 			return false;
 		}
+		@SuppressWarnings("rawtypes")
 		JoinBuilder other = (JoinBuilder) obj;
 		if (joins == null)
 		{

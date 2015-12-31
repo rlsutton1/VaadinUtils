@@ -1,8 +1,8 @@
 package au.com.vaadinutils.jasper.scheduler;
 
-import com.vaadin.addon.jpacontainer.JPAContainer;
-
 import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailScheduleEntity;
+
+import com.vaadin.addon.jpacontainer.JPAContainer;
 
 public interface ScheduleCreater
 {

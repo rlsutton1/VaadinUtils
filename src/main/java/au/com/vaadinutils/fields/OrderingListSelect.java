@@ -22,7 +22,7 @@ public class OrderingListSelect<T> extends CustomComponent
 	public enum Direction
 	{
 		UP, DOWN
-	};
+	}
 
 	private ListSelect listSelect;
 	private Button upButton;
@@ -168,7 +168,8 @@ public class OrderingListSelect<T> extends CustomComponent
 		return index;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings(
+	{ "unchecked", "deprecation" })
 	public void save()
 	{
 		for (Object itemId : container.getItemIds())
@@ -183,6 +184,10 @@ public class OrderingListSelect<T> extends CustomComponent
 
 		container.commit();
 		setModified(false);
+		if (listener != null)
+		{
+			listSelect.removeListener(listener);
+		}
 	}
 
 	public ListSelect getListSelect()

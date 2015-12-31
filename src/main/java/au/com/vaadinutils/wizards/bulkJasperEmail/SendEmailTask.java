@@ -12,7 +12,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import au.com.vaadinutils.dao.EntityManagerProvider;
-import au.com.vaadinutils.dao.Transaction;
+import au.com.vaadinutils.dao.EntityWorker;
 import au.com.vaadinutils.jasper.AttachmentType;
 import au.com.vaadinutils.jasper.JasperEmailBuilder;
 import au.com.vaadinutils.jasper.JasperManager;
@@ -61,92 +61,68 @@ public class SendEmailTask extends ProgressBarTask<JasperTransmission> implement
 
 	}
 
-	private void sendMessages(List<JasperTransmission> targets, JasperProxy proxy)
+	private void sendMessages(final List<JasperTransmission> targets,final JasperProxy proxy) throws Exception
 
 	{
 
-		int sent = 0;
-		Transaction t = new Transaction(EntityManagerProvider.createEntityManager());
-		try
+		
+		EntityManagerProvider.setThreadLocalEntityManager(new EntityWorker<Void>()
 		{
-			for (JasperTransmission transmission : targets)
+			
+			@Override
+			public Void exec() throws Exception 
 			{
-				if (cancel == true)
-					break;
-
+				int sent = 0;
 				try
 				{
-					JasperManager manager = proxy.getManager();
-					RenderedReport renderedHtml = manager.export(OutputFormat.HTML, null);
-					RenderedReport renderedPDF = manager.export(OutputFormat.PDF, null);
-					JasperEmailBuilder builder = new JasperEmailBuilder(proxy.getEmailSettings());
-					builder.setFrom(proxy.getSenderEmailAddress()).setSubject(proxy.getSubject())
-							// .setHtmlBody("<html><body></body></html>")
-							.setHtmlBody(renderedHtml).addTo(transmission.getRecipientEmailAddress())
-							.addAttachement(renderedPDF.getBodyAsDataSource("report.pdf", AttachmentType.PDF));
+					for (JasperTransmission transmission : targets)
+					{
+						if (cancel == true)
+							break;
 
-					builder.send(false);
+						try
+						{
+							JasperManager manager = proxy.getManager();
+							RenderedReport renderedHtml = manager.export(OutputFormat.HTML, null);
+							RenderedReport renderedPDF = manager.export(OutputFormat.PDF, null);
+							JasperEmailBuilder builder = new JasperEmailBuilder(proxy.getEmailSettings());
+							builder.setFrom(proxy.getSenderEmailAddress()).setSubject(proxy.getSubject())
+									// .setHtmlBody("<html><body></body></html>")
+									.setHtmlBody(renderedHtml).addTo(transmission.getRecipientEmailAddress())
+									.addAttachement(renderedPDF.getBodyAsDataSource("report.pdf", AttachmentType.PDF));
+
+							builder.send(false);
+						}
+						catch (EmailException e)
+						{
+							logger.error(e, e);
+							transmission.setException(e);
+							SendEmailTask.super.taskItemError(transmission);
+							VUNotification.show(e, Type.ERROR_MESSAGE);
+						}
+
+
+					}
+
 				}
-				catch (EmailException e)
+				catch (Exception e)
 				{
-					logger.error(e, e);
-					transmission.setException(e);
-					super.taskItemError(transmission);
 					VUNotification.show(e, Type.ERROR_MESSAGE);
-				}
+					throw e;
 
-				// try
-				// {
-				// // daoSMTPSettings.sendEmail(settings,
-				// proxy.getSenderEmailAddress(), proxy.getRecipient(),
-				// // null, proxy.getSubject(), proxy.getBody(),
-				// proxy.getAttachments());
-				//
-				// // Log the activity
-				// ActivityDao daoActivity = new DaoFactory().getActivityDao();
-				// ActivityTypeDao daoActivityType = new
-				// DaoFactory().getActivityTypeDao();
-				// ActivityType type =
-				// daoActivityType.findByName(ActivityType.BULK_EMAIL);
-				// Activity activity = new Activity();
-				// activity.setAddedBy(user);
-				// //activity.setWithContact(transmission.getContact());
-				// activity.setSubject(proxy.getSubject());
-				// activity.setDetails(proxy.getBody());
-				// activity.setType(type);
-				//
-				// daoActivity.persist(activity);
-				// sent++;
-				// super.taskProgress(sent, targets.size(), transmission);
-				// SMNotification.show("Email sent to " +
-				// transmission.getDescription(), Type.TRAY_NOTIFICATION);
-				//
-				// // SMNotification.show("Message sent",
-				// // Type.TRAY_NOTIFICATION);
-				// }
-				// catch (EmailException e)
-				// {
-				// logger.error(e, e);
-				// transmission.setException(e);
-				// super.taskItemError(transmission);
-				// SMNotification.show(e, Type.ERROR_MESSAGE);
-				// }
+				}
+				finally
+				{
+
+					SendEmailTask.super.taskComplete(sent);
+				}
+				return null;
+				
 			}
 
-			t.commit();
-		}
-		catch (Throwable e)
-		{
-			logger.error(e, e);
-			VUNotification.show(e, Type.ERROR_MESSAGE);
-
-		}
-		finally
-		{
-
-			t.close();
-			super.taskComplete(sent);
-		}
+			
+		});
+		
 	}
 
 	@Override

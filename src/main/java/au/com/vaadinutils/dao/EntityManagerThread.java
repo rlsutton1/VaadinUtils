@@ -6,9 +6,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 /**
  * Creates a Thread that has its own private EntityManager attached.
  *
@@ -21,11 +18,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class EntityManagerThread<T>
 {
-	private Logger logger = LogManager.getLogger();
-	private final Callable<T> callable;
-	private final Callable<T> thread;
 	private final Future<T> future;
-	private final ExecutorService executor;
 
 	/**
 	 * Create an thread with a copy of the current threads UI (because you can't
@@ -40,37 +33,8 @@ public class EntityManagerThread<T>
 	 */
 	public EntityManagerThread(EntityManagerCallable<T> callable)
 	{
-		this.callable = callable;
 
-		executor = Executors.newFixedThreadPool(1);
-
-		thread = new Callable<T>()
-		{
-
-			@Override
-			public T call() throws Exception
-			{
-				T result = null;
-				try
-				{
-					result = EntityManagerThread.this.callable.call();
-				}
-				catch (Exception e)
-				{
-
-					logger.error(e, e);
-				}
-				finally
-				{
-					executor.shutdown();
-				}
-				return result;
-
-			}
-
-		};
-
-		future = executor.submit(this.thread);
+		this((Callable<T>) callable);
 
 	}
 
@@ -85,48 +49,35 @@ public class EntityManagerThread<T>
 	 * @param callable
 	 */
 
-	public EntityManagerThread(Callable<T> callable)
+	public EntityManagerThread(final Callable<T> callable)
 	{
-		this.callable = callable;
 
-		executor = Executors.newFixedThreadPool(1);
+		ExecutorService executor = Executors.newFixedThreadPool(1);
 
-		thread = new Callable<T>()
+		Callable<T> thread = new Callable<T>()
 		{
 
 			@Override
 			public T call() throws Exception
 			{
-				T result = null;
-				try
+
+				return EntityManagerProvider.setThreadLocalEntityManager(new EntityWorker<T>()
 				{
-					result = EntityManagerProvider.setThreadLocalEntityManager(new EntityWorker<T>()
+
+					@Override
+					public T exec() throws Exception
 					{
+						return callable.call();
+					}
 
-						@Override
-						public T exec() throws Exception
-						{
-							return EntityManagerThread.this.callable.call();
-						}
-
-					});
-				}
-				catch (Exception e)
-				{
-
-					logger.error(e, e);
-				}
-				finally
-				{
-					executor.shutdown();
-				}
-				return result;
+				});
 
 			}
 
 		};
 
-		future = executor.submit(this.thread);
+		future = executor.submit(thread);
+		executor.shutdown();
 
 	}
 
