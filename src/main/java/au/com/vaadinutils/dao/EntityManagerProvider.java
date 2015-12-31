@@ -15,15 +15,25 @@ import au.com.vaadinutils.errorHandling.ErrorWindow;
  * The class is a place holder to allow access to an 'non-injected' entity
  * manager.
  *
- * You need to initialise this Provider during application startup by calling
- * setEntityManagerFactory.
+ * Normally you need a EM for each thread and the EntityManagerProvider provides
+ * a simple mechanism to inject an EM into a thread.
  *
- * Then for each request you need to inject a thread local EntityManager by
- * calling setCurrentEntityManager and then clearing it when the request
- * completes by calling setCurrentEntityManager with a null.
+ * NOTE: You need to initialise this Provider during application startup by
+ * calling EntityManagerProvider.setEntityManagerFactory().
  *
- * You should also wrap the entity in a Transaction block before calling
- * setCurrentEntityManager.
+ * You shouldn't use this provider directly but rather use it via one of:
+ *
+ * EntityManagerCallable EntityManagerRunnable EntityManagerThread
+ *
+ * Each of these class correctly sets up the EM, starts a Transaction and
+ * finally clears the threads EM once the thread is complete.
+ *
+ * If you want to use EntityManagerProvider directly (DON'T):
+ *
+ * Then for each thread you need to inject a thread local EntityManager by
+ * calling setCurrentEntityManager and then clearing it when the thread shuts
+ * down by calling setCurrentEntityManager with a null. You will also need wrap
+ * the entity in a Transaction block before calling setCurrentEntityManager.
  *
  * e.g.
  *
