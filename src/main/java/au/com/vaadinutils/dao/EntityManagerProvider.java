@@ -2,6 +2,7 @@ package au.com.vaadinutils.dao;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import javax.persistence.EntityManager;
 import javax.validation.ConstraintViolationException;
@@ -195,6 +196,19 @@ public enum EntityManagerProvider
 
 	}
 
+	/**
+	 * Allows you to pass a Runnable to wrap in an entity manager.
+	 *
+	 * A new Runnable is returned which should then be called to run your
+	 * runnable.
+	 *
+	 * i.e. don't run you own runnable directly rather use the returned
+	 * Runnable.
+	 *
+	 * @param runnable
+	 *            - the runnable to run as contains an entity manager.
+	 * @return
+	 */
 	public static Runnable setThreadLocalEntityManager(final Runnable runnable)
 	{
 		return new Runnable()
@@ -220,6 +234,53 @@ public enum EntityManagerProvider
 				{
 					logger.error(e, e);
 				}
+
+			}
+		};
+	}
+
+	/**
+	 * Allows you to pass in a Callable to wrap in an entity manager.
+	 *
+	 * A new Callable is returned which should then be called to run your
+	 * Callable.
+	 *
+	 * i.e. don't run you own Callable directly rather use the returned
+	 * Callable.
+	 *
+	 * @param Callable
+	 *            - the Callable to run as contains an entity manager.
+	 * @return
+	 */
+
+	public static <T> Callable<T> setThreadLocalEntityManager(final Callable<T> callable)
+	{
+		return new Callable<T>()
+		{
+
+			@Override
+			public T call() throws Exception
+			{
+				T result = null;
+				try
+				{
+					setThreadLocalEntityManager(new EntityWorker<T>()
+					{
+
+						@Override
+						public T exec() throws Exception
+						{
+							return callable.call();
+						}
+					});
+
+				}
+				catch (Exception e)
+				{
+					logger.error(e, e);
+					throw e;
+				}
+				return result;
 
 			}
 		};
