@@ -11,8 +11,10 @@ import org.apache.commons.mail.EmailException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import au.com.vaadinutils.dao.EntityManagerProvider;
-import au.com.vaadinutils.dao.EntityWorker;
+import com.vaadin.ui.Notification.Type;
+import com.vaadin.ui.UI;
+
+import au.com.vaadinutils.dao.EntityManagerCallable;
 import au.com.vaadinutils.jasper.AttachmentType;
 import au.com.vaadinutils.jasper.JasperEmailBuilder;
 import au.com.vaadinutils.jasper.JasperManager;
@@ -27,10 +29,7 @@ import au.com.vaadinutils.util.ProgressBarTask;
 import au.com.vaadinutils.util.ProgressTaskListener;
 import au.com.vaadinutils.util.VUNotification;
 
-import com.vaadin.ui.Notification.Type;
-
-public class SendEmailTask extends ProgressBarTask<JasperTransmission> implements CancelListener,
-		JasperReportProperties
+public class SendEmailTask extends ProgressBarTask<JasperTransmission> implements CancelListener, JasperReportProperties
 {
 	transient Logger logger = LogManager.getLogger(SendEmailTask.class);
 	private JasperProxy proxy;
@@ -47,7 +46,7 @@ public class SendEmailTask extends ProgressBarTask<JasperTransmission> implement
 	}
 
 	@Override
-	public void run()
+	public void runUI(UI ui)
 	{
 		try
 		{
@@ -61,16 +60,15 @@ public class SendEmailTask extends ProgressBarTask<JasperTransmission> implement
 
 	}
 
-	private void sendMessages(final List<JasperTransmission> targets,final JasperProxy proxy) throws Exception
+	private void sendMessages(final List<JasperTransmission> targets, final JasperProxy proxy) throws Exception
 
 	{
 
-		
-		EntityManagerProvider.setThreadLocalEntityManager(new EntityWorker<Void>()
+		new EntityManagerCallable<Void>(UI.getCurrent())
 		{
-			
+
 			@Override
-			public Void exec() throws Exception 
+			protected Void run(UI ui) throws Exception
 			{
 				int sent = 0;
 				try
@@ -101,7 +99,6 @@ public class SendEmailTask extends ProgressBarTask<JasperTransmission> implement
 							VUNotification.show(e, Type.ERROR_MESSAGE);
 						}
 
-
 					}
 
 				}
@@ -117,12 +114,10 @@ public class SendEmailTask extends ProgressBarTask<JasperTransmission> implement
 					SendEmailTask.super.taskComplete(sent);
 				}
 				return null;
-				
-			}
 
-			
-		});
-		
+			}
+		};
+
 	}
 
 	@Override
@@ -131,69 +126,65 @@ public class SendEmailTask extends ProgressBarTask<JasperTransmission> implement
 		this.cancel = true;
 
 	}
-	
-	
+
 	@Override
 	public Map<String, Object> getCustomReportParameterMap()
 	{
-		return  null;
+		return null;
 
 	}
 
 	@Override
 	public ReportFilterUIBuilder getFilterBuilder()
 	{
-		
+
 		return null;
 	}
 
 	@Override
-	public List<ReportParameter<?>> prepareData(Collection<ReportParameter<?>> params,String reportFilename, 
+	public List<ReportParameter<?>> prepareData(Collection<ReportParameter<?>> params, String reportFilename,
 			CleanupCallback cleanupCallback) throws Exception
 	{
-		
+
 		return null;
 	}
 
 	@Override
 	public void prepareForOutputFormat(OutputFormat outputFormat)
 	{
-		
 
 	}
 
 	@Override
 	public void closeDBConnection()
 	{
-		
 
 	}
 
 	@Override
 	public void initDBConnection()
 	{
-		
 
 	}
 
 	@Override
 	public OutputFormat getDefaultFormat()
 	{
-		
+
 		return null;
 	}
 
 	@Override
 	public CleanupCallback getCleanupCallback()
 	{
-		
+
 		return null;
 	}
 
 	@Override
-	public String generateDynamicHeaderImage(int pageWidth,int height, String reportTitle)
+	public String generateDynamicHeaderImage(int pageWidth, int height, String reportTitle)
 	{
-		
+
 		return null;
 	}
 
@@ -206,69 +197,69 @@ public class SendEmailTask extends ProgressBarTask<JasperTransmission> implement
 	@Override
 	public String getReportFileName()
 	{
-		
+
 		return null;
 	}
 
 	@Override
 	public String getReportTitle()
 	{
-		
+
 		return null;
 	}
 
 	@Override
 	public String getHeaderFooterTemplateName()
 	{
-		
+
 		return null;
 	}
 
 	@Override
 	public String getUsername()
 	{
-		
+
 		return null;
 	}
 
 	@Override
 	public Connection getConnection()
 	{
-		
+
 		return null;
 	}
 
 	@Override
 	public File getReportFolder()
 	{
-		
+
 		return null;
 	}
 
 	@Override
 	public Class<? extends JasperReportProperties> getReportClass()
 	{
-		
+
 		return null;
 	}
 
 	@Override
 	public String getUserEmailAddress()
 	{
-		
+
 		return null;
 	}
 
 	@Override
 	public Enum<?> getReportIdentifier()
 	{
-		
+
 		return null;
 	}
+
 	@Override
 	public String getDynamicJrxmlFileName()
 	{
 		return null;
 	}
 }
-
