@@ -16,7 +16,7 @@ import java.util.concurrent.Future;
  * @author bsutton
  *
  */
-public class EntityManagerThread<T>
+final public class EntityManagerThread<T>
 {
 	private final Future<T> future;
 
@@ -31,7 +31,8 @@ public class EntityManagerThread<T>
 	 * @param ui
 	 * @param callable
 	 */
-	public EntityManagerThread(EntityManagerCallable<T> callable)
+
+	public EntityManagerThread(CallableUI<T> callable)
 	{
 
 		this((Callable<T>) callable);

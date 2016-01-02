@@ -75,6 +75,7 @@ import au.com.vaadinutils.crud.events.CrudEventType;
 import au.com.vaadinutils.crud.security.SecurityManagerFactoryProxy;
 import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.dao.EntityManagerRunnable;
+import au.com.vaadinutils.dao.RunnableUI;
 import au.com.vaadinutils.errorHandling.ErrorWindow;
 import au.com.vaadinutils.listener.ClickEventLogged;
 import au.com.vaadinutils.menu.Menu;
@@ -976,14 +977,14 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 			private EntityManagerRunnable invokeAction(final Object entityId, final ConfirmDialog pleaseWaitMessage,
 					final CrudAction<E> action)
 			{
-				final EntityManagerRunnable runner = new EntityManagerRunnable(UI.getCurrent())
+				final EntityManagerRunnable runner = new EntityManagerRunnable(new RunnableUI(UI.getCurrent())
 				{
 
 					@Override
-					public void run(final UI ui)
+					protected void run(final UI ui)
 					{
 
-						UI.getCurrent().access(new Runnable()
+						ui.access(new Runnable()
 						{
 
 							@Override
@@ -1008,7 +1009,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 						});
 
 					}
-				};
+				});
+
 				return runner;
 			}
 
@@ -1032,6 +1034,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 				pleaseWaitMessage.setCaption("Preparing Action");
 				return pleaseWaitMessage;
 			}
+
 		});
 
 	}

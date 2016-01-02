@@ -1,5 +1,6 @@
 package au.com.vaadinutils.dao;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -24,7 +25,12 @@ import au.com.vaadinutils.errorHandling.ErrorWindow;
  *
  * You shouldn't use this provider directly but rather use it via one of:
  *
- * EntityManagerCallable EntityManagerRunnable EntityManagerThread
+ * EntityManagerCallable
+ * EntityManagerRunnable
+ * EntityManagerThread
+ *
+ * EntityManagerInjectorFilter
+ * AtmosphereFilter
  *
  * Each of these class correctly sets up the EM, starts a Transaction and
  * finally clears the threads EM once the thread is complete.
@@ -38,19 +44,31 @@ import au.com.vaadinutils.errorHandling.ErrorWindow;
  *
  * e.g.
  *
- * EntityManager em = EntityManagerProvider.createEntityManager(); Transaction t
- * = null; Transaction t = new Transaction(em); try { // Create and set the
- * entity manager EntityManagerProvider.setCurrentEntityManager(em);
+ * @formatter:off
+ * 		EntityManager em = EntityManagerProvider.createEntityManager();
+ *      Transaction t = null; Transaction t = new Transaction(em);
+ *      try
+ *      {
+ *      	// Create and set the entity manager
+ *          EntityManagerProvider.setCurrentEntityManager(em);
+ *          // Handle the request
+ *          filterChain.doFilter(servletRequest, servletResponse);
  *
- * // Handle the request filterChain.doFilter(servletRequest, servletResponse);
+ *			t.commit();
+ *		}
+ *		finally
+ *		{
+ *			if (t!= null)
+ *				t.close();
+ *			// Reset the entity manager
+ *          EntityManagerProvider.setCurrentEntityManager(null);
+ *      }
  *
- * t.commit(); } finally { if (t!= null) t.close(); // Reset the entity manager
- * EntityManagerProvider.setCurrentEntityManager(null); } }
- *
+ * @formatter:on
  *
  * You can use the @Link au.com.vaadinutils.filter.EntityManagerInjectorFilter
- * and @Link au.com.vaadinutils.filter.AtmosphereFilter to do the injection or
- * make up your own methods.
+ *  and @Link au.com.vaadinutils.filter.AtmosphereFilter to do the
+ *  injection or make up your own methods.
  *
  * @author bsutton
  *
@@ -59,10 +77,18 @@ public enum EntityManagerProvider
 {
 	INSTANCE;
 
+	private static final Logger logger = LogManager.getLogger();
+
+	/**
+	 * provides a mechanism to register actions that should happen should happen
+	 * before a transaction is started and after it is committed.
+	 */
+	private static List<EMAction> registeredPreActions = new ArrayList<>();
+
+	private static List<Runnable> registeredPostActions = new ArrayList<>();
+
 	private ThreadLocal<EntityManager> entityManagerThreadLocal = new ThreadLocal<EntityManager>();
 	private javax.persistence.EntityManagerFactory emf;
-
-	static final Logger logger = LogManager.getLogger();
 
 	/**
 	 * Get the entity manager attached to this thread.
@@ -81,6 +107,8 @@ public enum EntityManagerProvider
 	 */
 	public static void setCurrentEntityManager(EntityManager em)
 	{
+		EntityManager oldem = INSTANCE.entityManagerThreadLocal.get();
+
 		if (em == null)
 		{
 			logger.debug("Clearing entity manager for thread {}", Thread.currentThread().getId());
@@ -94,33 +122,15 @@ public enum EntityManagerProvider
 			}
 
 		}
-		INSTANCE.entityManagerThreadLocal.set(em);
 
-		if (em == null)
+		if (em != null)
+			runPreActions(em);
+		else
 		{
-			try
-			{
-				List<Runnable> actions = afterTransactionActions.get();
-				if (actions != null)
-				{
-					for (Runnable action : actions)
-					{
-						try
-						{
-							action.run();
-						}
-						catch (Throwable e)
-						{
-							logger.error(e, e);
-						}
-					}
-				}
-			}
-			finally
-			{
-				afterTransactionActions.set(null);
-			}
+			runPostActions();
 		}
+
+		INSTANCE.entityManagerThreadLocal.set(em);
 
 	}
 
@@ -153,8 +163,8 @@ public enum EntityManagerProvider
 
 			try
 			{
-
 				setCurrentEntityManager(em);
+
 				em.getTransaction().begin();
 
 				T ret = worker.exec();
@@ -178,6 +188,7 @@ public enum EntityManagerProvider
 						{
 							logger.error("Rolling back transaction");
 							em.getTransaction().rollback();
+
 						}
 					}
 					finally
@@ -353,7 +364,18 @@ public enum EntityManagerProvider
 
 	}
 
-	private static ThreadLocal<List<Runnable>> afterTransactionActions = new ThreadLocal<>();
+	private static ThreadLocal<List<Runnable>> transientPostTransactionActions = new ThreadLocal<>();
+
+	/**
+	 * deprecated - use registerTransientPostAction(Runnable runnable)
+	 *
+	 * @param runnable
+	 */
+	@Deprecated
+	public static void performAfterTransactionCompletes(Runnable runnable)
+	{
+		registerTransientPostAction(runnable);
+	}
 
 	/**
 	 * Adds a runnable to the list of Actions that will be performed after the
@@ -365,16 +387,126 @@ public enum EntityManagerProvider
 	 * @param runnable
 	 *            The Action to run when the em is cleared.
 	 */
-	public static void performAfterTransactionCompletes(Runnable runnable)
+	public static void registerTransientPostAction(Runnable runnable)
 	{
-		List<Runnable> actionList = afterTransactionActions.get();
+		List<Runnable> actionList = transientPostTransactionActions.get();
 		if (actionList == null)
 		{
 			actionList = new LinkedList<>();
-			afterTransactionActions.set(actionList);
+			transientPostTransactionActions.set(actionList);
 		}
 		actionList.add(runnable);
 
+	}
+
+	private static void runTransientPostActions()
+	{
+		try
+		{
+			List<Runnable> actions = transientPostTransactionActions.get();
+			runRunnableActions(actions);
+		}
+		finally
+		{
+			// These actions are transient, so once run we clear them out.
+			transientPostTransactionActions.set(null);
+		}
+	}
+
+	private static void runRunnableActions(List<Runnable> actions)
+	{
+		if (actions != null)
+			for (Runnable action : actions)
+			{
+				try
+				{
+					action.run();
+				}
+				catch (Throwable e)
+				{
+					logger.error(e, e);
+				}
+			}
+	}
+
+	/**
+	 * Register an action that will be executed before begin is called on the
+	 * transaction.
+	 *
+	 * Registered actions are global and will be run across all threads every
+	 * time an entity manager is set via void
+	 * setCurrentEntityManager(EntityManager em)
+	 *
+	 * @param action
+	 *            The action to run before begin is called on a transaction.
+	 */
+	public static void registerPreAction(EMAction action)
+	{
+		synchronized (registeredPreActions)
+		{
+			registeredPreActions.add(action);
+		}
+	}
+
+	/**
+	 * Register an action that will be executed after commit is called on the
+	 * transaction.
+	 *
+	 * Registered actions are global and will be run across all threads every
+	 * time an entity manager is set via a call to
+	 * @formatter:off
+	 * void setCurrentEntityManager(EntityManager em)
+	 * @formatter:on
+	 *
+	 * @param action
+	 *            The action to run before begin is called on a transaction.
+	 */
+	public static void registerPostAction(Runnable action)
+	{
+		synchronized (registeredPostActions)
+		{
+			registeredPostActions.add(action);
+		}
+	}
+
+	public static void runPreActions(EntityManager em)
+	{
+		synchronized (registeredPreActions)
+		{
+			runActions(registeredPreActions, em);
+		}
+	}
+
+	public static void runPostActions()
+	{
+		runTransientPostActions();
+
+		synchronized (registeredPostActions)
+		{
+			runRunnableActions(registeredPostActions);
+		}
+
+	}
+
+	public static void runActions(List<EMAction> actions, EntityManager em)
+	{
+		if (actions != null)
+			for (EMAction action : actions)
+			{
+				try
+				{
+					action.run(em);
+				}
+				catch (Throwable e)
+				{
+					logger.error(e, e);
+				}
+			}
+	}
+
+	static public abstract class EMAction
+	{
+		abstract public void run(EntityManager em);
 	}
 
 }

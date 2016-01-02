@@ -2,41 +2,47 @@ package au.com.vaadinutils.dao;
 
 import java.util.concurrent.Callable;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import com.vaadin.ui.UI;
-
 /**
- * Designed to work with the EntityManagerThread
+ * Allows a Callable to be wrapped in an EM.
+ *
+ * Usage:
+ *
+ * @formatter:off
+ *
+ * 	emc = new EntityManagerCallable(new Callable<T>() { T call() {return someT } };
+ *  ThreadPoolExecutor executor = (ThreadPoolExecutor)
+ *  Executors.newFixedThreadPool(1); executor.submit(emc);
+ *
+ * @formatter:on
  *
  * @author bsutton
  *
  * @param <T>
  */
-public abstract class EntityManagerCallable<T> implements Callable<T>
+final public class EntityManagerCallable<T> implements Callable<T>
 {
 
-	final private UI ui;
-	Logger logger = LogManager.getLogger();
+	/**
+	 * Wraps the passed Callable with the necessary instrumentation to ensure
+	 * that an EM is available.
+	 */
+	private final Callable<T> wrapper;
 
-	public EntityManagerCallable(UI ui)
+	public EntityManagerCallable(Callable<T> callable)
 	{
-		this.ui = ui;
+		wrapper = EntityManagerProvider.setThreadLocalEntityManager(callable);
+
 	}
 
-	/**
-	 * throws Exception allows the call method to throw an exception. 
-	 * The exception is chained from any exception thrown in the enclosed thread.
-	 */
+	public EntityManagerCallable(CallableUI<T> callable)
+	{
+		this.wrapper = EntityManagerProvider.setThreadLocalEntityManager(callable);
+	}
+
 	@Override
 	public T call() throws Exception
 	{
-
-		return run(ui);
-
+		return wrapper.call();
 	}
-
-	protected abstract T run(UI ui) throws Exception;
 
 }
