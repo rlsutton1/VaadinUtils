@@ -14,7 +14,8 @@ import org.apache.logging.log4j.Logger;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.UI;
 
-import au.com.vaadinutils.dao.EntityManagerCallable;
+import au.com.vaadinutils.dao.CallableUI;
+import au.com.vaadinutils.dao.EntityManagerThread;
 import au.com.vaadinutils.jasper.AttachmentType;
 import au.com.vaadinutils.jasper.JasperEmailBuilder;
 import au.com.vaadinutils.jasper.JasperManager;
@@ -64,11 +65,11 @@ public class SendEmailTask extends ProgressBarTask<JasperTransmission> implement
 
 	{
 
-		new EntityManagerCallable<Void>(UI.getCurrent())
+		new EntityManagerThread<Void>(new CallableUI<Void>(UI.getCurrent())
 		{
 
 			@Override
-			protected Void run(UI ui) throws Exception
+			protected Void call(UI ui) throws Exception
 			{
 				int sent = 0;
 				try
@@ -116,7 +117,7 @@ public class SendEmailTask extends ProgressBarTask<JasperTransmission> implement
 				return null;
 
 			}
-		};
+		});
 
 	}
 
