@@ -138,7 +138,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 	private Button advancedSearchButton;
 	private Set<RowChangedListener<E>> rowChangedListeners = new CopyOnWriteArraySet<RowChangedListener<E>>();
 	private int minSearchTextLength = 0;
-	private HeadingPropertySet<E> headings;
+	protected HeadingPropertySet<E> headings;
 	private boolean dragAndDropOrderingEnabled = false;
 	private SingularAttribute<E, Long> ordinalField;
 
