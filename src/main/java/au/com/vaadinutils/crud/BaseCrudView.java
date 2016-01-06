@@ -141,6 +141,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 	protected HeadingPropertySet<E> headings;
 	private boolean dragAndDropOrderingEnabled = false;
 	private SingularAttribute<E, Long> ordinalField;
+	protected CrudAction<E> exportAction;
 
 	protected BaseCrudView()
 	{
@@ -187,6 +188,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 		// first loads
 		resetFiltersWithoutChangeEvents();
 
+		// call createExportAction before calling initLayout since crudActions
+		// will be needed in initLayout-->buildActionLayout
+		exportAction = createExportAction();
 		initLayout();
 
 		initializeEntityTable();
@@ -593,7 +597,14 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 		CrudAction<E> crudAction = new CrudActionDelete<E>();
 		actions.add(crudAction);
 
-		CrudAction<E> exportAction = new CrudAction<E>()
+		actions.add(exportAction);
+
+		return actions;
+	}
+
+	protected CrudAction<E> createExportAction()
+	{
+		return new CrudAction<E>()
 		{
 
 			private static final long serialVersionUID = -7703959823800614876L;
@@ -622,9 +633,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 				return "Export CSV Data";
 			}
 		};
-		actions.add(exportAction);
-
-		return actions;
 	}
 
 	private void buildSearchBar()
