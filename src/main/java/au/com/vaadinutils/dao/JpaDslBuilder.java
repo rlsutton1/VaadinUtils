@@ -806,8 +806,8 @@ public class JpaDslBuilder<E>
 	{
 		return new JoinBuilder<E, K>(attribute, type);
 	}
-
-	public <K> JoinBuilder<E, K> leftJoin(final SingularAttribute<? super E, K> attribute)
+	
+		public <K> JoinBuilder<E, K> leftJoin(final SingularAttribute<? super E, K> attribute)
 	{
 		return new JoinBuilder<E, K>(attribute, JoinType.LEFT);
 	}
@@ -1232,6 +1232,8 @@ public class JpaDslBuilder<E>
 		};
 
 	}
+
+	
 
 
 }
