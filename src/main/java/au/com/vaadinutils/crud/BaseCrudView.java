@@ -23,16 +23,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.vaadin.dialogs.ConfirmDialog;
 
-import au.com.vaadinutils.crud.events.CrudEventDistributer;
-import au.com.vaadinutils.crud.events.CrudEventType;
-import au.com.vaadinutils.crud.security.SecurityManagerFactoryProxy;
-import au.com.vaadinutils.dao.EntityManagerProvider;
-import au.com.vaadinutils.dao.EntityRunnable;
-import au.com.vaadinutils.errorHandling.ErrorWindow;
-import au.com.vaadinutils.listener.ClickEventLogged;
-import au.com.vaadinutils.menu.Menu;
-import au.com.vaadinutils.menu.Menus;
-
 import com.google.common.base.Preconditions;
 import com.google.common.base.Stopwatch;
 import com.vaadin.addon.jpacontainer.EntityItem;
@@ -80,8 +70,19 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
-public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout implements RowChangeListener<E>,
-		Selected<E>, DirtyListener, ButtonListener
+import au.com.vaadinutils.crud.events.CrudEventDistributer;
+import au.com.vaadinutils.crud.events.CrudEventType;
+import au.com.vaadinutils.crud.security.SecurityManagerFactoryProxy;
+import au.com.vaadinutils.dao.EntityManagerProvider;
+import au.com.vaadinutils.dao.EntityManagerRunnable;
+import au.com.vaadinutils.dao.RunnableUI;
+import au.com.vaadinutils.errorHandling.ErrorWindow;
+import au.com.vaadinutils.listener.ClickEventLogged;
+import au.com.vaadinutils.menu.Menu;
+import au.com.vaadinutils.menu.Menus;
+
+public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
+		implements RowChangeListener<E>, Selected<E>, DirtyListener, ButtonListener
 {
 
 	private static transient Logger logger = LogManager.getLogger(BaseCrudView.class);
@@ -137,9 +138,10 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	private Button advancedSearchButton;
 	private Set<RowChangedListener<E>> rowChangedListeners = new CopyOnWriteArraySet<RowChangedListener<E>>();
 	private int minSearchTextLength = 0;
-	private HeadingPropertySet<E> headings;
+	protected HeadingPropertySet<E> headings;
 	private boolean dragAndDropOrderingEnabled = false;
 	private SingularAttribute<E, Long> ordinalField;
+	protected CrudAction<E> exportAction;
 
 	protected BaseCrudView()
 	{
@@ -164,7 +166,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		}
 		catch (Exception e)
 		{
-			logger.error(" ******* when constructing a jpaContainer for use with the BaseCrudView use JPAContainerFactory.makeBatchable ****** ");
+			logger.error(
+					" ******* when constructing a jpaContainer for use with the BaseCrudView use JPAContainerFactory.makeBatchable ****** ");
 			logger.error(e, e);
 			throw new RuntimeException(e);
 		}
@@ -185,6 +188,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		// first loads
 		resetFiltersWithoutChangeEvents();
 
+		// call createExportAction before calling initLayout since crudActions
+		// will be needed in initLayout-->buildActionLayout
+		exportAction = createExportAction();
 		initLayout();
 
 		initializeEntityTable();
@@ -239,7 +245,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 	/**
 	 * allows the user to sort the items in the list via drag and drop
-	 * 
+	 *
 	 * @param ordinalField
 	 */
 	public void enableDragAndDropOrdering(final SingularAttribute<E, Long> ordinalField)
@@ -247,13 +253,16 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		dragAndDropOrderingEnabled = true;
 		this.ordinalField = ordinalField;
 
-		container.sort(new Object[] { ordinalField.getName() }, new boolean[] { true });
+		container.sort(new Object[]
+		{ ordinalField.getName() }, new boolean[]
+		{ true });
 
 		this.entityTable.setDragMode(TableDragMode.ROW);
 		this.entityTable.setDropHandler(new DropHandler()
 		{
 			private static final long serialVersionUID = -6024948983201516170L;
 
+			@Override
 			public AcceptCriterion getAcceptCriterion()
 			{
 				return SourceIsTarget.get();
@@ -315,7 +324,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 				container.commit();
 				container.refresh();
-				container.sort(new Object[] { ordinalField.getName() }, new boolean[] { true });
+				container.sort(new Object[]
+				{ ordinalField.getName() }, new boolean[]
+				{ true });
 
 				// cause this crud to save, or if its a child cause the parent
 				// to save.
@@ -345,7 +356,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 * if you need to provide a security manager, call
 	 * SecurityManagerFactoryProxy.setFactory(...) at application initialisation
 	 * time
-	 * 
+	 *
 	 * @return
 	 * @throws ExecutionException
 	 */
@@ -438,8 +449,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			rightLayout.setId("rightLayout");
 
 			editor = buildEditor(fieldGroup);
-			Preconditions.checkNotNull(
-					editor,
+			Preconditions.checkNotNull(editor,
 					"Your editor implementation returned null!, you better create an editor. "
 							+ entityClass.getSimpleName());
 			mainEditPanel.addComponent(editor);
@@ -469,7 +479,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	/**
 	 * get the title for the page from the menu annotation, override this menu
 	 * to provide a custom page title
-	 * 
+	 *
 	 * @return
 	 */
 	protected String getTitleText()
@@ -485,8 +495,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		{
 			return ((Menus) annotation).menus()[0].display();
 		}
-		Exception e = new Exception("Override getTitleText() to set a custom title in "
-				+ this.getClass().getCanonicalName());
+		Exception e = new Exception(
+				"Override getTitleText() to set a custom title in " + this.getClass().getCanonicalName());
 		logger.error(e, e);
 		return "Override getTitleText() to set a custom title. " + this.getClass().getCanonicalName();
 	}
@@ -577,7 +587,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 * overload this method to add custom actions, in your overloaded version
 	 * you should call super.getCrudActions() to get a list with the
 	 * DeleteAction pre-populated
-	 * 
+	 *
 	 * if you need a specialized form of delete that does things like delete
 	 * files, there is a callback on the CrudActionDelete class for that
 	 */
@@ -587,7 +597,14 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		CrudAction<E> crudAction = new CrudActionDelete<E>();
 		actions.add(crudAction);
 
-		CrudAction<E> exportAction = new CrudAction<E>()
+		actions.add(exportAction);
+
+		return actions;
+	}
+
+	protected CrudAction<E> createExportAction()
+	{
+		return new CrudAction<E>()
 		{
 
 			private static final long serialVersionUID = -7703959823800614876L;
@@ -616,9 +633,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				return "Export CSV Data";
 			}
 		};
-		actions.add(exportAction);
-
-		return actions;
 	}
 
 	private void buildSearchBar()
@@ -766,7 +780,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	/**
 	 * Used when creating a 'new' record to disable actions such as 'new' and
 	 * delete until the record is saved.
-	 * 
+	 *
 	 * @param show
 	 */
 	protected void activateEditMode(boolean activate)
@@ -784,12 +798,12 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 * A child class can call this method to stop a user from being able to edit
 	 * a record. When called the Save/Cancel buttons are disabled from the
 	 * screen.
-	 * 
+	 *
 	 * If you also set hideSaveCancelLayout to true then the save/cancel buttons
 	 * will be completely removed from the layout.
-	 * 
+	 *
 	 * By default editing is allowed.
-	 * 
+	 *
 	 * @param disallow
 	 */
 	protected void disallowEdit(boolean disallow)
@@ -801,11 +815,11 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	/**
 	 * A child class can call this method to stop a user from being able to add
 	 * new records.
-	 * 
+	 *
 	 * When called the 'New' button is removed from the UI.
-	 * 
+	 *
 	 * By default adding new records is allowed.
-	 * 
+	 *
 	 * @param disallow
 	 */
 	protected void disallowNew(boolean disallow)
@@ -826,9 +840,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	 * delete a record. When called the delete action is removed from the action
 	 * combo. If the delete is the only action then the action combo and apply
 	 * button will also be removed.
-	 * 
+	 *
 	 * By default deleting is allowed.
-	 * 
+	 *
 	 * @param disallow
 	 */
 	protected void disallowDelete(boolean disallow)
@@ -865,7 +879,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 	/**
 	 * Internal method to show hide the new button when editing.
-	 * 
+	 *
 	 * If the user has called disallowNew then the new button will never be
 	 * displayed.
 	 */
@@ -880,12 +894,12 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	/**
 	 * Hides the Action layout which contains the 'New' button and 'Action'
 	 * combo.
-	 * 
+	 *
 	 * Hiding the action layout effectively stops the user from creating new
 	 * records or applying any action such as deleting a record.
-	 * 
+	 *
 	 * Hiding the action layout provides more room for the list of records.
-	 * 
+	 *
 	 * @param show
 	 */
 	protected void showActionLayout(boolean show)
@@ -904,6 +918,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		{
 			private static final long serialVersionUID = 1L;
 
+			@Override
 			public void clicked(ClickEvent event)
 			{
 
@@ -960,24 +975,24 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 					// before it's created - that won't work.
 					final ScheduledExecutorService exec = Executors.newScheduledThreadPool(1);
 
-					final EntityRunnable runner = invokeAction(entityId, pleaseWaitMessage, action);
+					final EntityManagerRunnable runner = invokeAction(entityId, pleaseWaitMessage, action);
 					exec.schedule(runner, 1, TimeUnit.SECONDS);
 					exec.shutdown();
 					UI.getCurrent().setPollInterval(500);
 				}
 			}
 
-			private EntityRunnable invokeAction(final Object entityId, final ConfirmDialog pleaseWaitMessage,
+			private EntityManagerRunnable invokeAction(final Object entityId, final ConfirmDialog pleaseWaitMessage,
 					final CrudAction<E> action)
 			{
-				final EntityRunnable runner = new EntityRunnable()
+				final EntityManagerRunnable runner = new EntityManagerRunnable(new RunnableUI(UI.getCurrent())
 				{
 
 					@Override
-					public void run(final UI ui)
+					protected void run(final UI ui)
 					{
 
-						UI.getCurrent().access(new Runnable()
+						ui.access(new Runnable()
 						{
 
 							@Override
@@ -1002,7 +1017,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 						});
 
 					}
-				};
+				});
+
 				return runner;
 			}
 
@@ -1010,15 +1026,15 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			{
 				final ConfirmDialog pleaseWaitMessage = ConfirmDialog.show(UI.getCurrent(), "Please wait...",
 						new ConfirmDialog.Listener()
-						{
+				{
 
-							private static final long serialVersionUID = 1L;
+					private static final long serialVersionUID = 1L;
 
-							@Override
-							public void onClose(ConfirmDialog dialog)
-							{
-							}
-						});
+					@Override
+					public void onClose(ConfirmDialog dialog)
+					{
+					}
+				});
 				pleaseWaitMessage.setClosable(false);
 				pleaseWaitMessage.getCancelButton().setVisible(false);
 				pleaseWaitMessage.getOkButton().setVisible(false);
@@ -1026,10 +1042,12 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				pleaseWaitMessage.setCaption("Preparing Action");
 				return pleaseWaitMessage;
 			}
+
 		});
 
 	}
 
+	@Override
 	public void cancelClicked()
 	{
 		fieldGroup.discard();
@@ -1087,13 +1105,13 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 	/**
 	 * Override this method to intercept activation of an action.
-	 * 
+	 *
 	 * Return true if you are happy for the action to proceed otherwise return
 	 * false if you want to suppress the action.
-	 * 
+	 *
 	 * When suppressing the action you should display a notification as to why
 	 * you suppressed it.
-	 * 
+	 *
 	 * @param action
 	 * @param entity
 	 * @return
@@ -1157,7 +1175,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	/**
 	 * hook for implementations that need to do some additional cleanup before a
 	 * delete.
-	 * 
+	 *
 	 */
 	protected void preDelete(E entity)
 	{
@@ -1167,7 +1185,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	/**
 	 * hook for implementations that need to do some additional cleanup after a
 	 * delete.
-	 * 
+	 *
 	 */
 	protected void postDelete(E entity)
 	{
@@ -1238,8 +1256,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 			// children may have been added to the parent, evict the parent from
 			// the JPA cache so it will get updated
-			EntityManagerProvider.getEntityManager().getEntityManagerFactory().getCache()
-					.evict(entityClass, newEntity.getId());
+			EntityManagerProvider.getEntityManager().getEntityManagerFactory().getCache().evict(entityClass,
+					newEntity.getId());
 
 			newEntity = EntityManagerProvider.merge(newEntity);
 			postSaveAction(newEntity);
@@ -1334,7 +1352,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 	/**
 	 * commits the container and retrieves the new recordid
-	 * 
+	 *
 	 * we have to hook the ItemSetChangeListener to be able to get the database
 	 * id of a new record.
 	 */
@@ -1423,10 +1441,10 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	/**
 	 * opportunity for implementing classes to modify or add data to the entity
 	 * being saved.
-	 * 
+	 *
 	 * NOTE: modify the item properties not the entity as accessing the entity
 	 * is unreliable
-	 * 
+	 *
 	 * @param item
 	 * @throws Exception
 	 */
@@ -1461,6 +1479,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		{
 			private static final long serialVersionUID = 1L;
 
+			@Override
 			public void textChange(final TextChangeEvent event)
 			{
 				try
@@ -1491,7 +1510,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	/**
 	 * override this method if you have searches to trigger when the user types
 	 * in the search field even if advanced search is on
-	 * 
+	 *
 	 * @return
 	 */
 	protected Boolean triggerSearchOnTextChange()
@@ -1502,7 +1521,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	/**
 	 * the minimum number of characters entered in to the search field required
 	 * to trigger a search, default is 0
-	 * 
+	 *
 	 * @param minLength
 	 */
 	public void setMinimumSearchTextLength(int minLength)
@@ -1564,7 +1583,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	/**
 	 * create a filter for the text supplied, the text is as entered in the text
 	 * search bar.
-	 * 
+	 *
 	 * @param string
 	 * @return
 	 */
@@ -1594,52 +1613,50 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 		if (fieldGroup.isModified() || newEntity != null || dirty)
 		{
-			ConfirmDialog
-					.show(UI.getCurrent(),
-							"Discard changes?",
-							"You have unsaved changes for this record. Continuing will result in those changes being discarded. ",
-							"Continue", "Cancel", new ConfirmDialog.Listener()
+			ConfirmDialog.show(UI.getCurrent(), "Discard changes?",
+					"You have unsaved changes for this record. Continuing will result in those changes being discarded. ",
+					"Continue", "Cancel", new ConfirmDialog.Listener()
+					{
+						private static final long serialVersionUID = 1L;
+
+						@Override
+						public void onClose(ConfirmDialog dialog)
+						{
+							if (dialog.isConfirmed())
 							{
-								private static final long serialVersionUID = 1L;
+								/*
+								 * When an entity is selected from the list, we
+								 * want to show that in our editor on the right.
+								 * This is nicely done by the FieldGroup that
+								 * binds all the fields to the corresponding
+								 * Properties in our entity at once.
+								 */
+								fieldGroup.discard();
 
-								public void onClose(ConfirmDialog dialog)
+								for (ChildCrudListener<E> child : childCrudListeners)
 								{
-									if (dialog.isConfirmed())
-									{
-										/*
-										 * When an entity is selected from the
-										 * list, we want to show that in our
-										 * editor on the right. This is nicely
-										 * done by the FieldGroup that binds all
-										 * the fields to the corresponding
-										 * Properties in our entity at once.
-										 */
-										fieldGroup.discard();
-
-										for (ChildCrudListener<E> child : childCrudListeners)
-										{
-											child.discard();
-										}
-
-										if (restoreDelete)
-										{
-											activateEditMode(false);
-											restoreDelete = false;
-										}
-
-										newEntity = null;
-
-										callback.allowRowChange();
-
-									}
-									else
-									{
-										// User did not confirm so don't allow
-										// the change.
-
-									}
+									child.discard();
 								}
-							});
+
+								if (restoreDelete)
+								{
+									activateEditMode(false);
+									restoreDelete = false;
+								}
+
+								newEntity = null;
+
+								callback.allowRowChange();
+
+							}
+							else
+							{
+								// User did not confirm so don't allow
+								// the change.
+
+							}
+						}
+					});
 		}
 		else
 		{
@@ -1661,7 +1678,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	/**
 	 * Called when the currently selected row in the table part of this view has
 	 * changed. We use this to update the editor's current item.
-	 * 
+	 *
 	 * @item the item that is now selected. This may be null if selection has
 	 *       been lost.
 	 */
@@ -1740,7 +1757,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	/**
 	 * Overload this method to control if a specific row is editable. By default
 	 * all rows are editable. This method is called each time the row changes.
-	 * 
+	 *
 	 * @param item
 	 * @return true if the row should be editable by the user.
 	 */
@@ -1805,7 +1822,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 	/**
 	 * Overload this method to provide cross-field (form level) validation.
-	 * 
+	 *
 	 * @return
 	 */
 	protected void formValidate() throws InvalidValueException
@@ -1857,7 +1874,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 	/**
 	 * check if the editor has changes
-	 * 
+	 *
 	 * @return
 	 */
 	public boolean isDirty()
@@ -1868,7 +1885,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	/**
 	 * a ChildCrudView adds it's self here so it will be notified when the
 	 * parent saves
-	 * 
+	 *
 	 * @param listener
 	 */
 	public void addChildCrudListener(ChildCrudListener<E> listener)
@@ -1976,8 +1993,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 				ret = field.getCaption() + "\n\n" + message;
 				logger.warn(
 						"Invalid Field...\n caption:'{}'\n type:{}\n fieldNumber: {}\n value: '{}'\n crud: {} ({})\n {}\n",
-						field.getCaption(), field.getClass().getSimpleName(), ctr, field.getValue(), this.getClass()
-								.getCanonicalName(), this.getClass().getSimpleName() + ".java:1", message);
+						field.getCaption(), field.getClass().getSimpleName(), ctr, field.getValue(),
+						this.getClass().getCanonicalName(), this.getClass().getSimpleName() + ".java:1", message);
 				Component childField = field;
 
 				for (int i = 0; i < 10; i++)
@@ -2005,7 +2022,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	/**
 	 * you might want to implement this method in a child crud that needs to
 	 * load some sort of list when a new entity is created based on the parent
-	 * 
+	 *
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
 	 */
@@ -2017,7 +2034,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	/**
 	 * override this method if you have child entities, you can use this
 	 * opportunity to do some dirty hacking to populate fields
-	 * 
+	 *
 	 * @param newEntity
 	 */
 
@@ -2035,7 +2052,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	/**
 	 * Override this method if you need to initialise the entity when a new
 	 * record is created.
-	 * 
+	 *
 	 * @param newEntity
 	 * @return
 	 * @throws IllegalAccessException
@@ -2049,9 +2066,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	/**
 	 * after making changes via JPA, to get the crud to see the changes call
 	 * this method if needed.
-	 * 
+	 *
 	 * beware it is a costly operation.
-	 * 
+	 *
 	 * commit the transaction, then refresh the container
 	 */
 	public void reloadDataFromDB()
@@ -2194,13 +2211,13 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	/**
 	 * Override this method to intercept the save process after clicking the
 	 * save button.
-	 * 
+	 *
 	 * Return true if you would like the save action to proceed otherwise return
 	 * false if you want to halt the save process.
-	 * 
+	 *
 	 * When suppressing the action you should display a notification as to why
 	 * you suppressed it.
-	 * 
+	 *
 	 * @return whether to continue saving
 	 */
 	public boolean interceptSaveClicked()

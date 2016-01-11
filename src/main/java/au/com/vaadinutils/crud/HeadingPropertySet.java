@@ -15,6 +15,8 @@ import au.com.vaadinutils.user.UserSettingsStorageFactory;
 import com.google.common.base.Preconditions;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.ColumnGenerator;
+import com.vaadin.ui.Table.ColumnReorderEvent;
+import com.vaadin.ui.Table.ColumnReorderListener;
 import com.vaadin.ui.Table.ColumnResizeEvent;
 import com.vaadin.ui.Table.ColumnResizeListener;
 
@@ -85,6 +87,7 @@ public class HeadingPropertySet<E>
 			cols.add(new HeadingToPropertyId<E>(heading, headingPropertyId, null).setHidden());
 			return this;
 		}
+
 		public <T extends Object> Builder<E> addHiddenColumn(String heading, SingularAttribute<E, T> headingPropertyId)
 		{
 			cols.add(new HeadingToPropertyId<E>(heading, headingPropertyId.getName(), null).setHidden());
@@ -275,6 +278,7 @@ public class HeadingPropertySet<E>
 			table.setVisibleColumns(colsToShow.toArray());
 
 			configureSaveColumnWidths(table, uniqueTableId);
+			configureSaveColumnOrder(table, uniqueTableId);
 		}
 		catch (Exception e)
 		{
@@ -311,6 +315,33 @@ public class HeadingPropertySet<E>
 			}
 		});
 
+	}
+
+	private void configureSaveColumnOrder(final Table table, final String uniqueTableId)
+	{
+		final String keyStub = uniqueTableId + "-order";
+
+		String columns = UserSettingsStorageFactory.getUserSettingsStorage().get(keyStub);
+		if (columns != null && !columns.isEmpty())
+		{
+			columns = columns.replaceAll("\\[|\\]", "");
+			Object[] parsedColumns = columns.split(", ?");
+			if (parsedColumns.length > 0)
+				table.setVisibleColumns(parsedColumns);
+		}
+
+		table.addColumnReorderListener(new ColumnReorderListener()
+		{
+			private static final long serialVersionUID = -2810298692555333890L;
+
+			@Override
+			public void columnReorder(ColumnReorderEvent event)
+			{
+				Object[] columns = ((Table) event.getSource()).getVisibleColumns();
+				System.out.println(Arrays.toString(columns));
+				UserSettingsStorageFactory.getUserSettingsStorage().store(keyStub, "" + Arrays.toString(columns));
+			}
+		});
 	}
 
 	public String toString()

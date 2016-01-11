@@ -130,6 +130,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 		selectedCols.setSizeFull();
 		selectedCols.setHeight("200");
 		selectedCols.setSelectable(true);
+		selectedCols.setMultiSelect(true);
 		createAvailableTable();
 
 		addSelectedColumnTooltip();
@@ -324,11 +325,12 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	public boolean isModified()
 	{
 		Collection<C> convertedValue = (Collection<C>) getConvertedValue();
-		Preconditions.checkNotNull(convertedValue,"If you look at getConvertedValue, you'll see convertedValue can never be null");
-		
-		if ((sourceValue == null || sourceValue.size() == 0) && ( convertedValue.size() > 0))
+		Preconditions.checkNotNull(convertedValue,
+				"If you look at getConvertedValue, you'll see convertedValue can never be null");
+
+		if ((sourceValue == null || sourceValue.size() == 0) && (convertedValue.size() > 0))
 			return true;
-		if ((sourceValue == null || sourceValue.size() == 0) && ( convertedValue.size() == 0))
+		if ((sourceValue == null || sourceValue.size() == 0) && (convertedValue.size() == 0))
 			return false;
 		boolean equal = convertedValue.containsAll(sourceValue) && sourceValue.containsAll(convertedValue);
 		return !equal;
@@ -406,8 +408,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 		}
 
 		// Just to be clear that this method will NEVER return null
-		Preconditions.checkNotNull(selected,"If you look at getConvertedValue, you'll see this can never be null");
-
+		Preconditions.checkNotNull(selected, "If you look at getConvertedValue, you'll see this can never be null");
 
 		if (beans != null)
 		{
@@ -592,19 +593,21 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 				ids.addAll((Collection<? extends Long>) available.getSelectedItems());
 				if (ids.size() > 0)
 				{
-					Long id = ids.get(0);
-					if (id != null)
+					for (Long id : ids)
 					{
-						if (isPreAddActionRequired())
+						if (id != null)
 						{
-							handlePreAddAction(id);
-						}
-						else
-						{
-							handleAddAction(id);
-						}
+							if (isPreAddActionRequired())
+							{
+								handlePreAddAction(id);
+							}
+							else
+							{
+								handleAddAction(id);
+							}
 
-						postAddAction();
+							postAddAction();
+						}
 					}
 				}
 
@@ -642,26 +645,31 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 		{
 			private static final long serialVersionUID = 1L;
 
+			@SuppressWarnings("unchecked")
 			@Override
 			public void buttonClick(ClickEvent event)
 			{
 				try
 				{
-					Long id = (Long) selectedCols.getValue();
+					final List<Long> ids = new LinkedList<>();
+					ids.addAll((Collection<? extends Long>) selectedCols.getValue());
 
-					if (isRemoveAllowed())
+					for (Long id : ids)
 					{
-						beans.removeItem(id);
-						if (listener != null)
+						if (isRemoveAllowed())
 						{
-							listener.valueChanged(getFieldValue());
-						}
+							beans.removeItem(id);
+							if (listener != null)
+							{
+								listener.valueChanged(getFieldValue());
+							}
 
-						postRemoveAction();
-					}
-					else
-					{
-						handleRemoveValidation();
+							postRemoveAction();
+						}
+						else
+						{
+							handleRemoveValidation();
+						}
 					}
 
 				}

@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -22,6 +21,21 @@ import java.util.concurrent.TimeUnit;
 
 import javax.activation.DataSource;
 
+import org.apache.commons.mail.ByteArrayDataSource;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import com.google.gwt.thirdparty.guava.common.base.Preconditions;
+import com.vaadin.server.Page;
+import com.vaadin.server.VaadinServlet;
+import com.vaadin.server.WrappedSession;
+import com.vaadin.ui.UI;
+
+import au.com.vaadinutils.jasper.parameter.ReportChooser;
+import au.com.vaadinutils.jasper.parameter.ReportParameter;
+import au.com.vaadinutils.jasper.servlet.VaadinJasperPrintServlet;
+import au.com.vaadinutils.jasper.ui.CleanupCallback;
+import au.com.vaadinutils.jasper.ui.JasperReportProperties;
 import net.sf.jasperreports.engine.JRAbstractExporter;
 import net.sf.jasperreports.engine.JRBand;
 import net.sf.jasperreports.engine.JRElement;
@@ -55,22 +69,6 @@ import net.sf.jasperreports.engine.util.JRLoader;
 import net.sf.jasperreports.engine.util.JRSwapFile;
 import net.sf.jasperreports.web.servlets.AsyncJasperPrintAccessor;
 import net.sf.jasperreports.web.servlets.ReportExecutionStatus;
-
-import org.apache.commons.mail.ByteArrayDataSource;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import au.com.vaadinutils.jasper.parameter.ReportChooser;
-import au.com.vaadinutils.jasper.parameter.ReportParameter;
-import au.com.vaadinutils.jasper.servlet.VaadinJasperPrintServlet;
-import au.com.vaadinutils.jasper.ui.CleanupCallback;
-import au.com.vaadinutils.jasper.ui.JasperReportProperties;
-
-import com.google.gwt.thirdparty.guava.common.base.Preconditions;
-import com.vaadin.server.Page;
-import com.vaadin.server.VaadinServlet;
-import com.vaadin.server.WrappedSession;
-import com.vaadin.ui.UI;
 
 public class JasperManager implements Runnable
 {
@@ -174,7 +172,7 @@ public class JasperManager implements Runnable
 	final static Map<String, Long> compiledReports = new ConcurrentHashMap<String, Long>();
 
 	/**
-	 * 
+	 *
 	 * @param jasperReport
 	 *            path to jasper report.
 	 * @throws JRException
@@ -199,8 +197,8 @@ public class JasperManager implements Runnable
 			String reportDesignName = suppliedFileName + ".jrxml";
 
 			File designFile = new File(reportProperties.getReportFolder(), reportDesignName);
-			Preconditions.checkArgument(designFile.exists(), "The passed Jasper Report File doesn't exist: "
-					+ designFile.getAbsolutePath());
+			Preconditions.checkArgument(designFile.exists(),
+					"The passed Jasper Report File doesn't exist: " + designFile.getAbsolutePath());
 
 			File sourcePath = designFile.getParentFile();
 
@@ -224,8 +222,8 @@ public class JasperManager implements Runnable
 
 				jasperReportCompiler.compileReport(design, sourcePath, sourcePath, suppliedFileName);
 			}
-			this.jasperReport = (JasperReport) JRLoader.loadObject(new File(reportProperties.getReportFolder(),
-					reportFileName));
+			this.jasperReport = (JasperReport) JRLoader
+					.loadObject(new File(reportProperties.getReportFolder(), reportFileName));
 			compiledReports.put(reportFileName, designFile.lastModified());
 
 		}
@@ -239,7 +237,7 @@ public class JasperManager implements Runnable
 	/**
 	 * replaces the header, footer, nodata band and dynamically adds user
 	 * friendly report parameter display to the report.
-	 * 
+	 *
 	 * @param designFile
 	 * @param template
 	 * @throws JRException
@@ -288,7 +286,7 @@ public class JasperManager implements Runnable
 	/**
 	 * replace the footer with the template footer, including update the place
 	 * holder for the report title in the footer
-	 * 
+	 *
 	 * @param designFile
 	 * @param template
 	 * @param margin
@@ -320,7 +318,7 @@ public class JasperManager implements Runnable
 	/**
 	 * we are now dropping the existing title on the ground in favour of the
 	 * dynamically generated one based on the template
-	 * 
+	 *
 	 * @param designFile
 	 * @param newTitle
 	 * @param yoffset
@@ -347,7 +345,7 @@ public class JasperManager implements Runnable
 	 * add a set of dynamically generated user friendly report parameter fields
 	 * to this band and add parameters to the report for them if not already
 	 * present.
-	 * 
+	 *
 	 * @param designFile
 	 * @param templateBand
 	 * @param targetBand
@@ -381,9 +379,10 @@ public class JasperManager implements Runnable
 				{
 					int height = 140;
 					final int imageWidth = designFile.getPageWidth() - (margin * 2);
-					String fileName = reportProperties.generateDynamicHeaderImage(imageWidth,height, reportProperties.getReportTitle());
+					String fileName = reportProperties.generateDynamicHeaderImage(imageWidth, height,
+							reportProperties.getReportTitle());
 					im.setWidth(imageWidth);
-					//im.setHeight(height);
+					// im.setHeight(height);
 					im.setX(-8);
 
 					expr = expr.replace("logo.png", fileName);
@@ -423,7 +422,7 @@ public class JasperManager implements Runnable
 	/**
 	 * add user friendly paramters to the band and report port parameters if not
 	 * already present
-	 * 
+	 *
 	 * @param designFile
 	 * @param targetBand
 	 * @param maxY
@@ -526,13 +525,13 @@ public class JasperManager implements Runnable
 
 	/**
 	 * Binds a value to a report parameter.
-	 * 
+	 *
 	 * Essentially a report can have a no. of named parameters which are used to
 	 * filter the report or display on the report. This method allows you to set
 	 * the parameters value at runtime.
-	 * 
+	 *
 	 * @param parameterName2
-	 * 
+	 *
 	 * @param parameterName
 	 * @param parameterValue
 	 */
@@ -814,14 +813,17 @@ public class JasperManager implements Runnable
 					reportProperties.getReportFileName(), cleanupCallback);
 
 			compileReport();
-			
-			if (reportProperties.getCustomReportParameterMap()!=null)
+
+			if (reportProperties.getCustomReportParameterMap() != null)
 			{
-				boundParams.putAll( reportProperties.getCustomReportParameterMap());
+				boundParams.putAll(reportProperties.getCustomReportParameterMap());
 			}
 
-			params.removeAll(extraParams);
-			params.addAll(extraParams);
+			if (extraParams != null)
+			{
+				params.removeAll(extraParams);
+				params.addAll(extraParams);
+			}
 
 			logger.info("Running report " + reportProperties.getReportFileName());
 			for (ReportParameter<?> param : params)
@@ -866,55 +868,48 @@ public class JasperManager implements Runnable
 
 			switch (exportMethod)
 			{
-			case HTML:
-			{
-				exporter = new JRHtmlExporter();
-
-				exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasper_print);
-				exporter.setParameter(JRHtmlExporterParameter.IMAGES_MAP, images);
-
-				if (VaadinServlet.getCurrent() != null)
+				case HTML:
 				{
-					String context = VaadinServlet.getCurrent().getServletContext().getContextPath();
-					int contextIndex = Page.getCurrent().getLocation().toString().lastIndexOf(context);
-					String baseurl = Page.getCurrent().getLocation().toString()
-							.substring(0, contextIndex + context.length() + 1);
+					exporter = new JRHtmlExporter();
 
-					String imageUrl = baseurl + "VaadinJasperPrintServlet?image=";
+					exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasper_print);
+					exporter.setParameter(JRHtmlExporterParameter.IMAGES_MAP, images);
 
-					exporter.setParameter(JRHtmlExporterParameter.IMAGES_URI, imageUrl);
+					if (VaadinServlet.getCurrent() != null)
+					{
+						String context = VaadinServlet.getCurrent().getServletContext().getContextPath();
+						int contextIndex = Page.getCurrent().getLocation().toString().lastIndexOf(context);
+						String baseurl = Page.getCurrent().getLocation().toString().substring(0,
+								contextIndex + context.length() + 1);
+
+						String imageUrl = baseurl + "VaadinJasperPrintServlet?image=";
+
+						exporter.setParameter(JRHtmlExporterParameter.IMAGES_URI, imageUrl);
+					}
+					else
+					{
+						logger.warn("Vaadin Servlet doens't have a current context");
+					}
+					break;
 				}
-				else
+				case PDF:
 				{
-					logger.warn("Vaadin Servlet doens't have a current context");
+					exporter = new JRPdfExporter();
+					exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasper_print);
+					break;
 				}
-				break;
-			}
-			case PDF:
-			{
-				exporter = new JRPdfExporter();
-				exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasper_print);
-				break;
-			}
-			case CSV:
-			{
-				exporter = new JRCsvExporter();
-				exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasper_print);
-				break;
-			}
-			default:
-			{
-				throw new RuntimeException("Unsupported export option " + exportMethod);
-			}
-
-			}
-
-			if (logger.isDebugEnabled())
-				for (Entry<JRExporterParameter, Object> param : exporter.getParameters().entrySet())
+				case CSV:
 				{
-					logger.debug("{} : {}", param.getKey(), param.getValue());
-
+					exporter = new JRCsvExporter();
+					exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasper_print);
+					break;
 				}
+				default:
+				{
+					throw new RuntimeException("Unsupported export option " + exportMethod);
+				}
+
+			}
 
 			imagesrcs = (images.size() <= 0) ? null : new DataSource[images.size()];
 			if (imagesrcs != null)
@@ -1073,7 +1068,8 @@ public class JasperManager implements Runnable
 					reportStatus.addQueueEntry(entry);
 
 				}
-				reportStatus.setStatus("Waiting for " + (pos - reportLimit) + " of the queued reports to complete");
+				if (pos > reportLimit)
+					reportStatus.setStatus("Waiting for " + (pos - reportLimit) + " of the queued reports to complete");
 			}
 		}
 		catch (Exception e)

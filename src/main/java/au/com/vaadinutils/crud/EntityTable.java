@@ -58,6 +58,7 @@ public class EntityTable<E> extends Table implements EntityList<E>
 
 		this.setSelectable(true);
 		this.setImmediate(true);
+		this.setColumnReorderingAllowed(true);
 
 		this.addValueChangeListener(new Property.ValueChangeListener()
 		{

@@ -34,6 +34,8 @@ public interface EntityList<E> extends Component
 
 	public void setColumnCollapsingAllowed(boolean b);
 
+	public boolean isColumnCollapsingAllowed();
+
 	public void addGeneratedColumn(Object id, ColumnGenerator generatedColumn);
 
 	public void setDragMode(TableDragMode row);
@@ -47,4 +49,8 @@ public interface EntityList<E> extends Component
 	public void setColumnCollapsed(String name, boolean b);
 
 	public void refreshRowCache();
+	
+	public void setColumnReorderingAllowed(boolean b);
+	
+	public boolean isColumnReorderingAllowed();
 }

@@ -1,5 +1,5 @@
 /*
- * PrintServlet.java
+ * VaadinJasperPrintServlet.java
  * Designed to print a JasperReport report by name to the requested
  * output sink.
  * The default output sink is HTML.
@@ -22,7 +22,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * 
+ *
  * @author bsutton
  * @version
  */
@@ -53,8 +53,8 @@ public class VaadinJasperPrintServlet extends HttpServlet
 					byte[] imageData = imagesMap.get(imageName);
 
 					if (imageData == null)
-						throw new IllegalStateException("The passed image (" + imageName
-								+ " has not been loaded into the session.");
+						throw new IllegalStateException(
+								"The passed image (" + imageName + " has not been loaded into the session.");
 
 					response.setContentLength(imageData.length);
 					ServletOutputStream out = response.getOutputStream();
