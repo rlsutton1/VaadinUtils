@@ -42,7 +42,7 @@ public class VUNotification extends Notification
 			{
 				Notification notification = new Notification(caption, type);
 				if (type == Type.TRAY_NOTIFICATION)
-					notification.setPosition(Position.BOTTOM_RIGHT);
+					notification.setPosition(Position.BOTTOM_LEFT);
 				notification.show(Page.getCurrent());
 			}
 		});
@@ -59,7 +59,7 @@ public class VUNotification extends Notification
 
 				Notification notification = new Notification(caption, description, type);
 				if (type == Type.TRAY_NOTIFICATION)
-					notification.setPosition(Position.BOTTOM_RIGHT);
+					notification.setPosition(Position.BOTTOM_LEFT);
 				notification.show(Page.getCurrent());
 			}
 		});

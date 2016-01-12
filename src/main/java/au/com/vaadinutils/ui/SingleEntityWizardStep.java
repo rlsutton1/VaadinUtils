@@ -25,6 +25,7 @@ import au.com.vaadinutils.crud.FormHelper;
 import au.com.vaadinutils.crud.ValidatingFieldGroup;
 import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.dao.JpaBaseDao;
+import au.com.vaadinutils.util.VUNotification;
 
 public abstract class SingleEntityWizardStep<E extends CrudEntity> implements WizardStep
 {
@@ -159,7 +160,7 @@ public abstract class SingleEntityWizardStep<E extends CrudEntity> implements Wi
 				// entity = container.getItem(entity.getId()).getEntity();
 
 				valid = true;
-				Notification.show("The details have been saved.", Type.TRAY_NOTIFICATION);
+				VUNotification.show("The details have been saved.", Type.TRAY_NOTIFICATION);
 			}
 		}
 		catch (ConstraintViolationException e)
