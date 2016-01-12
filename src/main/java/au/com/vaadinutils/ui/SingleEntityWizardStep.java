@@ -9,12 +9,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.vaadin.teemu.wizards.WizardStep;
 
-import au.com.vaadinutils.crud.CrudEntity;
-import au.com.vaadinutils.crud.FormHelper;
-import au.com.vaadinutils.crud.ValidatingFieldGroup;
-import au.com.vaadinutils.dao.EntityManagerProvider;
-import au.com.vaadinutils.dao.JpaBaseDao;
-
 import com.google.gwt.thirdparty.guava.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
@@ -25,6 +19,12 @@ import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
+
+import au.com.vaadinutils.crud.CrudEntity;
+import au.com.vaadinutils.crud.FormHelper;
+import au.com.vaadinutils.crud.ValidatingFieldGroup;
+import au.com.vaadinutils.dao.EntityManagerProvider;
+import au.com.vaadinutils.dao.JpaBaseDao;
 
 public abstract class SingleEntityWizardStep<E extends CrudEntity> implements WizardStep
 {
@@ -49,16 +49,13 @@ public abstract class SingleEntityWizardStep<E extends CrudEntity> implements Wi
 	}
 
 	@Override
-	public String getCaption()
-	{
-		return "Group Details";
-	}
+	public abstract String getCaption();
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public Component getContent()
 	{
-//		if (editor == null)
+		// if (editor == null)
 		{
 			this.entity = findEntity();
 			EntityItem<E> entityItem;
@@ -81,7 +78,7 @@ public abstract class SingleEntityWizardStep<E extends CrudEntity> implements Wi
 					logger.error(e, e);
 					throw new RuntimeException(e);
 				}
-				 
+
 			}
 			else
 			{
@@ -95,9 +92,9 @@ public abstract class SingleEntityWizardStep<E extends CrudEntity> implements Wi
 			}
 			Preconditions.checkNotNull(entityItem);
 			Preconditions.checkArgument(entity == entityItem.getEntity());
-			
+
 			fieldGroup.setItemDataSource(entityItem);
-			
+
 			editor = getContent(fieldGroup);
 		}
 
@@ -107,16 +104,16 @@ public abstract class SingleEntityWizardStep<E extends CrudEntity> implements Wi
 
 	/**
 	 * Do any custom initialisation of a new entity.
-	 * 
+	 *
 	 * @param entity
 	 */
 	abstract protected void initEntity(E entity);
 
 	/**
-	 * 
+	 *
 	 * Search for an existing entity to edit or return null if one doesn't
 	 * exist.
-	 * 
+	 *
 	 * @return
 	 */
 	abstract protected E findEntity();
@@ -124,7 +121,7 @@ public abstract class SingleEntityWizardStep<E extends CrudEntity> implements Wi
 	/**
 	 * Build the layout used for editing the entity Any fields must be bound to
 	 * the field Group.
-	 * 
+	 *
 	 * @param fieldGroup
 	 * @return
 	 */
@@ -195,11 +192,10 @@ public abstract class SingleEntityWizardStep<E extends CrudEntity> implements Wi
 	{
 		return fieldGroup;
 	}
-	
-	
+
 	/**
 	 * commits the container and retrieves the new recordid
-	 * 
+	 *
 	 * we have to hook the ItemSetChangeListener to be able to get the database
 	 * id of a new record.
 	 */
@@ -215,7 +211,7 @@ public abstract class SingleEntityWizardStep<E extends CrudEntity> implements Wi
 		{
 
 			/**
-			 * 
+			 *
 			 */
 			private static final long serialVersionUID = 9132090066374531277L;
 
@@ -265,6 +261,5 @@ public abstract class SingleEntityWizardStep<E extends CrudEntity> implements Wi
 		// return the entity
 		return newEntity.get();
 	}
-
 
 }
