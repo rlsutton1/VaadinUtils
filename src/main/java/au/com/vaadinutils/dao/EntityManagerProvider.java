@@ -11,6 +11,8 @@ import javax.validation.ConstraintViolationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.google.common.base.Preconditions;
+
 import au.com.vaadinutils.errorHandling.ErrorWindow;
 
 /**
@@ -25,12 +27,9 @@ import au.com.vaadinutils.errorHandling.ErrorWindow;
  *
  * You shouldn't use this provider directly but rather use it via one of:
  *
- * EntityManagerCallable
- * EntityManagerRunnable
- * EntityManagerThread
+ * EntityManagerCallable EntityManagerRunnable EntityManagerThread
  *
- * EntityManagerInjectorFilter
- * AtmosphereFilter
+ * EntityManagerInjectorFilter AtmosphereFilter
  *
  * Each of these class correctly sets up the EM, starts a Transaction and
  * finally clears the threads EM once the thread is complete.
@@ -44,31 +43,24 @@ import au.com.vaadinutils.errorHandling.ErrorWindow;
  *
  * e.g.
  *
- * @formatter:off
- * 		EntityManager em = EntityManagerProvider.createEntityManager();
- *      Transaction t = null; Transaction t = new Transaction(em);
- *      try
- *      {
- *      	// Create and set the entity manager
- *          EntityManagerProvider.setCurrentEntityManager(em);
- *          // Handle the request
- *          filterChain.doFilter(servletRequest, servletResponse);
+ * @formatter:off EntityManager em =
+ *                EntityManagerProvider.createEntityManager(); Transaction t =
+ *                null; Transaction t = new Transaction(em); try { // Create and
+ *                set the entity manager
+ *                EntityManagerProvider.setCurrentEntityManager(em); // Handle
+ *                the request filterChain.doFilter(servletRequest,
+ *                servletResponse);
  *
- *			t.commit();
- *		}
- *		finally
- *		{
- *			if (t!= null)
- *				t.close();
- *			// Reset the entity manager
- *          EntityManagerProvider.setCurrentEntityManager(null);
- *      }
+ *                t.commit(); } finally { if (t!= null) t.close(); // Reset the
+ *                entity manager
+ *                EntityManagerProvider.setCurrentEntityManager(null); }
  *
  * @formatter:on
  *
- * You can use the @Link au.com.vaadinutils.filter.EntityManagerInjectorFilter
- *  and @Link au.com.vaadinutils.filter.AtmosphereFilter to do the
- *  injection or make up your own methods.
+ *               You can use the @Link
+ *               au.com.vaadinutils.filter.EntityManagerInjectorFilter and @Link
+ *               au.com.vaadinutils.filter.AtmosphereFilter to do the injection
+ *               or make up your own methods.
  *
  * @author bsutton
  *
@@ -109,6 +101,11 @@ public enum EntityManagerProvider
 	{
 		EntityManager oldem = INSTANCE.entityManagerThreadLocal.get();
 
+		Preconditions.checkArgument(em == null || (oldem == null && em != null),
+				"Can not replace the current entity manager, close it and set it to null first!!!!");
+		
+		Preconditions.checkArgument(oldem==null || !oldem.isOpen(),"Current entity manager is still open, close it first");
+
 		if (em == null)
 		{
 			logger.debug("Clearing entity manager for thread {}", Thread.currentThread().getId());
@@ -123,14 +120,18 @@ public enum EntityManagerProvider
 
 		}
 
+		INSTANCE.entityManagerThreadLocal.set(em);
+		
 		if (em != null)
+		{
 			runPreActions(em);
+		}
 		else
 		{
 			runPostActions();
 		}
 
-		INSTANCE.entityManagerThreadLocal.set(em);
+		
 
 	}
 
@@ -323,11 +324,11 @@ public enum EntityManagerProvider
 		// EntityManagerTrackerWrapper(INSTANCE.emf.createEntityManager());
 		EntityManager entityManager = INSTANCE.emf.createEntityManager();
 
-		return entityManager;
+		// return entityManager;
 
 		// you might want to use this if your having deadlocks...
 		// don't ever use JPAFactory to build your JPAContainers
-		// return new EntityManagerWrapper(entityManager);
+		return new EntityManagerWrapper(entityManager);
 	}
 
 	/**
@@ -454,8 +455,8 @@ public enum EntityManagerProvider
 	 *
 	 * Registered actions are global and will be run across all threads every
 	 * time an entity manager is set via a call to
-	 * @formatter:off
-	 * void setCurrentEntityManager(EntityManager em)
+	 * 
+	 * @formatter:off void setCurrentEntityManager(EntityManager em)
 	 * @formatter:on
 	 *
 	 * @param action
