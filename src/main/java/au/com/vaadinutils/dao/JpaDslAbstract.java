@@ -29,7 +29,17 @@ import au.com.vaadinutils.dao.JpaBaseDao.Condition;
 
 import com.google.common.base.Preconditions;
 
-public abstract class JpaDslAbstract<E>
+/**
+ * 
+ * @author rsutton
+ *
+ * @param <E>
+ *            - Entity Type the Query is based on
+ * @param <R>
+ *            - Return Type - usually the same as the Entity Type, but in the
+ *            case of a Tuple query then it would be Tuple
+ */
+public abstract class JpaDslAbstract<E, R>
 {
 
 	protected CriteriaBuilder builder;
@@ -39,14 +49,13 @@ public abstract class JpaDslAbstract<E>
 	Predicate predicate = null;
 
 	private Integer startPosition = null;
-	protected CriteriaQuery<?> criteria;
+	protected CriteriaQuery<R> criteria;
 	protected Class<E> entityClass;
 
 	/**
 	 * used to check that the entityManager doesn't shift under our feet!!!
 	 */
 	final private EntityManager dontUseThis = EntityManagerProvider.getEntityManager();
-
 
 	/**
 	 * it's very important that we don't retain a reference to the
@@ -73,7 +82,6 @@ public abstract class JpaDslAbstract<E>
 						+ "separate thread or servlet request");
 		return em;
 	}
-
 
 	public Condition<E> and(final Condition<E> c1)
 	{
@@ -221,29 +229,44 @@ public abstract class JpaDslAbstract<E>
 	 * @param field
 	 * @return
 	 */
-	public <L> JpaDslAbstract<E> fetch(SingularAttribute<E, L> field)
+	public <L> JpaDslAbstract<E, R> fetch(SingularAttribute<E, L> field)
 	{
 		root.fetch(field, JoinType.LEFT);
 		return this;
 	}
 
-	public <L> JpaDslAbstract<E> fetch(ListAttribute<E, L> field, JoinType type)
+	public <L> JpaDslAbstract<E, R> fetch(ListAttribute<E, L> field, JoinType type)
 	{
 		root.fetch(field, type);
 		return this;
 	}
 
-	public <L> JpaDslAbstract<E> fetch(SingularAttribute<E, L> field, JoinType type)
+	public <L> JpaDslAbstract<E, R> fetch(SingularAttribute<E, L> field, JoinType type)
 	{
 		root.fetch(field, type);
 		return this;
 	}
 
-	public abstract List<?> getResultList();
+	public List<R> getResultList()
+	{
+		return prepareQuery().getResultList();
+	}
 
-	public abstract Object getSingleResultOrNull();
+	public R getSingleResult()
+	{
+		limit(1);
+		return prepareQuery().getSingleResult();
+	}
 
-	public abstract Object getSingleResult();
+	public R getSingleResultOrNull()
+	{
+		limit(1);
+		List<R> resultList = prepareQuery().getResultList();
+		if (resultList.size() == 0)
+			return null;
+
+		return resultList.get(0);
+	}
 
 	public <J, V extends Comparable<? super V>> Condition<E> greaterThanOrEqualTo(
 			final SingularAttribute<? super E, J> joinAttribute, final JoinType joinType,
@@ -456,7 +479,7 @@ public abstract class JpaDslAbstract<E>
 		};
 	}
 
-	public JpaDslAbstract<E> limit(int limit)
+	public JpaDslAbstract<E, R> limit(int limit)
 	{
 		this.limit = limit;
 		return this;
@@ -504,7 +527,7 @@ public abstract class JpaDslAbstract<E>
 	List<Order> orders = new LinkedList<>();
 	protected Root<E> root;
 
-	public JpaDslAbstract<E> orderBy(SingularAttribute<E, ?> field, boolean asc)
+	public JpaDslAbstract<E, R> orderBy(SingularAttribute<E, ?> field, boolean asc)
 	{
 		if (asc)
 		{
@@ -518,7 +541,7 @@ public abstract class JpaDslAbstract<E>
 		return this;
 	}
 
-	public <K, V> JpaDslAbstract<E> orderBy(JoinBuilder<E, K> join, SingularAttribute<K, V> field, boolean asc)
+	public <K, V> JpaDslAbstract<E, R> orderBy(JoinBuilder<E, K> join, SingularAttribute<K, V> field, boolean asc)
 	{
 		if (asc)
 		{
@@ -532,7 +555,7 @@ public abstract class JpaDslAbstract<E>
 		return this;
 	}
 
-	TypedQuery<?> prepareQuery()
+	TypedQuery<R> prepareQuery()
 	{
 		if (predicate != null)
 		{
@@ -546,7 +569,7 @@ public abstract class JpaDslAbstract<E>
 		{
 			criteria.distinct(true);
 		}
-		TypedQuery<?> query = getEntityManager().createQuery(criteria);
+		TypedQuery<R> query = getEntityManager().createQuery(criteria);
 
 		if (limit != null)
 		{
@@ -686,7 +709,7 @@ public abstract class JpaDslAbstract<E>
 		return getEntityManager().createQuery(query).getSingleResult();
 	}
 
-	public JpaDslAbstract<E> startPosition(int startPosition)
+	public JpaDslAbstract<E, R> startPosition(int startPosition)
 	{
 		this.startPosition = startPosition;
 		return this;
@@ -727,7 +750,7 @@ public abstract class JpaDslAbstract<E>
 		return new JoinBuilder<E, K>(attribute, type);
 	}
 
-	public JpaDslAbstract<E> where(Condition<E> condition)
+	public JpaDslAbstract<E, R> where(Condition<E> condition)
 	{
 		predicate = condition.getPredicates();
 		return this;
@@ -912,8 +935,7 @@ public abstract class JpaDslAbstract<E>
 		return new AbstractCondition<E>()
 		{
 
-			@SuppressWarnings(
-			{ "unchecked", "rawtypes" })
+			@SuppressWarnings({ "unchecked", "rawtypes" })
 			@Override
 			public Predicate getPredicates()
 			{
@@ -1034,7 +1056,7 @@ public abstract class JpaDslAbstract<E>
 		return new JpaDslSubqueryBuilder<E, J>(target, criteria, root);
 	}
 
-	public JpaDslAbstract<E> distinct()
+	public JpaDslAbstract<E, R> distinct()
 	{
 		this.distinct = true;
 		return this;
