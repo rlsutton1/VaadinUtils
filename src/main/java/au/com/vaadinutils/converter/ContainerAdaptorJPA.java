@@ -26,7 +26,8 @@ public class ContainerAdaptorJPA<E extends CrudEntity> implements ContainerAdapt
 	return container.getItem(id);
     }
 
-    @Override
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	@Override
     public Property getProperty(E item, Object propertyId)
     {
 	return container.getContainerProperty(item.getId(), propertyId);

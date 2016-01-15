@@ -2,7 +2,6 @@ package au.com.vaadinutils.dao;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -276,7 +275,7 @@ public class EntityManagerWrapper implements EntityManager
 	}
 
 	@Override
-	public Query createQuery(CriteriaUpdate updateQuery)
+	public Query createQuery(@SuppressWarnings("rawtypes") CriteriaUpdate updateQuery)
 	{
 		logger.error("Thread: {} using entity Manager {}", Thread.currentThread().getId(), emid);
 
@@ -284,7 +283,7 @@ public class EntityManagerWrapper implements EntityManager
 	}
 
 	@Override
-	public Query createQuery(CriteriaDelete deleteQuery)
+	public Query createQuery(@SuppressWarnings("rawtypes") CriteriaDelete deleteQuery)
 	{
 		logger.error("Thread: {} using entity Manager {}", Thread.currentThread().getId(), emid);
 
@@ -324,7 +323,7 @@ public class EntityManagerWrapper implements EntityManager
 	}
 
 	@Override
-	public Query createNativeQuery(String sqlString, Class resultClass)
+	public Query createNativeQuery(String sqlString, @SuppressWarnings("rawtypes") Class resultClass)
 	{
 		logger.error("Thread: {} using entity Manager {}", Thread.currentThread().getId(), emid);
 
@@ -356,7 +355,7 @@ public class EntityManagerWrapper implements EntityManager
 	}
 
 	@Override
-	public StoredProcedureQuery createStoredProcedureQuery(String procedureName, Class... resultClasses)
+	public StoredProcedureQuery createStoredProcedureQuery(String procedureName, @SuppressWarnings("rawtypes") Class... resultClasses)
 	{
 		logger.error("Thread: {} using entity Manager {}", Thread.currentThread().getId(), emid);
 

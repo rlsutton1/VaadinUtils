@@ -197,12 +197,11 @@ public class MultiSelectConverter<T extends CrudEntity> implements Converter<Col
 
 	}
 
-	@SuppressWarnings("unchecked")
 	private void removeBackReference(T entity)
 	{
 		if (!isOwningSide())
 		{
-			Property itemProperty = getBackReferenceItemProperty(entity);
+			Property<Object> itemProperty = getBackReferenceItemProperty(entity);
 			Object property = itemProperty.getValue();
 			if (property instanceof Collection)
 			{
@@ -220,7 +219,7 @@ public class MultiSelectConverter<T extends CrudEntity> implements Converter<Col
 		}
 	}
 
-	private Property getBackReferenceItemProperty(T entity)
+	private Property<Object> getBackReferenceItemProperty(T entity)
 	{
 		return getContainer().getProperty(entity,mappedBy);
 	}
