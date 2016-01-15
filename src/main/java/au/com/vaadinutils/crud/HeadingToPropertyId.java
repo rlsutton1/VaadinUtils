@@ -1,7 +1,5 @@
 package au.com.vaadinutils.crud;
 
-import javax.persistence.metamodel.SingularAttribute;
-
 import com.google.gwt.thirdparty.guava.common.base.Preconditions;
 import com.vaadin.ui.Table.ColumnGenerator;
 
@@ -10,60 +8,59 @@ public class HeadingToPropertyId<E>
 	private final String heading;
 	private final String propertyId;
 	private final ColumnGenerator columnGenerator;
-	private final SingularAttribute<E, ?> attribute;
 	private Integer width;
-	private boolean hidden=false;
+	private boolean defaultVisibleState = true;
+	private boolean lockedState = false;
 
 	/**
-	 * 
+	 * Instantiates a new heading to property id.
+	 *
 	 * @param heading
-	 * @param columnGenerator2 
-	 * @param hidden TODO
-	 * @param propertyId
-	 *            - the real field name
+	 *            the column heading that will be displayed
+	 * @param headingPropertyId
+	 *            the heading property id
+	 * @param columnGenerator
+	 *            the column generator
+	 * @param defaultVisibleState
+	 *            whether the column is visible by default
+	 * @param lockedState
+	 *            whether the visibility of a column can be modified
+	 * @param width
+	 *            the width of the column
 	 */
-	public <M extends Object> HeadingToPropertyId(String heading, SingularAttribute<E, M> attribute, ColumnGenerator columnGenerator2, Boolean hidden)
-	{
-		Preconditions.checkNotNull(attribute);
-		this.heading = heading;
-		this.propertyId = null;
-		this.attribute = attribute;
-		this.columnGenerator = columnGenerator2;
-		this.hidden = hidden;
-	}
-	
-	/**
-	 * 
-	 * @param heading
-	 * @param propertyId
-	 *            - the real field name
-	 * @param columnGenerator2 
-	 */
-	public HeadingToPropertyId(String heading, String propertyId, ColumnGenerator columnGenerator2)
+	HeadingToPropertyId(final String heading, final String propertyId, final ColumnGenerator columnGenerator,
+			final boolean defaultVisibleState, final boolean lockedState, final Integer width)
 	{
 		Preconditions.checkNotNull(propertyId);
 		this.heading = heading;
 		this.propertyId = propertyId;
-		this.attribute = null;
-		this.columnGenerator = columnGenerator2;
+		this.columnGenerator = columnGenerator;
+		this.defaultVisibleState = defaultVisibleState;
+		this.lockedState = lockedState;
+		this.width = width;
 	}
-	
-	public HeadingToPropertyId<E> setHidden()
+
+	public HeadingToPropertyId<E> setVisibleByDefault(final boolean defaultVisibleState)
 	{
-		hidden = true;
+		this.defaultVisibleState = defaultVisibleState;
 		return this;
 	}
-	
-	public HeadingToPropertyId<E> setWidth(Integer width)
+
+	public HeadingToPropertyId<E> setLocked()
+	{
+		lockedState = true;
+		return this;
+	}
+
+	public HeadingToPropertyId<E> setWidth(final Integer width)
 	{
 		this.width = width;
 		return this;
 	}
 
-
 	public String getPropertyId()
 	{
-		return (propertyId == null ? this.attribute.getName() : this.propertyId);
+		return propertyId;
 	}
 
 	public String getHeader()
@@ -78,7 +75,9 @@ public class HeadingToPropertyId<E>
 	}
 
 	/**
-	 * returns true if the column is a virtual table column and not in the underlying container.
+	 * returns true if the column is a virtual table column and not in the
+	 * underlying container.
+	 * 
 	 * @return
 	 */
 	public boolean isGenerated()
@@ -91,9 +90,13 @@ public class HeadingToPropertyId<E>
 		return width;
 	}
 
-	public boolean isHidden()
+	public boolean isVisibleByDefault()
 	{
-		return hidden;
+		return defaultVisibleState;
 	}
 
+	public boolean isLocked()
+	{
+		return lockedState;
+	}
 }
