@@ -9,7 +9,7 @@ import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Selection;
 import javax.persistence.metamodel.SingularAttribute;
 
-public class JpaDslTupleBuilder<E> extends JpaDslAbstract<E>
+public class JpaDslTupleBuilder<E> extends JpaDslAbstract<E, Tuple>
 {
 	private List<Selection<?>> multiselects = new LinkedList<>();
 
@@ -29,36 +29,12 @@ public class JpaDslTupleBuilder<E> extends JpaDslAbstract<E>
 		return path;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public List<Tuple> getResultList()
 	{
 		criteria.multiselect(multiselects);
-		TypedQuery<?> query = prepareQuery();
-		return (List<Tuple>) query.getResultList();
+		TypedQuery<Tuple> query = prepareQuery();
+		return query.getResultList();
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public Object getSingleResult()
-	{
-		limit(1);
-		TypedQuery<?> query = prepareQuery();
-
-		return (E) query.getSingleResult();
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public Object getSingleResultOrNull()
-	{
-		limit(1);
-		TypedQuery<?> query = prepareQuery();
-
-		List<?> resultList = query.getResultList();
-		if (resultList.size() == 0)
-			return null;
-
-		return (E) resultList.get(0);
-	}
 }
