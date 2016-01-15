@@ -40,11 +40,6 @@ public class EntityTable<E> extends Table implements EntityList<E>
 		this.rowChangeListener = rowChangeListener;
 	}
 
-	public void init()
-	{
-		init(null);
-	}
-
 	/**
 	 * 
 	 * @param uniqueTableId
