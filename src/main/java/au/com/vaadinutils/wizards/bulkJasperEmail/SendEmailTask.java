@@ -61,7 +61,7 @@ public class SendEmailTask extends ProgressBarTask<JasperTransmission> implement
 
 	}
 
-	private void sendMessages(final List<JasperTransmission> targets, final JasperProxy proxy) throws Exception
+	private void sendMessages(final List<JasperTransmission> targets, final JasperProxy proxy) 
 
 	{
 

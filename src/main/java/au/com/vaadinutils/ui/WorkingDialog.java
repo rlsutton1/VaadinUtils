@@ -165,6 +165,20 @@ public class WorkingDialog extends Window implements ProgressListener<String>
 
 	}
 
+	/**
+	 * convenience method, wraps the runnable in a EntityManagerRunnable and
+	 * passes it to setWorker
+	 * 
+	 * @param runnable
+	 * @param listener
+	 */
+	public void setEntityWorker(Runnable runnable, CompleteListener listener)
+	{
+		setWorker(new EntityManagerRunnable(runnable),listener);
+
+
+	}
+
 	class Worker implements Runnable
 	{
 
