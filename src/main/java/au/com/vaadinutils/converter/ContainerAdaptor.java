@@ -13,7 +13,7 @@ public interface ContainerAdaptor<T extends CrudEntity>
 
     Item getItem(Object id);
     
-    Property getProperty(T entity, Object id);
+    Property<Object> getProperty(T entity, Object id);
 
     T getEntity(Object id);
 

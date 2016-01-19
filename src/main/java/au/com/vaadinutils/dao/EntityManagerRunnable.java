@@ -1,7 +1,5 @@
 package au.com.vaadinutils.dao;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
  * Pass a Runnable that needs to be wrapped in an EM transaction with its own
@@ -25,7 +23,6 @@ import org.apache.logging.log4j.Logger;
  */
 public final class EntityManagerRunnable implements Runnable
 {
-	private Logger logger = LogManager.getLogger();
 
 	private final Runnable wrapper;
 

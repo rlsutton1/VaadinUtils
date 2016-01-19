@@ -107,8 +107,17 @@ public class HelpSplitPanel extends HorizontalSplitPanel implements View, HelpPa
 
 			}
 		});
-		
 
+	}
+
+	@Override
+	public void setLocked(boolean locked)
+	{
+		// calling setLocked with IE, completely breaks the layout
+		if (!UI.getCurrent().getPage().getWebBrowser().isIE())
+		{
+			super.setLocked(locked);
+		}
 	}
 
 	public View getView()
@@ -384,6 +393,5 @@ public class HelpSplitPanel extends HorizontalSplitPanel implements View, HelpPa
 		throw new RuntimeException("This is the top level HelpPageListener, you cant set the HelpPageListener");
 
 	}
-
 
 }

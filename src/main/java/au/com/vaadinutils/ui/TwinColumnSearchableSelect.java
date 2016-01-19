@@ -69,6 +69,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	private Class<? extends Collection> valueClass;
 	private boolean isAscending;
 	private boolean showAddRemoveAll;
+	protected String availableColumnHeader;
 
 	/**
 	 * Unfortunately TwinColumnSelect wont work with large sets, it isn't
@@ -131,6 +132,9 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 		selectedCols.setHeight("200");
 		selectedCols.setSelectable(true);
 		selectedCols.setMultiSelect(true);
+		// setting value of header here so that subclasses can
+		// modify header if needed
+		setAvailableColumnHeader(assignAvailableHeaderValue());
 		createAvailableTable();
 
 		addSelectedColumnTooltip();
@@ -206,7 +210,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 			@Override
 			public HeadingPropertySet<C> getHeadingPropertySet()
 			{
-				return new HeadingPropertySet.Builder<C>().addColumn("Available", itemLabel).build();
+				return new HeadingPropertySet.Builder<C>().addColumn(availableColumnHeader, itemLabel).build();
 			}
 
 			@Override
@@ -545,6 +549,21 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	public void setSelectedColumnHeader(String header)
 	{
 		this.selectedCols.setColumnHeaders(header);
+	}
+
+	public String getAvailableColumnHeader()
+	{
+		return availableColumnHeader;
+	}
+
+	public void setAvailableColumnHeader(String availableColumnHeader)
+	{
+		this.availableColumnHeader = availableColumnHeader;
+	}
+
+	protected String assignAvailableHeaderValue()
+	{
+		return "Available";
 	}
 
 	protected ClickListener addAllClickListener()

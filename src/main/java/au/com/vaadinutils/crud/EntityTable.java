@@ -40,11 +40,6 @@ public class EntityTable<E> extends Table implements EntityList<E>
 		this.rowChangeListener = rowChangeListener;
 	}
 
-	public void init()
-	{
-		init(null);
-	}
-
 	/**
 	 * 
 	 * @param uniqueTableId
@@ -58,6 +53,7 @@ public class EntityTable<E> extends Table implements EntityList<E>
 
 		this.setSelectable(true);
 		this.setImmediate(true);
+		this.setColumnReorderingAllowed(true);
 
 		this.addValueChangeListener(new Property.ValueChangeListener()
 		{

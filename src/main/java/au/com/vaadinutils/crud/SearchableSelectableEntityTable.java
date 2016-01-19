@@ -409,4 +409,14 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 	{
 		selectableTable.selectAll();
 	}
+
+	public void setColumnReorderingAllowed(boolean columnReorderingAllowed)
+	{
+		selectableTable.setColumnReorderingAllowed(true);
+	}
+
+	public boolean isColumnReorderingAllowed()
+	{
+		return selectableTable.isColumnReorderingAllowed();
+	}
 }

@@ -69,9 +69,9 @@ public class ErrorWindow
 
 	}
 
-	public static void showErrorWindow(Throwable error)
+	public static void showErrorWindow(Throwable e)
 	{
-		new ErrorWindow(true).internalShowErrorWindow(error);
+		new ErrorWindow(true).internalShowErrorWindow(e);
 
 	}
 

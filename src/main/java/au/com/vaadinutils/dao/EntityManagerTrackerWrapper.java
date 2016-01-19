@@ -257,14 +257,14 @@ public class EntityManagerTrackerWrapper implements EntityManager
 	}
 
 	@Override
-	public Query createQuery(CriteriaUpdate updateQuery)
+	public Query createQuery(@SuppressWarnings("rawtypes") CriteriaUpdate updateQuery)
 	{
 
 		return em.createQuery(updateQuery);
 	}
 
 	@Override
-	public Query createQuery(CriteriaDelete deleteQuery)
+	public Query createQuery(@SuppressWarnings("rawtypes") CriteriaDelete deleteQuery)
 	{
 
 		return em.createQuery(deleteQuery);
@@ -299,7 +299,7 @@ public class EntityManagerTrackerWrapper implements EntityManager
 	}
 
 	@Override
-	public Query createNativeQuery(String sqlString, Class resultClass)
+	public Query createNativeQuery(String sqlString, @SuppressWarnings("rawtypes") Class resultClass)
 	{
 
 		return em.createNativeQuery(sqlString, resultClass);
@@ -327,7 +327,7 @@ public class EntityManagerTrackerWrapper implements EntityManager
 	}
 
 	@Override
-	public StoredProcedureQuery createStoredProcedureQuery(String procedureName, Class... resultClasses)
+	public StoredProcedureQuery createStoredProcedureQuery(String procedureName, @SuppressWarnings("rawtypes") Class... resultClasses)
 	{
 
 		return em.createStoredProcedureQuery(procedureName, resultClasses);

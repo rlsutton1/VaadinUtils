@@ -630,6 +630,11 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 	{
 		return new JpaDslBuilder<E>(entityClass);
 	}
+	
+	public JpaDslTupleBuilder<E> findTuple()
+	{
+		return new JpaDslTupleBuilder<E>(entityClass);
+	}
 
 	public JpaDslBuilder<E> jpaContainerDelegate(CriteriaBuilder criteriaBuilder, CriteriaQuery<E> query)
 	{

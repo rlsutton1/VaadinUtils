@@ -866,7 +866,6 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 	@Override
 	protected void resetFilters()
 	{
-
 		try
 		{
 			container.removeAllContainerFilters();
@@ -875,7 +874,6 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 		catch (UnsupportedFilterException e)
 		{
 			ErrorWindow.showErrorWindow(e);
-
 		}
 	}
 
