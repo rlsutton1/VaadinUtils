@@ -808,7 +808,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 	 */
 	protected void disallowEdit(boolean disallow)
 	{
-		Preconditions.checkArgument(buttonLayout == null, "You must call disallowEdit before init");
+		if (buttonLayout != null)
+			throw new IllegalStateException("You must call disallowEdit before'init()'");
 		this.disallowEditing = disallow;
 	}
 
@@ -824,7 +825,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 	 */
 	protected void disallowNew(boolean disallow)
 	{
-		Preconditions.checkArgument(buttonLayout == null, "You must call disallowNew before init");
+		if (buttonLayout != null)
+			throw new IllegalStateException("You must call disallowNew before'init()'");
 
 		this.disallowNew = disallow;
 		showNew(!disallow);
@@ -847,6 +849,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 	 */
 	protected void disallowDelete(boolean disallow)
 	{
+		if (this.actionCombo == null)
+			throw new IllegalStateException("You must call disallowDelete after 'init()'");
 
 		if (disallow || !getSecurityManager().canUserDelete())
 		{
@@ -2123,6 +2127,12 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 	/**
 	 * for child cruds, they overload this to ensure that the minimum necessary
 	 * filters are always applied.
+	 *
+	 * You must ensure that you call container.removeAllContainerFilters()
+	 * otherwise the set of filters will continue to grow.
+	 *
+	 * CONSIDER: should we just be calling container.removeAllContainerFilters()
+	 * before this method is called to ensure it happens regardless?
 	 */
 	protected void resetFilters()
 	{
