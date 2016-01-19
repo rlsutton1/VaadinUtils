@@ -31,6 +31,7 @@ import com.vaadin.data.Container.ItemSetChangeListener;
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.data.util.filter.Compare;
+import com.vaadin.data.util.filter.UnsupportedFilterException;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
@@ -871,7 +872,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 			container.removeAllContainerFilters();
 			container.addContainerFilter(parentFilter);
 		}
-		catch (Exception e)
+		catch (UnsupportedFilterException e)
 		{
 			ErrorWindow.showErrorWindow(e);
 
