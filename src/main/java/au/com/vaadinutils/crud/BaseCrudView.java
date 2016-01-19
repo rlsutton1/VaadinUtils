@@ -138,9 +138,10 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 	private Button advancedSearchButton;
 	private Set<RowChangedListener<E>> rowChangedListeners = new CopyOnWriteArraySet<RowChangedListener<E>>();
 	private int minSearchTextLength = 0;
-	private HeadingPropertySet<E> headings;
+	protected HeadingPropertySet<E> headings;
 	private boolean dragAndDropOrderingEnabled = false;
 	private SingularAttribute<E, Long> ordinalField;
+	protected CrudAction<E> exportAction;
 
 	protected BaseCrudView()
 	{
@@ -187,6 +188,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 		// first loads
 		resetFiltersWithoutChangeEvents();
 
+		// call createExportAction before calling initLayout since crudActions
+		// will be needed in initLayout-->buildActionLayout
+		exportAction = createExportAction();
 		initLayout();
 
 		initializeEntityTable();
@@ -593,7 +597,14 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 		CrudAction<E> crudAction = new CrudActionDelete<E>();
 		actions.add(crudAction);
 
-		CrudAction<E> exportAction = new CrudAction<E>()
+		actions.add(exportAction);
+
+		return actions;
+	}
+
+	protected CrudAction<E> createExportAction()
+	{
+		return new CrudAction<E>()
 		{
 
 			private static final long serialVersionUID = -7703959823800614876L;
@@ -622,9 +633,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 				return "Export CSV Data";
 			}
 		};
-		actions.add(exportAction);
-
-		return actions;
 	}
 
 	private void buildSearchBar()
@@ -800,7 +808,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 	 */
 	protected void disallowEdit(boolean disallow)
 	{
-		Preconditions.checkArgument(buttonLayout == null, "You must call disallowEdit before init");
+		if (buttonLayout != null)
+			throw new IllegalStateException("You must call disallowEdit before'init()'");
 		this.disallowEditing = disallow;
 	}
 
@@ -816,7 +825,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 	 */
 	protected void disallowNew(boolean disallow)
 	{
-		Preconditions.checkArgument(buttonLayout == null, "You must call disallowNew before init");
+		if (buttonLayout != null)
+			throw new IllegalStateException("You must call disallowNew before'init()'");
 
 		this.disallowNew = disallow;
 		showNew(!disallow);
@@ -839,6 +849,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 	 */
 	protected void disallowDelete(boolean disallow)
 	{
+		if (this.actionCombo == null)
+			throw new IllegalStateException("You must call disallowDelete after 'init()'");
 
 		if (disallow || !getSecurityManager().canUserDelete())
 		{
@@ -2115,6 +2127,12 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 	/**
 	 * for child cruds, they overload this to ensure that the minimum necessary
 	 * filters are always applied.
+	 *
+	 * You must ensure that you call container.removeAllContainerFilters()
+	 * otherwise the set of filters will continue to grow.
+	 *
+	 * CONSIDER: should we just be calling container.removeAllContainerFilters()
+	 * before this method is called to ensure it happens regardless?
 	 */
 	protected void resetFilters()
 	{
