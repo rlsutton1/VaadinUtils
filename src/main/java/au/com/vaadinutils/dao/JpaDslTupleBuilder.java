@@ -4,7 +4,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.persistence.Tuple;
-import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Selection;
 import javax.persistence.metamodel.SingularAttribute;
@@ -29,6 +28,12 @@ public class JpaDslTupleBuilder<E> extends JpaDslAbstract<E, Tuple>
 
 		return path;
 	}
+	
+	public JpaDslTupleBuilder<E> multiselect(final Selection<?> selection)
+	{
+		multiselects.add(selection);
+		return this;
+	}
 
 	@Override
 	public List<Tuple> getResultList()
@@ -50,13 +55,4 @@ public class JpaDslTupleBuilder<E> extends JpaDslAbstract<E, Tuple>
 		criteria.multiselect(multiselects);
 		return super.getSingleResultOrNull();
 	}
-
-	public <T extends Number> Expression<T> sum(SingularAttribute<E, T> attribute)
-	{
-		Expression<T> sum = builder.sum(root.get(attribute));
-		multiselects.add(sum);
-		
-		return sum;
-	}
-
 }

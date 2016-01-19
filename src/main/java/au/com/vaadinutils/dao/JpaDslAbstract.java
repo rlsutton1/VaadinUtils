@@ -1064,7 +1064,6 @@ public abstract class JpaDslAbstract<E, R>
 
 	public Expression<String> trim(final SingularAttribute<E, String> attribute)
 	{
-
 		return builder.trim(root.get(attribute));
 	}
 
@@ -1139,5 +1138,10 @@ public abstract class JpaDslAbstract<E, R>
 				return builder.greaterThan(root.get(field), value);
 			}
 		};
+	}
+
+	public <T extends Number> Expression<T> sum(SingularAttribute<E, T> attribute)
+	{
+		return builder.sum(root.get(attribute));
 	}
 }
