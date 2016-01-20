@@ -201,7 +201,6 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 		HorizontalLayout layout = new HorizontalLayout();
 		layout.setSizeFull();
 		
-		
 		TextField field = new SplitTextField(fieldLabel);
 		field.setWidth("100%");
 		field.setImmediate(true);
