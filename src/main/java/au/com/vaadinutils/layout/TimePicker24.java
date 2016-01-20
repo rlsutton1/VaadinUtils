@@ -7,6 +7,9 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.vaadin.data.Property;
 import com.vaadin.data.Validator;
 import com.vaadin.data.Validator.InvalidValueException;
@@ -30,6 +33,7 @@ import com.vaadin.ui.themes.Reindeer;
 @SuppressWarnings("rawtypes")
 public class TimePicker24 extends HorizontalLayout implements Field
 {
+	Logger logger = LogManager.getLogger();
 
 	protected static final String TIME_FORMAT = "HH:mm a";
 	protected static final String TIME_FORMAT2 = "HH:mma";
@@ -694,7 +698,7 @@ public class TimePicker24 extends HorizontalLayout implements Field
 	@Override
 	public void valueChange(com.vaadin.data.Property.ValueChangeEvent event)
 	{
-		System.out.println("Value change");
+		logger.info("Value change");
 
 	}
 

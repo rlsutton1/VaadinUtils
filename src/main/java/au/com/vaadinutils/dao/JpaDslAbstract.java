@@ -1,5 +1,6 @@
 package au.com.vaadinutils.dao;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -19,6 +20,7 @@ import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Order;
+import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.ListAttribute;
@@ -219,6 +221,20 @@ public abstract class JpaDslAbstract<E, R>
 			public Predicate getPredicates()
 			{
 				return builder.lessThanOrEqualTo(join.getJoin(root).get(field), value);
+			}
+		};
+	}
+
+	public <J> Condition<E> greaterThanOrEqualTo(final JoinBuilder<E, J> join, final SingularAttribute<J, Date> field,
+			final Date value)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+				return builder.greaterThanOrEqualTo(join.getJoin(root).get(field), value);
 			}
 		};
 	}
@@ -1064,7 +1080,6 @@ public abstract class JpaDslAbstract<E, R>
 
 	public Expression<String> trim(final SingularAttribute<E, String> attribute)
 	{
-
 		return builder.trim(root.get(attribute));
 	}
 
@@ -1139,5 +1154,30 @@ public abstract class JpaDslAbstract<E, R>
 				return builder.greaterThan(root.get(field), value);
 			}
 		};
+	}
+
+	public <T extends Number> Expression<T> sum(final SingularAttribute<E, T> attribute)
+	{
+		return builder.sum(root.get(attribute));
+	}
+	
+	public <T> Path<T> get(final SingularAttribute<E, T> attribute)
+	{
+		return root.get(attribute);
+	}
+	
+	public <K, T> Path<T> get(final JoinBuilder<E, K> join, final SingularAttribute<K, T> attribute)
+	{
+		return join.getJoin(root).get(attribute);
+	}
+
+	public Expression<Number> divide(final Path<? extends Number> path1, final Path<? extends Number> path2)
+	{
+		return builder.quot(path1, path2);
+	}
+
+	public <T extends Number> Expression<Number> divide(final SingularAttribute<E, T> attribute, final Path<? extends Number> path2)
+	{
+		return builder.quot(get(attribute), path2);
 	}
 }
