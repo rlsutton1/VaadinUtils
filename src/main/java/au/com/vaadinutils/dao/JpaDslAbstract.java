@@ -1,6 +1,5 @@
 package au.com.vaadinutils.dao;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -581,10 +580,6 @@ public abstract class JpaDslAbstract<E, R>
 		{
 			criteria.orderBy(orders);
 		}
-		if (distinct)
-		{
-			criteria.distinct(true);
-		}
 		TypedQuery<R> query = getEntityManager().createQuery(criteria);
 
 		if (limit != null)
@@ -964,8 +959,6 @@ public abstract class JpaDslAbstract<E, R>
 
 	boolean isJpaContainerDelegate;
 
-	private boolean distinct = false;
-
 	@SuppressWarnings("unchecked")
 	<K> Join<E, K> getJoin(JoinBuilder<E, K> builder)
 	{
@@ -1074,7 +1067,7 @@ public abstract class JpaDslAbstract<E, R>
 
 	public JpaDslAbstract<E, R> distinct()
 	{
-		this.distinct = true;
+		criteria.distinct(true);
 		return this;
 	}
 
