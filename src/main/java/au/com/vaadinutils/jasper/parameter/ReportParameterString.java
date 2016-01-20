@@ -1,5 +1,8 @@
 package au.com.vaadinutils.jasper.parameter;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import au.com.vaadinutils.jasper.scheduler.entities.DateParameterType;
 
 import com.vaadin.data.Validator;
@@ -8,6 +11,7 @@ import com.vaadin.ui.TextField;
 
 public class ReportParameterString extends ReportParameter<String>
 {
+	Logger logger = LogManager.getLogger();
 
 	protected TextField field;
 
@@ -73,7 +77,7 @@ public class ReportParameterString extends ReportParameter<String>
 			@Override
 			public void validate(Object value) throws InvalidValueException
 			{
-				System.out.println(value);
+				logger.info(value);
 				
 			}};
 			field.addValidator(validator);
