@@ -21,7 +21,7 @@ public class JpaDslTupleBuilder<E> extends JpaDslAbstract<E, Tuple>
 		root = criteria.from(entityClass);
 	}
 
-	public <T> Path<T> multiselect(SingularAttribute<E, T> attribute)
+	public <T> Path<T> multiselect(final SingularAttribute<E, T> attribute)
 	{
 		final Path<T> path = root.get(attribute);
 		multiselects.add(path);
