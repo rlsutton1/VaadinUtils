@@ -609,7 +609,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 			public void buttonClick(ClickEvent event)
 			{
 				List<Long> ids = new LinkedList<>();
-				ids.addAll((Collection<? extends Long>) available.getSelectedItems());
+				ids.addAll((Collection<Long>) available.getSelectedItems());
 				if (ids.size() > 0)
 				{
 					for (Long id : ids)
