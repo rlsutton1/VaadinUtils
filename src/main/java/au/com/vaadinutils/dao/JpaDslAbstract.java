@@ -1,6 +1,5 @@
 package au.com.vaadinutils.dao;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -27,9 +26,9 @@ import javax.persistence.metamodel.ListAttribute;
 import javax.persistence.metamodel.SetAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 
-import au.com.vaadinutils.dao.JpaBaseDao.Condition;
-
 import com.google.common.base.Preconditions;
+
+import au.com.vaadinutils.dao.JpaBaseDao.Condition;
 
 /**
  * 

@@ -4,7 +4,7 @@ import au.com.vaadinutils.fields.OrderingListSelect;
 
 import com.vaadin.ui.Label;
 
-public class SplitOrderingListSelect extends OrderingListSelect implements SplitField
+public class SplitOrderingListSelect<T> extends OrderingListSelect<T> implements SplitField
 {
 	/**
 	 * 
