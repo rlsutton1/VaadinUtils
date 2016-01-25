@@ -1,13 +1,16 @@
 package au.com.vaadinutils.crud;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.persistence.metamodel.SingularAttribute;
 
+import org.apache.commons.logging.impl.AvalonLogger;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mozilla.javascript.tools.shell.ParsedContentType;
 
 import au.com.vaadinutils.dao.Path;
 import au.com.vaadinutils.user.UserSettingsStorageFactory;
@@ -70,7 +73,8 @@ public class HeadingPropertySet<E>
 		public Builder<E> addColumn(final String heading, final String headingPropertyId,
 				final boolean defaultVisibleState, final boolean lockedState, final int width)
 		{
-			cols.add(new HeadingToPropertyId<E>(heading, headingPropertyId, null, defaultVisibleState, lockedState, null));
+			cols.add(new HeadingToPropertyId<E>(heading, headingPropertyId, null, defaultVisibleState, lockedState,
+					null));
 			return this;
 		}
 
@@ -84,7 +88,8 @@ public class HeadingPropertySet<E>
 		public <T extends Object> Builder<E> addColumn(final String heading, final String headingPropertyId,
 				final boolean defaultVisibleState, final boolean lockedState)
 		{
-			cols.add(new HeadingToPropertyId<E>(heading, headingPropertyId, null, defaultVisibleState, lockedState, null));
+			cols.add(new HeadingToPropertyId<E>(heading, headingPropertyId, null, defaultVisibleState, lockedState,
+					null));
 			return this;
 		}
 
@@ -406,13 +411,15 @@ public class HeadingPropertySet<E>
 	{
 		final String keyStub = uniqueTableId + "-order";
 
-		String columns = UserSettingsStorageFactory.getUserSettingsStorage().get(keyStub);
-		if (columns != null && !columns.isEmpty())
+		final Object[] availableColumns = table.getVisibleColumns();
+		final String columns = UserSettingsStorageFactory.getUserSettingsStorage().get(keyStub);
+		if (availableColumns.length > 0 && columns != null && !columns.isEmpty())
 		{
-			columns = columns.replaceAll("\\[|\\]", "");
-			final Object[] parsedColumns = columns.split(", ?");
+			final Object[] parsedColumns = columns.replaceAll("\\[|\\]", "").split(", ?");
 			if (parsedColumns.length > 0)
-				table.setVisibleColumns(parsedColumns);
+			{
+				table.setVisibleColumns(calculateColumnOrder(availableColumns, parsedColumns));
+			}
 		}
 
 		table.addColumnReorderListener(new ColumnReorderListener()
@@ -426,6 +433,36 @@ public class HeadingPropertySet<E>
 				UserSettingsStorageFactory.getUserSettingsStorage().store(keyStub, "" + Arrays.toString(columns));
 			}
 		});
+	}
+
+	/**
+	 * If a column order has already been saved for a user, but the columns for
+	 * a table have been modified, then we need to remove any columns that no
+	 * longer exist and add any new columns to the list of visible columns.
+	 *
+	 * @param availableColumns
+	 *            the columns that are available in the table
+	 * @param parsedColumns
+	 *            the column order that has been restored from preferences
+	 * @return the calculated order of columns with old removed and new added
+	 */
+	private Object[] calculateColumnOrder(final Object[] availableColumns, final Object[] parsedColumns)
+	{
+		final List<Object> availableList = new ArrayList<>(Arrays.asList(availableColumns));
+		final List<Object> parsedList = new ArrayList<>(Arrays.asList(parsedColumns));
+		
+		// Remove old columns
+		parsedList.retainAll(availableList);
+
+		// Add new columns in the same index position as they were added to the table in
+		final List<Object> newList = new ArrayList<>(availableList);
+		newList.removeAll(parsedList);
+		for (Object column : newList)
+		{
+			parsedList.add(availableList.indexOf(column), column);
+		}
+		
+		return parsedList.toArray();
 	}
 
 	private void configureSaveColumnVisible(final Table table, final String uniqueTableId)
