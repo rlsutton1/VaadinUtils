@@ -41,18 +41,18 @@ public class ScheduleCalcTest
 			Date scheduled = ScheduleMode.DAY_OF_WEEK.getNextRuntime(schedule, now);
 
 			Date expectedResult = testTime.getValue();
-			assertTrue("expected "+expectedResult+ " got "+scheduled,scheduled.equals(expectedResult));
+			assertTrue("expected " + expectedResult + " got " + scheduled, scheduled.equals(expectedResult));
 
 		}
 
 	}
-	
+
 	@Test
 	public void testDayOfMonth() throws ParseException
 	{
 		SimpleDateFormat sdf = new SimpleDateFormat("yy/MM/dd HH:mm:ss");
 		Date scheduledTime = sdf.parse("14/05/29 09:30:00");
-		String daysOfMonth = "1,3,5"; // mon, wed & fri
+		// String daysOfMonth = "1,3,5"; // mon, wed & fri
 
 		ReportEmailSchedule schedule = new DayOfMonthSchedule(scheduledTime, 29);
 
@@ -67,28 +67,28 @@ public class ScheduleCalcTest
 			Date scheduled = ScheduleMode.DAY_OF_MONTH.getNextRuntime(schedule, now);
 
 			Date expectedResult = testTime.getValue();
-			assertTrue("expected "+expectedResult+ " got "+scheduled,scheduled.equals(expectedResult));
+			assertTrue("expected " + expectedResult + " got " + scheduled, scheduled.equals(expectedResult));
 
 		}
 
 	}
-	
+
 	@Test
 	public void testEveryDay() throws ParseException
 	{
 		SimpleDateFormat sdf = new SimpleDateFormat("yy/MM/dd HH:mm:ss");
 		Date scheduledTime = sdf.parse("14/05/29 09:30:00");
-	
+
 		ReportEmailSchedule schedule = new EveryDaySchedule(scheduledTime);
 
 		Map<Date, Date> testTimes = new HashMap<Date, Date>();
-		testTimes.put(sdf.parse("14/05/29 10:00:00"), sdf.parse("14/05/30 09:30:00")); 
-		testTimes.put(sdf.parse("14/05/30 10:00:00"), sdf.parse("14/05/31 09:30:00")); 
-		testTimes.put(sdf.parse("14/05/31 10:00:00"), sdf.parse("14/06/01 09:30:00")); 
-		testTimes.put(sdf.parse("14/06/01 10:00:00"), sdf.parse("14/06/02 09:30:00")); 
-		testTimes.put(sdf.parse("14/06/02 10:00:00"), sdf.parse("14/06/03 09:30:00")); 
-		testTimes.put(sdf.parse("14/06/03 10:00:00"), sdf.parse("14/06/04 09:30:00")); 
-		testTimes.put(sdf.parse("14/06/04 10:00:00"), sdf.parse("14/06/05 09:30:00")); 
+		testTimes.put(sdf.parse("14/05/29 10:00:00"), sdf.parse("14/05/30 09:30:00"));
+		testTimes.put(sdf.parse("14/05/30 10:00:00"), sdf.parse("14/05/31 09:30:00"));
+		testTimes.put(sdf.parse("14/05/31 10:00:00"), sdf.parse("14/06/01 09:30:00"));
+		testTimes.put(sdf.parse("14/06/01 10:00:00"), sdf.parse("14/06/02 09:30:00"));
+		testTimes.put(sdf.parse("14/06/02 10:00:00"), sdf.parse("14/06/03 09:30:00"));
+		testTimes.put(sdf.parse("14/06/03 10:00:00"), sdf.parse("14/06/04 09:30:00"));
+		testTimes.put(sdf.parse("14/06/04 10:00:00"), sdf.parse("14/06/05 09:30:00"));
 
 		for (Entry<Date, Date> testTime : testTimes.entrySet())
 		{
@@ -96,7 +96,7 @@ public class ScheduleCalcTest
 			Date scheduled = ScheduleMode.EVERY_DAY.getNextRuntime(schedule, now);
 
 			Date expectedResult = testTime.getValue();
-			assertTrue("expected "+expectedResult+ " got "+scheduled,scheduled.equals(expectedResult));
+			assertTrue("expected " + expectedResult + " got " + scheduled, scheduled.equals(expectedResult));
 
 		}
 
