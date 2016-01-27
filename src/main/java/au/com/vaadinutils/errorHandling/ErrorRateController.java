@@ -68,7 +68,7 @@ public class ErrorRateController
 			}
 //			if (permitsToAdd > 0)
 //			{
-//				System.out.println("Added " + permitsToAdd);
+//				logger.info("Added " + permitsToAdd);
 //			}
 			
 		}

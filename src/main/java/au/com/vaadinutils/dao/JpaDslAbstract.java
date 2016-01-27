@@ -19,15 +19,16 @@ import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Order;
+import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.ListAttribute;
 import javax.persistence.metamodel.SetAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 
-import au.com.vaadinutils.dao.JpaBaseDao.Condition;
-
 import com.google.common.base.Preconditions;
+
+import au.com.vaadinutils.dao.JpaBaseDao.Condition;
 
 /**
  * 
@@ -219,6 +220,20 @@ public abstract class JpaDslAbstract<E, R>
 			public Predicate getPredicates()
 			{
 				return builder.lessThanOrEqualTo(join.getJoin(root).get(field), value);
+			}
+		};
+	}
+
+	public <J> Condition<E> greaterThanOrEqualTo(final JoinBuilder<E, J> join, final SingularAttribute<J, Date> field,
+			final Date value)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+				return builder.greaterThanOrEqualTo(join.getJoin(root).get(field), value);
 			}
 		};
 	}
@@ -564,10 +579,6 @@ public abstract class JpaDslAbstract<E, R>
 		if (orders.size() > 0)
 		{
 			criteria.orderBy(orders);
-		}
-		if (distinct)
-		{
-			criteria.distinct(true);
 		}
 		TypedQuery<R> query = getEntityManager().createQuery(criteria);
 
@@ -948,8 +959,6 @@ public abstract class JpaDslAbstract<E, R>
 
 	boolean isJpaContainerDelegate;
 
-	private boolean distinct = false;
-
 	@SuppressWarnings("unchecked")
 	<K> Join<E, K> getJoin(JoinBuilder<E, K> builder)
 	{
@@ -1058,13 +1067,12 @@ public abstract class JpaDslAbstract<E, R>
 
 	public JpaDslAbstract<E, R> distinct()
 	{
-		this.distinct = true;
+		criteria.distinct(true);
 		return this;
 	}
 
 	public Expression<String> trim(final SingularAttribute<E, String> attribute)
 	{
-
 		return builder.trim(root.get(attribute));
 	}
 
@@ -1139,5 +1147,30 @@ public abstract class JpaDslAbstract<E, R>
 				return builder.greaterThan(root.get(field), value);
 			}
 		};
+	}
+
+	public <T extends Number> Expression<T> sum(final SingularAttribute<E, T> attribute)
+	{
+		return builder.sum(root.get(attribute));
+	}
+	
+	public <T> Path<T> get(final SingularAttribute<E, T> attribute)
+	{
+		return root.get(attribute);
+	}
+	
+	public <K, T> Path<T> get(final JoinBuilder<E, K> join, final SingularAttribute<K, T> attribute)
+	{
+		return join.getJoin(root).get(attribute);
+	}
+
+	public Expression<Number> divide(final Path<? extends Number> path1, final Path<? extends Number> path2)
+	{
+		return builder.quot(path1, path2);
+	}
+
+	public <T extends Number> Expression<Number> divide(final SingularAttribute<E, T> attribute, final Path<? extends Number> path2)
+	{
+		return builder.quot(get(attribute), path2);
 	}
 }
