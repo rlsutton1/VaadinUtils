@@ -7,13 +7,8 @@ import java.util.List;
 
 import javax.persistence.metamodel.SingularAttribute;
 
-import org.apache.commons.logging.impl.AvalonLogger;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mozilla.javascript.tools.shell.ParsedContentType;
-
-import au.com.vaadinutils.dao.Path;
-import au.com.vaadinutils.user.UserSettingsStorageFactory;
 
 import com.google.common.base.Preconditions;
 import com.vaadin.ui.Table;
@@ -24,6 +19,9 @@ import com.vaadin.ui.Table.ColumnReorderEvent;
 import com.vaadin.ui.Table.ColumnReorderListener;
 import com.vaadin.ui.Table.ColumnResizeEvent;
 import com.vaadin.ui.Table.ColumnResizeListener;
+
+import au.com.vaadinutils.dao.Path;
+import au.com.vaadinutils.user.UserSettingsStorageFactory;
 
 public class HeadingPropertySet<E>
 {
