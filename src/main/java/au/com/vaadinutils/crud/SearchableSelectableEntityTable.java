@@ -46,7 +46,7 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 
 	protected TextField searchField = new TextField();
 	private AbstractLayout advancedSearchLayout;
-	private VerticalLayout searchBar;
+	private AbstractLayout searchBar;
 	private Button advancedSearchCheckbox;
 	public boolean advancedSearchOn = false;
 	protected SelectableEntityTable<E> selectableTable;
@@ -69,7 +69,7 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 			return;
 		}
 
-		AbstractLayout searchBar = buildSearchBar();
+		 searchBar = buildSearchBar();
 
 		Label title = new Label(getTitle());
 		title.setStyleName(Reindeer.LABEL_H1);
@@ -133,16 +133,16 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 		selectableTable.addGeneratedColumn(id, generatedColumn);
 	}
 
-	private AbstractLayout buildSearchBar()
+	protected AbstractLayout buildSearchBar()
 	{
-		searchBar = new VerticalLayout();
-		searchBar.setWidth("100%");
+		VerticalLayout layout = new VerticalLayout();
+		layout.setWidth("100%");
 		searchField.setWidth("100%");
 
 		HorizontalLayout basicSearchLayout = new HorizontalLayout();
 		basicSearchLayout.setSizeFull();
 		basicSearchLayout.setSpacing(true);
-		searchBar.addComponent(basicSearchLayout);
+		layout.addComponent(basicSearchLayout);
 
 		AbstractLayout advancedSearch = buildAdvancedSearch();
 		if (advancedSearch != null)
@@ -177,7 +177,7 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 
 		searchField.focus();
 
-		return searchBar;
+		return layout;
 	}
 
 	public void disableSelectable()
@@ -395,7 +395,7 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 		return new SelectableEntityTable<E>(container, getHeadingPropertySet(), uniqueId);
 	}
 
-	public VerticalLayout getSearchBar()
+	public AbstractLayout getSearchBar()
 	{
 		return searchBar;
 	}

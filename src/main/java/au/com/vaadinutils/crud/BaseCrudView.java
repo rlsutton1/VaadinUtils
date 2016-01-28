@@ -915,6 +915,11 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 	{
 		splitPanel.setSplitPosition(pos);
 	}
+	
+	public void setLocked()
+	{
+		splitPanel.setLocked();
+	}
 
 	private void initButtons()
 	{
