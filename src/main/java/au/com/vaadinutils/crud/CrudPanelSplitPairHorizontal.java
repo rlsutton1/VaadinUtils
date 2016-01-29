@@ -25,9 +25,9 @@ public class CrudPanelSplitPairHorizontal extends HorizontalSplitPanel implement
 	}
 	
 	@Override
-	public void setLocked()
+	public void setLocked(boolean locked)
 	{
-		super.setLocked(true);
+		super.setLocked(locked);
 	}
 	
 	@Override
