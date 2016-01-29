@@ -80,35 +80,34 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 
 	public TwinColumnSearchableSelect(String fieldName, SingularAttribute<C, ?> listField)
 	{
-		this(fieldName, listField, null);
-
-		availableContainer.sort(new Object[]
-		{ listField.getName() }, new boolean[]
-		{ true });
-		this.isAscending = true;
+		this(fieldName, listField, null, true);
 	}
 
 	public TwinColumnSearchableSelect(String fieldName, SingularAttribute<C, ?> listField, boolean isAscending)
 	{
-		this(fieldName, listField, null);
-		availableContainer.sort(new Object[]
-		{ listField.getName() }, new boolean[]
-		{ isAscending });
-		this.isAscending = isAscending;
+		this(fieldName, listField, null, isAscending);
 	}
 
-	public TwinColumnSearchableSelect(String fieldName, SingularAttribute<C, ?> listField, String itemLabel)
+	public TwinColumnSearchableSelect(final String fieldName, final SingularAttribute<C, ?> listField, final String itemLabel)
 	{
-		beans = new BeanContainer<Long, C>(listField.getDeclaringType().getJavaType());
+		this(fieldName, listField, itemLabel, true);
+	}
 
+	public TwinColumnSearchableSelect(final String fieldName, final SingularAttribute<C, ?> listField, String itemLabel, final boolean isAscending)
+	{
 		mainLayout = new HorizontalLayout();
 
+		this.isAscending = isAscending;
 		this.listField = listField;
+		beans = new BeanContainer<Long, C>(listField.getDeclaringType().getJavaType());
 		Metamodel metaModel = EntityManagerProvider.getEntityManager().getMetamodel();
 		EntityType<C> type = metaModel.entity(listField.getDeclaringType().getJavaType());
 		beanIdField = type.getDeclaredId(Long.class);
 		availableContainer = JpaBaseDao.getGenericDao(listField.getDeclaringType().getJavaType())
 				.createVaadinContainer();
+		availableContainer.sort(new Object[]
+		{ listField.getName() }, new boolean[]
+		{ isAscending });
 
 		if (itemLabel == null)
 		{
@@ -193,7 +192,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 
 	public void setSelectedColumnGenerator(ColumnGenerator generatedColumn)
 	{
-		selectedCols.addGeneratedColumn(listField.getName(), generatedColumn);
+		selectedCols.addGeneratedColumn(itemLabel, generatedColumn);
 	}
 
 	private void createAvailableTable()
