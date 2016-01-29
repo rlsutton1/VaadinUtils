@@ -531,6 +531,11 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 		return availableContainer;
 	}
 
+	public void refreshAvailableContainer()
+	{
+		availableContainer.refresh();
+	}
+
 	protected void resetAvailableContainer(JPAContainer<C> newContainer)
 	{
 		this.availableContainer = newContainer;
