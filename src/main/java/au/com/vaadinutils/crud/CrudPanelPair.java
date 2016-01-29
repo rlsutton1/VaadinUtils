@@ -17,6 +17,6 @@ public interface CrudPanelPair
 
 	public void showSecondComponet();
 
-	void setLocked();
+	void setLocked(boolean locked);
 
 }
