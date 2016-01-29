@@ -138,6 +138,7 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 		VerticalLayout layout = new VerticalLayout();
 		layout.setWidth("100%");
 		searchField.setWidth("100%");
+		searchBar = layout;
 
 		HorizontalLayout basicSearchLayout = new HorizontalLayout();
 		basicSearchLayout.setSizeFull();
