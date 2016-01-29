@@ -15,7 +15,7 @@ public class IntegerRangeValidator extends RangeValidator<Integer>
 	protected Integer getObjectValue(String str)
 	{
 		Integer number = 0;
-		if (str != null)
+		if (str != null && !"".equalsIgnoreCase(str))
 		{
 			try
 			{

@@ -58,7 +58,7 @@ public class CrudPanelSplitPairHidding extends VerticalLayout implements CrudPan
 	}
 
 	@Override
-	public void setLocked()
+	public void setLocked(boolean locked)
 	{
 		// TODO Auto-generated method stub
 		

@@ -12,11 +12,12 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import au.com.vaadinutils.crud.ChildCrudEntity;
 import au.com.vaadinutils.jasper.scheduler.ScheduledDateParameter;
 
 @Entity
 @Table(name = "tblreportemailscheduleddateparameter")
-public class ReportEmailScheduledDateParameter implements ScheduledDateParameter
+public class ReportEmailScheduledDateParameter implements ScheduledDateParameter,ChildCrudEntity
 {
 
 	@Id
@@ -136,6 +137,39 @@ public class ReportEmailScheduledDateParameter implements ScheduledDateParameter
 	public String getEndName()
 	{
 		return endName;
+	}
+
+
+
+	@Override
+	public Long getId()
+	{
+		return iID;
+	}
+
+
+
+	@Override
+	public void setId(Long id)
+	{
+		iID = id;
+	}
+
+
+
+	@Override
+	public String getName()
+	{
+		return ""+iID;
+	}
+
+
+
+	@Override
+	public String getGuid()
+	{
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 

@@ -42,9 +42,9 @@ public class CrudPanelSplitPairVertical extends VerticalSplitPanel implements Cr
 	}
 
 	@Override
-	public void setLocked()
+	public void setLocked(boolean locked)
 	{
-		// TODO Auto-generated method stub
+		super.setLocked(locked);
 		
 	}
 

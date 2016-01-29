@@ -1173,4 +1173,9 @@ public abstract class JpaDslAbstract<E, R>
 	{
 		return builder.quot(get(attribute), path2);
 	}
+	
+	public <T extends Number> Expression<T> max(final SingularAttribute<E, T> attribute)
+	{
+		return builder.max(root.get(attribute));
+	}
 }
