@@ -1,7 +1,10 @@
 package au.com.vaadinutils.crud;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -11,6 +14,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.google.common.base.Preconditions;
+import com.vaadin.addon.jpacontainer.EntityItem;
+import com.vaadin.addon.jpacontainer.EntityItemProperty;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.ColumnCollapseEvent;
 import com.vaadin.ui.Table.ColumnCollapseListener;
@@ -291,7 +297,112 @@ public class HeadingPropertySet<E>
 		{
 			return addGeneratedColumn(heading, columnGenerator, false, false);
 		}
+
+		/**
+		 * Add a date column and format it.
+		 *
+		 * @param heading
+		 *            - the headling label for this column
+		 * @param column
+		 *            - the Date column that is to be displayed in the column
+		 * @param format
+		 *            - the format for the Date. format is passed to a
+		 *            SimpleDateFormat
+		 */
+		public Builder<E> addColumn(String headingLabel, SingularAttribute<E, Date> column, String dateFormat,
+				int width)
+		{
+			return addGeneratedColumn(headingLabel, column.getName(),
+					new DateColumnGenerator<E>(column.getName(), dateFormat), true, false, width);
+		}
+
+		/**
+		 * Add a date column and format it.
+		 *
+		 * @param heading
+		 *            - the headling label for this column
+		 * @param column
+		 *            - the Date column that is to be displayed in the column
+		 * @param format
+		 *            - the format for the Date. format is passed to a
+		 *            SimpleDateFormat
+		 */
+		public Builder<E> addColumn(String headingLabel, String headingPropertyId, String dateFormat, int width)
+		{
+			// We make the alias the same as the underlying property so that we
+			// can sort this column.
+			// Generated columns are not normally sortable however by mapping
+			// our generated column to the underlying date column our generated
+			// column becomes sortable.
+			return addGeneratedColumn(headingLabel, headingPropertyId,
+					new DateColumnGenerator<E>(headingPropertyId, dateFormat), true, false, width);
+
+		}
+
 	}
+
+	/**
+	 * Date Column generator used to format Date columns.
+	 *
+	 * @author bsutton
+	 *
+	 * @param <E>
+	 */
+
+	static class DateColumnGenerator<E> implements ColumnGenerator
+	{
+		private static final long serialVersionUID = 1;
+		private Logger logger = LogManager.getLogger();
+
+		final private SimpleDateFormat sdf;
+		final private SimpleDateFormat sdfParse = new SimpleDateFormat("YYYY-MM-DD");
+		final private String headingPropertyId;
+
+		DateColumnGenerator(String headingPropertyId, String format)
+		{
+			this.headingPropertyId = headingPropertyId;
+			this.sdf = new SimpleDateFormat(format);
+		}
+
+		@Override
+		public Object generateCell(Table source, Object itemId, Object columnId)
+		{
+			@SuppressWarnings("unchecked")
+			EntityItem<E> item = (EntityItem<E>) source.getItem(itemId);
+
+			EntityItemProperty dateProperty = item.getItemProperty(headingPropertyId);
+			Object objDate = dateProperty.getValue();
+			String strDate = objDate.toString();
+			Date date;
+			if (objDate instanceof Date)
+			{
+				date = (Date) objDate;
+			}
+			else
+			{
+				strDate = objDate.toString();
+				try
+				{
+					date = sdfParse.parse(strDate);
+
+				}
+				catch (ParseException e)
+				{
+					// just so we have a value.
+					date = new Date();
+					logger.error(
+							"Looks like our assumptions about the format of dates stored in EntityItems is wrong. Please update the parse format to match:"
+									+ strDate);
+				}
+
+			}
+			String formattedDate = sdf.format(date);
+			Label label = new Label(formattedDate);
+
+			return label;
+		}
+
+	};
 
 	public List<HeadingToPropertyId<E>> getColumns()
 	{
@@ -323,7 +434,7 @@ public class HeadingPropertySet<E>
 	}
 
 	/**
-	 * 
+	 *
 	 * @param table
 	 * @param uniqueTableId
 	 *            - an id for this layout/table combination, it is used to
@@ -383,8 +494,8 @@ public class HeadingPropertySet<E>
 
 		for (HeadingToPropertyId<E> id : getColumns())
 		{
-			final String setWidth = UserSettingsStorageFactory.getUserSettingsStorage().get(
-					keyStub + "-" + id.getPropertyId());
+			final String setWidth = UserSettingsStorageFactory.getUserSettingsStorage()
+					.get(keyStub + "-" + id.getPropertyId());
 			if (setWidth != null && setWidth.length() > 0)
 			{
 				table.setColumnWidth(id.getPropertyId(), Integer.parseInt(setWidth));
@@ -448,18 +559,19 @@ public class HeadingPropertySet<E>
 	{
 		final List<Object> availableList = new ArrayList<>(Arrays.asList(availableColumns));
 		final List<Object> parsedList = new ArrayList<>(Arrays.asList(parsedColumns));
-		
+
 		// Remove old columns
 		parsedList.retainAll(availableList);
 
-		// Add new columns in the same index position as they were added to the table in
+		// Add new columns in the same index position as they were added to the
+		// table in
 		final List<Object> newList = new ArrayList<>(availableList);
 		newList.removeAll(parsedList);
 		for (Object column : newList)
 		{
 			parsedList.add(availableList.indexOf(column), column);
 		}
-		
+
 		return parsedList.toArray();
 	}
 
@@ -469,8 +581,8 @@ public class HeadingPropertySet<E>
 
 		for (HeadingToPropertyId<E> id : getColumns())
 		{
-			final String setVisible = UserSettingsStorageFactory.getUserSettingsStorage().get(
-					keyStub + "-" + id.getPropertyId());
+			final String setVisible = UserSettingsStorageFactory.getUserSettingsStorage()
+					.get(keyStub + "-" + id.getPropertyId());
 			if (setVisible != null && !setVisible.isEmpty())
 				table.setColumnCollapsed(id.getPropertyId(), !Boolean.parseBoolean(setVisible));
 		}
@@ -489,6 +601,7 @@ public class HeadingPropertySet<E>
 		});
 	}
 
+	@Override
 	public String toString()
 	{
 		return Arrays.toString(cols.toArray());
