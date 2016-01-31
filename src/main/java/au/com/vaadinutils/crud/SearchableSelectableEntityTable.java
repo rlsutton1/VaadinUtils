@@ -69,7 +69,7 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 			return;
 		}
 
-		 searchBar = buildSearchBar();
+		searchBar = buildSearchBar();
 
 		Label title = new Label(getTitle());
 		title.setStyleName(Reindeer.LABEL_H1);
@@ -136,12 +136,12 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 	protected AbstractLayout buildSearchBar()
 	{
 		VerticalLayout layout = new VerticalLayout();
-		layout.setWidth("100%");
-		searchField.setWidth("100%");
+		layout.setWidth(100, Unit.PERCENTAGE);
+		searchField.setWidth(100, Unit.PERCENTAGE);
 		searchBar = layout;
 
 		HorizontalLayout basicSearchLayout = new HorizontalLayout();
-		basicSearchLayout.setSizeFull();
+		basicSearchLayout.setWidth(100, Unit.PERCENTAGE);
 		basicSearchLayout.setSpacing(true);
 		layout.addComponent(basicSearchLayout);
 

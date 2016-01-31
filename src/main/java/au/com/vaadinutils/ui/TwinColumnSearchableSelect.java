@@ -35,6 +35,7 @@ import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomField;
 import com.vaadin.ui.HorizontalLayout;
@@ -127,8 +128,8 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 		selectedCols.setVisibleColumns(itemLabel);
 		selectedCols.setColumnHeaders(fieldName);
 
-		selectedCols.setSizeFull();
-		selectedCols.setHeight("200");
+		selectedCols.setWidth(200, Unit.PIXELS);
+		selectedCols.setHeight(300, Unit.PIXELS);
 		selectedCols.setSelectable(true);
 		selectedCols.setMultiSelect(true);
 		// setting value of header here so that subclasses can
@@ -173,17 +174,13 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 		available.setHeight(height);
 		mainLayout.setHeight(height);
 	}
-
+	
 	@Override
 	protected Component initContent()
 	{
-		mainLayout.setSizeFull();
-
-		mainLayout.addComponent(selectedCols);
-
-		mainLayout.addComponent(buildButtons());
-
 		mainLayout.addComponent(available);
+		mainLayout.addComponent(buildButtons());
+		mainLayout.addComponent(selectedCols);
 		mainLayout.setExpandRatio(available, 1);
 		mainLayout.setExpandRatio(selectedCols, 1);
 
@@ -248,27 +245,19 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 		};
 		available.disableSelectable();
 
-		available.setSizeFull();
-		available.setHeight("200");
+		available.setWidth(200, Unit.PIXELS);
+		available.setHeight(300, Unit.PIXELS);
 	}
 
 	private Component buildButtons()
 	{
 		VerticalLayout layout = new VerticalLayout();
-		layout.setSizeFull();
-		layout.setWidth("50");
-		layout.setHeight("100");
-
+		layout.setWidth("40");
+		
 		removeButton.addClickListener(removeClickListener());
-		removeButton.setHeight("50");
-
 		removeAllButton.addClickListener(removeAllClickListener());
-		removeAllButton.setHeight("50");
-
 		addButton.addClickListener(addClickListener());
-
 		addAllButton.addClickListener(addAllClickListener());
-
 		addNewButton.addClickListener(addNewClickListener());
 
 		layout.addComponent(removeButton);
@@ -276,6 +265,12 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 		layout.addComponent(removeAllButton);
 		layout.addComponent(addAllButton);
 		layout.addComponent(addNewButton);
+		
+		layout.setComponentAlignment(removeButton, Alignment.MIDDLE_CENTER);
+		layout.setComponentAlignment(addButton, Alignment.MIDDLE_CENTER);
+		layout.setComponentAlignment(removeAllButton, Alignment.MIDDLE_CENTER);
+		layout.setComponentAlignment(addAllButton, Alignment.MIDDLE_CENTER);
+		layout.setComponentAlignment(addNewButton, Alignment.MIDDLE_CENTER);
 
 		return layout;
 
@@ -728,5 +723,13 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 				}
 			}
 		};
+	}
+	
+	public void setSizeFull()
+	{
+		super.setSizeFull();
+		mainLayout.setSizeFull();
+		selectedCols.setSizeFull();
+		available.setSizeFull();
 	}
 }
