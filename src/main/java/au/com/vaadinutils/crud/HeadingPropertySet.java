@@ -14,8 +14,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.google.common.base.Preconditions;
-import com.vaadin.addon.jpacontainer.EntityItem;
-import com.vaadin.addon.jpacontainer.EntityItemProperty;
+import com.vaadin.data.Item;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.ColumnCollapseEvent;
@@ -355,7 +354,7 @@ public class HeadingPropertySet<E>
 		private Logger logger = LogManager.getLogger();
 
 		final private SimpleDateFormat sdf;
-		final private SimpleDateFormat sdfParse = new SimpleDateFormat("YYYY-MM-DD");
+		final private SimpleDateFormat sdfParse = new SimpleDateFormat("yyyy-MM-dd");
 		final private String headingPropertyId;
 
 		DateColumnGenerator(String headingPropertyId, String format)
@@ -367,42 +366,39 @@ public class HeadingPropertySet<E>
 		@Override
 		public Object generateCell(Table source, Object itemId, Object columnId)
 		{
-			@SuppressWarnings("unchecked")
-			EntityItem<E> item = (EntityItem<E>) source.getItem(itemId);
+			Item item = source.getItem(itemId);
 
-			EntityItemProperty dateProperty = item.getItemProperty(headingPropertyId);
-			Object objDate = dateProperty.getValue();
-			String strDate = objDate.toString();
-			Date date;
+			Object objDate = item.getItemProperty(headingPropertyId).getValue();
+
+			String formattedDate = "";
+
 			if (objDate instanceof Date)
 			{
-				date = (Date) objDate;
+				formattedDate = sdf.format((Date) objDate);
 			}
-			else
+			else if (objDate != null)
 			{
-				strDate = objDate.toString();
+				String strDate = objDate.toString();
 				try
 				{
-					date = sdfParse.parse(strDate);
-
+					formattedDate = sdf.format(sdfParse.parse(strDate));
 				}
 				catch (ParseException e)
 				{
 					// just so we have a value.
-					date = new Date();
+					formattedDate = "Invalid";
 					logger.error(
-							"Looks like our assumptions about the format of dates stored in EntityItems is wrong. Please update the parse format to match:"
-									+ strDate);
+							"Looks like our assumptions about the format of dates is wrong. Please update the parse format to match:"
+									+ strDate +" "+sdf.toPattern());
 				}
-
 			}
-			String formattedDate = sdf.format(date);
+
 			Label label = new Label(formattedDate);
 
 			return label;
 		}
 
-	};
+	}
 
 	public List<HeadingToPropertyId<E>> getColumns()
 	{
