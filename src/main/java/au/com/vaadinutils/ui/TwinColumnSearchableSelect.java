@@ -57,10 +57,10 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	protected JPAContainer<C> availableContainer;
 	protected SearchableSelectableEntityTable<C> available;
 	private SingularAttribute<C, Long> beanIdField;
-	protected Button addButton = new Button("<");
-	protected Button removeButton = new Button(">");
-	protected Button removeAllButton = new Button(">>");
-	protected Button addAllButton = new Button("<<");
+	protected Button addButton = new Button(">");
+	protected Button removeButton = new Button("<");
+	protected Button removeAllButton = new Button("<<");
+	protected Button addAllButton = new Button(">>");
 	protected Filter baselineFilter;
 	protected HorizontalLayout mainLayout;
 	protected ValueChangeListener<C> listener;
@@ -260,10 +260,10 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 		addAllButton.addClickListener(addAllClickListener());
 		addNewButton.addClickListener(addNewClickListener());
 
-		layout.addComponent(removeButton);
 		layout.addComponent(addButton);
-		layout.addComponent(removeAllButton);
+		layout.addComponent(removeButton);
 		layout.addComponent(addAllButton);
+		layout.addComponent(removeAllButton);
 		layout.addComponent(addNewButton);
 		
 		layout.setComponentAlignment(removeButton, Alignment.MIDDLE_CENTER);
