@@ -198,14 +198,11 @@ public class ContainerCSVExport<E>
 				{
 					Object value = generator.generateCell(table, id, propertyId);
 					if (value instanceof Label)
-					{
 						value = new HtmlToPlainText().getPlainText(Jsoup.parse(((Label) value).getValue()));
-					}
 					if (value instanceof AbstractLayout)
-					{
 						value = new HtmlToPlainText().getPlainText(Jsoup.parse(itemProperty.getValue().toString()));
-					}
-					values[i++] = value.toString();
+					if (value != null)
+						values[i++] = value.toString();
 				}
 				else
 				{
@@ -266,7 +263,8 @@ public class ContainerCSVExport<E>
 
 	private void writeHeaders(CSVWriter writer, List<String> headers)
 	{
-		writer.writeNext(headers.toArray(new String[] {}));
+		writer.writeNext(headers.toArray(new String[]
+		{}));
 	}
 
 	/**
