@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.Vector;
 
 import javax.persistence.metamodel.EntityType;
 import javax.persistence.metamodel.Metamodel;
@@ -19,6 +20,7 @@ import au.com.vaadinutils.crud.HeadingPropertySet;
 import au.com.vaadinutils.crud.SearchableSelectableEntityTable;
 import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.dao.JpaBaseDao;
+import au.com.vaadinutils.dao.NullFilter;
 
 import com.google.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.JPAContainer;
@@ -29,13 +31,15 @@ import com.vaadin.data.Container.Filterable;
 import com.vaadin.data.Property;
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.util.BeanContainer;
-import com.vaadin.data.util.filter.And;
+import com.vaadin.data.util.filter.Compare;
+import com.vaadin.data.util.filter.Not;
+import com.vaadin.data.util.filter.Or;
 import com.vaadin.data.util.filter.SimpleStringFilter;
 import com.vaadin.server.FontAwesome;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
-import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomField;
 import com.vaadin.ui.HorizontalLayout;
@@ -62,6 +66,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	protected Button removeAllButton = new Button("<<");
 	protected Button addAllButton = new Button(">>");
 	protected Filter baselineFilter;
+	protected Filter selectedFilter;
 	protected HorizontalLayout mainLayout;
 	protected ValueChangeListener<C> listener;
 	protected Button addNewButton = new Button(FontAwesome.PLUS);
@@ -89,13 +94,16 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 		this(fieldName, listField, null, isAscending);
 	}
 
-	public TwinColumnSearchableSelect(final String fieldName, final SingularAttribute<C, ?> listField, final String itemLabel)
+	public TwinColumnSearchableSelect(final String fieldName, final SingularAttribute<C, ?> listField,
+			final String itemLabel)
 	{
 		this(fieldName, listField, itemLabel, true);
 	}
 
-	public TwinColumnSearchableSelect(final String fieldName, final SingularAttribute<C, ?> listField, String itemLabel, final boolean isAscending)
+	public TwinColumnSearchableSelect(final String fieldName, final SingularAttribute<C, ?> listField,
+			String itemLabel, final boolean isAscending)
 	{
+		this.setCaption(fieldName);
 		mainLayout = new HorizontalLayout();
 
 		this.isAscending = isAscending;
@@ -126,7 +134,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 		}
 
 		selectedCols.setVisibleColumns(itemLabel);
-		selectedCols.setColumnHeaders(fieldName);
+		selectedCols.setColumnHeaders("Selected");
 
 		selectedCols.setWidth(200, Unit.PIXELS);
 		selectedCols.setHeight(300, Unit.PIXELS);
@@ -139,6 +147,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 
 		addSelectedColumnTooltip();
 		addNewButton.setVisible(false);
+		refreshSelected();
 	}
 
 	public void allowAddNew(CreateNewCallback<C> createNewCallback)
@@ -174,7 +183,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 		available.setHeight(height);
 		mainLayout.setHeight(height);
 	}
-	
+
 	@Override
 	protected Component initContent()
 	{
@@ -194,13 +203,8 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 
 	private void createAvailableTable()
 	{
-
 		available = new SearchableSelectableEntityTable<C>(this.getClass().getSimpleName())
 		{
-
-			/**
-			*
-			*/
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -218,23 +222,12 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 			@Override
 			protected Filter getContainerFilter(String filterString, boolean advancedSearchActive)
 			{
-				Filter filter = null;
+				Filter searchFilter = null;
+
 				if (filterString != null && filterString.length() > 0)
-				{
-					filter = new SimpleStringFilter(listField.getName(), filterString, true, false);
-				}
-				if (baselineFilter != null)
-				{
-					if (filter != null)
-					{
-						filter = new And(baselineFilter, filter);
-					}
-					else
-					{
-						filter = baselineFilter;
-					}
-				}
-				return filter;
+					searchFilter = getSearchFilter(filterString);
+
+				return NullFilter.and(baselineFilter, selectedFilter, searchFilter);
 			}
 
 			@Override
@@ -243,8 +236,8 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 				return "";
 			}
 		};
-		available.disableSelectable();
 
+		available.disableSelectable();
 		available.setWidth(200, Unit.PIXELS);
 		available.setHeight(300, Unit.PIXELS);
 	}
@@ -253,7 +246,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	{
 		VerticalLayout layout = new VerticalLayout();
 		layout.setWidth("40");
-		
+
 		removeButton.addClickListener(removeClickListener());
 		removeAllButton.addClickListener(removeAllClickListener());
 		addButton.addClickListener(addClickListener());
@@ -265,7 +258,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 		layout.addComponent(addAllButton);
 		layout.addComponent(removeAllButton);
 		layout.addComponent(addNewButton);
-		
+
 		layout.setComponentAlignment(removeButton, Alignment.MIDDLE_CENTER);
 		layout.setComponentAlignment(addButton, Alignment.MIDDLE_CENTER);
 		layout.setComponentAlignment(removeAllButton, Alignment.MIDDLE_CENTER);
@@ -370,6 +363,8 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 		beans.sort(new Object[]
 		{ listField.getName() }, new boolean[]
 		{ isAscending });
+
+		refreshSelected();
 	}
 
 	@Override
@@ -433,9 +428,29 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	public void setFilter(Filter filter)
 	{
 		baselineFilter = filter;
+		availableContainer.setFireContainerItemSetChangeEvents(false);
 		availableContainer.removeAllContainerFilters();
+		availableContainer.setFireContainerItemSetChangeEvents(true);
 		availableContainer.addContainerFilter(filter);
+	}
 
+	private void refreshSelected()
+	{
+		final List<Long> selectedIds = beans.getItemIds();
+		if (selectedIds.size() == 1)
+		{
+			selectedFilter = new Compare.Equal(beanIdField.getName(), selectedIds.get(0));
+			available.triggerFilter();
+			return;
+		}
+
+		final Vector<Filter> filters = new Vector<>();
+		for (Long id : selectedIds)
+		{
+			filters.add(new Compare.Equal(beanIdField.getName(), id));
+		}
+		selectedFilter = new Not(new Or(filters.toArray(new Filter[filters.size()])));
+		available.triggerFilter();
 	}
 
 	public void setFilterDelegate(DefaultQueryModifierDelegate defaultQueryModifierDelegate)
@@ -575,7 +590,6 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 			@Override
 			public void buttonClick(ClickEvent event)
 			{
-				beans.removeAllItems();
 				List<Long> ids = new LinkedList<>();
 				ids.addAll((Collection<? extends Long>) available.getContainer().getItemIds());
 
@@ -592,7 +606,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 						}
 					}
 				}
-
+				refreshSelected();
 			}
 		};
 	}
@@ -632,6 +646,8 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 				beans.sort(new Object[]
 				{ listField.getName() }, new boolean[]
 				{ isAscending });
+
+				refreshSelected();
 			}
 		};
 	}
@@ -683,6 +699,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 							}
 
 							postRemoveAction();
+							refreshSelected();
 						}
 						else
 						{
@@ -716,6 +733,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 					{
 						listener.valueChanged(getFieldValue());
 					}
+					refreshSelected();
 				}
 				catch (Exception e)
 				{
@@ -724,12 +742,17 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 			}
 		};
 	}
-	
+
 	public void setSizeFull()
 	{
 		super.setSizeFull();
 		mainLayout.setSizeFull();
 		selectedCols.setSizeFull();
 		available.setSizeFull();
+	}
+
+	protected Filter getSearchFilter(final String filterString)
+	{
+		return new SimpleStringFilter(listField.getName(), filterString, true, false);
 	}
 }
