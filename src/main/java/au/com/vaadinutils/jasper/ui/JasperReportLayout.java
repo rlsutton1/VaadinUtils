@@ -11,26 +11,6 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import au.com.vaadinutils.dao.JpaBaseDao;
-import au.com.vaadinutils.jasper.JasperManager;
-import au.com.vaadinutils.jasper.JasperManager.OutputFormat;
-import au.com.vaadinutils.jasper.JasperProgressListener;
-import au.com.vaadinutils.jasper.QueueEntry;
-import au.com.vaadinutils.jasper.ReportStatus;
-import au.com.vaadinutils.jasper.filter.ExpanderComponent;
-import au.com.vaadinutils.jasper.filter.ReportFilterUIBuilder;
-import au.com.vaadinutils.jasper.parameter.ReportChooser;
-import au.com.vaadinutils.jasper.parameter.ReportParameter;
-import au.com.vaadinutils.jasper.parameter.ReportParameterConstant;
-import au.com.vaadinutils.jasper.scheduler.JasperReportEmailWindow;
-import au.com.vaadinutils.jasper.scheduler.JasperReportSchedulerWindow;
-import au.com.vaadinutils.jasper.scheduler.ScheduleIconBuilder;
-import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailScheduleEntity;
-import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailScheduleEntity_;
-import au.com.vaadinutils.listener.CancelListener;
-import au.com.vaadinutils.listener.ClickEventLogged;
-import au.com.vaadinutils.ui.WorkingDialog;
-
 import com.google.common.base.Preconditions;
 import com.vaadin.data.Item;
 import com.vaadin.event.UIEvents.PollEvent;
@@ -58,6 +38,25 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Reindeer;
 
+import au.com.vaadinutils.dao.JpaBaseDao;
+import au.com.vaadinutils.jasper.JasperManager;
+import au.com.vaadinutils.jasper.JasperManager.OutputFormat;
+import au.com.vaadinutils.jasper.JasperProgressListener;
+import au.com.vaadinutils.jasper.QueueEntry;
+import au.com.vaadinutils.jasper.ReportStatus;
+import au.com.vaadinutils.jasper.filter.ExpanderComponent;
+import au.com.vaadinutils.jasper.filter.ReportFilterUIBuilder;
+import au.com.vaadinutils.jasper.parameter.ReportChooser;
+import au.com.vaadinutils.jasper.parameter.ReportParameter;
+import au.com.vaadinutils.jasper.parameter.ReportParameterConstant;
+import au.com.vaadinutils.jasper.scheduler.JasperReportEmailWindow;
+import au.com.vaadinutils.jasper.scheduler.JasperReportSchedulerWindow;
+import au.com.vaadinutils.jasper.scheduler.ScheduleIconBuilder;
+import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailScheduleEntity;
+import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailScheduleEntity_;
+import au.com.vaadinutils.listener.CancelListener;
+import au.com.vaadinutils.listener.ClickEventLogged;
+import au.com.vaadinutils.ui.WorkingDialog;
 import elemental.json.JsonArray;
 import elemental.json.JsonObject;
 
@@ -68,7 +67,7 @@ import elemental.json.JsonObject;
 class JasperReportLayout extends VerticalLayout
 {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -4195751089112256038L;
 
@@ -181,7 +180,7 @@ class JasperReportLayout extends VerticalLayout
 
 				}
 			});
-			
+
 		}
 		splash.addComponent(splashLabel);
 
@@ -232,8 +231,8 @@ class JasperReportLayout extends VerticalLayout
 						}
 						else
 						{
-							subFilters.add(new ReportParameterConstant<String>(key, params.getString(key), key, params
-									.getString(key)));
+							subFilters.add(new ReportParameterConstant<String>(key, params.getString(key), key,
+									params.getString(key)));
 						}
 					}
 
@@ -384,16 +383,18 @@ class JasperReportLayout extends VerticalLayout
 		scheduleButton = new NativeButton();
 
 		JpaBaseDao<ReportEmailScheduleEntity, Long> dao = JpaBaseDao.getGenericDao(ReportEmailScheduleEntity.class);
-		Long count = dao.getCount(ReportEmailScheduleEntity_.JasperReportPropertiesClassName, reportProperties
-				.getReportClass().getCanonicalName());
+		Long count = dao.getCount(ReportEmailScheduleEntity_.JasperReportPropertiesClassName,
+				reportProperties.getReportClass().getCanonicalName());
 
 		ScheduleIconBuilder iconBuilder = new ScheduleIconBuilder();
 
 		String baseIconFileName = "Call Calendar_32";
 		String path = VaadinServlet.getCurrent().getServletContext().getRealPath("templates/images/seanau/");
-		
-		// HACK: added this as the lack of a leading slash causes it to return null in scoutmaster but didn't know if adding the slash would break existing code.
-		if (path == null)
+
+		// HACK: scoutmaster stores images in a different directory so if the
+		// images isn't found in the above templates directory
+		// then search in the /images/seanau director.
+		if (path == null || !new File(path).exists())
 			path = VaadinServlet.getCurrent().getServletContext().getRealPath("/images/seanau/");
 		String targetFileName = baseIconFileName + "-" + count + ".png";
 		iconBuilder.buildLogo(count.intValue(), new File(path), baseIconFileName + ".png", targetFileName);
@@ -474,7 +475,7 @@ class JasperReportLayout extends VerticalLayout
 
 	/**
 	 * intended to allow the pdf to print as it opens.
-	 * 
+	 *
 	 * firefox prevents it, and for large pdfs in chrome it is firing too soon
 	 * and prevents display of the pdf as a result
 	 */
@@ -548,12 +549,9 @@ class JasperReportLayout extends VerticalLayout
 
 		UI.getCurrent().addWindow(dialog);
 
-
- getProgressDialogRefreshListener(dialog);
-
+		getProgressDialogRefreshListener(dialog);
 
 		getStreamConnectorRefreshListener(outputFormat);
-		
 
 		JasperProgressListener listener = getJasperManagerProgressListener(UI.getCurrent(), dialog, outputFormat);
 		manager.exportAsync(outputFormat, params, listener);
@@ -594,7 +592,7 @@ class JasperReportLayout extends VerticalLayout
 				{
 					componet.getComponent().setEnabled(true);
 				}
-				
+
 				dialog.close();
 			}
 
@@ -621,7 +619,7 @@ class JasperReportLayout extends VerticalLayout
 		UI.getCurrent().setPollInterval(500);
 		UI.getCurrent().addPollListener(new PollListener()
 		{
-	
+
 			private static final long serialVersionUID = -5641305025399715756L;
 
 			@Override
@@ -648,7 +646,7 @@ class JasperReportLayout extends VerticalLayout
 						getDisplayPanel().setSource(resource);
 					}
 					UI.getCurrent().removePollListener(this);
-					
+
 				}
 
 			}
@@ -674,7 +672,7 @@ class JasperReportLayout extends VerticalLayout
 
 			}
 		});
-		
+
 	}
 
 	private void showCsvSplash()

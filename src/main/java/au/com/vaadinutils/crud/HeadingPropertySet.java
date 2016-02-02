@@ -1,6 +1,10 @@
 package au.com.vaadinutils.crud;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -9,10 +13,9 @@ import javax.persistence.metamodel.SingularAttribute;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import au.com.vaadinutils.dao.Path;
-import au.com.vaadinutils.user.UserSettingsStorageFactory;
-
 import com.google.common.base.Preconditions;
+import com.vaadin.data.Item;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.ColumnCollapseEvent;
 import com.vaadin.ui.Table.ColumnCollapseListener;
@@ -21,6 +24,9 @@ import com.vaadin.ui.Table.ColumnReorderEvent;
 import com.vaadin.ui.Table.ColumnReorderListener;
 import com.vaadin.ui.Table.ColumnResizeEvent;
 import com.vaadin.ui.Table.ColumnResizeListener;
+
+import au.com.vaadinutils.dao.Path;
+import au.com.vaadinutils.user.UserSettingsStorageFactory;
 
 public class HeadingPropertySet<E>
 {
@@ -70,7 +76,8 @@ public class HeadingPropertySet<E>
 		public Builder<E> addColumn(final String heading, final String headingPropertyId,
 				final boolean defaultVisibleState, final boolean lockedState, final int width)
 		{
-			cols.add(new HeadingToPropertyId<E>(heading, headingPropertyId, null, defaultVisibleState, lockedState, null));
+			cols.add(new HeadingToPropertyId<E>(heading, headingPropertyId, null, defaultVisibleState, lockedState,
+					null));
 			return this;
 		}
 
@@ -84,7 +91,8 @@ public class HeadingPropertySet<E>
 		public <T extends Object> Builder<E> addColumn(final String heading, final String headingPropertyId,
 				final boolean defaultVisibleState, final boolean lockedState)
 		{
-			cols.add(new HeadingToPropertyId<E>(heading, headingPropertyId, null, defaultVisibleState, lockedState, null));
+			cols.add(new HeadingToPropertyId<E>(heading, headingPropertyId, null, defaultVisibleState, lockedState,
+					null));
 			return this;
 		}
 
@@ -288,6 +296,108 @@ public class HeadingPropertySet<E>
 		{
 			return addGeneratedColumn(heading, columnGenerator, false, false);
 		}
+
+		/**
+		 * Add a date column and format it.
+		 *
+		 * @param heading
+		 *            - the headling label for this column
+		 * @param column
+		 *            - the Date column that is to be displayed in the column
+		 * @param format
+		 *            - the format for the Date. format is passed to a
+		 *            SimpleDateFormat
+		 */
+		public Builder<E> addColumn(String headingLabel, SingularAttribute<E, Date> column, String dateFormat,
+				int width)
+		{
+			return addGeneratedColumn(headingLabel, column.getName(),
+					new DateColumnGenerator<E>(column.getName(), dateFormat), true, false, width);
+		}
+
+		/**
+		 * Add a date column and format it.
+		 *
+		 * @param heading
+		 *            - the headling label for this column
+		 * @param column
+		 *            - the Date column that is to be displayed in the column
+		 * @param format
+		 *            - the format for the Date. format is passed to a
+		 *            SimpleDateFormat
+		 */
+		public Builder<E> addColumn(String headingLabel, String headingPropertyId, String dateFormat, int width)
+		{
+			// We make the alias the same as the underlying property so that we
+			// can sort this column.
+			// Generated columns are not normally sortable however by mapping
+			// our generated column to the underlying date column our generated
+			// column becomes sortable.
+			return addGeneratedColumn(headingLabel, headingPropertyId,
+					new DateColumnGenerator<E>(headingPropertyId, dateFormat), true, false, width);
+
+		}
+
+	}
+
+	/**
+	 * Date Column generator used to format Date columns.
+	 *
+	 * @author bsutton
+	 *
+	 * @param <E>
+	 */
+
+	static class DateColumnGenerator<E> implements ColumnGenerator
+	{
+		private static final long serialVersionUID = 1;
+		private Logger logger = LogManager.getLogger();
+
+		final private SimpleDateFormat sdf;
+		final private SimpleDateFormat sdfParse = new SimpleDateFormat("yyyy-MM-dd");
+		final private String headingPropertyId;
+
+		DateColumnGenerator(String headingPropertyId, String format)
+		{
+			this.headingPropertyId = headingPropertyId;
+			this.sdf = new SimpleDateFormat(format);
+		}
+
+		@Override
+		public Object generateCell(Table source, Object itemId, Object columnId)
+		{
+			Item item = source.getItem(itemId);
+
+			Object objDate = item.getItemProperty(headingPropertyId).getValue();
+
+			String formattedDate = "";
+
+			if (objDate instanceof Date)
+			{
+				formattedDate = sdf.format((Date) objDate);
+			}
+			else if (objDate != null)
+			{
+				String strDate = objDate.toString();
+				try
+				{
+					formattedDate = sdf.format(sdfParse.parse(strDate));
+				}
+				catch (ParseException e)
+				{
+					// just so we have a value.
+					formattedDate = "Invalid";
+					logger.error(
+							"Looks like our assumptions about the format of dates is wrong. Please update the parse format to match:"
+									+ strDate +" "+sdf.toPattern());
+				}
+			}
+
+			Label label = new Label(formattedDate);
+
+			return label;
+		}
+
 	}
 
 	public List<HeadingToPropertyId<E>> getColumns()
@@ -320,7 +430,7 @@ public class HeadingPropertySet<E>
 	}
 
 	/**
-	 * 
+	 *
 	 * @param table
 	 * @param uniqueTableId
 	 *            - an id for this layout/table combination, it is used to
@@ -380,8 +490,8 @@ public class HeadingPropertySet<E>
 
 		for (HeadingToPropertyId<E> id : getColumns())
 		{
-			final String setWidth = UserSettingsStorageFactory.getUserSettingsStorage().get(
-					keyStub + "-" + id.getPropertyId());
+			final String setWidth = UserSettingsStorageFactory.getUserSettingsStorage()
+					.get(keyStub + "-" + id.getPropertyId());
 			if (setWidth != null && setWidth.length() > 0)
 			{
 				table.setColumnWidth(id.getPropertyId(), Integer.parseInt(setWidth));
@@ -406,13 +516,15 @@ public class HeadingPropertySet<E>
 	{
 		final String keyStub = uniqueTableId + "-order";
 
-		String columns = UserSettingsStorageFactory.getUserSettingsStorage().get(keyStub);
-		if (columns != null && !columns.isEmpty())
+		final Object[] availableColumns = table.getVisibleColumns();
+		final String columns = UserSettingsStorageFactory.getUserSettingsStorage().get(keyStub);
+		if (availableColumns.length > 0 && columns != null && !columns.isEmpty())
 		{
-			columns = columns.replaceAll("\\[|\\]", "");
-			final Object[] parsedColumns = columns.split(", ?");
+			final Object[] parsedColumns = columns.replaceAll("\\[|\\]", "").split(", ?");
 			if (parsedColumns.length > 0)
-				table.setVisibleColumns(parsedColumns);
+			{
+				table.setVisibleColumns(calculateColumnOrder(availableColumns, parsedColumns));
+			}
 		}
 
 		table.addColumnReorderListener(new ColumnReorderListener()
@@ -428,14 +540,45 @@ public class HeadingPropertySet<E>
 		});
 	}
 
+	/**
+	 * If a column order has already been saved for a user, but the columns for
+	 * a table have been modified, then we need to remove any columns that no
+	 * longer exist and add any new columns to the list of visible columns.
+	 *
+	 * @param availableColumns
+	 *            the columns that are available in the table
+	 * @param parsedColumns
+	 *            the column order that has been restored from preferences
+	 * @return the calculated order of columns with old removed and new added
+	 */
+	private Object[] calculateColumnOrder(final Object[] availableColumns, final Object[] parsedColumns)
+	{
+		final List<Object> availableList = new ArrayList<>(Arrays.asList(availableColumns));
+		final List<Object> parsedList = new ArrayList<>(Arrays.asList(parsedColumns));
+
+		// Remove old columns
+		parsedList.retainAll(availableList);
+
+		// Add new columns in the same index position as they were added to the
+		// table in
+		final List<Object> newList = new ArrayList<>(availableList);
+		newList.removeAll(parsedList);
+		for (Object column : newList)
+		{
+			parsedList.add(availableList.indexOf(column), column);
+		}
+
+		return parsedList.toArray();
+	}
+
 	private void configureSaveColumnVisible(final Table table, final String uniqueTableId)
 	{
 		final String keyStub = uniqueTableId + "-visible";
 
 		for (HeadingToPropertyId<E> id : getColumns())
 		{
-			final String setVisible = UserSettingsStorageFactory.getUserSettingsStorage().get(
-					keyStub + "-" + id.getPropertyId());
+			final String setVisible = UserSettingsStorageFactory.getUserSettingsStorage()
+					.get(keyStub + "-" + id.getPropertyId());
 			if (setVisible != null && !setVisible.isEmpty())
 				table.setColumnCollapsed(id.getPropertyId(), !Boolean.parseBoolean(setVisible));
 		}
@@ -454,6 +597,7 @@ public class HeadingPropertySet<E>
 		});
 	}
 
+	@Override
 	public String toString()
 	{
 		return Arrays.toString(cols.toArray());

@@ -744,10 +744,12 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 					}
 					if (!advancedSearchOn)
 					{
+						advancedSearchButton.setCaption("Advanced");
 						advancedSearchButton.removeStyleName(ValoTheme.BUTTON_FRIENDLY);
 					}
 					else
 					{
+						advancedSearchButton.setCaption("Basic");
 						advancedSearchButton.setStyleName(ValoTheme.BUTTON_FRIENDLY);
 					}
 

@@ -26,7 +26,8 @@ public class ContainerAdaptorEntity<E extends CrudEntity> implements ContainerAd
 	return container.getItem(id);
     }
 
-    @Override
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	@Override
     public Property getProperty(E entity, Object id)
     {
 	return container.getContainerProperty(entity.getId(), id);

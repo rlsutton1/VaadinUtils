@@ -58,12 +58,14 @@ import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.AbstractSelect.ItemCaptionMode;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomField;
 import com.vaadin.ui.DateField;
 import com.vaadin.ui.Field;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
@@ -130,6 +132,16 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 		return field;
 	}
 
+	public <M> TextField bindTextFieldWithButton(String fieldLabel, SingularAttribute<E, M> member, Button button)
+	{
+
+		TextField field = bindTextFieldWithButton(form, group, fieldLabel, member.getName(), button);
+
+		this.fieldList.add(field);
+
+		return field;
+	}
+
 	public TextField bindTextField(String fieldLabel, String fieldName)
 	{
 		TextField field = bindTextField(form, group, fieldLabel, fieldName);
@@ -182,6 +194,32 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 		return field;
 	}
 
+	public TextField bindTextFieldWithButton(AbstractLayout form, ValidatingFieldGroup<E> group, String fieldLabel,
+			String fieldName, Button button)
+	{
+
+		HorizontalLayout layout = new HorizontalLayout();
+		layout.setSizeFull();
+		
+		TextField field = new SplitTextField(fieldLabel);
+		field.setWidth("100%");
+		field.setImmediate(true);
+		field.setNullRepresentation("");
+		field.setNullSettingAllowed(false);
+		field.setId(fieldLabel);
+		addValueChangeListeners(field);
+		doBinding(group, fieldName, field);
+
+		layout.addComponent(field);
+		layout.addComponent(button);
+
+		layout.setExpandRatio(field, 2);
+		
+		form.addComponent(layout);
+
+		return field;
+	}
+
 	public void doBinding(FieldGroup group, String fieldName, @SuppressWarnings("rawtypes") Field field)
 	{
 		if (group != null)
@@ -200,9 +238,8 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 		this.fieldList.add(field);
 		return field;
 	}
-	
-	public <M> PasswordField bindPasswordField( String fieldLabel,
-			SingularAttribute<E, M> member)
+
+	public <M> PasswordField bindPasswordField(String fieldLabel, SingularAttribute<E, M> member)
 	{
 		PasswordField field = bindPasswordField(form, group, fieldLabel, (member != null ? member.getName() : null));
 		this.fieldList.add(field);
@@ -636,7 +673,9 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 
 			ContainerAdaptor<L> adaptor = ContainerAdaptorFactory.getAdaptor(container);
 			if (adaptor.getSortableContainerPropertyIds().contains(listField))
-				adaptor.sort(new String[] { listField }, new boolean[] { true });
+				adaptor.sort(new String[]
+				{ listField }, new boolean[]
+				{ true });
 
 			component.setItemCaptionPropertyId(listField);
 			component.setContainerDataSource(container);
@@ -788,7 +827,8 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 		private AbstractLayout builderForm;
 		private boolean multiSelect = false;
 
-		@SuppressWarnings({ "unchecked", "rawtypes" })
+		@SuppressWarnings(
+		{ "unchecked", "rawtypes" })
 		public SplitListSelect build()
 		{
 			Preconditions.checkNotNull(label, "label may not be null");
@@ -818,7 +858,9 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 					+ " is not valid, valid listFields are " + container.getContainerPropertyIds().toString());
 
 			if (container.getSortableContainerPropertyIds().contains(listField))
-				container.sort(new String[] { listField }, new boolean[] { true });
+				container.sort(new String[]
+				{ listField }, new boolean[]
+				{ true });
 
 			component.setContainerDataSource(container);
 
@@ -838,7 +880,7 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 			component.setNullSelectionAllowed(false);
 			component.setId(label);
 
-			if (group != null && field !=null)
+			if (group != null && field != null)
 			{
 				Preconditions.checkState(group.getContainer().getContainerPropertyIds().contains(field), field
 						+ " is not valid, valid listFieldNames are "
@@ -964,7 +1006,8 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 		private String leftColumnCaption = "Available";
 		private String rightColumnCaption = "Selected";
 
-		@SuppressWarnings({ "unchecked", "rawtypes" })
+		@SuppressWarnings(
+		{ "unchecked", "rawtypes" })
 		public SplitTwinColSelect build()
 		{
 			Preconditions.checkNotNull(label, "label may not be null");
@@ -998,7 +1041,9 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 
 			ContainerAdaptor<L> adaptor = ContainerAdaptorFactory.getAdaptor(container);
 			if (adaptor.getSortableContainerPropertyIds().contains(listField))
-				adaptor.sort(new String[] { listField }, new boolean[] { true });
+				adaptor.sort(new String[]
+				{ listField }, new boolean[]
+				{ true });
 
 			component.setContainerDataSource(container);
 			component.setConverter(new MultiSelectConverter(component, Set.class));
@@ -1316,7 +1361,8 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings(
+	{ "rawtypes", "unchecked" })
 	static public <J extends CrudEntity> FormHelper<?>.ListSelectBuilder<J> getListSelectBuilder(AbstractLayout form,
 			Class<J> j)
 	{
@@ -1325,7 +1371,8 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings(
+	{ "rawtypes", "unchecked" })
 	static public <J extends CrudEntity> FormHelper<?>.EntityFieldBuilder<J> getEntityFieldBuilder(AbstractLayout form,
 			Class<J> j)
 	{

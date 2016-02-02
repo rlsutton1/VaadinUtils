@@ -103,8 +103,27 @@ public enum EntityManagerProvider
 
 		Preconditions.checkArgument(em == null || (oldem == null && em != null),
 				"Can not replace the current entity manager, close it and set it to null first!!!!");
-		
-		Preconditions.checkArgument(oldem==null || !oldem.isOpen(),"Current entity manager is still open, close it first");
+
+		/**
+		 * Before you try to clear or replace the current entity manager you
+		 * should do something similar to:
+		 *
+		 *  @formatter:off
+		 *  	try
+		 *		{
+		 *			transaction.commit();
+		 *			transaction.close();
+		 *			em.close();
+		 *		}
+		 *		finally
+		 *		{
+		 *			EntityManagerProvider.setCurrentEntityManager(null);
+		 *		}
+		 *  @formatter:on
+		 *
+		 */
+		Preconditions.checkArgument(oldem == null || !oldem.isOpen(),
+				"Current entity manager is still open, commit and close any transactions and then close the EntityManager first");
 
 		if (em == null)
 		{
@@ -121,7 +140,7 @@ public enum EntityManagerProvider
 		}
 
 		INSTANCE.entityManagerThreadLocal.set(em);
-		
+
 		if (em != null)
 		{
 			runPreActions(em);
@@ -130,8 +149,6 @@ public enum EntityManagerProvider
 		{
 			runPostActions();
 		}
-
-		
 
 	}
 
@@ -455,7 +472,7 @@ public enum EntityManagerProvider
 	 *
 	 * Registered actions are global and will be run across all threads every
 	 * time an entity manager is set via a call to
-	 * 
+	 *
 	 * @formatter:off void setCurrentEntityManager(EntityManager em)
 	 * @formatter:on
 	 *

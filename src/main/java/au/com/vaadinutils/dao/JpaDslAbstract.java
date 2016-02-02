@@ -1,6 +1,5 @@
 package au.com.vaadinutils.dao;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -27,9 +26,9 @@ import javax.persistence.metamodel.ListAttribute;
 import javax.persistence.metamodel.SetAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 
-import au.com.vaadinutils.dao.JpaBaseDao.Condition;
-
 import com.google.common.base.Preconditions;
+
+import au.com.vaadinutils.dao.JpaBaseDao.Condition;
 
 /**
  * 
@@ -581,10 +580,6 @@ public abstract class JpaDslAbstract<E, R>
 		{
 			criteria.orderBy(orders);
 		}
-		if (distinct)
-		{
-			criteria.distinct(true);
-		}
 		TypedQuery<R> query = getEntityManager().createQuery(criteria);
 
 		if (limit != null)
@@ -964,8 +959,6 @@ public abstract class JpaDslAbstract<E, R>
 
 	boolean isJpaContainerDelegate;
 
-	private boolean distinct = false;
-
 	@SuppressWarnings("unchecked")
 	<K> Join<E, K> getJoin(JoinBuilder<E, K> builder)
 	{
@@ -1074,7 +1067,7 @@ public abstract class JpaDslAbstract<E, R>
 
 	public JpaDslAbstract<E, R> distinct()
 	{
-		this.distinct = true;
+		criteria.distinct(true);
 		return this;
 	}
 
@@ -1179,5 +1172,10 @@ public abstract class JpaDslAbstract<E, R>
 	public <T extends Number> Expression<Number> divide(final SingularAttribute<E, T> attribute, final Path<? extends Number> path2)
 	{
 		return builder.quot(get(attribute), path2);
+	}
+	
+	public <T extends Number> Expression<T> max(final SingularAttribute<E, T> attribute)
+	{
+		return builder.max(root.get(attribute));
 	}
 }

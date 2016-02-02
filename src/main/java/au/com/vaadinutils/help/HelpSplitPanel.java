@@ -54,9 +54,9 @@ public class HelpSplitPanel extends HorizontalSplitPanel implements View, HelpPa
 	{
 		super();
 		this.component = component;
-		if (component instanceof HelpPageListener)
+		if (component instanceof HelpPageListenerMinimal)
 		{
-			((HelpPageListener) component).setHelpPageListener(this);
+			((HelpPageListenerMinimal) component).setHelpPageListener(this);
 		}
 
 		setImmediate(true);
@@ -126,6 +126,7 @@ public class HelpSplitPanel extends HorizontalSplitPanel implements View, HelpPa
 	}
 
 	boolean helpHiding = false;
+	private VerticalLayout innerSecondPanel;
 
 	private boolean isHelpHidden()
 	{
@@ -215,7 +216,11 @@ public class HelpSplitPanel extends HorizontalSplitPanel implements View, HelpPa
 		setSplitPosition(100, Unit.PERCENTAGE, false);
 		setLocked(true);
 
-		super.setSecondComponent(tb);
+		innerSecondPanel = new VerticalLayout();
+		innerSecondPanel.setSizeFull();
+		innerSecondPanel.addComponent(tb);
+
+		super.setSecondComponent(innerSecondPanel);
 
 		Page.getCurrent().addBrowserWindowResizeListener(new BrowserWindowResizeListener()
 		{
@@ -376,21 +381,55 @@ public class HelpSplitPanel extends HorizontalSplitPanel implements View, HelpPa
 	}
 
 	@Override
-	public void showHelpOnPage()
+	public void setHelpPageListener(HelpPageListener helpSplitPanel)
 	{
-		HelpSplitPanel.super.removeComponent(HelpSplitPanel.super.getSecondComponent());
-		HelpSplitPanel.super.setSecondComponent(helpPane);
-		showHelpOnPage = true;
-		setHelpPageId(currentHelpId);
-		adjustHelpSize(currentHelpId);
-		setLocked(false);
-		resizeHelp();
+		throw new RuntimeException(
+				"This is the top level HelpPageListenerMinimal, you cant set the HelpPageListenerMinimal");
+
 	}
 
 	@Override
-	public void setHelpPageListener(HelpPageListener helpSplitPanel)
+	public void showHelpOnPage()
 	{
-		throw new RuntimeException("This is the top level HelpPageListener, you cant set the HelpPageListener");
+		showHelpOnLayout(innerSecondPanel);
+
+		adjustHelpSize(currentHelpId);
+		setLocked(false);
+
+	}
+
+	@Override
+	public void showHelpOnLayout(VerticalLayout layout)
+	{
+
+		innerSecondPanel.removeComponent(helpPane);
+		final VerticalLayout content = new VerticalLayout(new Label("Help is current displayed on the page"));
+		content.setMargin(true);
+		tb.setContent(content);
+		tb.setVisible(false);
+		layout.addComponent(helpPane);
+		showHelpOnPage = true;
+		setHelpPageId(currentHelpId);
+	
+		resizeHelp();
+
+	}
+
+	@Override
+	public void resetHelpPosition()
+	{
+
+		innerSecondPanel.removeComponent(helpPane);
+		tb.setContent(helpPane);
+		tb.setVisible(true);
+		helpPane.setMargin(true);
+		showHelpOnPage = false;
+		setHelpPageId(currentHelpId);
+		resizeHelp();
+		adjustHelpSize(currentHelpId);
+		
+		setSplitPosition(100f);
+		setLocked(true);
 
 	}
 

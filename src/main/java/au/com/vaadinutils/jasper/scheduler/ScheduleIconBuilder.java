@@ -22,7 +22,7 @@ public class ScheduleIconBuilder
 
 	/**
 	 * image is rendered at twice the requested size to guarantee good quality
-	 * 
+	 *
 	 * @param width
 	 * @param title
 	 * @param imagePath
@@ -36,9 +36,9 @@ public class ScheduleIconBuilder
 		try
 		{
 
-			Preconditions.checkArgument(imagePath.exists(), "Image path " + imagePath.getAbsolutePath()
-					+ " doesn't exist");
-			File targetFile = new File(imagePath, targetFileName );
+			Preconditions.checkArgument(imagePath.exists(),
+					"Image path " + imagePath.getAbsolutePath() + "/" + targetFileName + " doesn't exist");
+			File targetFile = new File(imagePath, targetFileName);
 
 			if (targetFile.exists())
 			{
@@ -63,8 +63,8 @@ public class ScheduleIconBuilder
 
 			// position "Noojee Telephony Solutions"
 			String nts = "" + number;
-			
-			graphics.drawString(nts,  2, (metrics.getHeight()/2) + 6);
+
+			graphics.drawString(nts, 2, (metrics.getHeight() / 2) + 6);
 
 			// save the image
 
