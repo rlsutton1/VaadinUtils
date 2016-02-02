@@ -13,6 +13,9 @@ import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.converter.Converter;
+import com.vaadin.event.ItemClickEvent;
+import com.vaadin.event.ItemClickEvent.ItemClickListener;
+import com.vaadin.shared.MouseEventDetails.MouseButton;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.themes.ValoTheme;
 
@@ -32,7 +35,7 @@ public class EntityTable<E> extends Table implements EntityList<E>
 		this.columnConfiguration = headingPropertySet;
 		addStyleName(ValoTheme.TABLE_COMPACT);
 		this.setContainerDataSource(entityContainer);
-
+		addRightClickSelect();
 	}
 
 	public void setRowChangeListener(RowChangeListener<E> rowChangeListener)
@@ -282,5 +285,25 @@ public class EntityTable<E> extends Table implements EntityList<E>
 		{
 			select(itemId);
 		}
+	}
+
+	/**
+	 * Adds a listener to select the right clicked item in the table. This is
+	 * needed by ContextMenus.
+	 */
+	private void addRightClickSelect()
+	{
+		this.addItemClickListener(new ItemClickListener()
+		{
+			private static final long serialVersionUID = 1L;
+
+			public void itemClick(ItemClickEvent event)
+			{
+				if (event.getButton() == MouseButton.RIGHT)
+				{
+					EntityTable.this.setValue(event.getItemId());
+				}
+			}
+		});
 	}
 }

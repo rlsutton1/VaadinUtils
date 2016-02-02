@@ -46,7 +46,9 @@ public class TableContextMenu extends ContextMenu
 				{
 					if (event.getButton() == MouseButton.RIGHT)
 					{
-						events.preContextMenuOpen();
+						if (events != null)
+							events.preContextMenuOpen();
+
 						fireEvent(new ContextMenuOpenedOnTableRowEvent(TableContextMenu.this, table, event.getItemId(),
 								event.getPropertyId()));
 						open(event.getClientX(), event.getClientY());
@@ -66,7 +68,9 @@ public class TableContextMenu extends ContextMenu
 				{
 					if (event.getButton() == MouseButton.RIGHT)
 					{
-						events.preContextMenuOpen();
+						if (events != null)
+							events.preContextMenuOpen();
+
 						fireEvent(new ContextMenuOpenedOnTableHeaderEvent(TableContextMenu.this, table, event
 								.getPropertyId()));
 						open(event.getClientX(), event.getClientY());
@@ -86,7 +90,9 @@ public class TableContextMenu extends ContextMenu
 				{
 					if (event.getButton() == MouseButton.RIGHT)
 					{
-						events.preContextMenuOpen();
+						if (events != null)
+							events.preContextMenuOpen();
+
 						fireEvent(new ContextMenuOpenedOnTableHeaderEvent(TableContextMenu.this, table, event
 								.getPropertyId()));
 						open(event.getClientX(), event.getClientY());
