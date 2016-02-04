@@ -1,5 +1,8 @@
 package au.com.vaadinutils.fields;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.vaadin.peter.contextmenu.ContextMenu;
 
 import com.vaadin.event.ItemClickEvent;
@@ -14,7 +17,7 @@ public class TableContextMenu extends ContextMenu
 {
 	private static final long serialVersionUID = 1L;
 
-	private TableContextMenuEvents events;
+	private List<TableContextMenuEvents> eventsList = new ArrayList<>();
 
 	/**
 	 * Assigns this as the context menu of given table. Allows context menu to
@@ -46,7 +49,7 @@ public class TableContextMenu extends ContextMenu
 				{
 					if (event.getButton() == MouseButton.RIGHT)
 					{
-						if (events != null)
+						for (TableContextMenuEvents events : eventsList)
 							events.preContextMenuOpen();
 
 						fireEvent(new ContextMenuOpenedOnTableRowEvent(TableContextMenu.this, table, event.getItemId(),
@@ -68,7 +71,7 @@ public class TableContextMenu extends ContextMenu
 				{
 					if (event.getButton() == MouseButton.RIGHT)
 					{
-						if (events != null)
+						for (TableContextMenuEvents events : eventsList)
 							events.preContextMenuOpen();
 
 						fireEvent(new ContextMenuOpenedOnTableHeaderEvent(TableContextMenu.this, table, event
@@ -90,7 +93,7 @@ public class TableContextMenu extends ContextMenu
 				{
 					if (event.getButton() == MouseButton.RIGHT)
 					{
-						if (events != null)
+						for (TableContextMenuEvents events : eventsList)
 							events.preContextMenuOpen();
 
 						fireEvent(new ContextMenuOpenedOnTableHeaderEvent(TableContextMenu.this, table, event
@@ -102,8 +105,8 @@ public class TableContextMenu extends ContextMenu
 		}
 	}
 
-	public void setEvents(TableContextMenuEvents events)
+	public void addEvents(final TableContextMenuEvents events)
 	{
-		this.events = events;
+		eventsList.add(events);
 	}
 }
