@@ -450,7 +450,7 @@ public class ErrorWindow
 		}
 		catch (Exception e)
 		{
-			logger.error(e, e);
+			logger.error(e);
 		}
 		return "Error getting user name";
 	}
