@@ -703,7 +703,12 @@ class JasperReportLayout extends VerticalLayout
 			{
 				try
 				{
-					return manager.getStream();
+					InputStream stream = manager.getStream();
+					if (stream == null)
+					{
+					    Notification.show("Couldn't attach to stream, if you cancelled a report this is normal",Type.ERROR_MESSAGE);
+					}
+					return stream;
 				}
 				catch (InterruptedException e)
 				{

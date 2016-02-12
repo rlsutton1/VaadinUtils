@@ -702,6 +702,10 @@ public class JasperManager implements Runnable
 		});
 		latch.await();
 		InputStream stream = getStream();
+		if (stream ==null)
+		{
+		    throw new RuntimeException("Unable to get stream");
+		}
 		// completeBarrier.await();
 		return new RenderedReport(stream, imagesrcs, exportMethod);
 
@@ -800,6 +804,7 @@ public class JasperManager implements Runnable
 		boolean initialized = false;
 		try
 		{
+		    logger.error("{} permits are available",concurrentLimit.availablePermits());
 			concurrentLimit.acquire();
 			initialized = true;
 			inQueue = false;
