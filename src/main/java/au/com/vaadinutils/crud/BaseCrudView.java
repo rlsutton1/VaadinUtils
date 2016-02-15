@@ -559,11 +559,19 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 	private void addCrudActions()
 	{
-		/**
-		 * Add the set of actions in.
-		 */
+		final List<CrudAction<E>> actions = getCrudActions();
+		// If there are no actions then remove the combo box and button
+		if (actions.isEmpty())
+		{
+			actionCombo.setVisible(false);
+			applyButton.setVisible(false);
+			actionLabel.setVisible(false);
+
+			return;
+		}
+
 		CrudAction<E> defaultAction = null;
-		for (CrudAction<E> action : getCrudActions())
+		for (CrudAction<E> action : actions)
 		{
 			if (action.isDefault())
 			{
@@ -898,19 +906,20 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	}
 
 	/**
-	 * Hides the Action layout which contains the 'New' button and 'Action'
-	 * combo.
+	 * Sets the visibility of the Action layout which contains the 'New' button
+	 * and 'Action' combo.
 	 *
 	 * Hiding the action layout effectively stops the user from creating new
 	 * records or applying any action such as deleting a record.
 	 *
 	 * Hiding the action layout provides more room for the list of records.
 	 *
-	 * @param show
+	 * @param showAction
+	 *            visibility of action layout
 	 */
-	protected void showActionLayout(boolean show)
+	protected void showActionLayout(final boolean showAction)
 	{
-		this.actionLayout.setVisible(show);
+		actionLayout.setEnabled(showAction);
 	}
 
 	public void setSplitPosition(float pos)
@@ -1544,12 +1553,12 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	/**
 	 * call this method to cause filters to be applied
 	 */
-	protected void triggerFilter()
+	public void triggerFilter()
 	{
 		triggerFilter(searchField.getValue());
 	}
 
-	int emptyFilterWarningCount = 3;
+	private int emptyFilterWarningCount = 3;
 
 	protected void triggerFilter(String searchText)
 	{
@@ -1557,10 +1566,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 
 		Filter filter = getContainerFilter(searchText.trim(), advancedSearchActive);
 		if (filter == null && emptyFilterWarningCount-- > 0)
-		{
 			logger.warn("({}.java:1) getContainerFilter() returned NULL", this.getClass().getCanonicalName());
-
-		}
 
 		applyFilter(filter);
 	}
