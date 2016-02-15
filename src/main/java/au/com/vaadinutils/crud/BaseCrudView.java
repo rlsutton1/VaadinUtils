@@ -103,21 +103,10 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	protected Button searchButton = new Button("Search");
 	private boolean dynamicSearch = true;
 	protected Class<E> entityClass;
-
 	protected ValidatingFieldGroup<E> fieldGroup;
-
 	private VerticalLayout mainEditPanel = new VerticalLayout();
-
 	// private E currentEntity;
-
-	/*
-	 * Any component can be bound to an external data source. This example uses
-	 * just a dummy in-memory list, but there are many more practical
-	 * implementations.
-	 */
 	protected JPAContainer<E> container;
-
-	/* User interface components are stored in session. */
 	protected EntityList<E> entityTable;
 	protected VerticalLayout rightLayout;
 	protected Component editor;
@@ -132,6 +121,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	private boolean disallowEditing = false;
 	private boolean disallowNew = false;
 	private Label actionLabel;
+	private Label actionMessage;
 	private boolean noEditor;
 	public boolean advancedSearchOn = false;
 	private boolean triggerFilterOnClear = true;
@@ -533,23 +523,28 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		actionCombo.setWidth("160");
 		actionCombo.setNullSelectionAllowed(false);
 		actionCombo.setTextInputAllowed(false);
-
 		group.addComponent(actionCombo);
 
 		addCrudActions();
 		group.addComponent(applyButton);
 		applyButton.setId("applyButton");
+		
+		actionMessage = new Label("", ContentMode.HTML);
+		group.addComponent(actionMessage);
 
 		newButton.setCaption(getNewButtonLabel());
 		newButton.setId("CrudNewButton-" + getNewButtonLabel());
 		actionLayout.addComponent(newButton);
 
-		// tweak the alignments.
 		actionLayout.setComponentAlignment(group, Alignment.MIDDLE_LEFT);
 		actionLayout.setComponentAlignment(newButton, Alignment.MIDDLE_RIGHT);
 		actionLayout.setExpandRatio(group, 1.0f);
-
 		actionLayout.setHeight("35");
+	}
+	
+	protected void setActionMessage(final String message)
+	{
+		actionMessage.setValue("&nbsp;&nbsp;&nbsp;" + message);
 	}
 
 	protected String getNewButtonLabel()
