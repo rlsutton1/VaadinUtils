@@ -528,7 +528,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		addCrudActions();
 		group.addComponent(applyButton);
 		applyButton.setId("applyButton");
-		
+
 		actionMessage = new Label("", ContentMode.HTML);
 		group.addComponent(actionMessage);
 
@@ -541,7 +541,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		actionLayout.setExpandRatio(group, 1.0f);
 		actionLayout.setHeight("35");
 	}
-	
+
 	protected void setActionMessage(final String message)
 	{
 		actionMessage.setValue("&nbsp;&nbsp;&nbsp;" + message);
@@ -1640,10 +1640,11 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 									if (dialog.isConfirmed())
 									{
 										/*
-										 * When an entity is selected from the list, we
-										 * want to show that in our editor on the right.
-										 * This is nicely done by the FieldGroup that
-										 * binds all the fields to the corresponding
+										 * When an entity is selected from the
+										 * list, we want to show that in our
+										 * editor on the right. This is nicely
+										 * done by the FieldGroup that binds all
+										 * the fields to the corresponding
 										 * Properties in our entity at once.
 										 */
 										fieldGroup.discard();
@@ -1820,7 +1821,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	protected void commitFieldGroup() throws CommitException
 	{
 		formValidate();
-		String fieldName = selectFirstErrorFieldAndShowTab();
+		String fieldName = selectFirstErrorFieldAndShowTab(this.fieldGroup);
 		if (!fieldGroup.isValid())
 		{
 			throw new InvalidValueException("Invalid Field: " + fieldName);
@@ -1980,7 +1981,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		}
 	}
 
-	protected String selectFirstErrorFieldAndShowTab()
+	protected String selectFirstErrorFieldAndShowTab(ValidatingFieldGroup<? extends CrudEntity> fieldGroup)
 	{
 		String ret = "";
 		int ctr = 0;
