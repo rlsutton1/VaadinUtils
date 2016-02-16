@@ -6,10 +6,6 @@ import javax.validation.ConstraintViolationException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.eclipse.jdt.internal.core.util.HandleFactory;
-
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.Notification.Type;
 
 /**
  * The class is a place holder to allow access to an 'non-injected' entity
