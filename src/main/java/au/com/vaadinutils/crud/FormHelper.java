@@ -23,6 +23,7 @@ import javax.validation.ConstraintViolationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.vaadin.addons.lazyquerycontainer.EntityContainer;
+import org.vaadin.ui.LegacyComboBox;
 
 import au.com.vaadinutils.converter.ContainerAdaptor;
 import au.com.vaadinutils.converter.ContainerAdaptorFactory;
@@ -38,6 +39,7 @@ import au.com.vaadinutils.crud.splitFields.SplitPasswordField;
 import au.com.vaadinutils.crud.splitFields.SplitTextArea;
 import au.com.vaadinutils.crud.splitFields.SplitTextField;
 import au.com.vaadinutils.crud.splitFields.SplitTwinColSelect;
+import au.com.vaadinutils.crud.splitFields.legacy.LegacySplitComboBox;
 import au.com.vaadinutils.dao.JpaBaseDao;
 import au.com.vaadinutils.domain.iColor;
 import au.com.vaadinutils.domain.iColorFactory;
@@ -474,6 +476,21 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 			String fieldLabel, Collection<?> options)
 	{
 		ComboBox field = new SplitComboBox(fieldLabel, options);
+		field.setNewItemsAllowed(false);
+		field.setNullSelectionAllowed(false);
+		field.setTextInputAllowed(true);
+		field.setWidth(STANDARD_COMBO_WIDTH);
+		field.setImmediate(true);
+		form.addComponent(field);
+		addValueChangeListeners(field);
+		doBinding(group, fieldName, field);
+		return field;
+	}
+	
+	public <L> LegacyComboBox bindLegacyComboBox(AbstractLayout form, ValidatingFieldGroup<E> fieldGroup, String fieldName,
+			String fieldLabel, Collection<?> options)
+	{
+		LegacyComboBox field = new LegacySplitComboBox(fieldLabel, options);
 		field.setNewItemsAllowed(false);
 		field.setNullSelectionAllowed(false);
 		field.setTextInputAllowed(true);

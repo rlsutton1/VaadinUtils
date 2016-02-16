@@ -439,7 +439,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 		final List<Long> selectedIds = beans.getItemIds();
 		if (selectedIds.size() == 1)
 		{
-			selectedFilter = new Compare.Equal(beanIdField.getName(), selectedIds.get(0));
+			selectedFilter = new Not(new Compare.Equal(beanIdField.getName(), selectedIds.get(0)));
 			available.triggerFilter();
 			return;
 		}
@@ -503,6 +503,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 				listener.valueChanged(getFieldValue());
 			}
 		}
+		refreshSelected();
 	}
 
 	public boolean isPreAddActionRequired()
@@ -630,13 +631,9 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 						if (id != null)
 						{
 							if (isPreAddActionRequired())
-							{
 								handlePreAddAction(id);
-							}
 							else
-							{
 								handleAddAction(id);
-							}
 
 							postAddAction();
 						}
@@ -646,8 +643,6 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 				beans.sort(new Object[]
 				{ listField.getName() }, new boolean[]
 				{ isAscending });
-
-				refreshSelected();
 			}
 		};
 	}

@@ -434,7 +434,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 		{
 			if (getCurrent() != null)
 			{
-				String fieldName = selectFirstErrorFieldAndShowTab();
+				String fieldName = selectFirstErrorFieldAndShowTab(this.fieldGroup);
 				if (!fieldGroup.isValid())
 				{
 

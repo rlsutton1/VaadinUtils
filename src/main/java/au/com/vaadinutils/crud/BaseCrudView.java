@@ -81,8 +81,8 @@ import au.com.vaadinutils.listener.ClickEventLogged;
 import au.com.vaadinutils.menu.Menu;
 import au.com.vaadinutils.menu.Menus;
 
-public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
-		implements RowChangeListener<E>, Selected<E>, DirtyListener, ButtonListener
+public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout implements RowChangeListener<E>,
+		Selected<E>, DirtyListener, ButtonListener
 {
 
 	private static transient Logger logger = LogManager.getLogger(BaseCrudView.class);
@@ -103,21 +103,10 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 	protected Button searchButton = new Button("Search");
 	private boolean dynamicSearch = true;
 	protected Class<E> entityClass;
-
 	protected ValidatingFieldGroup<E> fieldGroup;
-
 	private VerticalLayout mainEditPanel = new VerticalLayout();
-
 	// private E currentEntity;
-
-	/*
-	 * Any component can be bound to an external data source. This example uses
-	 * just a dummy in-memory list, but there are many more practical
-	 * implementations.
-	 */
 	protected JPAContainer<E> container;
-
-	/* User interface components are stored in session. */
 	protected EntityList<E> entityTable;
 	protected VerticalLayout rightLayout;
 	protected Component editor;
@@ -132,6 +121,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 	private boolean disallowEditing = false;
 	private boolean disallowNew = false;
 	private Label actionLabel;
+	private Label actionMessage;
 	private boolean noEditor;
 	public boolean advancedSearchOn = false;
 	private boolean triggerFilterOnClear = true;
@@ -166,8 +156,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 		}
 		catch (Exception e)
 		{
-			logger.error(
-					" ******* when constructing a jpaContainer for use with the BaseCrudView use JPAContainerFactory.makeBatchable ****** ");
+			logger.error(" ******* when constructing a jpaContainer for use with the BaseCrudView use JPAContainerFactory.makeBatchable ****** ");
 			logger.error(e, e);
 			throw new RuntimeException(e);
 		}
@@ -449,7 +438,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 			rightLayout.setId("rightLayout");
 
 			editor = buildEditor(fieldGroup);
-			Preconditions.checkNotNull(editor,
+			Preconditions.checkNotNull(
+					editor,
 					"Your editor implementation returned null!, you better create an editor. "
 							+ entityClass.getSimpleName());
 			mainEditPanel.addComponent(editor);
@@ -495,8 +485,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 		{
 			return ((Menus) annotation).menus()[0].display();
 		}
-		Exception e = new Exception(
-				"Override getTitleText() to set a custom title in " + this.getClass().getCanonicalName());
+		Exception e = new Exception("Override getTitleText() to set a custom title in "
+				+ this.getClass().getCanonicalName());
 		logger.error(e, e);
 		return "Override getTitleText() to set a custom title. " + this.getClass().getCanonicalName();
 	}
@@ -533,23 +523,28 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 		actionCombo.setWidth("160");
 		actionCombo.setNullSelectionAllowed(false);
 		actionCombo.setTextInputAllowed(false);
-
 		group.addComponent(actionCombo);
 
 		addCrudActions();
 		group.addComponent(applyButton);
 		applyButton.setId("applyButton");
 
+		actionMessage = new Label("", ContentMode.HTML);
+		group.addComponent(actionMessage);
+
 		newButton.setCaption(getNewButtonLabel());
 		newButton.setId("CrudNewButton-" + getNewButtonLabel());
 		actionLayout.addComponent(newButton);
 
-		// tweak the alignments.
 		actionLayout.setComponentAlignment(group, Alignment.MIDDLE_LEFT);
 		actionLayout.setComponentAlignment(newButton, Alignment.MIDDLE_RIGHT);
 		actionLayout.setExpandRatio(group, 1.0f);
-
 		actionLayout.setHeight("35");
+	}
+
+	protected void setActionMessage(final String message)
+	{
+		actionMessage.setValue("&nbsp;&nbsp;&nbsp;" + message);
 	}
 
 	protected String getNewButtonLabel()
@@ -559,11 +554,19 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 
 	private void addCrudActions()
 	{
-		/**
-		 * Add the set of actions in.
-		 */
+		final List<CrudAction<E>> actions = getCrudActions();
+		// If there are no actions then remove the combo box and button
+		if (actions.isEmpty())
+		{
+			actionCombo.setVisible(false);
+			applyButton.setVisible(false);
+			actionLabel.setVisible(false);
+
+			return;
+		}
+
 		CrudAction<E> defaultAction = null;
-		for (CrudAction<E> action : getCrudActions())
+		for (CrudAction<E> action : actions)
 		{
 			if (action.isDefault())
 			{
@@ -898,26 +901,27 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 	}
 
 	/**
-	 * Hides the Action layout which contains the 'New' button and 'Action'
-	 * combo.
+	 * Sets the visibility of the Action layout which contains the 'New' button
+	 * and 'Action' combo.
 	 *
 	 * Hiding the action layout effectively stops the user from creating new
 	 * records or applying any action such as deleting a record.
 	 *
 	 * Hiding the action layout provides more room for the list of records.
 	 *
-	 * @param show
+	 * @param showAction
+	 *            visibility of action layout
 	 */
-	protected void showActionLayout(boolean show)
+	protected void showActionLayout(final boolean showAction)
 	{
-		this.actionLayout.setVisible(show);
+		actionLayout.setEnabled(showAction);
 	}
 
 	public void setSplitPosition(float pos)
 	{
 		splitPanel.setSplitPosition(pos);
 	}
-	
+
 	public void setLocked(boolean locked)
 	{
 		splitPanel.setLocked(locked);
@@ -1037,15 +1041,15 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 			{
 				final ConfirmDialog pleaseWaitMessage = ConfirmDialog.show(UI.getCurrent(), "Please wait...",
 						new ConfirmDialog.Listener()
-				{
+						{
 
-					private static final long serialVersionUID = 1L;
+							private static final long serialVersionUID = 1L;
 
-					@Override
-					public void onClose(ConfirmDialog dialog)
-					{
-					}
-				});
+							@Override
+							public void onClose(ConfirmDialog dialog)
+							{
+							}
+						});
 				pleaseWaitMessage.setClosable(false);
 				pleaseWaitMessage.getCancelButton().setVisible(false);
 				pleaseWaitMessage.getOkButton().setVisible(false);
@@ -1209,6 +1213,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 		try
 		{
 			commitFieldGroup();
+			validateChildren();
 			CrudEventType eventType = CrudEventType.EDIT;
 			if (newEntity != null)
 			{
@@ -1258,7 +1263,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 			{
 				// only commit dirty children, saves time for a crud with lots
 				// of children
-				if (commitListener.isDirty() || !(commitListener instanceof ChildCrudView))
+				if (commitListener.isDirty())
 				{
 					commitListener.committed(newEntity);
 				}
@@ -1267,8 +1272,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 
 			// children may have been added to the parent, evict the parent from
 			// the JPA cache so it will get updated
-			EntityManagerProvider.getEntityManager().getEntityManagerFactory().getCache().evict(entityClass,
-					newEntity.getId());
+			EntityManagerProvider.getEntityManager().getEntityManagerFactory().getCache()
+					.evict(entityClass, newEntity.getId());
 
 			newEntity = EntityManagerProvider.merge(newEntity);
 			postSaveAction(newEntity);
@@ -1543,12 +1548,12 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 	/**
 	 * call this method to cause filters to be applied
 	 */
-	protected void triggerFilter()
+	public void triggerFilter()
 	{
 		triggerFilter(searchField.getValue());
 	}
 
-	int emptyFilterWarningCount = 3;
+	private int emptyFilterWarningCount = 3;
 
 	protected void triggerFilter(String searchText)
 	{
@@ -1556,10 +1561,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 
 		Filter filter = getContainerFilter(searchText.trim(), advancedSearchActive);
 		if (filter == null && emptyFilterWarningCount-- > 0)
-		{
 			logger.warn("({}.java:1) getContainerFilter() returned NULL", this.getClass().getCanonicalName());
-
-		}
 
 		applyFilter(filter);
 	}
@@ -1624,50 +1626,53 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 
 		if (fieldGroup.isModified() || newEntity != null || dirty)
 		{
-			ConfirmDialog.show(UI.getCurrent(), "Discard changes?",
-					"You have unsaved changes for this record. Continuing will result in those changes being discarded. ",
-					"Continue", "Cancel", new ConfirmDialog.Listener()
-					{
-						private static final long serialVersionUID = 1L;
-
-						@Override
-						public void onClose(ConfirmDialog dialog)
-						{
-							if (dialog.isConfirmed())
+			ConfirmDialog
+					.show(UI.getCurrent(),
+							"Discard changes?",
+							"You have unsaved changes for this record. Continuing will result in those changes being discarded. ",
+							"Continue", "Cancel", new ConfirmDialog.Listener()
 							{
-								/*
-								 * When an entity is selected from the list, we
-								 * want to show that in our editor on the right.
-								 * This is nicely done by the FieldGroup that
-								 * binds all the fields to the corresponding
-								 * Properties in our entity at once.
-								 */
-								fieldGroup.discard();
+								private static final long serialVersionUID = 1L;
 
-								for (ChildCrudListener<E> child : childCrudListeners)
+								@Override
+								public void onClose(ConfirmDialog dialog)
 								{
-									child.discard();
+									if (dialog.isConfirmed())
+									{
+										/*
+										 * When an entity is selected from the
+										 * list, we want to show that in our
+										 * editor on the right. This is nicely
+										 * done by the FieldGroup that binds all
+										 * the fields to the corresponding
+										 * Properties in our entity at once.
+										 */
+										fieldGroup.discard();
+
+										for (ChildCrudListener<E> child : childCrudListeners)
+										{
+											child.discard();
+										}
+
+										if (restoreDelete)
+										{
+											activateEditMode(false);
+											restoreDelete = false;
+										}
+
+										newEntity = null;
+
+										callback.allowRowChange();
+
+									}
+									else
+									{
+										// User did not confirm so don't allow
+										// the change.
+
+									}
 								}
-
-								if (restoreDelete)
-								{
-									activateEditMode(false);
-									restoreDelete = false;
-								}
-
-								newEntity = null;
-
-								callback.allowRowChange();
-
-							}
-							else
-							{
-								// User did not confirm so don't allow
-								// the change.
-
-							}
-						}
-					});
+							});
 		}
 		else
 		{
@@ -1816,19 +1821,24 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 	protected void commitFieldGroup() throws CommitException
 	{
 		formValidate();
-		String fieldName = selectFirstErrorFieldAndShowTab();
+		String fieldName = selectFirstErrorFieldAndShowTab(this.fieldGroup);
 		if (!fieldGroup.isValid())
 		{
-
 			throw new InvalidValueException("Invalid Field: " + fieldName);
-
 		}
 		fieldGroup.commit();
+	}
+
+	private void validateChildren()
+	{
 		for (ChildCrudListener<E> child : childCrudListeners)
 		{
-			child.validateFieldz();
+			// Only validate dirty children
+			// Note: If there is existing bad data in the database then
+			// this will pass validation if nothing has been edited on the child
+			if (child.isDirty())
+				child.validateFieldz();
 		}
-
 	}
 
 	/**
@@ -1971,7 +1981,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 		}
 	}
 
-	protected String selectFirstErrorFieldAndShowTab()
+	protected String selectFirstErrorFieldAndShowTab(ValidatingFieldGroup<? extends CrudEntity> fieldGroup)
 	{
 		String ret = "";
 		int ctr = 0;
@@ -2004,8 +2014,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 				ret = field.getCaption() + "\n\n" + message;
 				logger.warn(
 						"Invalid Field...\n caption:'{}'\n type:{}\n fieldNumber: {}\n value: '{}'\n crud: {} ({})\n {}\n",
-						field.getCaption(), field.getClass().getSimpleName(), ctr, field.getValue(),
-						this.getClass().getCanonicalName(), this.getClass().getSimpleName() + ".java:1", message);
+						field.getCaption(), field.getClass().getSimpleName(), ctr, field.getValue(), this.getClass()
+								.getCanonicalName(), this.getClass().getSimpleName() + ".java:1", message);
 				Component childField = field;
 
 				for (int i = 0; i < 10; i++)
@@ -2084,44 +2094,28 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 	 */
 	public void reloadDataFromDB()
 	{
-		Object selectedId = null;
-		if (entityTable.getCurrent() != null)
-		{
-			selectedId = entityTable.getCurrent().getItemId();
-		}
-		EntityManagerProvider.getEntityManager().getTransaction().commit();
-		EntityManagerProvider.getEntityManager().getTransaction().begin();
-		container.refresh();
-		entityTable.select(null);
-		if (selectedId == null)
-		{
-			entityTable.select(entityTable.firstItemId());
-		}
-		else
-		{
-			entityTable.select(selectedId);
-		}
+		reloadDataFromDB(null);
 	}
 
 	public void reloadDataFromDB(Long itemId)
 	{
 		Object selectedId = null;
 		if (entityTable.getCurrent() != null)
-		{
 			selectedId = entityTable.getCurrent().getItemId();
-		}
+
 		EntityManagerProvider.getEntityManager().getTransaction().commit();
 		EntityManagerProvider.getEntityManager().getTransaction().begin();
-		container.refreshItem(itemId);
+
+		if (itemId != null)
+			container.refreshItem(itemId);
+		else
+			container.refresh();
+
 		entityTable.select(null);
 		if (selectedId == null)
-		{
 			entityTable.select(entityTable.firstItemId());
-		}
 		else
-		{
 			entityTable.select(selectedId);
-		}
 	}
 
 	protected void resetFiltersWithoutChangeEvents()
