@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -116,6 +117,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	private boolean disallowDelete = false;
 	private Label actionLabel;
 	private boolean noEditor;
+	
+	private Set<RowChangedListener<E>> rowChangedListeners = new CopyOnWriteArraySet<RowChangedListener<E>>();
 
 	protected BaseCrudView()
 	{
@@ -1339,6 +1342,16 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		{
 			commitListener.selectedParentRowChanged(item);
 		}
+		
+		if (item == null)
+		{
+			notifyRowChangedListeners(null);
+		}
+		else
+		{
+			notifyRowChangedListeners(item.getEntity());
+		}
+
 
 		if (item != null || newEntity != null)
 		{
@@ -1689,4 +1702,25 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		splitPanel.setLocked();
 		
 	}
+	
+	private void notifyRowChangedListeners(E entity)
+	{
+		for (RowChangedListener<E> listener : rowChangedListeners)
+		{
+			listener.rowChanged(entity);
+		}
+
+	}
+	
+	public void addRowChangedListener(RowChangedListener<E> listener)
+	{
+		rowChangedListeners.add(listener);
+	}
+	
+
+	public void removeRowChangedListener(RowChangedListener<E> listener)
+	{
+		rowChangedListeners.remove(listener);
+	}
+
 }
