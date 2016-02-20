@@ -30,6 +30,7 @@ public class DateTimePickerInline extends TimePicker
 		super(title);
 	}
 
+	@Override
 	protected void buildUI(String title)
 	{
 
@@ -87,8 +88,10 @@ public class DateTimePickerInline extends TimePicker
 					final Date parsedDate = parseDate((String) event.getProperty().getValue());
 					if (parsedDate != null)
 					{
-						dateTime.set(Calendar.HOUR_OF_DAY, parsedDate.getHours());
-						dateTime.set(Calendar.MINUTE, parsedDate.getMinutes());
+						Calendar parsed = Calendar.getInstance();
+						parsed.setTime(parsedDate);
+						dateTime.set(Calendar.HOUR_OF_DAY, parsed.get(Calendar.HOUR_OF_DAY));
+						dateTime.set(Calendar.MINUTE, parsed.get(Calendar.MINUTE));
 						isSet = true;
 						setNewValue();
 					}
@@ -243,6 +246,7 @@ public class DateTimePickerInline extends TimePicker
 
 	}
 
+	@Override
 	public void setValues(Date date)
 	{
 		if (date != null)
@@ -259,6 +263,7 @@ public class DateTimePickerInline extends TimePicker
 		}
 	}
 
+	@Override
 	protected void setNewValue()
 	{
 		displayTime.setValue(getValueAsString());
