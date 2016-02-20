@@ -1,7 +1,6 @@
 package au.com.vaadinutils.entity;
 
 import javax.persistence.Column;
-import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -9,7 +8,6 @@ import javax.persistence.MappedSuperclass;
 
 import au.com.vaadinutils.crud.ChildCrudEntity;
 import au.com.vaadinutils.dao.JpaEntityHelper;
-
 
 @MappedSuperclass
 public abstract class BaseCrudEntity implements ChildCrudEntity
@@ -23,6 +21,7 @@ public abstract class BaseCrudEntity implements ChildCrudEntity
 	@Column(updatable = false)
 	String guid = JpaEntityHelper.getGuid();
 
+	@Override
 	public String getGuid()
 	{
 		return guid;
@@ -49,7 +48,7 @@ public abstract class BaseCrudEntity implements ChildCrudEntity
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
@@ -63,7 +62,7 @@ public abstract class BaseCrudEntity implements ChildCrudEntity
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
