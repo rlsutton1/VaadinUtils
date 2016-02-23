@@ -1,5 +1,6 @@
 package au.com.vaadinutils.dao;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -764,6 +765,17 @@ public abstract class JpaDslAbstract<E, R>
 	public JpaDslAbstract<E, R> where(Condition<E> condition)
 	{
 		predicate = condition.getPredicates();
+		return this;
+	}
+
+	public JpaDslAbstract<E, R> where(final List<Condition<E>> conditions)
+	{
+		final List<Predicate> predicates = new ArrayList<>(conditions.size());
+		for (Condition<E> condition : conditions)
+		{
+			predicates.add(condition.getPredicates());
+		}
+		predicate = builder.and(predicates.toArray(new Predicate[predicates.size()]));
 		return this;
 	}
 
