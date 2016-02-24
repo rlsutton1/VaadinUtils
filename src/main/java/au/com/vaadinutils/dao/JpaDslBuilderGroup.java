@@ -77,20 +77,32 @@ public class JpaDslBuilderGroup<E>
 
 	public List<E> getResults()
 	{
-		for (JpaDslBuilderGroupItem<E> builder : builders)
+		if (builders.size() > 0)
 		{
-			final JpaDslBuilder<E> q = new JpaDslBuilder<E>(entityClass);
-			final List<Condition<E>> conditions = new LinkedList<>();
-			if (common != null)
-				common.conditionsWillBeAdded(q, conditions);
-			builder.conditionsWillBeAdded(q, conditions);
-			if (distinct)
-				q.distinct();
-			q.where(conditions);
-			results.addAll(q.getResultList());
+			for (JpaDslBuilderGroupItem<E> builder : builders)
+			{
+				results.addAll(makeQuery(builder));
+			}
 		}
+		else
+			results.addAll(makeQuery(null));
 
 		return results;
+	}
+
+	private List<E> makeQuery(final JpaDslBuilderGroupItem<E> builder)
+	{
+		final JpaDslBuilder<E> q = new JpaDslBuilder<E>(entityClass);
+		final List<Condition<E>> conditions = new LinkedList<>();
+		if (common != null)
+			common.conditionsWillBeAdded(q, conditions);
+		if (builder != null)
+			builder.conditionsWillBeAdded(q, conditions);
+		if (distinct)
+			q.distinct();
+		q.where(conditions);
+
+		return q.getResultList();
 	}
 
 	public void distinct()

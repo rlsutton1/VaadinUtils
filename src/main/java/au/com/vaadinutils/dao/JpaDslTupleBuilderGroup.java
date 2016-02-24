@@ -102,27 +102,37 @@ public class JpaDslTupleBuilderGroup<E>
 
 	public List<Tuple> getResults()
 	{
-		for (JpaDslTupleBuilderGroupItem<E> builder : builders)
+		if (builders.size() > 0)
 		{
-			final JpaDslTupleBuilder<E> q = new JpaDslTupleBuilder<E>(entityClass);
-
-			final List<Condition<E>> conditions = new LinkedList<>();
-			if (common != null)
-				common.conditionsWillBeAdded(q, conditions);
-			builder.conditionsWillBeAdded(q, conditions);
-			if (distinct)
-				q.distinct();
-			q.where(conditions);
-
-			for (Entry<SingularAttribute<E, ?>, Integer> multiselect : multiselects.entrySet())
+			for (JpaDslTupleBuilderGroupItem<E> builder : builders)
 			{
-				q.multiselect(multiselect.getKey());
+				results.addAll(makeQuery(builder));
 			}
-
-			results.addAll(q.getResultList());
 		}
+		else
+			results.addAll(makeQuery(null));
 
 		return results;
+	}
+
+	private List<Tuple> makeQuery(final JpaDslTupleBuilderGroupItem<E> builder)
+	{
+		final JpaDslTupleBuilder<E> q = new JpaDslTupleBuilder<E>(entityClass);
+		final List<Condition<E>> conditions = new LinkedList<>();
+		if (common != null)
+			common.conditionsWillBeAdded(q, conditions);
+		if (builder != null)
+			builder.conditionsWillBeAdded(q, conditions);
+		if (distinct)
+			q.distinct();
+		q.where(conditions);
+
+		for (Entry<SingularAttribute<E, ?>, Integer> multiselect : multiselects.entrySet())
+		{
+			q.multiselect(multiselect.getKey());
+		}
+
+		return q.getResultList();
 	}
 
 	public void distinct()
