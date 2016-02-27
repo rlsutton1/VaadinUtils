@@ -120,8 +120,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	protected ComboBox actionCombo;
 	private boolean disallowEditing = false;
 	private boolean disallowNew = false;
-	private Label actionLabel;
-	private Label actionMessage;
+	protected CssLayout group = new CssLayout();
+	protected Label actionLabel;
+	protected Label actionMessage;
 	private boolean noEditor;
 	public boolean advancedSearchOn = false;
 	private boolean triggerFilterOnClear = true;
@@ -514,7 +515,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		actionLabel = new Label("&nbsp;Action");
 		actionLabel.setContentMode(ContentMode.HTML);
 		actionLabel.setWidth("50");
-		CssLayout group = new CssLayout();
+
 		group.addStyleName("v-component-group");
 		actionLayout.addComponent(group);
 		group.addComponent(actionLabel);
