@@ -19,7 +19,7 @@ public class ViolationConstraintHandler
 	/**
 	 * logs the initial error and calls the recusive version of it'self. always
 	 * throws a runtime exception
-	 * 
+	 *
 	 * @param e
 	 */
 	static void expandException(Throwable e)
@@ -41,7 +41,7 @@ public class ViolationConstraintHandler
 	/**
 	 * digs down looking for a useful exception, it will throw a runtime
 	 * exception if it finds an useful exception
-	 * 
+	 *
 	 * @param e
 	 * @param nestLimit
 	 */
@@ -62,7 +62,7 @@ public class ViolationConstraintHandler
 				String groupedViolationMessage = e.getClass().getSimpleName() + " ";
 				for (ConstraintViolation<?> violation : ((ConstraintViolationException) e).getConstraintViolations())
 				{
-					logger.error(violation.getLeafBean().getClass().getCanonicalName() + " " + violation.getLeafBean());
+					logger.error("{}", violation.getLeafBean().getClass().getCanonicalName());
 					String violationMessage = violation.getLeafBean().getClass().getSimpleName() + " "
 							+ violation.getPropertyPath() + " " + violation.getMessage() + ", the value was "
 							+ violation.getInvalidValue();
