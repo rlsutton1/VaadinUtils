@@ -3,10 +3,10 @@ package au.com.vaadinutils.crud.security;
 import au.com.vaadinutils.crud.CrudSecurityManager;
 
 /**
- * allow all execept super user
- * 
+ * allow all except super user
+ *
  * @author rsutton
- * 
+ *
  */
 public class AllowAllSecurityManager implements CrudSecurityManager
 {
