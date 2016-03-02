@@ -1,6 +1,10 @@
 package au.com.vaadinutils.fields;
 
+import com.vaadin.event.LayoutEvents.LayoutClickEvent;
+import com.vaadin.event.LayoutEvents.LayoutClickListener;
 import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
 
@@ -10,38 +14,58 @@ import com.vaadin.ui.VerticalLayout;
 @SuppressWarnings("serial")
 public class ClickableLabel extends VerticalLayout
 {
-	private Label label;
+    private Label label;
 
-	public ClickableLabel()
-	{
-		this(null);
-		setImmediate(true);
-	}
+    public ClickableLabel()
+    {
+        this(null);
+        setImmediate(true);
+    }
 
-	public ClickableLabel(String value)
-	{
-		label = new Label(value, ContentMode.HTML);
-		addComponent(label);
-	}
+    public ClickableLabel(String value)
+    {
+        label = new Label(value, ContentMode.HTML);
+        addComponent(label);
+    }
 
-	public void setValue(String value)
-	{
-		label.setValue(value);
-	}
+    public void setValue(String value)
+    {
+        label.setValue(value);
+    }
 
-	public void setStyleName(String style)
-	{
-		label.setStyleName(style);
-	}
+    public void setStyleName(String style)
+    {
+        label.setStyleName(style);
+    }
 
-	public void setContentMode(ContentMode contentMode)
-	{
-		label.setContentMode(contentMode);
+    public void setContentMode(ContentMode contentMode)
+    {
+        label.setContentMode(contentMode);
 
-	}
+    }
 
-	public String getValue()
-	{
-		return label.getValue() != null ? label.getValue() : "";
-	}
+    public String getValue()
+    {
+        return label.getValue() != null ? label.getValue() : "";
+    }
+
+    /**
+     * makes the ClickableLabel a drop in replace ment for a button
+     * 
+     * @param clickListener
+     */
+    public void addClickListener(final ClickListener clickListener)
+    {
+        addLayoutClickListener(new LayoutClickListener()
+        {
+
+            @Override
+            public void layoutClick(LayoutClickEvent event)
+            {
+                clickListener.buttonClick(new ClickEvent(event.getComponent()));
+
+            }
+        });
+
+    }
 }
