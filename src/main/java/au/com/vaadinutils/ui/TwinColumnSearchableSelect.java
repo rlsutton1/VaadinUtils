@@ -79,6 +79,10 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	private boolean showAddRemoveAll;
 	protected String availableColumnHeader;
 
+	private static final float BUTTON_LAYOUT_WIDTH = 50;
+	private static final float BUTTON_WIDTH = 45;
+
+
 	/**
 	 * Unfortunately TwinColumnSelect wont work with large sets, it isn't
 	 * searchable and it doesn't lazy load, it also isn't sortable.
@@ -271,7 +275,13 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	private Component buildButtons()
 	{
 		VerticalLayout layout = new VerticalLayout();
-		layout.setWidth("40");
+		layout.setWidth(BUTTON_LAYOUT_WIDTH, Unit.PIXELS);
+
+		removeButton.setWidth(BUTTON_WIDTH, Unit.PIXELS);
+		removeAllButton.setWidth(BUTTON_WIDTH, Unit.PIXELS);
+		addButton.setWidth(BUTTON_WIDTH, Unit.PIXELS);
+		addAllButton.setWidth(BUTTON_WIDTH, Unit.PIXELS);
+		addNewButton.setWidth(BUTTON_WIDTH, Unit.PIXELS);
 
 		removeButton.addClickListener(removeClickListener());
 		removeAllButton.addClickListener(removeAllClickListener());
@@ -775,5 +785,20 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	protected Filter getSearchFilter(final String filterString)
 	{
 		return new SimpleStringFilter(listField.getName(), filterString, true, false);
+	}
+	
+	@Override
+	public void setWidth(float width, Unit unit)
+	{
+		super.setWidth(width, unit);
+
+		if (mainLayout != null && selectedTable != null && availableTable != null)
+		{
+			mainLayout.setWidth(width, unit);
+
+			selectedTable.setWidth(((width-5) / 2) - (BUTTON_LAYOUT_WIDTH /2), unit);
+			availableTable.setWidth(((width-5) / 2) - (BUTTON_LAYOUT_WIDTH/ 2), unit);
+		}
+
 	}
 }
