@@ -6,6 +6,7 @@ import java.util.List;
 import org.vaadin.peter.contextmenu.ContextMenu;
 
 import com.vaadin.event.ItemClickEvent;
+import com.vaadin.event.MouseEvents.ClickEvent;
 import com.vaadin.shared.MouseEventDetails.MouseButton;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.FooterClickEvent;
@@ -108,5 +109,16 @@ public class TableContextMenu extends ContextMenu
 	public void addEvents(final TableContextMenuEvents events)
 	{
 		eventsList.add(events);
+	}
+
+	public void openRow(final ClickEvent event, final Object itemId, final Object propertyId)
+	{
+		if (event.getButton() == MouseButton.RIGHT)
+		{
+			for (TableContextMenuEvents events : eventsList)
+				events.preContextMenuOpen();
+
+			open(event.getClientX(), event.getClientY());
+		}
 	}
 }
