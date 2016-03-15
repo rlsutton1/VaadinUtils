@@ -529,7 +529,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 	}
 
-	public <V> int deleteAllByAttribute(SingularAttribute<E, V> vKey, V value)
+	public <V> int deleteAllByAttribute(SingularAttribute<? super E, V> vKey, V value)
 	{
 
 		CriteriaBuilder builder = getEntityManager().getCriteriaBuilder();
@@ -630,7 +630,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 	{
 		return new JpaDslBuilder<E>(entityClass);
 	}
-	
+
 	public JpaDslTupleBuilder<E> findTuple()
 	{
 		return new JpaDslTupleBuilder<E>(entityClass);

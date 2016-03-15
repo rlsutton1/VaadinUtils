@@ -35,6 +35,8 @@ import com.vaadin.data.util.filter.Compare;
 import com.vaadin.data.util.filter.Not;
 import com.vaadin.data.util.filter.Or;
 import com.vaadin.data.util.filter.SimpleStringFilter;
+import com.vaadin.event.ItemClickEvent;
+import com.vaadin.event.ItemClickEvent.ItemClickListener;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -56,10 +58,10 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	private String itemLabel;
 
 	protected Collection<C> sourceValue;
-	protected Table selectedCols;
+	protected Table selectedTable;
 	protected BeanContainer<Long, C> beans;
 	protected JPAContainer<C> availableContainer;
-	protected SearchableSelectableEntityTable<C> available;
+	protected SearchableSelectableEntityTable<C> availableTable;
 	private SingularAttribute<C, Long> beanIdField;
 	protected Button addButton = new Button(">");
 	protected Button removeButton = new Button("<");
@@ -76,6 +78,10 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	private boolean isAscending;
 	private boolean showAddRemoveAll;
 	protected String availableColumnHeader;
+
+	private static final float BUTTON_LAYOUT_WIDTH = 50;
+	private static final float BUTTON_WIDTH = 45;
+
 
 	/**
 	 * Unfortunately TwinColumnSelect wont work with large sets, it isn't
@@ -123,23 +129,35 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 			itemLabel = listField.getName();
 		}
 		this.itemLabel = itemLabel;
-		selectedCols = new Table();
+		selectedTable = new Table();
 
-		selectedCols.setContainerDataSource(createBeanContainer());
-		if (!selectedCols.getContainerPropertyIds().contains(itemLabel))
+		selectedTable.setContainerDataSource(createBeanContainer());
+		if (!selectedTable.getContainerPropertyIds().contains(itemLabel))
 		{
 			logger.error("you need to define a getter for the field {} in {}, valid fields are {}", itemLabel,
 					listField.getDeclaringType().getJavaType(),
-					Arrays.toString(selectedCols.getContainerPropertyIds().toArray()));
+					Arrays.toString(selectedTable.getContainerPropertyIds().toArray()));
 		}
+		
+		selectedTable.addItemClickListener(new ItemClickListener()
+		{
+			private static final long serialVersionUID = 1L;
 
-		selectedCols.setVisibleColumns(itemLabel);
-		selectedCols.setColumnHeaders("Selected");
+			@Override
+			public void itemClick(ItemClickEvent event)
+			{
+				if (event.isDoubleClick())
+					removeButton.click();
+			}
+		});
 
-		selectedCols.setWidth(200, Unit.PIXELS);
-		selectedCols.setHeight(300, Unit.PIXELS);
-		selectedCols.setSelectable(true);
-		selectedCols.setMultiSelect(true);
+		selectedTable.setVisibleColumns(itemLabel);
+		selectedTable.setColumnHeaders("Selected");
+
+		selectedTable.setWidth(200, Unit.PIXELS);
+		selectedTable.setHeight(300, Unit.PIXELS);
+		selectedTable.setSelectable(true);
+		selectedTable.setMultiSelect(true);
 		// setting value of header here so that subclasses can
 		// modify header if needed
 		setAvailableColumnHeader(assignAvailableHeaderValue());
@@ -179,31 +197,31 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	public void setHeight(String height)
 	{
 		super.setHeight(height);
-		selectedCols.setHeight(height);
-		available.setHeight(height);
+		selectedTable.setHeight(height);
+		availableTable.setHeight(height);
 		mainLayout.setHeight(height);
 	}
 
 	@Override
 	protected Component initContent()
 	{
-		mainLayout.addComponent(available);
+		mainLayout.addComponent(availableTable);
 		mainLayout.addComponent(buildButtons());
-		mainLayout.addComponent(selectedCols);
-		mainLayout.setExpandRatio(available, 1);
-		mainLayout.setExpandRatio(selectedCols, 1);
+		mainLayout.addComponent(selectedTable);
+		mainLayout.setExpandRatio(availableTable, 1);
+		mainLayout.setExpandRatio(selectedTable, 1);
 
 		return mainLayout;
 	}
 
 	public void setSelectedColumnGenerator(ColumnGenerator generatedColumn)
 	{
-		selectedCols.addGeneratedColumn(itemLabel, generatedColumn);
+		selectedTable.addGeneratedColumn(itemLabel, generatedColumn);
 	}
 
 	private void createAvailableTable()
 	{
-		available = new SearchableSelectableEntityTable<C>(this.getClass().getSimpleName())
+		availableTable = new SearchableSelectableEntityTable<C>(this.getClass().getSimpleName())
 		{
 			private static final long serialVersionUID = 1L;
 
@@ -237,15 +255,33 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 			}
 		};
 
-		available.disableSelectable();
-		available.setWidth(200, Unit.PIXELS);
-		available.setHeight(300, Unit.PIXELS);
+		availableTable.addItemClickListener(new ItemClickListener()
+		{
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void itemClick(ItemClickEvent event)
+			{
+				if (event.isDoubleClick())
+					addButton.click();
+			}
+		});
+
+		availableTable.disableSelectable();
+		availableTable.setWidth(200, Unit.PIXELS);
+		availableTable.setHeight(300, Unit.PIXELS);
 	}
 
 	private Component buildButtons()
 	{
 		VerticalLayout layout = new VerticalLayout();
-		layout.setWidth("40");
+		layout.setWidth(BUTTON_LAYOUT_WIDTH, Unit.PIXELS);
+
+		removeButton.setWidth(BUTTON_WIDTH, Unit.PIXELS);
+		removeAllButton.setWidth(BUTTON_WIDTH, Unit.PIXELS);
+		addButton.setWidth(BUTTON_WIDTH, Unit.PIXELS);
+		addAllButton.setWidth(BUTTON_WIDTH, Unit.PIXELS);
+		addNewButton.setWidth(BUTTON_WIDTH, Unit.PIXELS);
 
 		removeButton.addClickListener(removeClickListener());
 		removeAllButton.addClickListener(removeAllClickListener());
@@ -330,7 +366,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	@Override
 	public void setReadOnly(boolean b)
 	{
-		selectedCols.setReadOnly(b);
+		selectedTable.setReadOnly(b);
 		super.setReadOnly(b);
 
 		// hide the add/remove and available list
@@ -341,7 +377,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 			addAllButton.setVisible(!b);
 			removeAllButton.setVisible(!b);
 		}
-		available.setVisible(!b);
+		availableTable.setVisible(!b);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -440,7 +476,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 		if (selectedIds.size() == 1)
 		{
 			selectedFilter = new Not(new Compare.Equal(beanIdField.getName(), selectedIds.get(0)));
-			available.triggerFilter();
+			availableTable.triggerFilter();
 			return;
 		}
 
@@ -450,7 +486,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 			filters.add(new Compare.Equal(beanIdField.getName(), id));
 		}
 		selectedFilter = new Not(new Or(filters.toArray(new Filter[filters.size()])));
-		available.triggerFilter();
+		availableTable.triggerFilter();
 	}
 
 	public void setFilterDelegate(DefaultQueryModifierDelegate defaultQueryModifierDelegate)
@@ -483,7 +519,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 
 	protected Table getSelectedCols()
 	{
-		return selectedCols;
+		return selectedTable;
 	}
 
 	public void handleRemoveValidation()
@@ -523,7 +559,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 
 	public void refreshSelectedColumn()
 	{
-		selectedCols.refreshRowCache();
+		selectedTable.refreshRowCache();
 	}
 
 	protected void postRemoveAction()
@@ -563,7 +599,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 
 	public void setSelectedColumnHeader(String header)
 	{
-		this.selectedCols.setColumnHeaders(header);
+		this.selectedTable.setColumnHeaders(header);
 	}
 
 	public String getAvailableColumnHeader()
@@ -592,7 +628,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 			public void buttonClick(ClickEvent event)
 			{
 				List<Long> ids = new LinkedList<>();
-				ids.addAll((Collection<? extends Long>) available.getContainer().getItemIds());
+				ids.addAll((Collection<? extends Long>) availableTable.getContainer().getItemIds());
 
 				for (Long id : ids)
 				{
@@ -623,7 +659,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 			public void buttonClick(ClickEvent event)
 			{
 				List<Long> ids = new LinkedList<>();
-				ids.addAll((Collection<Long>) available.getSelectedItems());
+				ids.addAll((Collection<Long>) availableTable.getSelectedItems());
 				if (ids.size() > 0)
 				{
 					for (Long id : ids)
@@ -681,7 +717,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 				try
 				{
 					final List<Long> ids = new LinkedList<>();
-					ids.addAll((Collection<? extends Long>) selectedCols.getValue());
+					ids.addAll((Collection<? extends Long>) selectedTable.getValue());
 
 					for (Long id : ids)
 					{
@@ -742,12 +778,27 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	{
 		super.setSizeFull();
 		mainLayout.setSizeFull();
-		selectedCols.setSizeFull();
-		available.setSizeFull();
+		selectedTable.setSizeFull();
+		availableTable.setSizeFull();
 	}
 
 	protected Filter getSearchFilter(final String filterString)
 	{
 		return new SimpleStringFilter(listField.getName(), filterString, true, false);
+	}
+	
+	@Override
+	public void setWidth(float width, Unit unit)
+	{
+		super.setWidth(width, unit);
+
+		if (mainLayout != null && selectedTable != null && availableTable != null)
+		{
+			mainLayout.setWidth(width, unit);
+
+			selectedTable.setWidth(((width-5) / 2) - (BUTTON_LAYOUT_WIDTH /2), unit);
+			availableTable.setWidth(((width-5) / 2) - (BUTTON_LAYOUT_WIDTH/ 2), unit);
+		}
+
 	}
 }

@@ -9,6 +9,8 @@ import java.util.Map.Entry;
 import javax.persistence.Tuple;
 import javax.persistence.metamodel.SingularAttribute;
 
+import au.com.vaadinutils.dao.JpaBaseDao.Condition;
+
 /**
  * Sometimes it is faster to run multiple queries returning the same entity than
  * it is to run a single (potentially slow) query with multiple joins and
@@ -19,29 +21,33 @@ import javax.persistence.metamodel.SingularAttribute;
  * 
  * <pre>
  * <code>
- * JpaDslTupleBuilderGroup<TblContact> queryGroup = new JpaDslTupleBuilderGroup<>(TblContact.class);
- * queryGroup.distinct();
- * 
- * queryGroup.addItem(new JpaDslTupleBuilderItem<TblContact>()
- * {
- * 	@Override
- * 	public void conditionsWillBeAdded(JpaDslTupleBuilder<TblContact> builder)
+ * 	final JpaDslTupleBuilderGroup<TblSalesCustCallItem> queryGroup = new JpaDslTupleBuilderGroup<>(
+ * 			TblSalesCustCallItem.class);
+ * 	queryGroup.multiselect(TblSalesCustCallItem_.iid);
+ * 	queryGroup.setCommon(new JpaDslTupleBuilderGroupCommon<TblSalesCustCallItem>()
  * 	{
- * 		final Condition<TblContact> primaryCondition = builder.in(builder.join(TblContact_.tblCustomers),
- * 					TblCustomer_.customerID, parentIds);
- * 			final Condition<TblContact> mainCriteria = applySearchFilter(searchFilterEnabled, contactShareEnabled,
- * 					builder, account, primaryCondition);
- * 			builder.where(mainCriteria);
+ * 		@Override
+ * 		public void conditionsWillBeAdded(JpaDslTupleBuilder<TblSalesCustCallItem> builder,
+ * 				List<Condition<TblSalesCustCallItem>> conditions)
+ * 		{
+ * 			conditions.add(builder.eq(TblSalesCustCallItem_.contact, contact));
  * 		}
  * 	});
- * }
  * 
- * queryGroup.multiselect(TblContact_.contactID);
+ * 	queryGroup.addItem(new JpaDslTupleBuilderGroupItem<TblSalesCustCallItem>()
+ * 	{
+ * 		@Override
+ * 		public void conditionsWillBeAdded(JpaDslTupleBuilder<TblSalesCustCallItem> builder,
+ * 				List<Condition<TblSalesCustCallItem>> conditions)
+ * 		{
+ * 			conditions.add(builder.eq(TblSalesCustCallItem_.tblSalesPerson, salesperson));
+ * 		}
+ * 	});
  * 
- * final List<Long> contactIds = new LinkedList<>();
+ * final List<Long> itemIds = new ArrayList<>();
  * for (Tuple result : queryGroup.getResults())
  * {
- *		contactIds.add(queryGroup.get(result, TblContact_.contactID));
+ * 			itemIds.add(queryGroup.get(result, TblSalesCustCallItem_.iid));
  * }
  * </code>
  * </pre>
@@ -50,7 +56,8 @@ import javax.persistence.metamodel.SingularAttribute;
 public class JpaDslTupleBuilderGroup<E>
 {
 
-	List<JpaDslTupleBuilderItem<E>> builders = new LinkedList<>();
+	private List<JpaDslTupleBuilderGroupItem<E>> builders = new LinkedList<>();
+	private JpaDslTupleBuilderGroupCommon<E> common;
 	private Class<E> entityClass;
 	private List<Tuple> results = new LinkedList<>();
 	private boolean distinct = false;
@@ -62,14 +69,24 @@ public class JpaDslTupleBuilderGroup<E>
 		this.entityClass = entityClass;
 	}
 
-	public void addItem(JpaDslTupleBuilderItem<E> builder)
+	public void addItem(JpaDslTupleBuilderGroupItem<E> builder)
 	{
 		builders.add(builder);
 	}
 
-	public interface JpaDslTupleBuilderItem<E>
+	public interface JpaDslTupleBuilderGroupItem<E>
 	{
-		public void conditionsWillBeAdded(final JpaDslTupleBuilder<E> builder);
+		public void conditionsWillBeAdded(final JpaDslTupleBuilder<E> builder, final List<Condition<E>> conditions);
+	}
+
+	public void setCommon(JpaDslTupleBuilderGroupCommon<E> common)
+	{
+		this.common = common;
+	}
+
+	public interface JpaDslTupleBuilderGroupCommon<E>
+	{
+		public void conditionsWillBeAdded(final JpaDslTupleBuilder<E> builder, final List<Condition<E>> conditions);
 	}
 
 	public <T> void multiselect(SingularAttribute<E, T> attribute)
@@ -85,23 +102,37 @@ public class JpaDslTupleBuilderGroup<E>
 
 	public List<Tuple> getResults()
 	{
-		for (JpaDslTupleBuilderItem<E> builder : builders)
+		if (builders.size() > 0)
 		{
-			final JpaDslTupleBuilder<E> q = new JpaDslTupleBuilder<E>(entityClass);
-
-			builder.conditionsWillBeAdded(q);
-
-			if (distinct)
-				q.distinct();
-			for (Entry<SingularAttribute<E, ?>, Integer> multiselect : multiselects.entrySet())
+			for (JpaDslTupleBuilderGroupItem<E> builder : builders)
 			{
-				q.multiselect(multiselect.getKey());
+				results.addAll(makeQuery(builder));
 			}
-
-			results.addAll(q.getResultList());
 		}
+		else
+			results.addAll(makeQuery(null));
 
 		return results;
+	}
+
+	private List<Tuple> makeQuery(final JpaDslTupleBuilderGroupItem<E> builder)
+	{
+		final JpaDslTupleBuilder<E> q = new JpaDslTupleBuilder<E>(entityClass);
+		final List<Condition<E>> conditions = new LinkedList<>();
+		if (common != null)
+			common.conditionsWillBeAdded(q, conditions);
+		if (builder != null)
+			builder.conditionsWillBeAdded(q, conditions);
+		if (distinct)
+			q.distinct();
+		q.where(conditions);
+
+		for (Entry<SingularAttribute<E, ?>, Integer> multiselect : multiselects.entrySet())
+		{
+			q.multiselect(multiselect.getKey());
+		}
+
+		return q.getResultList();
 	}
 
 	public void distinct()

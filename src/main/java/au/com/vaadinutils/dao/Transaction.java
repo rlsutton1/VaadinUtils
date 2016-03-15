@@ -1,5 +1,7 @@
 package au.com.vaadinutils.dao;
 
+import java.io.Closeable;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 
@@ -8,7 +10,7 @@ import org.apache.logging.log4j.Logger;
 
 import au.com.vaadinutils.errorHandling.ErrorWindow;
 
-public class Transaction
+public class Transaction implements Closeable
 {
 	private EntityTransaction transaction;
 	private boolean nested = false;
@@ -43,15 +45,17 @@ public class Transaction
 
 	public void commit()
 	{
-		try{
-		if (!nested)
+		try
 		{
-			if (transaction.isActive())
-				transaction.commit();
-			else
-				throw new IllegalStateException("Commit has already been called on the transaction");
+			if (!nested)
+			{
+				if (transaction.isActive())
+					transaction.commit();
+				else
+					throw new IllegalStateException("Commit has already been called on the transaction");
+			}
 		}
-		}catch (Exception e)
+		catch (Exception e)
 		{
 			ErrorWindow.showErrorWindow(e);
 			throw e;
