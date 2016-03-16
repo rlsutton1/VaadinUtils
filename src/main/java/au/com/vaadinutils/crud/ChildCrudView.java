@@ -48,7 +48,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	private Filter parentFilter;
 	protected boolean dirty = false;
 	final private Class<P> parentType;
-	public BaseCrudView<P> parentCrud;
+	public ParentCrud<P> parentCrud;
 	private ChildCrudEventHandler<E> eventHandler = getNullEventHandler();
 
 	/**
@@ -58,7 +58,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 	 * @param childKey
 	 *            - this will be the foreign key in the child table
 	 */
-	public ChildCrudView(BaseCrudView<P> parent, Class<P> parentType, Class<E> childType,
+	public ChildCrudView(ParentCrud<P> parent, Class<P> parentType, Class<E> childType,
 			SingularAttribute<? extends CrudEntity, ? extends Object> parentKey,
 			SingularAttribute<? extends CrudEntity, ? extends Object> childKey)
 	{
@@ -72,7 +72,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 
 	}
 
-	public ChildCrudView(BaseCrudView<P> parent, Class<P> parentType, Class<E> childType,
+	public ChildCrudView(ParentCrud<P> parent, Class<P> parentType, Class<E> childType,
 			SingularAttribute<? extends CrudEntity, ? extends Object> parentKey, String childKey)
 	{
 		super(CrudDisplayMode.VERTICAL);
@@ -139,7 +139,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends CrudEntity> 
 
 		// on a new parent, the parent id changes and the container becomes
 		// empty. so reset the parent filter and refresh the container
-		createParentFilter(parentCrud.getContainer().getItem(newParentId.getId()));
+		createParentFilter(parentCrud.getContainerItem(newParentId.getId()));
 		resetFilters();
 
 		// container.discard();

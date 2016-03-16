@@ -24,6 +24,12 @@ public class ClickableLabel extends VerticalLayout
 		addComponent(label);
 	}
 
+	public ClickableLabel(String value, ContentMode contentMode)
+	{
+		label = new Label(value, contentMode);
+		addComponent(label);
+	}
+
 	public void setValue(String value)
 	{
 		label.setValue(value);

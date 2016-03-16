@@ -62,7 +62,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Reindeer;
 
 public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout implements RowChangeListener<E>,
-		Selected<E>, DirtyListener
+		Selected<E>, DirtyListener, ParentCrud<E>
 {
 
 	private static transient Logger logger = LogManager.getLogger(BaseCrudView.class);
@@ -117,7 +117,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	private boolean disallowDelete = false;
 	private Label actionLabel;
 	private boolean noEditor;
-	
+
 	private Set<RowChangedListener<E>> rowChangedListeners = new CopyOnWriteArraySet<RowChangedListener<E>>();
 
 	protected BaseCrudView()
@@ -1342,7 +1342,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		{
 			commitListener.selectedParentRowChanged(item);
 		}
-		
+
 		if (item == null)
 		{
 			notifyRowChangedListeners(null);
@@ -1351,7 +1351,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		{
 			notifyRowChangedListeners(item.getEntity());
 		}
-
 
 		if (item != null || newEntity != null)
 		{
@@ -1700,9 +1699,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	public void lockSplitPosition()
 	{
 		splitPanel.setLocked();
-		
+
 	}
-	
+
 	private void notifyRowChangedListeners(E entity)
 	{
 		for (RowChangedListener<E> listener : rowChangedListeners)
@@ -1711,16 +1710,19 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		}
 
 	}
-	
+
 	public void addRowChangedListener(RowChangedListener<E> listener)
 	{
 		rowChangedListeners.add(listener);
 	}
-	
 
 	public void removeRowChangedListener(RowChangedListener<E> listener)
 	{
 		rowChangedListeners.remove(listener);
 	}
 
+	public EntityItem<E> getContainerItem(Long id)
+	{
+		return container.getItem(id);
+	}
 }

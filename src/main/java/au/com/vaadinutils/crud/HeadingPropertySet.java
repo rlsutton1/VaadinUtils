@@ -52,6 +52,13 @@ public class HeadingPropertySet<E>
 
 		}
 
+		public Builder<E> addGeneratedColumn(String heading, ColumnGenerator columnGenerator,int width)
+		{
+			cols.add(new HeadingToPropertyId<E>(heading, heading + "-generated", columnGenerator).setWidth(width));
+			return this;
+
+		}
+
 		public Builder<E> addGeneratedColumn(String heading, String headingPropertyId, ColumnGenerator columnGenerator)
 		{
 			cols.add(new HeadingToPropertyId<E>(heading, headingPropertyId, columnGenerator));
@@ -69,6 +76,13 @@ public class HeadingPropertySet<E>
 		public Builder<E> addColumn(String heading, String headingPropertyId)
 		{
 			cols.add(new HeadingToPropertyId<E>(heading, headingPropertyId, null));
+			return this;
+
+		}
+		
+		public Builder<E> addColumn(String heading, String headingPropertyId,int width)
+		{
+			cols.add(new HeadingToPropertyId<E>(heading, headingPropertyId, null).setWidth(width));
 			return this;
 
 		}
