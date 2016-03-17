@@ -16,6 +16,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Order;
+import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.ListAttribute;
@@ -255,6 +256,39 @@ public class JpaDslBuilder<E>
 			{
 
 				return builder.greaterThanOrEqualTo(root.get(field), value);
+			}
+
+		};
+
+	}
+
+	public <V extends Comparable<? super V>> Condition<E> greaterThanOrEqualTo(final TypedPath<E, V> field,
+			final V value)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+
+				return builder.greaterThanOrEqualTo(field.path, value);
+			}
+
+		};
+
+	}
+
+	public <V extends Comparable<? super V>> Condition<E> lessThanOrEqualTo(final TypedPath<E, V> field, final V value)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+
+				return builder.lessThanOrEqualTo(field.path, value);
 			}
 
 		};
@@ -884,6 +918,36 @@ public class JpaDslBuilder<E>
 	public <J> JpaDslSubqueryBuilder<E, J> subQuery(Class<J> target)
 	{
 		return new JpaDslSubqueryBuilder<E, J>(entityManager, target, criteria, root);
+	}
+
+	class TypedPath<E, V>
+	{
+		public TypedPath(Path<V> path2)
+		{
+			this.path = path2;
+		}
+
+		final Path<V> path;
+	}
+
+	public <V, J> TypedPath<E, V> path(SingularAttribute<? super E, J> partA, SingularAttribute<J, V> partB)
+	{
+		return new TypedPath<E, V>(root.get(partA).get(partB));
+
+	}
+
+	public <K> Condition<E> isNull(final TypedPath<E, K> path)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+				return builder.isNull(path.path);
+			}
+
+		};
 	}
 
 }

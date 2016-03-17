@@ -89,6 +89,7 @@ public class InputFormDialog extends Window
 		ok.setClickShortcut(KeyCode.ENTER);
 		ok.addStyleName("default");
 		buttons.addComponent(ok);
+		
 
 		layout.addComponent(buttons);
 		layout.setComponentAlignment(buttons, Alignment.MIDDLE_RIGHT);
