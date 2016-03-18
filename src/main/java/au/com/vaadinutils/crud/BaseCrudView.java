@@ -23,6 +23,17 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.vaadin.dialogs.ConfirmDialog;
 
+import au.com.vaadinutils.crud.events.CrudEventDistributer;
+import au.com.vaadinutils.crud.events.CrudEventType;
+import au.com.vaadinutils.crud.security.SecurityManagerFactoryProxy;
+import au.com.vaadinutils.dao.EntityManagerProvider;
+import au.com.vaadinutils.dao.EntityManagerRunnable;
+import au.com.vaadinutils.dao.RunnableUI;
+import au.com.vaadinutils.errorHandling.ErrorWindow;
+import au.com.vaadinutils.listener.ClickEventLogged;
+import au.com.vaadinutils.menu.Menu;
+import au.com.vaadinutils.menu.Menus;
+
 import com.google.common.base.Preconditions;
 import com.google.common.base.Stopwatch;
 import com.vaadin.addon.jpacontainer.EntityItem;
@@ -70,17 +81,6 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
-import au.com.vaadinutils.crud.events.CrudEventDistributer;
-import au.com.vaadinutils.crud.events.CrudEventType;
-import au.com.vaadinutils.crud.security.SecurityManagerFactoryProxy;
-import au.com.vaadinutils.dao.EntityManagerProvider;
-import au.com.vaadinutils.dao.EntityManagerRunnable;
-import au.com.vaadinutils.dao.RunnableUI;
-import au.com.vaadinutils.errorHandling.ErrorWindow;
-import au.com.vaadinutils.listener.ClickEventLogged;
-import au.com.vaadinutils.menu.Menu;
-import au.com.vaadinutils.menu.Menus;
-
 public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout implements RowChangeListener<E>,
 		Selected<E>, DirtyListener, ButtonListener
 {
@@ -109,6 +109,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	protected JPAContainer<E> container;
 	protected EntityList<E> entityTable;
 	protected VerticalLayout rightLayout;
+	// Layout for the tablesaveOnRowChange
+	protected VerticalLayout leftLayout;
 	protected Component editor;
 	protected CrudPanelPair splitPanel;
 	protected BaseCrudSaveCancelButtonTray buttonLayout;
@@ -386,9 +388,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		this.setExpandRatio(splitPanel.getPanel(), 1);
 		this.setSizeFull();
 
-		// Layout for the tablesaveOnRowChange
-		VerticalLayout leftLayout = new VerticalLayout();
-
+		leftLayout = new VerticalLayout();
 		// Start by defining the LHS which contains the table
 		splitPanel.setFirstComponent(leftLayout);
 		searchLayout = new VerticalLayout();
