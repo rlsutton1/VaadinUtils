@@ -136,6 +136,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	private SingularAttribute<E, Long> ordinalField;
 	protected CrudAction<E> exportAction;
 
+	private boolean isMainView = true;
+
 	protected BaseCrudView()
 	{
 
@@ -838,7 +840,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		showNew(!disallow);
 	}
 
-	protected boolean isDisallowNew()
+	public boolean isDisallowNew()
 	{
 		return this.disallowNew;
 	}
@@ -1072,51 +1074,54 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			child.discard();
 		}
 
-		if (newEntity != null)
+		if (isMainView)
 		{
-			if (restoreDelete)
+			if (newEntity != null)
 			{
-				activateEditMode(false);
-				restoreDelete = false;
+				if (restoreDelete)
+				{
+					activateEditMode(false);
+					restoreDelete = false;
+				}
+				newEntity = null;
+
+				// set the selection to the first item on the page.
+				// We need to set it to null first as if the first item was
+				// already selected
+				// then we won't get a row change which is need to update
+				// the rhs.
+				// CONSIDER: On the other hand I'm concerned that we might
+				// confuse people as they
+				// get two row changes events.
+				BaseCrudView.this.entityTable.select(null);
+				BaseCrudView.this.entityTable.select(entityTable.getCurrentPageFirstItemId());
+
 			}
-			newEntity = null;
-
-			// set the selection to the first item on the page.
-			// We need to set it to null first as if the first item was
-			// already selected
-			// then we won't get a row change which is need to update
-			// the rhs.
-			// CONSIDER: On the other hand I'm concerned that we might
-			// confuse people as they
-			// get two row changes events.
-			BaseCrudView.this.entityTable.select(null);
-			BaseCrudView.this.entityTable.select(entityTable.getCurrentPageFirstItemId());
-
-		}
-		else
-		{
-			// Force the row to be reselected so that derived
-			// classes get a rowChange when we cancel.
-			// CONSIDER: is there a better way of doing this?
-			// Could we not just fire an 'onCancel' event or similar?
-			Long id = null;
-			if (entityTable.getCurrent() != null)
+			else
 			{
-				id = entityTable.getCurrent().getEntity().getId();
+				// Force the row to be reselected so that derived
+				// classes get a rowChange when we cancel.
+				// CONSIDER: is there a better way of doing this?
+				// Could we not just fire an 'onCancel' event or similar?
+				Long id = null;
+				if (entityTable.getCurrent() != null)
+				{
+					id = entityTable.getCurrent().getEntity().getId();
+				}
+				BaseCrudView.this.entityTable.select(null);
+				BaseCrudView.this.entityTable.select(id);
+
 			}
-			BaseCrudView.this.entityTable.select(null);
-			BaseCrudView.this.entityTable.select(id);
+			splitPanel.showFirstComponet();
+			if (entityTable.getCurrent() == null)
+			{
+				showNoSelectionMessage();
+			}
 
+			Notification.show("Changes discarded.", "Any changes you have made to this record been discarded.",
+					Type.TRAY_NOTIFICATION);
+			buttonLayout.setDefaultState();
 		}
-		splitPanel.showFirstComponet();
-		if (entityTable.getCurrent() == null)
-		{
-			showNoSelectionMessage();
-		}
-
-		Notification.show("Changes discarded.", "Any changes you have made to this record been discarded.",
-				Type.TRAY_NOTIFICATION);
-		buttonLayout.setDefaultState();
 	}
 
 	/**
@@ -2293,5 +2298,35 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	public void setTriggerFilterOnClear(boolean triggerFilterOnClear)
 	{
 		this.triggerFilterOnClear = triggerFilterOnClear;
+	}
+
+	public boolean isDisallowEditing()
+	{
+		return disallowEditing;
+	}
+
+	/**
+	 * 
+	 * Set this to false if you are using the BaseCrudView's buttonLayout in a
+	 * different page (e.g. pop-up window) and wants to limit the
+	 * cancelClicked() action
+	 * 
+	 * @param isMainView
+	 */
+	public void setMainView(boolean isMainView)
+	{
+		this.isMainView = isMainView;
+	}
+
+	/**
+	 * Use this to remove temporaryChildCrudListener
+	 * 
+	 * @param listener
+	 *            ChildCrudListener that you do not intend to keep
+	 */
+	public void removeChildCrudListener(ChildCrudListener<E> listener)
+	{
+		if (childCrudListeners != null && childCrudListeners.contains(listener))
+			childCrudListeners.remove(listener);
 	}
 }
