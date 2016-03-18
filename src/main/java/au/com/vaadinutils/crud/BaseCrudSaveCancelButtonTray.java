@@ -19,10 +19,13 @@ public class BaseCrudSaveCancelButtonTray extends HorizontalLayout
 	private Button saveButton = new Button("Save");
 	private Button cancelButton = new Button("Cancel");
 
+	private ButtonListener buttonListener;
+
 	public BaseCrudSaveCancelButtonTray(boolean disallowEdit, boolean disallowNew, final ButtonListener listener)
 	{
 		this.disallowEdit = disallowEdit;
 		this.disallowNew = disallowNew;
+		this.buttonListener = listener;
 
 		if (disallowEdit && disallowNew)
 		{
@@ -35,7 +38,7 @@ public class BaseCrudSaveCancelButtonTray extends HorizontalLayout
 		setSizeFull();
 		setWidth("100%");
 		addComponent(cancelButton);
-		
+
 		addComponent(saveButton);
 		saveButton.setId("CrudSaveButton");
 		setComponentAlignment(saveButton, Alignment.MIDDLE_RIGHT);
@@ -50,7 +53,7 @@ public class BaseCrudSaveCancelButtonTray extends HorizontalLayout
 			@Override
 			public void buttonClick(ClickEvent event)
 			{
-				listener.saveClicked();
+				buttonListener.saveClicked();
 
 			}
 		});
@@ -65,7 +68,7 @@ public class BaseCrudSaveCancelButtonTray extends HorizontalLayout
 			@Override
 			public void buttonClick(ClickEvent event)
 			{
-				listener.cancelClicked();
+				buttonListener.cancelClicked();
 
 			}
 		});
@@ -98,4 +101,8 @@ public class BaseCrudSaveCancelButtonTray extends HorizontalLayout
 		return cancelButton;
 	}
 
+	public ButtonListener getButtonListener()
+	{
+		return buttonListener;
+	}
 }
