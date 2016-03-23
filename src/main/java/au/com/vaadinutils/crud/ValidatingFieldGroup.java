@@ -44,9 +44,24 @@ public class ValidatingFieldGroup<E> extends FieldGroup
 	private boolean groupIsDirty;
 	private DirtyListener dirtyListener;
 
+	public DirtyListener getDirtyListener()
+	{
+		return dirtyListener;
+	}
+
 	public void setDirtyListener(DirtyListener listener)
 	{
 		dirtyListener = listener;
+	}
+
+	public boolean getGroupIsDirty()
+	{
+		return groupIsDirty;
+	}
+
+	public void setGroupIsDirty(boolean groupIsDirty)
+	{
+		this.groupIsDirty = groupIsDirty;
 	}
 
 	private Set<Field<?>> knownFields = new HashSet<Field<?>>();
