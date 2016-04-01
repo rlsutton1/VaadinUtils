@@ -414,7 +414,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	@Override
 	public Class<? extends Collection<C>> getType()
 	{
-		return (Class<? extends Collection<C>>) Collection.class;
+		return (Class<Collection<C>>) (Class<?>) Collection.class;
 	}
 
 	public void setFilter(Filter filter)
