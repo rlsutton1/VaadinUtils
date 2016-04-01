@@ -20,6 +20,7 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.UI;
+import com.vaadin.ui.UIDetachedException;
 import com.vaadin.ui.Upload;
 import com.vaadin.ui.Upload.FailedEvent;
 import com.vaadin.ui.Upload.FailedListener;
@@ -151,7 +152,7 @@ public class ErrorWindow
 		{
 			// limit the number of errors that can be emailed without human
 			// action. also suppress some types of errors
-			if (emailRateController.acquire() && !(cause instanceof SocketException))
+			if (emailRateController.acquire() && !(cause instanceof SocketException) && !(cause instanceof UIDetachedException))
 			{
 				try
 				{
