@@ -772,12 +772,22 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 	{
 		advancedSearchOn = true;
 		advancedSearchLayout.setVisible(advancedSearchOn);
+		advancedSearchButton.setCaption("Basic");
 		advancedSearchButton.setStyleName(ValoTheme.BUTTON_FRIENDLY);
 
 		if (lockAdvancedSearch)
 		{
 			advancedSearchButton.setVisible(false);
 		}
+	}
+
+	public void closeAdvancedSearch()
+	{
+		clearAdvancedFilters();
+		advancedSearchOn = false;
+		advancedSearchLayout.setVisible(advancedSearchOn);
+		advancedSearchButton.setCaption("Advanced");
+		advancedSearchButton.removeStyleName(ValoTheme.BUTTON_FRIENDLY);
 	}
 
 	protected AbstractLayout getAdvancedSearchLayout()
@@ -1935,7 +1945,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			{
 				try
 				{
-					E previousEntity = getCurrent();
+					closeAdvancedSearch();
+					
+					final E previousEntity = getCurrent();
 
 					createNewEntity(previousEntity);
 
@@ -1955,14 +1967,12 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 					postNew(newEntity);
 
 					buttonLayout.startNewPhase();
-
 				}
 				catch (Exception e)
 				{
 					ErrorWindow.showErrorWindow(e);
 				}
 			}
-
 		});
 	}
 
