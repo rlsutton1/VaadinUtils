@@ -1845,7 +1845,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 		fieldGroup.commit();
 	}
 
-	private void validateChildren()
+	protected void validateChildren()
 	{
 		for (ChildCrudListener<E> child : childCrudListeners)
 		{
@@ -1945,8 +1945,11 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout 
 			{
 				try
 				{
-					closeAdvancedSearch();
-					
+					if (advancedSearchLayout != null)
+					{
+						closeAdvancedSearch();
+					}
+
 					final E previousEntity = getCurrent();
 
 					createNewEntity(previousEntity);
