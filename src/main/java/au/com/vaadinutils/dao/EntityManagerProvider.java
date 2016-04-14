@@ -293,7 +293,7 @@ public enum EntityManagerProvider
 				T result = null;
 				try
 				{
-					setThreadLocalEntityManager(new EntityWorker<T>()
+					result = setThreadLocalEntityManager(new EntityWorker<T>()
 					{
 
 						@Override
