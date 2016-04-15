@@ -188,7 +188,8 @@ public class TableCheckBoxSelect extends Table
 	public void setValue(Object value)
 	{
 		final ArrayList<Object> v = new ArrayList<>(1);
-		v.add(value);
+		if (value != null)
+			v.add(value);
 		super.setValue(v);
 	}
 
