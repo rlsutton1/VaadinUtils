@@ -196,12 +196,17 @@ public class TableCheckBoxSelect extends Table
 	@SuppressWarnings("unchecked")
 	public void setSelectedValue(Object value)
 	{
-		// super.setValue(newValue);
-		markedIds.clear(true, containerSize);
-		markedIds.addAll((Collection<Long>) value);
+		// If table is selectable with checkboxes then update the selected ids,
+		// otherwise update the selected checkboxes
+		if (selectable)
+		{
+			markedIds.clear(true, containerSize);
+			markedIds.addAll((Collection<Long>) value);
+		}
+		else
+			super.setValue(value);
 
 		this.refreshRowCache();
-
 	}
 
 	@Override
