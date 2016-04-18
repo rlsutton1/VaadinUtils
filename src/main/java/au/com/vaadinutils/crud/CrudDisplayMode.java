@@ -20,12 +20,12 @@ public enum CrudDisplayMode
 			return new CrudPanelSplitPairHorizontal();
 		}
 	},
-	HIDDING
+	HIDING
 	{
 		@Override
 		public CrudPanelPair getContainer()
 		{
-			return new CrudPanelSplitPairHidding();
+			return new CrudPanelSplitPairHiding();
 		}
 	};
 
