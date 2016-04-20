@@ -40,7 +40,7 @@ public class EntityTable<E> extends Table implements EntityList<E>
     }
 
     @Override
-    public Object prevVisableItemId(Object itemId)
+    public Object prevVisibleItemId(Object itemId)
     {
         Object prev = null;
         for (Object id : getVisibleItemIds())
