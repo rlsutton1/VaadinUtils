@@ -5,8 +5,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import javax.activation.DataSource;
-
-import org.apache.commons.mail.ByteArrayDataSource;
+import javax.mail.util.ByteArrayDataSource;
 
 import au.com.vaadinutils.jasper.JasperManager.OutputFormat;
 
@@ -15,57 +14,57 @@ import au.com.vaadinutils.jasper.JasperManager.OutputFormat;
  */
 public class RenderedReport
 {
-	private final InputStream reportBody;
-	private final DataSource[] images;
-	private OutputFormat exportMethod;
+    private final InputStream reportBody;
+    private final DataSource[] images;
+    private OutputFormat exportMethod;
 
-	RenderedReport(InputStream out, DataSource[] images, OutputFormat exportMethod)
-	{
-		this.reportBody = out;
-		this.images = images;
-		this.exportMethod = exportMethod;
-	}
+    RenderedReport(InputStream out, DataSource[] images, OutputFormat exportMethod)
+    {
+        this.reportBody = out;
+        this.images = images;
+        this.exportMethod = exportMethod;
+    }
 
-	public boolean isHTML()
-	{
-		return exportMethod == OutputFormat.HTML;
-	}
+    public boolean isHTML()
+    {
+        return exportMethod == OutputFormat.HTML;
+    }
 
-	public boolean isPDF()
-	{
-		return exportMethod == OutputFormat.PDF;
-	}
+    public boolean isPDF()
+    {
+        return exportMethod == OutputFormat.PDF;
+    }
 
-	public boolean isCsv()
-	{
-		return exportMethod == OutputFormat.CSV;
-	}
+    public boolean isCsv()
+    {
+        return exportMethod == OutputFormat.CSV;
+    }
 
-	public String getBodyAsHtml() 
-	{
-		InputStreamReader isr = new InputStreamReader(reportBody);
-		return isr.toString();
+    public String getBodyAsHtml()
+    {
+        InputStreamReader isr = new InputStreamReader(reportBody);
+        return isr.toString();
 
-	}
+    }
 
-	public DataSource getBodyAsDataSource(String fileName, AttachmentType type) throws IOException
-	{
+    public DataSource getBodyAsDataSource(String fileName, AttachmentType type) throws IOException
+    {
 
-		final ByteArrayDataSource body = new ByteArrayDataSource(reportBody, type.toString());
-		body.setName(fileName);
+        final ByteArrayDataSource body = new ByteArrayDataSource(reportBody, type.toString());
+        body.setName(fileName);
 
-		return body;
-	}
+        return body;
+    }
 
-	public DataSource[] getImages()
-	{
-		return images;
-	}
+    public DataSource[] getImages()
+    {
+        return images;
+    }
 
-	public void close() throws IOException
-	{
-		reportBody.close();
+    public void close() throws IOException
+    {
+        reportBody.close();
 
-	}
+    }
 
 }
