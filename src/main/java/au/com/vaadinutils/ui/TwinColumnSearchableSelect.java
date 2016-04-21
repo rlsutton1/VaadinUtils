@@ -82,6 +82,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	private static final float BUTTON_LAYOUT_WIDTH = 50;
 	private static final float BUTTON_WIDTH = 45;
 
+
 	/**
 	 * Unfortunately TwinColumnSelect wont work with large sets, it isn't
 	 * searchable and it doesn't lazy load, it also isn't sortable.
