@@ -82,7 +82,6 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	private static final float BUTTON_LAYOUT_WIDTH = 50;
 	private static final float BUTTON_WIDTH = 45;
 
-
 	/**
 	 * Unfortunately TwinColumnSelect wont work with large sets, it isn't
 	 * searchable and it doesn't lazy load, it also isn't sortable.
@@ -138,7 +137,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 					listField.getDeclaringType().getJavaType(),
 					Arrays.toString(selectedTable.getContainerPropertyIds().toArray()));
 		}
-		
+
 		selectedTable.addItemClickListener(new ItemClickListener()
 		{
 			private static final long serialVersionUID = 1L;
@@ -370,7 +369,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 		super.setReadOnly(b);
 
 		// hide the add/remove and available list
-		addButton.setVisible(!b);
+		setAddButtonVisibility(!b);
 		removeButton.setVisible(!b);
 		if (showAddRemoveAll)
 		{
@@ -774,6 +773,11 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 		};
 	}
 
+	protected void setAddButtonVisibility(boolean visible)
+	{
+		addButton.setVisible(visible);
+	}
+
 	public void setSizeFull()
 	{
 		super.setSizeFull();
@@ -786,7 +790,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 	{
 		return new SimpleStringFilter(listField.getName(), filterString, true, false);
 	}
-	
+
 	@Override
 	public void setWidth(float width, Unit unit)
 	{
@@ -796,8 +800,8 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 		{
 			mainLayout.setWidth(width, unit);
 
-			selectedTable.setWidth(((width-5) / 2) - (BUTTON_LAYOUT_WIDTH /2), unit);
-			availableTable.setWidth(((width-5) / 2) - (BUTTON_LAYOUT_WIDTH/ 2), unit);
+			selectedTable.setWidth(((width - 5) / 2) - (BUTTON_LAYOUT_WIDTH / 2), unit);
+			availableTable.setWidth(((width - 5) / 2) - (BUTTON_LAYOUT_WIDTH / 2), unit);
 		}
 
 	}
