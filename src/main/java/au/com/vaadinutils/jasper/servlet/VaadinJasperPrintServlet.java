@@ -22,52 +22,52 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- *
  * @author bsutton
  * @version
  */
 public class VaadinJasperPrintServlet extends HttpServlet
 {
 
-	public static final String IMAGES_MAP = "IMAGES_MAP";
-	private static final long serialVersionUID = -4735461255420730963L;
-	static Logger logger = LogManager.getLogger();
+    public static final String IMAGES_MAP = "IMAGES_MAP";
+    private static final long serialVersionUID = -4735461255420730963L;
+    static Logger logger = LogManager.getLogger();
 
-	/**
-	 * Called to show an image that has been loaded into the session be a prior
-	 * call to doPrint.
-	 */
-	@Override
-	public void doGet(HttpServletRequest request, HttpServletResponse response)
-	{
-		@SuppressWarnings("unchecked")
-		Map<String, byte[]> imagesMap = (Map<String, byte[]>) request.getSession().getAttribute(IMAGES_MAP);
+    /**
+     * Called to show an image that has been loaded into the session be a prior
+     * call to doPrint.
+     */
+    @Override
+    public void doGet(HttpServletRequest request, HttpServletResponse response)
+    {
+        @SuppressWarnings("unchecked")
+        Map<String, byte[]> imagesMap = (Map<String, byte[]>) request.getSession().getAttribute(IMAGES_MAP);
 
-		try
-		{
-			if (imagesMap != null)
-			{
-				String imageName = request.getParameter("image");
-				if (imageName != null)
-				{
-					byte[] imageData = imagesMap.get(imageName);
+        try
+        {
+            if (imagesMap != null)
+            {
+                String imageName = request.getParameter("image");
+                if (imageName != null)
+                {
+                    byte[] imageData = imagesMap.get(imageName);
 
-					if (imageData == null)
-						throw new IllegalStateException(
-								"The passed image (" + imageName + " has not been loaded into the session.");
+                    if (imageData == null)
+                        throw new IllegalStateException(
+                                "The passed image (" + imageName + " has not been loaded into the session.");
 
-					response.setContentLength(imageData.length);
-					ServletOutputStream out = response.getOutputStream();
-					out.write(imageData, 0, imageData.length);
-					out.flush();
-					out.close();
-				}
-			}
-		}
-		catch (Exception e)
-		{
-			logger.error(e, e);
-		}
-	}
+                    response.setContentLength(imageData.length);
+                    try (ServletOutputStream out = response.getOutputStream();)
+                    {
+                        out.write(imageData, 0, imageData.length);
+                        out.flush();
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            logger.error(e, e);
+        }
+    }
 
 }

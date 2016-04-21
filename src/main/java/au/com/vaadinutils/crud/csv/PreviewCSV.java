@@ -111,11 +111,10 @@ public class PreviewCSV
 	protected IndexedContainer buildContainerFromCSV(Reader reader, int rowLimit) throws IOException
 	{
 		IndexedContainer container = new IndexedContainer();
-		CSVReader csvReader = null;
-
-		try
+	
+		try(CSVReader csvReader = new CSVReader(reader);)
 		{
-			csvReader = new CSVReader(reader);
+			
 			String[] columnHeaders = null;
 			String[] record;
 
@@ -136,11 +135,7 @@ public class PreviewCSV
 				}
 			}
 		}
-		finally
-		{
-			if (csvReader != null)
-				csvReader.close();
-		}
+		
 		return container;
 	}
 

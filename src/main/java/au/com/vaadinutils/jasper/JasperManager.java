@@ -20,8 +20,8 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 import javax.activation.DataSource;
+import javax.mail.util.ByteArrayDataSource;
 
-import org.apache.commons.mail.ByteArrayDataSource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
