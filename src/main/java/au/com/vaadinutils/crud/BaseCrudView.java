@@ -1143,7 +1143,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
         // using prevVisableItemId instead of prevItemId because with some
         // sorting options JPAContainer causes eclipse link ti throw an error
         // and rolls the transaction back
-        previousItemId = entityTable.prevVisableItemId(entityId);
+        previousItemId = entityTable.prevVisibleItemId(entityId);
 
         newEntity = null;
 
