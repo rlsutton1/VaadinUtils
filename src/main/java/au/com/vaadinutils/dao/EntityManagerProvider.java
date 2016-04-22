@@ -174,53 +174,11 @@ public enum EntityManagerProvider
      */
     public static <T> T setThreadLocalEntityManager(EntityWorker<T> worker) throws Exception
     {
-        if (getEntityManager() == null)
+
+        try (AutoCloseable closer = EntityManagerProvider.setThreadLocalEntityManagerTryWithResources())
         {
-            final EntityManager em = createEntityManager();
-
-            try
-            {
-                setCurrentEntityManager(em);
-
-                em.getTransaction().begin();
-
-                T ret = worker.exec();
-
-                em.getTransaction().commit();
-                return ret;
-            }
-            catch (ConstraintViolationException e)
-            {
-                // ensure we get the cause of an underlying constraint violation
-                ErrorWindow.showErrorWindow(e);
-                throw e;
-            }
-            finally
-            {
-                try
-                {
-                    try
-                    {
-                        if (em.getTransaction().isActive())
-                        {
-                            logger.error("Rolling back transaction");
-                            em.getTransaction().rollback();
-
-                        }
-                    }
-                    finally
-                    {
-                        em.close();
-                    }
-                }
-                finally
-                {
-                    setCurrentEntityManager(null);
-                }
-            }
+            return worker.exec();
         }
-        // there was already an active entity manager, so just use it!
-        return worker.exec();
 
     }
 
@@ -252,6 +210,8 @@ public enum EntityManagerProvider
         }
         else
         {
+            // entityManager already existed, no need to create one or start a
+            // transaction
             em = null;
         }
 
@@ -319,22 +279,13 @@ public enum EntityManagerProvider
             @Override
             public void run()
             {
-                try
+                try (AutoCloseable closer = EntityManagerProvider.setThreadLocalEntityManagerTryWithResources())
                 {
-                    setThreadLocalEntityManager(new EntityWorker<Void>()
-                    {
-
-                        @Override
-                        public Void exec() throws Exception
-                        {
-                            runnable.run();
-                            return null;
-                        }
-                    });
+                    runnable.run();
                 }
                 catch (Exception e)
                 {
-                    logger.error(e, e);
+                    ErrorWindow.showErrorWindow(e);
                 }
 
             }
@@ -359,27 +310,10 @@ public enum EntityManagerProvider
             @Override
             public T call() throws Exception
             {
-                T result = null;
-                try
+                try (AutoCloseable closer = EntityManagerProvider.setThreadLocalEntityManagerTryWithResources())
                 {
-                    result = setThreadLocalEntityManager(new EntityWorker<T>()
-                    {
-
-                        @Override
-                        public T exec() throws Exception
-                        {
-                            return callable.call();
-                        }
-                    });
-
+                    return callable.call();
                 }
-                catch (Exception e)
-                {
-                    logger.error(e, e);
-                    throw e;
-                }
-                return result;
-
             }
         };
     }
