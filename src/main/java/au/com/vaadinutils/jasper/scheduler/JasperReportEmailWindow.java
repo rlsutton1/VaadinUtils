@@ -94,6 +94,7 @@ public class JasperReportEmailWindow extends Window
 		subject.setWidth("100%");
 		layout.addComponent(subject);
 		subject.setValue(reportProperties.getReportTitle() + " report is attached");
+		subject.setMaxLength(250);
 
 		message = new TextArea("Message");
 		message.setValue(reportProperties.getReportTitle() + " report is attached");
