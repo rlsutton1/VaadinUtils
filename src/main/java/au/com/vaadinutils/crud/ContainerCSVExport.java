@@ -107,6 +107,16 @@ public class ContainerCSVExport<E>
 				}
 				finally
 				{
+					try
+					{
+						// fire fox won't take the download without this sleep
+						Thread.sleep(1000);
+					}
+					catch (InterruptedException e)
+					{
+						// TODO Auto-generated catch block
+						logger.error(e,e);
+					}
 					window.close();
 				}
 				return null;
