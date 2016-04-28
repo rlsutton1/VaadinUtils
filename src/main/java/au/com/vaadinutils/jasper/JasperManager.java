@@ -678,26 +678,26 @@ public class JasperManager implements Runnable
 		final CountDownLatch latch = new CountDownLatch(1);
 		exportAsync(exportMethod, params, new JasperProgressListener()
 		{
-			
+
 			@Override
 			public void outputStreamReady()
 			{
 				latch.countDown();
-				
+
 			}
-			
+
 			@Override
 			public void failed(String string)
 			{
 				latch.countDown();
-				
+
 			}
-			
+
 			@Override
 			public void completed()
 			{
 				latch.countDown();
-				
+
 			}
 		});
 		latch.await();
@@ -722,6 +722,14 @@ public class JasperManager implements Runnable
 		readerReady.countDown();
 		if (!writerReady.await(10, TimeUnit.SECONDS))
 		{
+			try
+			{
+				inputStream.close();
+			}
+			catch (IOException e)
+			{
+				logger.error(e, e);
+			}
 			throw new RuntimeException("Couldn't attach to writer stream");
 		}
 		return inputStream;
@@ -873,46 +881,46 @@ public class JasperManager implements Runnable
 
 			switch (exportMethod)
 			{
-				case HTML:
-				{
-					exporter = new JRHtmlExporter();
+			case HTML:
+			{
+				exporter = new JRHtmlExporter();
 
-					exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasper_print);
-					exporter.setParameter(JRHtmlExporterParameter.IMAGES_MAP, images);
+				exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasper_print);
+				exporter.setParameter(JRHtmlExporterParameter.IMAGES_MAP, images);
 
-					if (VaadinServlet.getCurrent() != null)
-					{
-						String context = VaadinServlet.getCurrent().getServletContext().getContextPath();
-						int contextIndex = Page.getCurrent().getLocation().toString().lastIndexOf(context);
-						String baseurl = Page.getCurrent().getLocation().toString().substring(0,
-								contextIndex + context.length() + 1);
+				if (VaadinServlet.getCurrent() != null)
+				{
+					String context = VaadinServlet.getCurrent().getServletContext().getContextPath();
+					int contextIndex = Page.getCurrent().getLocation().toString().lastIndexOf(context);
+					String baseurl = Page.getCurrent().getLocation().toString().substring(0,
+							contextIndex + context.length() + 1);
 
-						String imageUrl = baseurl + "VaadinJasperPrintServlet?image=";
+					String imageUrl = baseurl + "VaadinJasperPrintServlet?image=";
 
-						exporter.setParameter(JRHtmlExporterParameter.IMAGES_URI, imageUrl);
-					}
-					else
-					{
-						logger.warn("Vaadin Servlet doens't have a current context");
-					}
-					break;
+					exporter.setParameter(JRHtmlExporterParameter.IMAGES_URI, imageUrl);
 				}
-				case PDF:
+				else
 				{
-					exporter = new JRPdfExporter();
-					exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasper_print);
-					break;
+					logger.warn("Vaadin Servlet doens't have a current context");
 				}
-				case CSV:
-				{
-					exporter = new JRCsvExporter();
-					exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasper_print);
-					break;
-				}
-				default:
-				{
-					throw new RuntimeException("Unsupported export option " + exportMethod);
-				}
+				break;
+			}
+			case PDF:
+			{
+				exporter = new JRPdfExporter();
+				exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasper_print);
+				break;
+			}
+			case CSV:
+			{
+				exporter = new JRCsvExporter();
+				exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasper_print);
+				break;
+			}
+			default:
+			{
+				throw new RuntimeException("Unsupported export option " + exportMethod);
+			}
 
 			}
 
