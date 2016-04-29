@@ -10,8 +10,8 @@ import com.vaadin.data.Container.Filter;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.VerticalLayout;
 
-import au.com.vaadinutils.crud.BaseCrudView;
 import au.com.vaadinutils.crud.CrudAction;
+import au.com.vaadinutils.crud.ParentCrud;
 import au.com.vaadinutils.crud.ValidatingFieldGroup;
 import au.com.vaadinutils.crud.adaptor.BaseCrudAdaptor;
 import au.com.vaadinutils.crud.adaptor.ChildCrudAdaptor;
@@ -42,7 +42,7 @@ public class ExampleCrud extends VerticalLayout
 	 * 
 	 * @param parent
 	 */
-	ExampleCrud(BaseCrudView<ReportEmailScheduleEntity> parent)
+	ExampleCrud(ParentCrud<ReportEmailScheduleEntity> parent)
 	{
 		crud = createChildCrud(parent);
 	}
@@ -55,7 +55,7 @@ public class ExampleCrud extends VerticalLayout
 		crud = createParentCrud();
 	}
 
-	CrudAdaptor<?, ReportEmailScheduledDateParameter> createChildCrud(BaseCrudView<ReportEmailScheduleEntity> parent)
+	CrudAdaptor<?, ReportEmailScheduledDateParameter> createChildCrud(ParentCrud<ReportEmailScheduleEntity> parent)
 	{
 		return new ChildCrudAdaptor<>(this, parent,
 				ReportEmailScheduleEntity.class, ReportEmailScheduledDateParameter.class,

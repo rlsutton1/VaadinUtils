@@ -9,12 +9,12 @@ import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.ui.Component;
 
-import au.com.vaadinutils.crud.BaseCrudView;
 import au.com.vaadinutils.crud.ChildCrudEntity;
 import au.com.vaadinutils.crud.ChildCrudView;
 import au.com.vaadinutils.crud.CrudAction;
 import au.com.vaadinutils.crud.CrudEntity;
 import au.com.vaadinutils.crud.HeadingPropertySet;
+import au.com.vaadinutils.crud.ParentCrud;
 import au.com.vaadinutils.crud.ValidatingFieldGroup;
 
 /**
@@ -36,7 +36,7 @@ public class ChildCrudAdaptor<P extends CrudEntity, E extends ChildCrudEntity> e
 	private static final long serialVersionUID = 1L;
 	private ChildCrudInterface<P, E> client;
 
-	public ChildCrudAdaptor(ChildCrudInterface<P, E> client, BaseCrudView<P> parent, Class<P> parentType,
+	public ChildCrudAdaptor(ChildCrudInterface<P, E> client, ParentCrud<P> parent, Class<P> parentType,
 			Class<E> childType, SingularAttribute<? extends CrudEntity, ? extends Object> parentKey,
 			SingularAttribute<? extends CrudEntity, ? extends Object> childKey)
 	{

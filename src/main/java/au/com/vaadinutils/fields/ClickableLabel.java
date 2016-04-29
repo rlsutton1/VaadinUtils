@@ -14,58 +14,66 @@ import com.vaadin.ui.VerticalLayout;
 @SuppressWarnings("serial")
 public class ClickableLabel extends VerticalLayout
 {
-    private Label label;
+	private Label label;
 
-    public ClickableLabel()
-    {
-        this(null);
-        setImmediate(true);
-    }
+	public ClickableLabel()
+	{
+		this(null);
+		setImmediate(true);
+	}
 
-    public ClickableLabel(String value)
-    {
-        label = new Label(value, ContentMode.HTML);
-        addComponent(label);
-    }
+	public ClickableLabel(String value)
+	{
+		label = new Label(value, ContentMode.HTML);
+		addComponent(label);
+		setImmediate(true);
+	}
 
-    public void setValue(String value)
-    {
-        label.setValue(value);
-    }
+	public ClickableLabel(String value, ContentMode contentMode)
+	{
+		label = new Label(value, contentMode);
+		addComponent(label);
+		setImmediate(true);
+	}
 
-    public void setStyleName(String style)
-    {
-        label.setStyleName(style);
-    }
+	public void setValue(String value)
+	{
+		label.setValue(value);
+	}
 
-    public void setContentMode(ContentMode contentMode)
-    {
-        label.setContentMode(contentMode);
+	public void setStyleName(String style)
+	{
+		label.setStyleName(style);
+	}
 
-    }
+	public void setContentMode(ContentMode contentMode)
+	{
+		label.setContentMode(contentMode);
 
-    public String getValue()
-    {
-        return label.getValue() != null ? label.getValue() : "";
-    }
+	}
 
-    /**
-     * makes the ClickableLabel a drop in replace ment for a button
-     * 
-     * @param clickListener
-     */
-    public void addClickListener(final ClickListener clickListener)
-    {
-        addLayoutClickListener(new LayoutClickListener()
-        {
+	public String getValue()
+	{
+		return label.getValue() != null ? label.getValue() : "";
+	}
 
-            @Override
-            public void layoutClick(LayoutClickEvent event)
-            {
-                clickListener.buttonClick(new ClickEvent(event.getComponent()));
+	/**
+	 * makes the ClickableLabel a drop in replace ment for a button
+	 * 
+	 * @param clickListener
+	 */
+	public void addClickListener(final ClickListener clickListener)
+	{
+		addLayoutClickListener(new LayoutClickListener()
+		{
 
-            }
-        });
+			@Override
+			public void layoutClick(LayoutClickEvent event)
+			{
+				clickListener.buttonClick(new ClickEvent(event.getComponent()));
 
-    }
+			}
+		});
+
+	}
 }

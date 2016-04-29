@@ -75,7 +75,7 @@ import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 
-public class FormHelper<E extends CrudEntity> implements Serializable
+public class FormHelper<E > implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 	public static final String STANDARD_COMBO_WIDTH = "220";
@@ -309,6 +309,15 @@ public class FormHelper<E extends CrudEntity> implements Serializable
 	public DateField bindDateField(String fieldLabel, String fieldName)
 	{
 		DateField field = bindDateField(form, group, fieldLabel, fieldName);
+		this.fieldList.add(field);
+		return field;
+	}
+	
+	public DateField bindDateField(String label, String member,
+			String dateFormat, Resolution resolution)
+	{
+		DateField field = bindDateField(form, group, label, member, dateFormat, resolution);
+		field.setWidth(STANDARD_COMBO_WIDTH);
 		this.fieldList.add(field);
 		return field;
 	}

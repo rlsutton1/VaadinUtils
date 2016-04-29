@@ -111,7 +111,7 @@ public abstract class JpaDslAbstract<E, R>
 		};
 	}
 
-	public <L> Condition<E> equal(final SingularAttribute<E, L> field, final L value)
+	public <L> Condition<E> equal(final SingularAttribute<? super E, L> field, final L value)
 	{
 
 		return new AbstractCondition<E>()
@@ -899,7 +899,7 @@ public abstract class JpaDslAbstract<E, R>
 		return lessThan(field, value);
 	}
 
-	public <J> Condition<E> eq(SingularAttribute<E, J> field, J value)
+	public <J> Condition<E> eq(SingularAttribute<? super E, J> field, J value)
 	{
 		return equal(field, value);
 	}
@@ -1190,4 +1190,70 @@ public abstract class JpaDslAbstract<E, R>
 	{
 		return builder.max(root.get(attribute));
 	}
+	
+	public static final class TypedPath<E, V>
+	{
+		public TypedPath(Path<V> path2)
+		{
+			this.path = path2;
+		}
+
+		final Path<V> path;
+	}
+	
+	public <V, J> TypedPath<E, V> path(SingularAttribute<? super E, J> partA, SingularAttribute<J, V> partB)
+	{
+		return new TypedPath<E, V>(root.get(partA).get(partB));
+
+	}
+
+	public <K> Condition<E> isNull(final TypedPath<E, K> path)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+				return builder.isNull(path.path);
+			}
+
+		};
+	}
+	
+	public <V extends Comparable<? super V>> Condition<E> greaterThanOrEqualTo(final TypedPath<E, V> field,
+			final V value)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+
+				return builder.greaterThanOrEqualTo(field.path, value);
+			}
+
+		};
+
+	}
+
+	public <V extends Comparable<? super V>> Condition<E> lessThanOrEqualTo(final TypedPath<E, V> field, final V value)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+
+				return builder.lessThanOrEqualTo(field.path, value);
+			}
+
+		};
+
+	}
+	
+	
+
 }

@@ -11,10 +11,6 @@ import javax.validation.ConstraintViolationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import au.com.vaadinutils.dao.EntityManagerProvider;
-import au.com.vaadinutils.dao.JpaBaseDao;
-import au.com.vaadinutils.errorHandling.ErrorWindow;
-
 import com.google.common.base.Preconditions;
 import com.google.common.base.Stopwatch;
 import com.vaadin.addon.jpacontainer.EntityItem;
@@ -35,6 +31,10 @@ import com.vaadin.data.util.filter.UnsupportedFilterException;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
+
+import au.com.vaadinutils.dao.EntityManagerProvider;
+import au.com.vaadinutils.dao.JpaBaseDao;
+import au.com.vaadinutils.errorHandling.ErrorWindow;
 
 /**
  * child crud does not support nesting.
@@ -58,7 +58,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 	protected Filter parentFilter;
 	protected boolean dirty = false;
 	final private Class<P> parentType;
-	public BaseCrudView<P> parentCrud;
+	public ParentCrud<P> parentCrud;
 	private ChildCrudEventHandler<E> eventHandler = getNullEventHandler();
 	private Class<E> childType;
 
@@ -69,7 +69,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 	 * @param childKey
 	 *            - this will be the foreign key in the child table
 	 */
-	public ChildCrudView(BaseCrudView<P> parent, Class<P> parentType, Class<E> childType,
+	public ChildCrudView(ParentCrud<P> parent, Class<P> parentType, Class<E> childType,
 			SingularAttribute<? extends CrudEntity, ? extends Object> parentKey,
 			SingularAttribute<? extends CrudEntity, ? extends Object> childKey)
 	{
@@ -84,7 +84,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 
 	}
 
-	public ChildCrudView(BaseCrudView<P> parent, Class<P> parentType, Class<E> childType,
+	public ChildCrudView(ParentCrud<P> parent, Class<P> parentType, Class<E> childType,
 			SingularAttribute<? extends CrudEntity, ? extends Object> parentKey, String childKey)
 	{
 		super(CrudDisplayMode.VERTICAL);
@@ -96,6 +96,65 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 		// setMargin(true);
 
 	}
+
+//	public ChildCrudView(final BaseCrudView<P> parentCrud, Class<P> parentType, Class<E> childType,
+//			SingularAttribute<? extends CrudEntity, ? extends Object> parentKey,
+//			SingularAttribute<? extends CrudEntity, ? extends Object> childKey)
+//	{
+//		super(CrudDisplayMode.VERTICAL);
+//		this.parentKey = parentKey.getName();
+//		this.childKey = childKey.getName();
+//		this.parentType = parentType;
+//		this.childType = childType;
+//		this.parentCrud = new ParentCrud<P>(){
+//
+//			@Override
+//			public EntityItem<P> getContainerItem(Long id)
+//			{
+//				return parentCrud.getContainer().getItem(id);
+//			}
+//
+//			@Override
+//			public void fieldGroupIsDirty(boolean b)
+//			{
+//				 parentCrud.fieldGroupIsDirty(b);
+//				
+//			}
+//
+//			@Override
+//			public P getCurrent()
+//			{
+//				return parentCrud.getCurrent();
+//			}
+//
+//			@Override
+//			public boolean isDirty()
+//			{
+//				return parentCrud.isDirty();
+//			}
+//
+//			@Override
+//			public void reloadDataFromDB()
+//			{
+//				parentCrud.reloadDataFromDB();
+//				
+//			}
+//
+//			@Override
+//			public void save()
+//			{
+//				parentCrud.save();
+//				
+//			}
+//
+//			@Override
+//			public void setSplitPosition(float pos)
+//			{
+//				parentCrud.setSplitPosition(pos);
+//				
+//			}};
+//		
+//	}
 
 	@Override
 	protected void init(Class<E> entityClass, JPAContainer<E> container, HeadingPropertySet<E> headings)
@@ -131,7 +190,8 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 		}
 		catch (InstantiationException | IllegalAccessException e)
 		{
-			logger.error(e, e);
+			logger.warn("Failed to instance "+parentType+" to create bogus parent filter");
+			
 		}
 	}
 
@@ -204,7 +264,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 
 		// on a new parent, the parent id changes and the container becomes
 		// empty. so reset the parent filter and refresh the container
-		createParentFilter(parentCrud.getContainer().getItem(newParentId.getId()));
+		createParentFilter(parentCrud.getContainerItem(newParentId.getId()));
 		resetFiltersWithoutChangeEvents();
 
 		// container.discard();

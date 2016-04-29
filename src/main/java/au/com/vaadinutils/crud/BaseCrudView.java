@@ -86,7 +86,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
             RowChangeListener<E>,
             Selected<E>,
             DirtyListener,
-            ButtonListener
+            ButtonListener, ParentCrud<E>
 {
 
     private static transient Logger logger = LogManager.getLogger(BaseCrudView.class);
@@ -918,6 +918,11 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
     public void setSplitPosition(float pos)
     {
         splitPanel.setSplitPosition(pos);
+    }
+    
+    public void setSplitPosition(float pos, Unit units)
+    {
+    	splitPanel.setSplitPosition(pos,units);
     }
 
     public void setLocked(boolean locked)
@@ -2310,4 +2315,10 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
         if (childCrudListeners != null && childCrudListeners.contains(listener))
             childCrudListeners.remove(listener);
     }
+    
+    public EntityItem<E> getContainerItem(Long id)
+    {
+    	return container.getItem(id);
+    }
+
 }
