@@ -2,6 +2,7 @@ package au.com.vaadinutils.fields;
 
 import com.vaadin.addon.jpacontainer.EntityItemProperty;
 import com.vaadin.data.Property.ValueChangeListener;
+import com.vaadin.data.util.converter.Converter;
 import com.vaadin.server.Resource;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
@@ -11,7 +12,7 @@ import com.vaadin.ui.TextField;
 @SuppressWarnings("serial")
 public class TextFieldWithLabel extends CustomComponent
 {
-	private TextField textField;
+	protected TextField textField;
 	private Label label;
 
 	public TextFieldWithLabel(String caption)
@@ -74,5 +75,17 @@ public class TextFieldWithLabel extends CustomComponent
 	{
 		textField.addValueChangeListener(listener);
 	}
-	
+
+    public void setConverter(Class<?> datamodelType) {
+    	textField.setConverter(datamodelType);
+    }
+
+    public void setConverter(Converter<String, ?> converter) {
+    	textField.setConverter(converter);
+    }
+    
+    public TextField getTextField()
+    {
+    	return textField;
+    }
 }
