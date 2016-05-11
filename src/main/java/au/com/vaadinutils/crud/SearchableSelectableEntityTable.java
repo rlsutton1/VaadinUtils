@@ -420,4 +420,8 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 	{
 		return selectableTable.isColumnReorderingAllowed();
 	}
+	
+	public void refresh() {
+		selectableTable.refreshRowCache();
+	}
 }
