@@ -359,6 +359,20 @@ public abstract class JpaDslAbstract<E, R>
 			}
 		};
 	}
+	
+	public <L,J> Condition<E> isNotNull(final JoinBuilder<E, L> join ,final SingularAttribute<L, J> field)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+				return builder.isNotNull(getJoin(join).get(field));
+			}
+		};
+	}
+
 
 	public <L> Condition<E> isNull(final SingularAttribute<E, L> field)
 	{
