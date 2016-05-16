@@ -2,11 +2,13 @@ package au.com.vaadinutils.fields;
 
 import javax.persistence.metamodel.SingularAttribute;
 
-import au.com.vaadinutils.crud.CrudEntity;
-
 import com.vaadin.addon.jpacontainer.EntityContainer;
+import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.fieldfactory.SingleSelectConverter;
 import com.vaadin.ui.ComboBox;
+
+import au.com.vaadinutils.crud.CrudEntity;
+import au.com.vaadinutils.dao.JpaBaseDao;
 
 /**
  * 
@@ -43,6 +45,13 @@ public class EntityComboBox<E extends CrudEntity> extends ComboBox
 	{
 		super(label);
 		init(childContainer, displayAttribute);
+	}
+	
+	public EntityComboBox(final String label, final String displayAttribute, final Class<E> containerClass)
+	{
+		super(label);
+		final JPAContainer<E> container = JpaBaseDao.getGenericDao(containerClass).createVaadinContainer();
+		init(container, displayAttribute);
 	}
 
 
