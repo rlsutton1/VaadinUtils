@@ -28,6 +28,21 @@ public class JpaDslTupleBuilder<E> extends JpaDslAbstract<E, Tuple>
 
 		return path;
 	}
+
+	public <T> Path<T> multiselect(final Path<T> path)
+	{
+		multiselects.add(path);
+
+		return path;
+	}
+
+	public <J, T> Path<T> multiselect(final JoinBuilder<E, J> join, final SingularAttribute<J, T> attribute)
+	{
+		final Path<T> path = join.getJoin(root).get(attribute);
+		multiselects.add(path);
+
+		return path;
+	}
 	
 	public JpaDslTupleBuilder<E> multiselect(final Selection<?> selection)
 	{
