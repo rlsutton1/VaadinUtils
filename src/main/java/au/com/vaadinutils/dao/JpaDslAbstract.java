@@ -206,7 +206,7 @@ public abstract class JpaDslAbstract<E, R>
 			@Override
 			public Predicate getPredicates()
 			{
-				return builder.equal(join.getJoin(root).get(field), value);
+				return builder.equal(getJoin(join).get(field), value);
 			}
 		};
 	}
@@ -220,7 +220,7 @@ public abstract class JpaDslAbstract<E, R>
 			@Override
 			public Predicate getPredicates()
 			{
-				return builder.lessThanOrEqualTo(join.getJoin(root).get(field), value);
+				return builder.lessThanOrEqualTo(getJoin(join).get(field), value);
 			}
 		};
 	}
@@ -234,7 +234,7 @@ public abstract class JpaDslAbstract<E, R>
 			@Override
 			public Predicate getPredicates()
 			{
-				return builder.greaterThanOrEqualTo(join.getJoin(root).get(field), value);
+				return builder.greaterThanOrEqualTo(getJoin(join).get(field), value);
 			}
 		};
 	}
@@ -987,7 +987,7 @@ public abstract class JpaDslAbstract<E, R>
 	boolean isJpaContainerDelegate;
 
 	@SuppressWarnings("unchecked")
-	<K> Join<E, K> getJoin(JoinBuilder<E, K> builder)
+	protected <K> Join<E, K> getJoin(JoinBuilder<E, K> builder)
 	{
 		Join<E, K> join = (Join<E, K>) joins2.get(builder);
 		if (join == null)
@@ -1103,9 +1103,9 @@ public abstract class JpaDslAbstract<E, R>
 		return builder.trim(root.get(attribute));
 	}
 
-	public <K> Expression<String> trim(JoinBuilder<E, K> leftJoin, SingularAttribute<K, String> attribute)
+	public <K> Expression<String> trim(JoinBuilder<E, K> join, SingularAttribute<K, String> attribute)
 	{
-		return builder.trim(leftJoin.getJoin(root).get(attribute));
+		return builder.trim(getJoin(join).get(attribute));
 	}
 
 	public Expression<String> concat(Expression<String> trim, String string)
@@ -1185,7 +1185,7 @@ public abstract class JpaDslAbstract<E, R>
 	public <K, T> Expression<Long> count(final JoinBuilder<E, K> join,
 			final SingularAttribute<K, T> attribute)
 	{
-		return builder.count(join.getJoin(root).get(attribute));
+		return builder.count(getJoin(join).get(attribute));
 	}
 
 	public <T> Path<T> get(final SingularAttribute<E, T> attribute)
@@ -1195,7 +1195,7 @@ public abstract class JpaDslAbstract<E, R>
 
 	public <K, T> Path<T> get(final JoinBuilder<E, K> join, final SingularAttribute<K, T> attribute)
 	{
-		return join.getJoin(root).get(attribute);
+		return getJoin(join).get(attribute);
 	}
 
 	public Expression<Number> divide(final Path<? extends Number> path1, final Path<? extends Number> path2)
