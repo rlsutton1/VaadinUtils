@@ -26,7 +26,7 @@ import au.com.vaadinutils.dao.JpaBaseDao.Condition;
  * 	queryGroup.multiselect(TblSalesCustCallItem_.iid);
  * 	queryGroup.setCommon(new JpaDslTupleBuilderGroupCommon<TblSalesCustCallItem>()
  * 	{
- * 		@Override
+ * 		&#64;Override
  * 		public void conditionsWillBeAdded(JpaDslTupleBuilder<TblSalesCustCallItem> builder,
  * 				List<Condition<TblSalesCustCallItem>> conditions)
  * 		{
@@ -36,7 +36,7 @@ import au.com.vaadinutils.dao.JpaBaseDao.Condition;
  * 
  * 	queryGroup.addItem(new JpaDslTupleBuilderGroupItem<TblSalesCustCallItem>()
  * 	{
- * 		@Override
+ * 		&#64;Override
  * 		public void conditionsWillBeAdded(JpaDslTupleBuilder<TblSalesCustCallItem> builder,
  * 				List<Condition<TblSalesCustCallItem>> conditions)
  * 		{
@@ -100,6 +100,20 @@ public class JpaDslTupleBuilderGroup<E>
 		return tuple.get(tuplePosition, attribute.getBindableJavaType());
 	}
 
+	public Object get(final Tuple tuple, final String alias)
+	{
+		// IllegalArgumentException will be thrown if tuple doesn't exist in query
+		// If this is the case then just return null
+		try
+		{
+			return tuple.get(alias);
+		}
+		catch (IllegalArgumentException e)
+		{
+			return null;
+		}
+	}
+
 	public List<Tuple> getResults()
 	{
 		if (builders.size() > 0)
@@ -118,6 +132,12 @@ public class JpaDslTupleBuilderGroup<E>
 	private List<Tuple> makeQuery(final JpaDslTupleBuilderGroupItem<E> builder)
 	{
 		final JpaDslTupleBuilder<E> q = new JpaDslTupleBuilder<E>(entityClass);
+
+		for (Entry<SingularAttribute<E, ?>, Integer> multiselect : multiselects.entrySet())
+		{
+			q.multiselect(multiselect.getKey());
+		}
+
 		final List<Condition<E>> conditions = new LinkedList<>();
 		if (common != null)
 			common.conditionsWillBeAdded(q, conditions);
@@ -126,11 +146,6 @@ public class JpaDslTupleBuilderGroup<E>
 		if (distinct)
 			q.distinct();
 		q.where(conditions);
-
-		for (Entry<SingularAttribute<E, ?>, Integer> multiselect : multiselects.entrySet())
-		{
-			q.multiselect(multiselect.getKey());
-		}
 
 		return q.getResultList();
 	}
