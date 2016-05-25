@@ -35,7 +35,7 @@ public class JSCallWithReturnValue
 	 */
 	public JSCallWithReturnValue(final String jsToExecute)
 	{
-		this.hookName = "callback" + JpaEntityHelper.getGuid();
+		this.hookName = "callback" + JpaEntityHelper.getGuid().replace("-", "_");
 		this.jsToExecute = jsToExecute;
 
 	}
