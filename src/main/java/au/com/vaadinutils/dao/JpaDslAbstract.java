@@ -69,9 +69,9 @@ public abstract class JpaDslAbstract<E, R>
 	protected EntityManager getEntityManager()
 	{
 		final EntityManager em = EntityManagerProvider.getEntityManager();
-		Preconditions.checkNotNull(em, "Entity manager has not been initialized, "
-				+ "if you are using a worker thread you will have to call "
-				+ "EntityManagerProvider.createEntityManager()");
+		Preconditions.checkNotNull(em,
+				"Entity manager has not been initialized, " + "if you are using a worker thread you will have to call "
+						+ "EntityManagerProvider.createEntityManager()");
 
 		Preconditions.checkState(dontUseThis == em,
 				"The entity manager has changed since this class was instanced, this is very bad. "
@@ -206,7 +206,7 @@ public abstract class JpaDslAbstract<E, R>
 			@Override
 			public Predicate getPredicates()
 			{
-				return builder.equal(join.getJoin(root).get(field), value);
+				return builder.equal(getJoin(join).get(field), value);
 			}
 		};
 	}
@@ -220,7 +220,7 @@ public abstract class JpaDslAbstract<E, R>
 			@Override
 			public Predicate getPredicates()
 			{
-				return builder.lessThanOrEqualTo(join.getJoin(root).get(field), value);
+				return builder.lessThanOrEqualTo(getJoin(join).get(field), value);
 			}
 		};
 	}
@@ -234,7 +234,7 @@ public abstract class JpaDslAbstract<E, R>
 			@Override
 			public Predicate getPredicates()
 			{
-				return builder.greaterThanOrEqualTo(join.getJoin(root).get(field), value);
+				return builder.greaterThanOrEqualTo(getJoin(join).get(field), value);
 			}
 		};
 	}
@@ -359,8 +359,8 @@ public abstract class JpaDslAbstract<E, R>
 			}
 		};
 	}
-	
-	public <L,J> Condition<E> isNotNull(final JoinBuilder<E, L> join ,final SingularAttribute<L, J> field)
+
+	public <L, J> Condition<E> isNotNull(final JoinBuilder<E, L> join, final SingularAttribute<L, J> field)
 	{
 		return new AbstractCondition<E>()
 		{
@@ -372,7 +372,6 @@ public abstract class JpaDslAbstract<E, R>
 			}
 		};
 	}
-
 
 	public <L> Condition<E> isNull(final SingularAttribute<E, L> field)
 	{
@@ -528,7 +527,8 @@ public abstract class JpaDslAbstract<E, R>
 		};
 	}
 
-	public <J, L> Condition<E> notEqual(final JoinBuilder<E, J> join, final SingularAttribute<J, L> field, final L value)
+	public <J, L> Condition<E> notEqual(final JoinBuilder<E, J> join, final SingularAttribute<J, L> field,
+			final L value)
 	{
 		return new AbstractCondition<E>()
 		{
@@ -972,7 +972,8 @@ public abstract class JpaDslAbstract<E, R>
 		return new AbstractCondition<E>()
 		{
 
-			@SuppressWarnings({ "unchecked", "rawtypes" })
+			@SuppressWarnings(
+			{ "unchecked", "rawtypes" })
 			@Override
 			public Predicate getPredicates()
 			{
@@ -986,7 +987,7 @@ public abstract class JpaDslAbstract<E, R>
 	boolean isJpaContainerDelegate;
 
 	@SuppressWarnings("unchecked")
-	<K> Join<E, K> getJoin(JoinBuilder<E, K> builder)
+	protected <K> Join<E, K> getJoin(JoinBuilder<E, K> builder)
 	{
 		Join<E, K> join = (Join<E, K>) joins2.get(builder);
 		if (join == null)
@@ -1102,9 +1103,9 @@ public abstract class JpaDslAbstract<E, R>
 		return builder.trim(root.get(attribute));
 	}
 
-	public <K> Expression<String> trim(JoinBuilder<E, K> leftJoin, SingularAttribute<K, String> attribute)
+	public <K> Expression<String> trim(JoinBuilder<E, K> join, SingularAttribute<K, String> attribute)
 	{
-		return builder.trim(leftJoin.getJoin(root).get(attribute));
+		return builder.trim(getJoin(join).get(attribute));
 	}
 
 	public Expression<String> concat(Expression<String> trim, String string)
@@ -1162,7 +1163,8 @@ public abstract class JpaDslAbstract<E, R>
 		};
 	}
 
-	public <V extends Comparable<? super V>> Condition<E> greaterThan(final SingularAttribute<E, V> field, final V value)
+	public <V extends Comparable<? super V>> Condition<E> greaterThan(final SingularAttribute<E, V> field,
+			final V value)
 	{
 		return new AbstractCondition<E>()
 		{
@@ -1179,15 +1181,21 @@ public abstract class JpaDslAbstract<E, R>
 	{
 		return builder.sum(root.get(attribute));
 	}
-	
+
+	public <K, T> Expression<Long> count(final JoinBuilder<E, K> join,
+			final SingularAttribute<K, T> attribute)
+	{
+		return builder.count(getJoin(join).get(attribute));
+	}
+
 	public <T> Path<T> get(final SingularAttribute<E, T> attribute)
 	{
 		return root.get(attribute);
 	}
-	
+
 	public <K, T> Path<T> get(final JoinBuilder<E, K> join, final SingularAttribute<K, T> attribute)
 	{
-		return join.getJoin(root).get(attribute);
+		return getJoin(join).get(attribute);
 	}
 
 	public Expression<Number> divide(final Path<? extends Number> path1, final Path<? extends Number> path2)
@@ -1195,16 +1203,17 @@ public abstract class JpaDslAbstract<E, R>
 		return builder.quot(path1, path2);
 	}
 
-	public <T extends Number> Expression<Number> divide(final SingularAttribute<E, T> attribute, final Path<? extends Number> path2)
+	public <T extends Number> Expression<Number> divide(final SingularAttribute<E, T> attribute,
+			final Path<? extends Number> path2)
 	{
 		return builder.quot(get(attribute), path2);
 	}
-	
+
 	public <T extends Number> Expression<T> max(final SingularAttribute<E, T> attribute)
 	{
 		return builder.max(root.get(attribute));
 	}
-	
+
 	public static final class TypedPath<E, V>
 	{
 		public TypedPath(Path<V> path2)
@@ -1214,7 +1223,7 @@ public abstract class JpaDslAbstract<E, R>
 
 		final Path<V> path;
 	}
-	
+
 	public <V, J> TypedPath<E, V> path(SingularAttribute<? super E, J> partA, SingularAttribute<J, V> partB)
 	{
 		return new TypedPath<E, V>(root.get(partA).get(partB));
@@ -1234,7 +1243,7 @@ public abstract class JpaDslAbstract<E, R>
 
 		};
 	}
-	
+
 	public <V extends Comparable<? super V>> Condition<E> greaterThanOrEqualTo(final TypedPath<E, V> field,
 			final V value)
 	{
@@ -1267,7 +1276,16 @@ public abstract class JpaDslAbstract<E, R>
 		};
 
 	}
-	
-	
 
+	public <T> Expression<T> coalesce(final SingularAttribute<E, T> attribute1,
+			final SingularAttribute<E, T> attribute2)
+	{
+		return builder.coalesce(root.get(attribute1), root.get(attribute2));
+	}
+	
+	public JpaDslAbstract<E, R> groupBy(Expression<?>... expressions)
+	{
+		criteria.groupBy(expressions);
+		return this;
+	}
 }
