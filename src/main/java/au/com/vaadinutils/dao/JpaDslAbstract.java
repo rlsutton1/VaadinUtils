@@ -279,7 +279,9 @@ public abstract class JpaDslAbstract<E, R>
 		limit(1);
 		List<R> resultList = prepareQuery().getResultList();
 		if (resultList.size() == 0)
+		{
 			return null;
+		}
 
 		return resultList.get(0);
 	}
@@ -795,6 +797,7 @@ public abstract class JpaDslAbstract<E, R>
 
 	public abstract class AbstractCondition<Z> implements Condition<Z>
 	{
+		@Override
 		public Condition<Z> and(final Condition<Z> c1)
 		{
 			return new AbstractCondition<Z>()
@@ -808,6 +811,7 @@ public abstract class JpaDslAbstract<E, R>
 			};
 		}
 
+		@Override
 		public Condition<Z> or(final Condition<Z> c1)
 		{
 			return new AbstractCondition<Z>()
@@ -972,8 +976,7 @@ public abstract class JpaDslAbstract<E, R>
 		return new AbstractCondition<E>()
 		{
 
-			@SuppressWarnings(
-			{ "unchecked", "rawtypes" })
+			@SuppressWarnings({ "unchecked", "rawtypes" })
 			@Override
 			public Predicate getPredicates()
 			{
@@ -1118,6 +1121,11 @@ public abstract class JpaDslAbstract<E, R>
 		return root.get(field).as(String.class);
 	}
 
+	public <K> Expression<String> asString(final JoinBuilder<E, K> join, SingularAttribute<K, ?> field)
+	{
+		return getJoin(join).get(field).as(String.class);
+	}
+
 	public Expression<String> concat(Expression<String> concat, Expression<String> trim)
 	{
 		return builder.concat(concat, trim);
@@ -1182,8 +1190,7 @@ public abstract class JpaDslAbstract<E, R>
 		return builder.sum(root.get(attribute));
 	}
 
-	public <K, T> Expression<Long> count(final JoinBuilder<E, K> join,
-			final SingularAttribute<K, T> attribute)
+	public <K, T> Expression<Long> count(final JoinBuilder<E, K> join, final SingularAttribute<K, T> attribute)
 	{
 		return builder.count(getJoin(join).get(attribute));
 	}
@@ -1282,7 +1289,7 @@ public abstract class JpaDslAbstract<E, R>
 	{
 		return builder.coalesce(root.get(attribute1), root.get(attribute2));
 	}
-	
+
 	public JpaDslAbstract<E, R> groupBy(Expression<?>... expressions)
 	{
 		criteria.groupBy(expressions);
