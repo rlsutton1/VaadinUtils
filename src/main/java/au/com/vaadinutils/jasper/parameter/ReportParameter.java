@@ -7,9 +7,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import au.com.vaadinutils.jasper.filter.ValidateListener;
-import au.com.vaadinutils.jasper.scheduler.entities.DateParameterType;
-
 import com.google.common.base.Preconditions;
 import com.vaadin.data.Property.ReadOnlyException;
 import com.vaadin.data.Validator.InvalidValueException;
@@ -17,6 +14,9 @@ import com.vaadin.data.util.converter.Converter.ConversionException;
 import com.vaadin.server.ErrorMessage;
 import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.Component;
+
+import au.com.vaadinutils.jasper.filter.ValidateListener;
+import au.com.vaadinutils.jasper.scheduler.entities.DateParameterType;
 
 public abstract class ReportParameter<T>
 {
@@ -26,14 +26,14 @@ public abstract class ReportParameter<T>
 
 	public ReportParameter(String label, String parameterName)
 	{
-		Preconditions.checkNotNull(label,"Label may not be null, as it is used for hashcode/equals");
+		Preconditions.checkNotNull(label, "Label may not be null, as it is used for hashcode/equals");
 		parameters.add(parameterName);
 		this.label = label;
 	}
 
 	public ReportParameter(String label, String parameterNames[])
 	{
-		Preconditions.checkNotNull(label,"Label may not be null, as it is used for hashcode/equals");
+		Preconditions.checkNotNull(label, "Label may not be null, as it is used for hashcode/equals");
 		for (String param : parameterNames)
 		{
 			parameters.add(param);
@@ -61,7 +61,7 @@ public abstract class ReportParameter<T>
 
 	public abstract String getExpectedParameterClassName();
 
-	public String getLabel()
+	public String getLabel(String parameterName)
 	{
 		return label;
 	}
@@ -80,7 +80,7 @@ public abstract class ReportParameter<T>
 		boolean valid = false;
 		try
 		{
-			
+
 			field.setComponentError(null);
 			if (validateListener != null)
 			{
@@ -130,7 +130,8 @@ public abstract class ReportParameter<T>
 		return true;
 	}
 
-	abstract public void setValueAsString(String value,String paramterName) throws ReadOnlyException, ConversionException, ParseException;
+	abstract public void setValueAsString(String value, String paramterName)
+			throws ReadOnlyException, ConversionException, ParseException;
 
 	abstract public boolean isDateField();
 
@@ -138,31 +139,33 @@ public abstract class ReportParameter<T>
 
 	public Date getStartDate()
 	{
-		throw new RuntimeException("Date Parameters must overide and implement this method: "
-				+ this.getClass().getCanonicalName());
+		throw new RuntimeException(
+				"Date Parameters must overide and implement this method: " + this.getClass().getCanonicalName());
 	}
 
 	public Date getEndDate()
 	{
-		throw new RuntimeException("Date Parameters must overide and implement this method: "
-				+ this.getClass().getCanonicalName());
+		throw new RuntimeException(
+				"Date Parameters must overide and implement this method: " + this.getClass().getCanonicalName());
 	}
 
 	public void setStartDate(Date date)
 	{
-		throw new RuntimeException("Date Parameters must overide and implement this method: "
-				+ this.getClass().getCanonicalName());
-		
+		throw new RuntimeException(
+				"Date Parameters must overide and implement this method: " + this.getClass().getCanonicalName());
+
 	}
 
 	public void setEndDate(Date date)
 	{
-		throw new RuntimeException("Date Parameters must overide and implement this method: "
-				+ this.getClass().getCanonicalName());
-		
+		throw new RuntimeException(
+				"Date Parameters must overide and implement this method: " + this.getClass().getCanonicalName());
+
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
@@ -174,7 +177,9 @@ public abstract class ReportParameter<T>
 		return result;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override

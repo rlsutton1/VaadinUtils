@@ -10,6 +10,31 @@ import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.vaadin.addon.jpacontainer.EntityItem;
+import com.vaadin.addon.jpacontainer.JPAContainer;
+import com.vaadin.data.Container.Filter;
+import com.vaadin.data.Property.ValueChangeEvent;
+import com.vaadin.data.Property.ValueChangeListener;
+import com.vaadin.data.Validator.InvalidValueException;
+import com.vaadin.data.util.filter.Or;
+import com.vaadin.data.util.filter.SimpleStringFilter;
+import com.vaadin.navigator.View;
+import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
+import com.vaadin.shared.ui.datefield.Resolution;
+import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.DateField;
+import com.vaadin.ui.FormLayout;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Notification.Type;
+import com.vaadin.ui.TabSheet;
+import com.vaadin.ui.Table;
+import com.vaadin.ui.Table.ColumnGenerator;
+import com.vaadin.ui.TextField;
+import com.vaadin.ui.VerticalLayout;
+
 import au.com.vaadinutils.crud.BaseCrudView;
 import au.com.vaadinutils.crud.EntityTable;
 import au.com.vaadinutils.crud.FormHelper;
@@ -38,31 +63,6 @@ import au.com.vaadinutils.jasper.scheduler.entities.ScheduleMode;
 import au.com.vaadinutils.jasper.ui.JasperReportProperties;
 import au.com.vaadinutils.layout.TimePicker;
 import au.com.vaadinutils.layout.TopVerticalLayout;
-
-import com.vaadin.addon.jpacontainer.EntityItem;
-import com.vaadin.addon.jpacontainer.JPAContainer;
-import com.vaadin.data.Container.Filter;
-import com.vaadin.data.Property.ValueChangeEvent;
-import com.vaadin.data.Property.ValueChangeListener;
-import com.vaadin.data.Validator.InvalidValueException;
-import com.vaadin.data.util.filter.Or;
-import com.vaadin.data.util.filter.SimpleStringFilter;
-import com.vaadin.navigator.View;
-import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
-import com.vaadin.shared.ui.datefield.Resolution;
-import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.DateField;
-import com.vaadin.ui.FormLayout;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.Notification.Type;
-import com.vaadin.ui.TabSheet;
-import com.vaadin.ui.Table;
-import com.vaadin.ui.Table.ColumnGenerator;
-import com.vaadin.ui.TextField;
-import com.vaadin.ui.VerticalLayout;
 
 /** A start view for navigating to the main view */
 public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailScheduleEntity> implements View, HelpProvider
@@ -120,7 +120,8 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 
 				final Label label = new Label("<font color='green'>Scheduled</font>");
 				label.setContentMode(ContentMode.HTML);
-				if (schedule.getReportLog() != null && schedule.getReportLog().length() > 0	&& !schedule.getReportLog().equals(Scheduler.REPORT_SUCCESSFULLY_RUN))
+				if (schedule.getReportLog() != null && schedule.getReportLog().length() > 0
+						&& !schedule.getReportLog().equals(Scheduler.REPORT_SUCCESSFULLY_RUN))
 				{
 					label.setValue("<font color='red'><b>Error</b></font>");
 				}
@@ -371,33 +372,33 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 
 				switch (mode)
 				{
-					case ONE_TIME:
-						oneTime.setRequired(true);
-						oneTime.setVisible(true);
-						timeOfDay.setVisible(false);
-						dayLayout.setVisible(false);
-						dayOfMonth.setVisible(false);
+				case ONE_TIME:
+					oneTime.setRequired(true);
+					oneTime.setVisible(true);
+					timeOfDay.setVisible(false);
+					dayLayout.setVisible(false);
+					dayOfMonth.setVisible(false);
 
-						break;
-					case DAY_OF_MONTH:
-						oneTime.setVisible(false);
-						timeOfDay.setVisible(true);
-						dayLayout.setVisible(false);
-						dayOfMonth.setVisible(true);
-						break;
-					case DAY_OF_WEEK:
-						oneTime.setVisible(false);
-						timeOfDay.setVisible(true);
-						dayLayout.setVisible(true);
-						dayLayout.setRequired(true);
-						dayOfMonth.setVisible(false);
-						break;
-					case EVERY_DAY:
-						oneTime.setVisible(false);
-						timeOfDay.setVisible(true);
-						dayLayout.setVisible(false);
-						dayOfMonth.setVisible(false);
-						break;
+					break;
+				case DAY_OF_MONTH:
+					oneTime.setVisible(false);
+					timeOfDay.setVisible(true);
+					dayLayout.setVisible(false);
+					dayOfMonth.setVisible(true);
+					break;
+				case DAY_OF_WEEK:
+					oneTime.setVisible(false);
+					timeOfDay.setVisible(true);
+					dayLayout.setVisible(true);
+					dayLayout.setRequired(true);
+					dayOfMonth.setVisible(false);
+					break;
+				case EVERY_DAY:
+					oneTime.setVisible(false);
+					timeOfDay.setVisible(true);
+					dayLayout.setVisible(false);
+					dayOfMonth.setVisible(false);
+					break;
 
 				}
 
@@ -755,10 +756,9 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 				// add missing parameter
 
 				ReportEmailParameterEntity reportEmailParameterEntity = new ReportEmailParameterEntity();
-				reportEmailParameterEntity.setLabel(bParam.getLabel());
+				reportEmailParameterEntity.setLabel(bParam.getLabel(""));
 
-				String[] names = bParam.getParameterNames().toArray(new String[]
-				{});
+				String[] names = bParam.getParameterNames().toArray(new String[] {});
 				reportEmailParameterEntity.setName(names[0]);
 				reportEmailParameterEntity.setValue((String) bParam.getValue(names[0]),
 						bParam.getDisplayValue(names[0]));
@@ -800,8 +800,7 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 	protected Filter getContainerFilter(String filterText, boolean advancedSearchActive)
 	{
 		Filter filter = null;
-		String[] searchFields = new String[]
-		{ ReportEmailScheduleEntity_.subject.getName() };
+		String[] searchFields = new String[] { ReportEmailScheduleEntity_.subject.getName() };
 		for (String property : searchFields)
 		{
 			if (filter == null)
@@ -829,7 +828,7 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 				if (!builtParam.validate())
 
 				{
-					throw new InvalidValueException(builtParam.getLabel() + " is invalid");
+					throw new InvalidValueException(builtParam.getLabel("") + " is invalid");
 				}
 			}
 		}

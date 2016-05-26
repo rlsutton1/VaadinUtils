@@ -395,7 +395,9 @@ class JasperReportLayout extends VerticalLayout
 		// images isn't found in the above templates directory
 		// then search in the /images/seanau director.
 		if (path == null || !new File(path).exists())
+		{
 			path = VaadinServlet.getCurrent().getServletContext().getRealPath("/images/seanau/");
+		}
 		String targetFileName = baseIconFileName + "-" + count + ".png";
 		iconBuilder.buildLogo(count.intValue(), new File(path), baseIconFileName + ".png", targetFileName);
 
@@ -659,7 +661,7 @@ class JasperReportLayout extends VerticalLayout
 				{
 					if (param.showFilter())
 					{
-						name += "-" + param.getLabel();
+						name += "-" + param.getLabel("");
 						for (String parameterName : param.getParameterNames())
 						{
 							name += "-" + param.getDisplayValue(parameterName);
@@ -706,7 +708,8 @@ class JasperReportLayout extends VerticalLayout
 					InputStream stream = manager.getStream();
 					if (stream == null)
 					{
-					    Notification.show("Couldn't attach to stream, if you cancelled a report this is normal",Type.ERROR_MESSAGE);
+						Notification.show("Couldn't attach to stream, if you cancelled a report this is normal",
+								Type.ERROR_MESSAGE);
 					}
 					return stream;
 				}

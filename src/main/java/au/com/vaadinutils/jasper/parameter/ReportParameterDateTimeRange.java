@@ -6,8 +6,6 @@ import java.util.Date;
 
 import org.joda.time.DateTime;
 
-import au.com.vaadinutils.jasper.scheduler.entities.DateParameterType;
-
 import com.google.common.base.Preconditions;
 import com.vaadin.data.Property.ReadOnlyException;
 import com.vaadin.data.Property.ValueChangeListener;
@@ -17,6 +15,8 @@ import com.vaadin.shared.ui.datefield.Resolution;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.DateField;
 import com.vaadin.ui.VerticalLayout;
+
+import au.com.vaadinutils.jasper.scheduler.entities.DateParameterType;
 
 public class ReportParameterDateTimeRange extends ReportParameter<String>
 {
@@ -217,8 +217,8 @@ public class ReportParameterDateTimeRange extends ReportParameter<String>
 	}
 
 	@Override
-	public void setValueAsString(String value, String parameterName) throws ReadOnlyException, ConversionException,
-			ParseException
+	public void setValueAsString(String value, String parameterName)
+			throws ReadOnlyException, ConversionException, ParseException
 	{
 		SimpleDateFormat sdf = new SimpleDateFormat(parameterFormat);
 		DateField field;
@@ -246,26 +246,41 @@ public class ReportParameterDateTimeRange extends ReportParameter<String>
 		return DateParameterType.DATE;
 	}
 
+	@Override
 	public Date getStartDate()
 	{
 		return getDate(startParameterName);
 	}
 
+	@Override
 	public Date getEndDate()
 	{
 		return getDate(endParameterName);
 	}
 
+	@Override
 	public void setStartDate(Date date)
 	{
 		startfield.setValue(date);
 
 	}
 
+	@Override
 	public void setEndDate(Date date)
 	{
 		endfield.setValue(date);
 
+	}
+
+	@Override
+	public String getLabel(String parameterName)
+	{
+		if (parameterName.equalsIgnoreCase(endParameterName))
+		{
+			return "To";
+		}
+
+		return "From";
 	}
 
 }

@@ -7,6 +7,14 @@ import java.util.List;
 
 import javax.mail.internet.InternetAddress;
 
+import com.vaadin.addon.jpacontainer.JPAContainer;
+import com.vaadin.data.Container.Filter;
+import com.vaadin.data.util.filter.Compare;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Notification.Type;
+import com.vaadin.ui.UI;
+import com.vaadin.ui.Window;
+
 import au.com.vaadinutils.help.HelpSplitPanel;
 import au.com.vaadinutils.jasper.parameter.ReportParameter;
 import au.com.vaadinutils.jasper.scheduler.entities.DateParameterOffsetType;
@@ -18,14 +26,6 @@ import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailSender;
 import au.com.vaadinutils.jasper.scheduler.entities.ScheduleMode;
 import au.com.vaadinutils.jasper.ui.JasperReportProperties;
 
-import com.vaadin.addon.jpacontainer.JPAContainer;
-import com.vaadin.data.Container.Filter;
-import com.vaadin.data.util.filter.Compare;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.Notification.Type;
-import com.vaadin.ui.UI;
-import com.vaadin.ui.Window;
-
 public class JasperReportSchedulerWindow extends Window
 {
 	private static final long serialVersionUID = 1L;
@@ -34,7 +34,6 @@ public class JasperReportSchedulerWindow extends Window
 			final Collection<ReportParameter<?>> params)
 	{
 
-		
 		try
 		{
 			new InternetAddress(reportProperties.getUserEmailAddress());
@@ -84,7 +83,7 @@ public class JasperReportSchedulerWindow extends Window
 
 						rparam.setType(param.getDateParameterType());
 						rparam.setOffsetType(DateParameterOffsetType.TODAY);
-						rparam.setLabel(param.getLabel());
+						rparam.setLabel(param.getLabel(names[0]));
 						dparams.add(rparam);
 
 					}

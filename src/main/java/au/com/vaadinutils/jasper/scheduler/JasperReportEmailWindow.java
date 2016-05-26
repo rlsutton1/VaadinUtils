@@ -10,6 +10,19 @@ import javax.persistence.EntityManager;
 
 import org.vaadin.dialogs.ConfirmDialog;
 
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.Button.ClickListener;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Notification.Type;
+import com.vaadin.ui.TextArea;
+import com.vaadin.ui.TextField;
+import com.vaadin.ui.UI;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
+
 import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.jasper.JasperManager.OutputFormat;
 import au.com.vaadinutils.jasper.parameter.ReportChooser;
@@ -24,19 +37,6 @@ import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailSender;
 import au.com.vaadinutils.jasper.scheduler.entities.ScheduleMode;
 import au.com.vaadinutils.jasper.ui.JasperReportProperties;
 
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Button.ClickListener;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.Notification.Type;
-import com.vaadin.ui.TextArea;
-import com.vaadin.ui.TextField;
-import com.vaadin.ui.UI;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window;
-
 public class JasperReportEmailWindow extends Window
 {
 	private static final long serialVersionUID = 1L;
@@ -46,7 +46,6 @@ public class JasperReportEmailWindow extends Window
 
 	public JasperReportEmailWindow(final JasperReportProperties props, final Collection<ReportParameter<?>> params)
 	{
-		
 
 		try
 		{
@@ -60,7 +59,6 @@ public class JasperReportEmailWindow extends Window
 			return;
 		}
 
-		
 		JasperReportProperties temp = props;
 		for (ReportParameter<?> p : params)
 		{
@@ -73,7 +71,7 @@ public class JasperReportEmailWindow extends Window
 			{
 				if (!p.validate())
 				{
-					Notification.show("Invalid parameter " + p.getLabel());
+					Notification.show("Invalid parameter " + p.getLabel(""));
 					return;
 				}
 			}
@@ -168,7 +166,7 @@ public class JasperReportEmailWindow extends Window
 		this.setHeight("80%");
 		layout.setMargin(true);
 		layout.setSpacing(true);
-		
+
 		setCaption("Email " + props.getReportTitle());
 
 		layout.setExpandRatio(message, 1);
@@ -198,11 +196,11 @@ public class JasperReportEmailWindow extends Window
 				}
 				hasValidTargets = true;
 			}
-			
+
 		}
 		if (!hasValidTargets)
 		{
-			Notification.show("Set at least one Recipient.",Type.ERROR_MESSAGE);
+			Notification.show("Set at least one Recipient.", Type.ERROR_MESSAGE);
 			return null;
 		}
 
@@ -250,7 +248,7 @@ public class JasperReportEmailWindow extends Window
 
 					rparam.setType(param.getDateParameterType());
 					rparam.setOffsetType(DateParameterOffsetType.CONSTANT);
-					rparam.setLabel(param.getLabel());
+					rparam.setLabel(param.getLabel(names[0]));
 					dparams.add(rparam);
 					entityManager.persist(rparam);
 

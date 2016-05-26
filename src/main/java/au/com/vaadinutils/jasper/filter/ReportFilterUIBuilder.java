@@ -9,15 +9,15 @@ import java.util.Set;
 
 import org.joda.time.DateTime;
 
-import au.com.vaadinutils.jasper.parameter.ReportParameter;
-import au.com.vaadinutils.jasper.parameter.ReportParameterDateTimeRange;
-import au.com.vaadinutils.jasper.parameter.ReportParameterEnum;
-import au.com.vaadinutils.jasper.parameter.ReportParameterString;
-
 import com.vaadin.server.ErrorMessage;
 import com.vaadin.ui.Accordion;
 import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.VerticalLayout;
+
+import au.com.vaadinutils.jasper.parameter.ReportParameter;
+import au.com.vaadinutils.jasper.parameter.ReportParameterDateTimeRange;
+import au.com.vaadinutils.jasper.parameter.ReportParameterEnum;
+import au.com.vaadinutils.jasper.parameter.ReportParameterString;
 
 /**
  * This class is used to build report filter UI by defining how report
@@ -58,8 +58,8 @@ public class ReportFilterUIBuilder implements ReportFilterFieldBuilder, ReportFi
 	}
 
 	@Override
-	public <T extends Enum<?>> ReportFilterFieldBuilder addEnumField(String label, String paramName,
-			Class<T> enumClass, T defaultValue)
+	public <T extends Enum<?>> ReportFilterFieldBuilder addEnumField(String label, String paramName, Class<T> enumClass,
+			T defaultValue)
 	{
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		ReportParameterEnum<?> param = new ReportParameterEnum(label, defaultValue, paramName, enumClass);
@@ -113,7 +113,7 @@ public class ReportFilterUIBuilder implements ReportFilterFieldBuilder, ReportFi
 								accordian = new Accordion();
 								accordian.setSizeFull();
 							}
-							final Tab tab = accordian.addTab(rparam.getComponent(), rparam.getLabel());
+							final Tab tab = accordian.addTab(rparam.getComponent(), rparam.getLabel(""));
 							rparam.addValidateListener(new ValidateListener()
 							{
 
@@ -146,12 +146,13 @@ public class ReportFilterUIBuilder implements ReportFilterFieldBuilder, ReportFi
 			// component so the fields will group together at the top
 			components.add(new ExpanderComponent(new VerticalLayout(), true));
 		}
-		
-		// add 15px high layout to pack up the bottom of the layout, otherwise on
+
+		// add 15px high layout to pack up the bottom of the layout, otherwise
+		// on
 		// some sets of filters the last component is hidden
 		VerticalLayout spacer = new VerticalLayout();
 		spacer.setHeight("15");
-		components.add(new ExpanderComponent(spacer,false));
+		components.add(new ExpanderComponent(spacer, false));
 
 		return components;
 	}

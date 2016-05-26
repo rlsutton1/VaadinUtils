@@ -440,7 +440,7 @@ public class JasperManager implements Runnable
 				{
 					JRDesignStaticText labelElement = new JRDesignStaticText();
 
-					String strippedLabel = param.getLabel().replaceAll("ReportParameter", "");
+					String strippedLabel = param.getLabel(parameterName).replaceAll("ReportParameter", "");
 
 					labelElement.setText(strippedLabel);
 					labelElement.setWidth(125);
@@ -702,9 +702,9 @@ public class JasperManager implements Runnable
 		});
 		latch.await();
 		InputStream stream = getStream();
-		if (stream ==null)
+		if (stream == null)
 		{
-		    throw new RuntimeException("Unable to get stream");
+			throw new RuntimeException("Unable to get stream");
 		}
 		// completeBarrier.await();
 		return new RenderedReport(stream, imagesrcs, exportMethod);
@@ -812,7 +812,7 @@ public class JasperManager implements Runnable
 		boolean initialized = false;
 		try
 		{
-		    logger.error("{} permits are available",concurrentLimit.availablePermits());
+			logger.error("{} permits are available", concurrentLimit.availablePermits());
 			concurrentLimit.acquire();
 			initialized = true;
 			inQueue = false;
@@ -1046,7 +1046,9 @@ public class JasperManager implements Runnable
 	{
 		final File file = new File(dir, name);
 		if (!file.exists())
+		{
 			throw new FileNotFoundException(file.toString());
+		}
 		return file.getCanonicalPath();
 	}
 
@@ -1082,7 +1084,9 @@ public class JasperManager implements Runnable
 
 				}
 				if (pos > reportLimit)
+				{
 					reportStatus.setStatus("Waiting for " + (pos - reportLimit) + " of the queued reports to complete");
+				}
 			}
 		}
 		catch (Exception e)

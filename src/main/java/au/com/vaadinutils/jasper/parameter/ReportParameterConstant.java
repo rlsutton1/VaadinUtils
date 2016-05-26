@@ -2,9 +2,9 @@ package au.com.vaadinutils.jasper.parameter;
 
 import java.lang.reflect.ParameterizedType;
 
-import au.com.vaadinutils.jasper.scheduler.entities.DateParameterType;
-
 import com.vaadin.ui.Component;
+
+import au.com.vaadinutils.jasper.scheduler.entities.DateParameterType;
 
 public class ReportParameterConstant<T> extends ReportParameter<T>
 {
@@ -29,7 +29,9 @@ public class ReportParameterConstant<T> extends ReportParameter<T>
 	}
 
 	/**
-	 * use this constructor if you want this parameter to show in the "Parameters" section of the report. 
+	 * use this constructor if you want this parameter to show in the
+	 * "Parameters" section of the report.
+	 * 
 	 * @param parameterName
 	 * @param value
 	 * @param displayLabel
@@ -45,11 +47,11 @@ public class ReportParameterConstant<T> extends ReportParameter<T>
 	}
 
 	@Override
-	public String getLabel()
+	public String getLabel(String parameterName)
 	{
 		return displayLabel;
 	}
-	
+
 	@Override
 	public boolean displayInreport()
 	{
@@ -85,9 +87,11 @@ public class ReportParameterConstant<T> extends ReportParameter<T>
 	@Override
 	public String getExpectedParameterClassName()
 	{
-		return ((Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0]).getCanonicalName();
+		return ((Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0])
+				.getCanonicalName();
 	}
 
+	@Override
 	public boolean showFilter()
 	{
 		return false;
@@ -110,9 +114,9 @@ public class ReportParameterConstant<T> extends ReportParameter<T>
 	public void setValueAsString(String value, String parameterName)
 	{
 		this.value = (T) value;
-		
+
 	}
-	
+
 	@Override
 	public boolean isDateField()
 	{
@@ -124,6 +128,5 @@ public class ReportParameterConstant<T> extends ReportParameter<T>
 	{
 		throw new RuntimeException("Not implemented");
 	}
-
 
 }
