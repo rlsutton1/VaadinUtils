@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.persistence.metamodel.SingularAttribute;
 
@@ -14,6 +15,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Stopwatch;
 import com.vaadin.data.Item;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
@@ -443,6 +445,9 @@ public class HeadingPropertySet<E>
 			final List<String> colsToShow = new LinkedList<String>();
 			for (HeadingToPropertyId<E> column : getColumns())
 			{
+				Stopwatch columnsTimer = Stopwatch.createUnstarted();
+				columnsTimer.start();
+
 				colsToShow.add(column.getPropertyId());
 				table.setColumnHeader(column.getPropertyId(), column.getHeader());
 
@@ -471,6 +476,9 @@ public class HeadingPropertySet<E>
 				if (column.isLocked())
 					table.setColumnCollapsible(column.getPropertyId(), false);
 
+				logger.error("@@@ " + uniqueTableId + " " + column.getPropertyId().toUpperCase() + " column total startup {}ms "
+						+ columnsTimer.elapsed(TimeUnit.MILLISECONDS));
+				columnsTimer.stop();
 			}
 			table.setVisibleColumns(colsToShow.toArray());
 

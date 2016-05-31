@@ -230,17 +230,22 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
     }
 
     protected void initializeEntityTable()
-    {
-        try
-        {
-            entityTable.init(this.getClass().getSimpleName());
-        }
-        catch (Exception e)
-        {
-            ErrorWindow.showErrorWindow(e);
+	{
+		Stopwatch timer = Stopwatch.createUnstarted();
+		timer.start();
+		logger.error("@@@ start initializeEntityTable");
+		try
+		{
+			entityTable.init(this.getClass().getSimpleName());
+		}
+		catch (Exception e)
+		{
+			ErrorWindow.showErrorWindow(e);
 
-        }
-    }
+		}
+		logger.error("@@@ after initializeEntityTable startup {}ms " + timer.elapsed(TimeUnit.MILLISECONDS));
+		timer.stop();
+	}
 
     /**
      * allows the user to sort the items in the list via drag and drop
