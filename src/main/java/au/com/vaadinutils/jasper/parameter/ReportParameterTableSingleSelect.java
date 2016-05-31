@@ -10,11 +10,6 @@ import javax.persistence.metamodel.SingularAttribute;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import au.com.vaadinutils.crud.CrudEntity;
-import au.com.vaadinutils.dao.JpaBaseDao;
-import au.com.vaadinutils.fields.TableCheckBoxSingleSelect;
-import au.com.vaadinutils.jasper.scheduler.entities.DateParameterType;
-
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.QueryModifierDelegate;
 import com.vaadin.addon.jpacontainer.fieldfactory.MultiSelectConverter;
@@ -32,7 +27,13 @@ import com.vaadin.ui.Table.ColumnHeaderMode;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
-public class ReportParameterTableSingleSelect<T extends CrudEntity> extends ReportParameter<String> implements ReportParameterSelectionListener<T>
+import au.com.vaadinutils.crud.CrudEntity;
+import au.com.vaadinutils.dao.JpaBaseDao;
+import au.com.vaadinutils.fields.TableCheckBoxSingleSelect;
+import au.com.vaadinutils.jasper.scheduler.entities.DateParameterType;
+
+public class ReportParameterTableSingleSelect<T extends CrudEntity> extends ReportParameter<String>
+		implements ReportParameterSelectionListener<T>
 {
 
 	protected TableCheckBoxSingleSelect table;
@@ -53,7 +54,7 @@ public class ReportParameterTableSingleSelect<T extends CrudEntity> extends Repo
 	}
 
 	public ReportParameterTableSingleSelect(String caption, String parameterName, Class<T> tableClass,
-			SingularAttribute<T, String> displayField,  Long defaultValue)
+			SingularAttribute<T, String> displayField, Long defaultValue)
 	{
 		super(caption, parameterName);
 		init(caption, tableClass, displayField);
@@ -109,15 +110,19 @@ public class ReportParameterTableSingleSelect<T extends CrudEntity> extends Repo
 		table.setNewItemsAllowed(false);
 		table.setNullSelectionAllowed(false);
 
-		
 		// removed for concertina
 		// layout.addComponent(new Label(caption));
 		layout.addComponent(searchText);
 		layout.addComponent(table);
-		
+
 		layout.setExpandRatio(table, 1);
 		// layout.setComponentAlignment(selectAll, Alignment.BOTTOM_RIGHT);
 
+	}
+
+	protected void addComponentToLayout(Component comp)
+	{
+		layout.addComponent(comp);
 	}
 
 	protected void setVisibleColumns(final SingularAttribute<T, String> displayField)
@@ -134,7 +139,7 @@ public class ReportParameterTableSingleSelect<T extends CrudEntity> extends Repo
 	 */
 	protected JPAContainer<T> createContainer(Class<T> tableClass, final SingularAttribute<T, String> displayField)
 	{
-		JPAContainer<T> cont = container =JpaBaseDao.getGenericDao(tableClass).createVaadinContainer();
+		JPAContainer<T> cont = container = JpaBaseDao.getGenericDao(tableClass).createVaadinContainer();
 		cont.sort(new Object[] { displayField.getName() }, new boolean[] { true });
 
 		cont.setQueryModifierDelegate(getQueryModifierDelegate());
@@ -152,6 +157,7 @@ public class ReportParameterTableSingleSelect<T extends CrudEntity> extends Repo
 		return null;
 	}
 
+	@Override
 	public void addSelectionListener(ValueChangeListener listener)
 	{
 		table.addValueChangeListener(listener);
@@ -231,7 +237,7 @@ public class ReportParameterTableSingleSelect<T extends CrudEntity> extends Repo
 				setValidateListenerComponentError(null);
 				table.setComponentError(null);
 				Collection<Long> ids = (Collection<Long>) table.getSelectedItems();
-				if (ids.size()==0)
+				if (ids.size() == 0)
 				{
 					ErrorMessage error = new ErrorMessage()
 					{
@@ -308,7 +314,9 @@ public class ReportParameterTableSingleSelect<T extends CrudEntity> extends Repo
 				ctr++;
 				selection += "" + table.getItem(id).getItemProperty(displayField.getName()) + ",";
 				if (ctr > 2)
+				{
 					break;
+				}
 			}
 			if (selection.length() > 1)
 			{
@@ -330,7 +338,8 @@ public class ReportParameterTableSingleSelect<T extends CrudEntity> extends Repo
 		{
 			for (String param : parameters)
 			{
-				logger.error("Exception while getting value(s) for {}, thread{}" , param,Thread.currentThread().getId());
+				logger.error("Exception while getting value(s) for {}, thread{}", param,
+						Thread.currentThread().getId());
 			}
 			throw new RuntimeException(e);
 		}

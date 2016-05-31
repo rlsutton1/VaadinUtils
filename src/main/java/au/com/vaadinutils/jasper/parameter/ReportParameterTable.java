@@ -10,12 +10,6 @@ import javax.persistence.metamodel.SingularAttribute;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import au.com.vaadinutils.crud.CrudEntity;
-import au.com.vaadinutils.dao.JpaBaseDao;
-import au.com.vaadinutils.fields.SelectionListener;
-import au.com.vaadinutils.fields.TableCheckBoxSelect;
-import au.com.vaadinutils.jasper.scheduler.entities.DateParameterType;
-
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.QueryModifierDelegate;
 import com.vaadin.addon.jpacontainer.fieldfactory.MultiSelectConverter;
@@ -38,8 +32,14 @@ import com.vaadin.ui.Table.ColumnHeaderMode;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
-public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<String> implements
-		ReportParameterSelectionListener<T>
+import au.com.vaadinutils.crud.CrudEntity;
+import au.com.vaadinutils.dao.JpaBaseDao;
+import au.com.vaadinutils.fields.SelectionListener;
+import au.com.vaadinutils.fields.TableCheckBoxSelect;
+import au.com.vaadinutils.jasper.scheduler.entities.DateParameterType;
+
+public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<String>
+		implements ReportParameterSelectionListener<T>
 {
 
 	protected TableCheckBoxSelect table;
@@ -68,7 +68,12 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 		setNotEmpty();
 	}
 
-	private void init(String caption, Class<T> tableClass, final SingularAttribute<T, String> displayField)
+	protected void addComponentToLayout(Component comp)
+	{
+		layout.addComponent(comp);
+	}
+
+	protected void init(String caption, Class<T> tableClass, final SingularAttribute<T, String> displayField)
 	{
 		JpaBaseDao.getGenericDao(tableClass).flushCache();
 		container = createContainer(tableClass, displayField);
@@ -202,6 +207,7 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 		return null;
 	}
 
+	@Override
 	public void addSelectionListener(ValueChangeListener listener)
 	{
 		table.addValueChangeListener(listener);
@@ -358,7 +364,9 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 				ctr++;
 				selection += "" + table.getItem(id).getItemProperty(displayField.getName()) + ",";
 				if (ctr > 2)
+				{
 					break;
+				}
 			}
 			if (selection.length() > 1)
 			{
@@ -380,7 +388,8 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 		{
 			for (String param : parameters)
 			{
-				logger.error("Exception while getting value(s) for {}, thread{}", param, Thread.currentThread().getId());
+				logger.error("Exception while getting value(s) for {}, thread{}", param,
+						Thread.currentThread().getId());
 			}
 			throw new RuntimeException(e);
 		}

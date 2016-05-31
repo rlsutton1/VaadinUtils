@@ -853,6 +853,19 @@ public abstract class JpaDslAbstract<E, R>
 		};
 	}
 
+	public <V> Condition<E> in(final SetAttribute<E, V> attribute, final Collection<V> values)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+				return root.get(attribute).in(values);
+			}
+		};
+	}
+
 	public <V> Condition<E> in(final SetAttribute<E, V> agents, final V agent)
 	{
 		return new AbstractCondition<E>()
