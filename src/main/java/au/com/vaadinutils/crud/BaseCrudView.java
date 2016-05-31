@@ -231,9 +231,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 
     protected void initializeEntityTable()
 	{
-		Stopwatch timer = Stopwatch.createUnstarted();
-		timer.start();
-		logger.error("@@@ start initializeEntityTable");
 		try
 		{
 			entityTable.init(this.getClass().getSimpleName());
@@ -243,8 +240,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 			ErrorWindow.showErrorWindow(e);
 
 		}
-		logger.error("@@@ after initializeEntityTable startup {}ms " + timer.elapsed(TimeUnit.MILLISECONDS));
-		timer.stop();
 	}
 
     /**
