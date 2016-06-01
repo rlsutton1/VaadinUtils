@@ -27,7 +27,7 @@ import com.vaadin.ui.Table.ColumnResizeListener;
 
 import au.com.vaadinutils.dao.Path;
 import au.com.vaadinutils.user.UserSettingsStorageFactory;
-
+ 
 public class HeadingPropertySet<E>
 {
 	private List<HeadingToPropertyId<E>> cols = new LinkedList<HeadingToPropertyId<E>>();

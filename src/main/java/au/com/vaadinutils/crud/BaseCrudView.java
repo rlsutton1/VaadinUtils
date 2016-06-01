@@ -84,7 +84,7 @@ import au.com.vaadinutils.menu.Menus;
 public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 		implements RowChangeListener<E>, Selected<E>, DirtyListener, ButtonListener, ParentCrud<E>
 {
-
+  
 	private static transient Logger logger = LogManager.getLogger(BaseCrudView.class);
 	private static final long serialVersionUID = 1L;
 
