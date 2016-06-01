@@ -445,9 +445,6 @@ public class HeadingPropertySet<E>
 			final List<String> colsToShow = new LinkedList<String>();
 			for (HeadingToPropertyId<E> column : getColumns())
 			{
-				Stopwatch columnsTimer = Stopwatch.createUnstarted();
-				columnsTimer.start();
-
 				colsToShow.add(column.getPropertyId());
 				table.setColumnHeader(column.getPropertyId(), column.getHeader());
 
@@ -476,9 +473,6 @@ public class HeadingPropertySet<E>
 				if (column.isLocked())
 					table.setColumnCollapsible(column.getPropertyId(), false);
 
-				logger.error("@@@ " + uniqueTableId + " " + column.getPropertyId().toUpperCase() + " column total startup {}ms "
-						+ columnsTimer.elapsed(TimeUnit.MILLISECONDS));
-				columnsTimer.stop();
 			}
 			table.setVisibleColumns(colsToShow.toArray());
 

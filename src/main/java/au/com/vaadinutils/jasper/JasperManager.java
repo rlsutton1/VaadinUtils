@@ -812,7 +812,7 @@ public class JasperManager implements Runnable
 		boolean initialized = false;
 		try
 		{
-			logger.error("{} permits are available", concurrentLimit.availablePermits());
+			logger.warn("{} permits are available", concurrentLimit.availablePermits());
 			concurrentLimit.acquire();
 			initialized = true;
 			inQueue = false;
