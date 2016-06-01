@@ -66,6 +66,8 @@ import elemental.json.JsonObject;
  */
 class JasperReportLayout extends VerticalLayout
 {
+	private static final int MAX_FILENAME_LENGTH = 125;
+
 	/**
 	 *
 	 */
@@ -656,7 +658,7 @@ class JasperReportLayout extends VerticalLayout
 			private String exportFileName(final JasperManager.OutputFormat outputFormat)
 			{
 				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
-				String name = reportProperties.getReportTitle() + "at" + sdf.format(new Date());
+				String name = reportProperties.getReportTitle() + "At" + sdf.format(new Date());
 				for (ReportParameter<?> param : builder.getReportParameters())
 				{
 					if (param.showFilter())
@@ -665,13 +667,16 @@ class JasperReportLayout extends VerticalLayout
 						for (String parameterName : param.getParameterNames())
 						{
 							name += "-" + param.getDisplayValue(parameterName);
-
+							System.out.println(name);
 						}
 					}
 				}
+				if (name.length() > MAX_FILENAME_LENGTH)
+				{
+					name = name.substring(0, MAX_FILENAME_LENGTH);
+				}
 
 				return name + outputFormat.getFileExtension();
-
 			}
 		});
 
