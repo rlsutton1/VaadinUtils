@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import javax.persistence.metamodel.SingularAttribute;
 
@@ -15,7 +14,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Stopwatch;
 import com.vaadin.data.Item;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
@@ -391,7 +389,7 @@ public class HeadingPropertySet<E>
 					formattedDate = "Invalid";
 					logger.error(
 							"Looks like our assumptions about the format of dates is wrong. Please update the parse format to match:"
-									+ strDate +" "+sdf.toPattern());
+									+ strDate + " " + sdf.toPattern());
 				}
 			}
 
@@ -471,7 +469,9 @@ public class HeadingPropertySet<E>
 				}
 
 				if (column.isLocked())
+				{
 					table.setColumnCollapsible(column.getPropertyId(), false);
+				}
 
 			}
 			table.setVisibleColumns(colsToShow.toArray());
@@ -582,7 +582,9 @@ public class HeadingPropertySet<E>
 			final String setVisible = UserSettingsStorageFactory.getUserSettingsStorage()
 					.get(keyStub + "-" + id.getPropertyId());
 			if (setVisible != null && !setVisible.isEmpty())
+			{
 				table.setColumnCollapsed(id.getPropertyId(), !Boolean.parseBoolean(setVisible));
+			}
 		}
 
 		table.addColumnCollapseListener(new ColumnCollapseListener()
