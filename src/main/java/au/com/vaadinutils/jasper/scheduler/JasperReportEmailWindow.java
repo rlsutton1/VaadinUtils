@@ -223,8 +223,21 @@ public class JasperReportEmailWindow extends Window
 		for (ReportParameter<?> param : params)
 		{
 			// omit report choosers, as they would complicate and confuse
-			if (!(param instanceof ReportChooser))
+			// if (!(param instanceof ReportChooser))
 			{
+				if (param instanceof ReportChooser)
+				{
+					String[] names = param.getParameterNames().toArray(new String[] {});
+
+					// add non date fields
+					ReportEmailParameterEntity rparam = new ReportEmailParameterEntity();
+					rparam.setName(names[0]);
+					rparam.setValue(param.getValue(names[0]).toString(), param.getDisplayValue(names[0]));
+					rparams.add(rparam);
+					entityManager.persist(rparam);
+				}
+				else
+
 				if (!param.isDateField())
 				{
 					String[] names = param.getParameterNames().toArray(new String[] {});

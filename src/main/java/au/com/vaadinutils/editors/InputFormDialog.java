@@ -53,6 +53,7 @@ public class InputFormDialog extends Window
 
 		cancelButton = new Button("Cancel", new Button.ClickListener()
 		{
+			@Override
 			public void buttonClick(ClickEvent event)
 			{
 				if (recipient.onCancel())
@@ -63,8 +64,9 @@ public class InputFormDialog extends Window
 		});
 		buttons.addComponent(cancelButton);
 
-		ok = new Button("Ok", new Button.ClickListener()
+		ok = new Button("OK", new Button.ClickListener()
 		{
+			@Override
 			public void buttonClick(ClickEvent event)
 			{
 				try
