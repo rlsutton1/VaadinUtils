@@ -212,4 +212,10 @@ public abstract class ReportParameter<T>
 		return true;
 	}
 
+	public void alterParameterNames(String names)
+	{
+		Preconditions.checkArgument(parameters.size() == 1);
+		parameters.clear();
+		parameters.add(names);
+	}
 }

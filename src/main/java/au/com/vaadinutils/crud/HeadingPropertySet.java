@@ -27,12 +27,16 @@ import com.vaadin.ui.Table.ColumnResizeListener;
 
 import au.com.vaadinutils.dao.Path;
 import au.com.vaadinutils.user.UserSettingsStorageFactory;
- 
+
 public class HeadingPropertySet<E>
 {
 	private List<HeadingToPropertyId<E>> cols = new LinkedList<HeadingToPropertyId<E>>();
 
 	private Logger logger = LogManager.getLogger();
+
+	public boolean autoExpandColumns = false;
+
+	private boolean eraseSavedConfig = false;
 
 	public HeadingPropertySet()
 	{
@@ -47,11 +51,15 @@ public class HeadingPropertySet<E>
 	public static class Builder<E>
 	{
 		private List<HeadingToPropertyId<E>> cols = new LinkedList<HeadingToPropertyId<E>>();
+		private boolean autoExpandColumns = false;
+		private boolean eraseSavedConfig = false;
 
 		public HeadingPropertySet<E> build()
 		{
 			final HeadingPropertySet<E> tmp = new HeadingPropertySet<E>();
 			tmp.cols = this.cols;
+			tmp.autoExpandColumns = autoExpandColumns;
+			tmp.eraseSavedConfig = eraseSavedConfig;
 
 			return tmp;
 		}
@@ -338,6 +346,17 @@ public class HeadingPropertySet<E>
 
 		}
 
+		public void setAutoExpandColumns()
+		{
+			autoExpandColumns = true;
+
+		}
+
+		public void setEraseSavedConfig()
+		{
+			eraseSavedConfig = true;
+		}
+
 	}
 
 	/**
@@ -461,6 +480,13 @@ public class HeadingPropertySet<E>
 				{
 					table.setColumnWidth(column.getPropertyId(), column.getWidth());
 				}
+				else
+				{
+					if (autoExpandColumns)
+					{
+						table.setColumnExpandRatio(column.getPropertyId(), (float) (1.0 / getColumns().size()));
+					}
+				}
 
 				if (!column.isVisibleByDefault())
 				{
@@ -475,6 +501,10 @@ public class HeadingPropertySet<E>
 
 			}
 			table.setVisibleColumns(colsToShow.toArray());
+			if (eraseSavedConfig)
+			{
+				eraseSavedConfig(uniqueTableId);
+			}
 
 			configureSaveColumnWidths(table, uniqueTableId);
 			configureSaveColumnOrder(table, uniqueTableId);
@@ -484,6 +514,11 @@ public class HeadingPropertySet<E>
 		{
 			logger.error(e, e);
 		}
+	}
+
+	void eraseSavedConfig(final String uniqueTableId)
+	{
+		UserSettingsStorageFactory.getUserSettingsStorage().erase(uniqueTableId);
 	}
 
 	private void configureSaveColumnWidths(final Table table, final String uniqueTableId)
