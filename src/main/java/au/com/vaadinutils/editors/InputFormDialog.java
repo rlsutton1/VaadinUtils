@@ -30,7 +30,7 @@ public class InputFormDialog extends Window
 	private Button cancelButton;
 	private Button ok;
 
-	public InputFormDialog(final UI parent, String title, Field<?> primaryFocusField, final AbstractLayout form,
+	public InputFormDialog(final UI parent, String title, Component primaryFocusField, final AbstractLayout form,
 			final InputFormDialogRecipient recipient)
 	{
 		setCaption(title);
@@ -111,7 +111,10 @@ public class InputFormDialog extends Window
 		this.setContent(layout);
 		parent.addWindow(this);
 
-		primaryFocusField.focus();
+		if (primaryFocusField instanceof Field<?>)
+		{
+			((Field<?>) primaryFocusField).focus();
+		}
 
 		if (form instanceof FormLayout)
 		{
