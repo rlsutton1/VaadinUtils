@@ -34,7 +34,7 @@ public class HeadingPropertySet<E>
 
 	private Logger logger = LogManager.getLogger();
 
-	private HeadingPropertySet()
+	public HeadingPropertySet()
 	{
 		// use the builder!
 	}
