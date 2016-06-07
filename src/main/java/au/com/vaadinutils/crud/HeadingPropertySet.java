@@ -38,7 +38,7 @@ public class HeadingPropertySet<E>
 
 	private boolean eraseSavedConfig = false;
 
-	public HeadingPropertySet()
+	public HeadingPropertySet() 
 	{
 		// use the builder!
 	}
