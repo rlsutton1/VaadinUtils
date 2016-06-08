@@ -49,6 +49,10 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.ColumnGenerator;
 import com.vaadin.ui.VerticalLayout;
 
+/**
+ * @deprecated  Replaced by {@link TwinColumnSelect}
+ */
+@Deprecated
 public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomField<Collection<C>>
 {
 
