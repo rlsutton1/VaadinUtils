@@ -377,7 +377,11 @@
 			<artifactId>screenshot</artifactId>
 			<version>0.4.1.2</version>
 		</dependency>
-
+		<dependency>
+			<groupId>org.vaadin.teemusa</groupId>
+			<artifactId>gridextensionpack</artifactId>
+			<version>1.0.0</version>
+		</dependency>
 
 	</dependencies>
 
