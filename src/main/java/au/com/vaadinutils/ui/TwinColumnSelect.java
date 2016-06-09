@@ -118,7 +118,7 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 				}
 			}
 		});
-	}
+	} 
 
 	private BeanContainer<Long, C> createSelectedContainer()
 	{
