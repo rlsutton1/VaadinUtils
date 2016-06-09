@@ -118,7 +118,7 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 				}
 			}
 		});
-	}
+	} 
 
 	private BeanContainer<Long, C> createSelectedContainer()
 	{
@@ -127,7 +127,9 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 		beanIdField = type.getDeclaredId(Long.class);
 		selectedBeans = new BeanContainer<Long, C>(itemClass);
 		selectedBeans.setBeanIdProperty(beanIdField.getName());
-		selectedBeans.sort(new Object[] { itemCaptionProperty.getName() }, new boolean[] { sortAscending });
+		selectedBeans.sort(new Object[]
+		{ itemCaptionProperty.getName() }, new boolean[]
+		{ sortAscending });
 
 		return selectedBeans;
 	}
@@ -143,8 +145,8 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 			@Override
 			public GridHeadingPropertySet<C> getHeadingPropertySet()
 			{
-				return new GridHeadingPropertySet.Builder<C>()
-						.addColumn(availableColumnHeader, itemCaptionProperty.getName(), true, true).build();
+				return new GridHeadingPropertySet.Builder<C>().addColumn(availableColumnHeader,
+						itemCaptionProperty.getName(), true, true).build();
 			}
 
 			@Override
@@ -174,7 +176,9 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 
 		// Needs to be here after availableContainer creation,
 		// otherwise sorting goes away
-		availableContainer.sort(new Object[] { itemCaptionProperty.getName() }, new boolean[] { sortAscending });
+		availableContainer.sort(new Object[]
+		{ itemCaptionProperty.getName() }, new boolean[]
+		{ sortAscending });
 
 		availableGrid.addItemClickListener(new ItemClickListener()
 		{
@@ -197,7 +201,9 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 	private JPAContainer<C> createAvailableContainer()
 	{
 		availableContainer = JpaBaseDao.getGenericDao(itemClass).createVaadinContainer();
-		availableContainer.sort(new Object[] { itemCaptionProperty.getName() }, new boolean[] { sortAscending });
+		availableContainer.sort(new Object[]
+		{ itemCaptionProperty.getName() }, new boolean[]
+		{ sortAscending });
 
 		return availableContainer;
 	}
@@ -259,6 +265,20 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 		addNewButton.setVisible(false);
 
 		return layout;
+	}
+
+	public void setEnabledAddAllButton(boolean enabled)
+	{
+		addAllButton.setVisible(enabled);
+		addAllButton.setEnabled(enabled);
+	}
+
+	public void setEnabledAddButton(boolean enabled)
+	{
+		// issue encountered : even when setting visible to false, the button
+		// still appears on the page but setEnabled has no issue
+		addButton.setVisible(enabled);
+		addButton.setEnabled(enabled);
 	}
 
 	public void setShowAddRemoveAll(boolean show)
@@ -512,6 +532,15 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 		}
 	}
 
+	protected void removeAllAction()
+	{
+		selectedBeans.removeAllItems();
+		if (listener != null)
+		{
+			listener.valueChanged(getValue());
+		}
+	}
+
 	public void setSelectedRowDescriptionGenerator(final RowDescriptionGenerator generator)
 	{
 		selectedGrid.setRowDescriptionGenerator(generator);
@@ -525,6 +554,16 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 	public void setAvailableColumnHeader(String availableColumnHeader)
 	{
 		this.availableColumnHeader = availableColumnHeader;
+	}
+
+	public String getSelectedColumnHeader()
+	{
+		return selectedColumnHeader;
+	}
+
+	public void setSelectedColumnHeader(String selectedColumnHeader)
+	{
+		this.selectedColumnHeader = selectedColumnHeader;
 	}
 
 	protected ClickListener addClickListener()
@@ -546,7 +585,9 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 
 					availableGrid.select(null);
 					refreshSelected();
-					selectedBeans.sort(new Object[] { itemCaptionProperty.getName() }, new boolean[] { sortAscending });
+					selectedBeans.sort(new Object[]
+					{ itemCaptionProperty.getName() }, new boolean[]
+					{ sortAscending });
 				}
 
 			}
@@ -572,7 +613,9 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 
 					availableGrid.select(null);
 					refreshSelected();
-					selectedBeans.sort(new Object[] { itemCaptionProperty.getName() }, new boolean[] { sortAscending });
+					selectedBeans.sort(new Object[]
+					{ itemCaptionProperty.getName() }, new boolean[]
+					{ sortAscending });
 				}
 			}
 		};
@@ -611,12 +654,7 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 			@Override
 			public void buttonClick(ClickEvent event)
 			{
-				selectedBeans.removeAllItems();
-				if (listener != null)
-				{
-					listener.valueChanged(getValue());
-				}
-
+				removeAllAction();
 				refreshSelected();
 			}
 		};
