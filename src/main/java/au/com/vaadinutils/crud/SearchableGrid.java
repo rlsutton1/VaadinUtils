@@ -65,7 +65,7 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 
 		this.uniqueId = uniqueId;
 		container = getContainer();
-		grid = new Grid(new GeneratedPropertyContainer((Indexed) container));
+		grid = new Grid(new GeneratedPropertyContainer(container));
 		grid.setSizeFull();
 		final Label title = new Label(getTitle());
 		title.setStyleName(Reindeer.LABEL_H1);
@@ -77,7 +77,7 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 		layout.addComponent(grid);
 		layout.setExpandRatio(grid, 1);
 		this.setCompositionRoot(layout);
-		//		triggerFilter();
+		// triggerFilter();
 	}
 
 	@Override
@@ -99,10 +99,14 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 	{
 		Annotation annotation = this.getClass().getAnnotation(Menu.class);
 		if (annotation instanceof Menu)
+		{
 			return ((Menu) annotation).display();
+		}
 		annotation = this.getClass().getAnnotation(Menus.class);
 		if (annotation instanceof Menus)
+		{
 			return ((Menus) annotation).menus()[0].display();
+		}
 
 		return "Override getTitle() to set a custom title.";
 	}
@@ -114,7 +118,7 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 
 	public void addGeneratedColumn(Object id, ColumnGenerator generatedColumn)
 	{
-		//		grid.addGeneratedColumn(id, generatedColumn);
+		// grid.addGeneratedColumn(id, generatedColumn);
 	}
 
 	protected AbstractLayout buildSearchBar()
@@ -131,7 +135,9 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 
 		final AbstractLayout advancedSearch = buildAdvancedSearch();
 		if (advancedSearch != null)
+		{
 			basicSearchLayout.addComponent(advancedSearchCheckbox);
+		}
 
 		searchField.setInputPrompt("Search");
 		searchField.setId("searchField");
@@ -141,6 +147,7 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 		{
 			private static final long serialVersionUID = 1L;
 
+			@Override
 			public void textChange(final TextChangeEvent event)
 			{
 				filterString = event.getText().trim();
@@ -203,11 +210,17 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 					advancedSearchOn = !advancedSearchOn;
 					advancedSearchLayout.setVisible(advancedSearchOn);
 					if (!advancedSearchOn)
+					{
 						triggerFilter();
+					}
 					if (!advancedSearchOn)
+					{
 						advancedSearchCheckbox.removeStyleName(ValoTheme.BUTTON_FRIENDLY);
+					}
 					else
+					{
 						advancedSearchCheckbox.setStyleName(ValoTheme.BUTTON_FRIENDLY);
+					}
 				}
 			});
 
@@ -233,9 +246,13 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 		boolean advancedSearchActive = advancedSearchOn;
 		Filter filter = getContainerFilter(searchText, advancedSearchActive);
 		if (filter == null)
+		{
 			resetFilters();
+		}
 		else
+		{
 			applyFilter(filter);
+		}
 	}
 
 	protected void resetFilters()
@@ -349,15 +366,19 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 	{
 		GridRefresher refresher = GridRefresher.extend(grid);
 		for (Object itemId : grid.getContainerDataSource().getItemIds())
+		{
 			refresher.refresh(itemId);
+		}
 	}
 
+	@Override
 	public void addContextClickListener(ContextClickListener listener)
 	{
 		grid.addContextClickListener(listener);
 	}
 
-    public void setCellDescriptionGenerator(CellDescriptionGenerator generator) {
-    	grid.setCellDescriptionGenerator(generator);
-    }
+	public void setCellDescriptionGenerator(CellDescriptionGenerator generator)
+	{
+		grid.setCellDescriptionGenerator(generator);
+	}
 }

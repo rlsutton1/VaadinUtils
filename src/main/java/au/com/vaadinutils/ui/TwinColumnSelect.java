@@ -94,7 +94,7 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 		createSelectedGrid();
 		createAvailableGrid();
 
-		//		refreshSelected();
+		// refreshSelected();
 	}
 
 	private void createSelectedGrid()
@@ -113,7 +113,9 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 			public void itemClick(ItemClickEvent event)
 			{
 				if (event.isDoubleClick())
+				{
 					removeButton.click();
+				}
 			}
 		});
 	}
@@ -125,9 +127,7 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 		beanIdField = type.getDeclaredId(Long.class);
 		selectedBeans = new BeanContainer<Long, C>(itemClass);
 		selectedBeans.setBeanIdProperty(beanIdField.getName());
-		selectedBeans.sort(new Object[]
-		{ itemCaptionProperty.getName() }, new boolean[]
-		{ sortAscending });
+		selectedBeans.sort(new Object[] { itemCaptionProperty.getName() }, new boolean[] { sortAscending });
 
 		return selectedBeans;
 	}
@@ -158,7 +158,9 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 			{
 				Filter searchFilter = null;
 				if (filterString != null && filterString.length() > 0)
+				{
 					searchFilter = getSearchFilter(filterString);
+				}
 
 				return NullFilter.and(baselineFilter, selectedFilter, searchFilter);
 			}
@@ -172,9 +174,7 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 
 		// Needs to be here after availableContainer creation,
 		// otherwise sorting goes away
-		availableContainer.sort(new Object[]
-		{ itemCaptionProperty.getName() }, new boolean[]
-		{ sortAscending });
+		availableContainer.sort(new Object[] { itemCaptionProperty.getName() }, new boolean[] { sortAscending });
 
 		availableGrid.addItemClickListener(new ItemClickListener()
 		{
@@ -184,7 +184,9 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 			public void itemClick(ItemClickEvent event)
 			{
 				if (event.isDoubleClick())
+				{
 					addButton.click();
+				}
 			}
 		});
 
@@ -195,9 +197,7 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 	private JPAContainer<C> createAvailableContainer()
 	{
 		availableContainer = JpaBaseDao.getGenericDao(itemClass).createVaadinContainer();
-		availableContainer.sort(new Object[]
-		{ itemCaptionProperty.getName() }, new boolean[]
-		{ sortAscending });
+		availableContainer.sort(new Object[] { itemCaptionProperty.getName() }, new boolean[] { sortAscending });
 
 		return availableContainer;
 	}
@@ -296,6 +296,7 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 		mainLayout.setHeight(height);
 	}
 
+	@Override
 	public void setSizeFull()
 	{
 		super.setSizeFull();
@@ -327,7 +328,9 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 	public void addValueChangeListener(ValueChangeListener<C> listener)
 	{
 		if (valueChangeListeners == null)
+		{
 			valueChangeListeners = new LinkedHashSet<ValueChangeListener<C>>();
+		}
 		valueChangeListeners.add(listener);
 	}
 
@@ -349,17 +352,21 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 	public void commit() throws Buffered.SourceException, InvalidValueException
 	{
 		super.commit();
-		final Collection<C> tmp = (Collection<C>) getConvertedValue();
+		final Collection<C> tmp = getConvertedValue();
 
 		// avoid possible npe
 		if (sourceValue == null)
+		{
 			sourceValue = tmp;
+		}
 
 		// add missing
 		for (C c : tmp)
 		{
 			if (!sourceValue.contains(c))
+			{
 				sourceValue.add(c);
+			}
 		}
 
 		// remove unneeded
@@ -377,14 +384,18 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 	@Override
 	public boolean isModified()
 	{
-		Collection<C> convertedValue = (Collection<C>) getConvertedValue();
+		Collection<C> convertedValue = getConvertedValue();
 		Preconditions.checkNotNull(convertedValue,
 				"If you look at getConvertedValue, you'll see convertedValue can never be null");
 
 		if ((sourceValue == null || sourceValue.size() == 0) && (convertedValue.size() > 0))
+		{
 			return true;
+		}
 		if ((sourceValue == null || sourceValue.size() == 0) && (convertedValue.size() == 0))
+		{
 			return false;
+		}
 		boolean equal = convertedValue.containsAll(sourceValue) && sourceValue.containsAll(convertedValue);
 		return !equal;
 	}
@@ -403,7 +414,7 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 		{
 			selectedBeans.addAll(newValue);
 		}
-		sourceValue = (Collection<C>) getConvertedValue();
+		sourceValue = getConvertedValue();
 
 		refreshSelected();
 	}
@@ -413,9 +424,13 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 	{
 		Collection<C> selected;
 		if (valueClass != null && List.class.isAssignableFrom(valueClass))
+		{
 			selected = new LinkedList<>();
+		}
 		else
+		{
 			selected = new HashSet<>();
+		}
 
 		for (Long id : selectedBeans.getItemIds())
 		{
@@ -428,13 +443,13 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 	@Override
 	public Collection<C> getValue()
 	{
-		return (Collection<C>) getConvertedValue();
+		return getConvertedValue();
 	}
 
 	@Override
 	public Collection<C> getInternalValue()
 	{
-		return (Collection<C>) getConvertedValue();
+		return getConvertedValue();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -482,7 +497,9 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 		{
 			selectedBeans.addBean(item);
 			if (listener != null)
+			{
 				listener.valueChanged(getValue());
+			}
 		}
 	}
 
@@ -490,7 +507,9 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 	{
 		selectedBeans.removeItem(id);
 		if (listener != null)
+		{
 			listener.valueChanged(getValue());
+		}
 	}
 
 	public void setSelectedRowDescriptionGenerator(final RowDescriptionGenerator generator)
@@ -527,9 +546,7 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 
 					availableGrid.select(null);
 					refreshSelected();
-					selectedBeans.sort(new Object[]
-					{ itemCaptionProperty.getName() }, new boolean[]
-					{ sortAscending });
+					selectedBeans.sort(new Object[] { itemCaptionProperty.getName() }, new boolean[] { sortAscending });
 				}
 
 			}
@@ -555,9 +572,7 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 
 					availableGrid.select(null);
 					refreshSelected();
-					selectedBeans.sort(new Object[]
-					{ itemCaptionProperty.getName() }, new boolean[]
-					{ sortAscending });
+					selectedBeans.sort(new Object[] { itemCaptionProperty.getName() }, new boolean[] { sortAscending });
 				}
 			}
 		};
@@ -598,7 +613,9 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 			{
 				selectedBeans.removeAllItems();
 				if (listener != null)
+				{
 					listener.valueChanged(getValue());
+				}
 
 				refreshSelected();
 			}

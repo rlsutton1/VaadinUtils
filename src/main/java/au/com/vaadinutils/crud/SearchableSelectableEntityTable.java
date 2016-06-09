@@ -6,12 +6,6 @@ import java.util.Collection;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import au.com.vaadinutils.crud.security.SecurityManagerFactoryProxy;
-import au.com.vaadinutils.fields.SelectionListener;
-import au.com.vaadinutils.listener.ClickEventLogged;
-import au.com.vaadinutils.menu.Menu;
-import au.com.vaadinutils.menu.Menus;
-
 import com.vaadin.data.Container;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Container.Filterable;
@@ -36,6 +30,12 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Reindeer;
 import com.vaadin.ui.themes.ValoTheme;
+
+import au.com.vaadinutils.crud.security.SecurityManagerFactoryProxy;
+import au.com.vaadinutils.fields.SelectionListener;
+import au.com.vaadinutils.listener.ClickEventLogged;
+import au.com.vaadinutils.menu.Menu;
+import au.com.vaadinutils.menu.Menus;
 
 public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 {
@@ -91,6 +91,7 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 		{
 			private static final long serialVersionUID = 1L;
 
+			@Override
 			@SuppressWarnings("deprecation")
 			public void itemClick(ItemClickEvent event)
 			{
@@ -159,6 +160,7 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 		{
 			private static final long serialVersionUID = 1L;
 
+			@Override
 			public void textChange(final TextChangeEvent event)
 			{
 				filterString = event.getText().trim();
@@ -181,6 +183,7 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 		return layout;
 	}
 
+	@SuppressWarnings("deprecation")
 	public void disableSelectable()
 	{
 		selectableTable.disableSelectable();
@@ -276,9 +279,13 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 		boolean advancedSearchActive = advancedSearchOn;
 		Filter filter = getContainerFilter(searchText, advancedSearchActive);
 		if (filter == null)
+		{
 			resetFilters();
+		}
 		else
+		{
 			applyFilter(filter);
+		}
 
 	}
 
@@ -321,6 +328,7 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 		return selectableTable.getSelectedIds();
 	}
 
+	@SuppressWarnings("deprecation")
 	public void addSelectionListener(SelectionListener listener)
 	{
 		selectableTable.addSelectionListener(listener);
@@ -351,12 +359,14 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 
 	}
 
+	@SuppressWarnings("deprecation")
 	public void setSelected(Collection<Long> ids)
 	{
 		selectableTable.setSelectedValue(ids);
 
 	}
 
+	@SuppressWarnings("deprecation")
 	public void setMultiSelect(boolean b)
 	{
 		selectableTable.setMultiSelect(true);
@@ -374,12 +384,14 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 
 	}
 
+	@SuppressWarnings("deprecation")
 	public void deselectAll()
 	{
 		selectableTable.deselectAll();
 
 	}
 
+	@SuppressWarnings("deprecation")
 	public Object getSelectedItems()
 	{
 		return selectableTable.getSelectedItems();
@@ -406,6 +418,7 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 		return selectableTable;
 	}
 
+	@SuppressWarnings("deprecation")
 	public void selectAll()
 	{
 		selectableTable.selectAll();
@@ -420,8 +433,9 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 	{
 		return selectableTable.isColumnReorderingAllowed();
 	}
-	
-	public void refresh() {
+
+	public void refresh()
+	{
 		selectableTable.refreshRowCache();
 	}
 }

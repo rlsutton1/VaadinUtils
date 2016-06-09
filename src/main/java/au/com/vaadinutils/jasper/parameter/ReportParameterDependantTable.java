@@ -6,16 +6,16 @@ import java.util.Set;
 
 import javax.persistence.metamodel.SingularAttribute;
 
-import au.com.vaadinutils.crud.CrudEntity;
-
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.filter.Compare;
 import com.vaadin.data.util.filter.Or;
 
-abstract public class ReportParameterDependantTable<P extends CrudEntity, T extends CrudEntity> extends
-		ReportParameterTable<T>
+import au.com.vaadinutils.crud.CrudEntity;
+
+abstract public class ReportParameterDependantTable<P extends CrudEntity, T extends CrudEntity>
+		extends ReportParameterTable<T>
 {
 
 	/**
@@ -51,6 +51,7 @@ abstract public class ReportParameterDependantTable<P extends CrudEntity, T exte
 
 			private static final long serialVersionUID = -3033912391060894738L;
 
+			@SuppressWarnings("deprecation")
 			@Override
 			public void valueChange(ValueChangeEvent event)
 			{

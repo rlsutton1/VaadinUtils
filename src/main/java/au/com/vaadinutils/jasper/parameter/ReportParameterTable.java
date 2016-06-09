@@ -38,6 +38,7 @@ import au.com.vaadinutils.fields.SelectionListener;
 import au.com.vaadinutils.fields.TableCheckBoxSelect;
 import au.com.vaadinutils.jasper.scheduler.entities.DateParameterType;
 
+@SuppressWarnings("deprecation")
 public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<String>
 		implements ReportParameterSelectionListener<T>
 {
@@ -355,7 +356,7 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 		try
 		{
 
-			@SuppressWarnings("unchecked")
+			@SuppressWarnings({ "unchecked" })
 			Set<Long> ids = (Set<Long>) table.getSelectedItems();
 			String selection = "";
 			int ctr = 0;

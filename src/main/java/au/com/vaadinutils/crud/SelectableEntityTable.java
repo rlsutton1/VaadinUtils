@@ -2,10 +2,11 @@ package au.com.vaadinutils.crud;
 
 import java.util.Collection;
 
-import au.com.vaadinutils.fields.TableCheckBoxSelect;
-
 import com.vaadin.data.Container;
 
+import au.com.vaadinutils.fields.TableCheckBoxSelect;
+
+@SuppressWarnings("deprecation")
 public class SelectableEntityTable<E> extends TableCheckBoxSelect
 {
 	// private static transient Logger logger =
