@@ -50,7 +50,7 @@ import com.vaadin.ui.Table.ColumnGenerator;
 import com.vaadin.ui.VerticalLayout;
 
 /**
- * @deprecated  Replaced by {@link TwinColumnSelect}
+ * @deprecated Replaced by {@link TwinColumnSelect}
  */
 @Deprecated
 public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomField<Collection<C>>
@@ -58,34 +58,39 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 
 	private static final long serialVersionUID = -4316521010865902678L;
 	private Logger logger = LogManager.getLogger();
-	private SingularAttribute<C, ?> listField;
-	private String itemLabel;
 
+	private SingularAttribute<C, ?> listField;
 	protected Collection<C> sourceValue;
+	@SuppressWarnings("rawtypes")
+	private Class<? extends Collection> valueClass;
+	protected SearchableSelectableEntityTable<C> availableTable;
+	protected JPAContainer<C> availableContainer;
 	protected Table selectedTable;
 	protected BeanContainer<Long, C> beans;
-	protected JPAContainer<C> availableContainer;
-	protected SearchableSelectableEntityTable<C> availableTable;
 	private SingularAttribute<C, Long> beanIdField;
+
+	protected HorizontalLayout mainLayout;
+	protected Button addNewButton = new Button(FontAwesome.PLUS);
 	protected Button addButton = new Button(">");
 	protected Button removeButton = new Button("<");
 	protected Button removeAllButton = new Button("<<");
 	protected Button addAllButton = new Button(">>");
+
 	protected Filter baselineFilter;
 	protected Filter selectedFilter;
-	protected HorizontalLayout mainLayout;
+
+	protected String availableColumnHeader;
+	private String itemLabel;
+
 	protected ValueChangeListener<C> listener;
-	protected Button addNewButton = new Button(FontAwesome.PLUS);
 	private CreateNewCallback<C> createNewCallback;
-	@SuppressWarnings("rawtypes")
-	private Class<? extends Collection> valueClass;
+
 	private boolean isAscending;
 	private boolean showAddRemoveAll;
-	protected String availableColumnHeader;
+	protected boolean isRemoveAllClicked = false;
 
 	private static final float BUTTON_LAYOUT_WIDTH = 50;
 	private static final float BUTTON_WIDTH = 45;
-
 
 	/**
 	 * Unfortunately TwinColumnSelect wont work with large sets, it isn't
@@ -763,12 +768,22 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 			{
 				try
 				{
-					beans.removeAllItems();
-					if (listener != null)
+					isRemoveAllClicked = true;
+					if (isRemoveAllowed())
 					{
-						listener.valueChanged(getFieldValue());
+						beans.removeAllItems();
+						if (listener != null)
+						{
+							listener.valueChanged(getFieldValue());
+						}
+
+						refreshSelected();
 					}
-					refreshSelected();
+					else
+					{
+						handleRemoveValidation();
+					}
+					isRemoveAllClicked = false;
 				}
 				catch (Exception e)
 				{
