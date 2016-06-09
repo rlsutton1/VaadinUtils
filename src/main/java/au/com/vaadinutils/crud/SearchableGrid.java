@@ -8,6 +8,7 @@ import org.vaadin.teemusa.gridextensions.refresher.GridRefresher;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Container.Filterable;
 import com.vaadin.data.Container.Indexed;
+import com.vaadin.data.sort.Sort;
 import com.vaadin.data.util.GeneratedPropertyContainer;
 import com.vaadin.data.util.converter.Converter;
 import com.vaadin.event.ContextClickEvent.ContextClickListener;
@@ -382,4 +383,10 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 	{
 		grid.setCellDescriptionGenerator(generator);
 	}
+
+	public void sort(final Sort sort)
+	{
+		grid.sort(sort);
+	}
+
 }
