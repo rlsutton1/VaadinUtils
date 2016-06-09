@@ -18,6 +18,10 @@ import com.vaadin.server.ErrorMessage;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Table;
 
+/**
+ * @deprecated Use Vaadin's Grid component instead
+ */
+@Deprecated
 public class TableCheckBoxSelect extends Table
 {
 
