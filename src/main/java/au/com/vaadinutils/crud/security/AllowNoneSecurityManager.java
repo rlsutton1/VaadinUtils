@@ -53,4 +53,10 @@ public class AllowNoneSecurityManager implements CrudSecurityManager
 	{
 		return "";
 	}
+
+	@Override
+	public String getUserDisallowedReason(Enum<?> outboundContactHub)
+	{
+		return this.getClass().getSimpleName();
+	}
 }

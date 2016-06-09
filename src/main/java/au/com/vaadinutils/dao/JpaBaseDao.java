@@ -127,7 +127,9 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		@SuppressWarnings("unchecked")
 		List<E> entities = query.getResultList();
 		if (entities.size() > 0)
+		{
 			entity = entities.get(0);
+		}
 		return entity;
 	}
 
@@ -140,7 +142,9 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		@SuppressWarnings("unchecked")
 		List<E> entities = query.getResultList();
 		if (entities.size() > 0)
+		{
 			entity = entities.get(0);
+		}
 		return entity;
 	}
 
@@ -233,9 +237,13 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		for (SingularAttribute<E, ?> field : order)
 		{
 			if (sortAscending[ordering.size()] == true)
+			{
 				ordering.add(builder.asc(root.get(field)));
+			}
 			else
+			{
 				ordering.add(builder.desc(root.get(field)));
+			}
 
 		}
 		criteria.orderBy(ordering);
@@ -246,16 +254,11 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 	}
 
-	public <V> E findOneByAttribute(SingularAttribute<E, V> vKey, V value)
+	public <V> E findOneByAttribute(SingularAttribute<? super E, V> vKey, V value)
 	{
-		E ret = null;
-		List<E> results = findAllByAttribute(vKey, value, null, 1);
-		if (results.size() > 0)
-		{
-			ret = results.get(0);
-		}
+		JpaDslBuilder<E> q = find();
+		return q.where(q.eq(vKey, value)).getSingleResultOrNull();
 
-		return ret;
 	}
 
 	public <V, SK> List<E> findAllByAttribute(SingularAttribute<E, V> vKey, V value, SingularAttribute<E, SK> order)
@@ -593,9 +596,13 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		Table annotation = entityClass.getAnnotation(Table.class);
 		String tableName;
 		if (annotation != null)
+		{
 			tableName = annotation.name();
+		}
 		else
+		{
 			tableName = entityName;
+		}
 
 		String qry = "select count(" + entityName + ") from " + tableName + " " + entityName;
 		Query query = getEntityManager().createQuery(qry);
@@ -876,5 +883,4 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 	}
 
-   
 }

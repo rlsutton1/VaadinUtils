@@ -27,7 +27,7 @@ public enum CrudEventDistributer
 		list.add(listener);
 	}
 
-	public static void removeListener(CrudEventListener listener, Class<? extends BaseCrudView<?>> type)
+	public static void removeListener(Class<? extends BaseCrudView<?>> type, CrudEventListener listener)
 	{
 		List<CrudEventListener> list = SELF.listeners.get(type);
 		if (list != null)

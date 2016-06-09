@@ -29,4 +29,6 @@ public interface CrudSecurityManager
 
 	String getFeatureName();
 
+	String getUserDisallowedReason(Enum<?> outboundContactHub);
+
 }
