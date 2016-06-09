@@ -30,9 +30,13 @@ import au.com.vaadinutils.user.UserSettingsStorageFactory;
 
 public class GridHeadingPropertySet<E>
 {
-	private List<GridHeadingToPropertyId<E>> cols = new LinkedList<GridHeadingToPropertyId<E>>();
-
 	private Logger logger = LogManager.getLogger();
+	private List<GridHeadingToPropertyId<E>> cols = new LinkedList<GridHeadingToPropertyId<E>>();
+	private Grid grid;
+	private String uniqueId;
+
+	// Set to true if you would like to defer loading settings until applySettingsToColumns is called
+	private boolean deferLoadSettings = false;
 
 	private GridHeadingPropertySet()
 	{
@@ -437,6 +441,9 @@ public class GridHeadingPropertySet<E>
 	 */
 	public void applyToGrid(final Grid grid, final String uniqueId)
 	{
+		this.grid = grid;
+		this.uniqueId = uniqueId;
+
 		try
 		{
 			final GeneratedPropertyContainer gpc = wrapGridContainer(grid);
@@ -459,9 +466,9 @@ public class GridHeadingPropertySet<E>
 							propertyId + " is not a valid property id, valid property ids are "
 									+ grid.getContainerDataSource().getContainerPropertyIds().toString());
 
-				grid.getDefaultHeaderRow().getCell(propertyId).setText(column.getHeader());
 				colsToShow.add(propertyId);
 				final Column gridColumn = grid.getColumn(propertyId);
+				gridColumn.setHeaderCaption(column.getHeader());
 
 				if (column.getWidth() != null)
 					gridColumn.setWidth(column.getWidth());
@@ -478,9 +485,12 @@ public class GridHeadingPropertySet<E>
 
 			grid.setColumns(colsToShow.toArray());
 
-			configureSaveColumnWidths(grid, uniqueId);
-			configureSaveColumnOrder(grid, uniqueId);
-			configureSaveColumnVisible(grid, uniqueId);
+			if (!deferLoadSettings)
+			{
+				configureSaveColumnWidths(grid, uniqueId);
+				configureSaveColumnOrder(grid, uniqueId);
+				configureSaveColumnVisible(grid, uniqueId);
+			}
 		}
 		catch (Exception e)
 		{
@@ -499,6 +509,20 @@ public class GridHeadingPropertySet<E>
 		}
 
 		return (GeneratedPropertyContainer) gridContainer;
+	}
+	
+	public void setDeferLoadSettings(final boolean deferLoadSettings)
+	{
+		this.deferLoadSettings = deferLoadSettings;
+	}
+
+	public void applySettingsToColumns()
+	{
+		Preconditions.checkState(grid != null, "You must call applytoGrid first");
+
+		configureSaveColumnWidths(grid, uniqueId);
+		configureSaveColumnOrder(grid, uniqueId);
+		configureSaveColumnVisible(grid, uniqueId);
 	}
 
 	private void configureSaveColumnWidths(final Grid grid, final String uniqueId)
