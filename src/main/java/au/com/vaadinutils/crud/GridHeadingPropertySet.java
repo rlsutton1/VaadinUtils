@@ -35,10 +35,16 @@ public class GridHeadingPropertySet
 	private Logger logger = LogManager.getLogger();
 
 	private boolean eraseSavedConfig = false;
+	private Grid grid;
+	private String uniqueId;
 
-	private GridHeadingPropertySet()
+	// Set to true if you would like to defer loading settings until
+	// applySettingsToColumns is called
+	private boolean deferLoadSettings = false;
+
+	public GridHeadingPropertySet(final List<GridHeadingToPropertyId> cols)
 	{
-		// use the builder!
+		this.cols = cols;
 	}
 
 	public static <E> Builder<E> getBuilder(Class<E> Class)
@@ -80,8 +86,8 @@ public class GridHeadingPropertySet
 
 			addColumn();
 
-			final GridHeadingPropertySet tmp = new GridHeadingPropertySet();
-			tmp.cols = this.cols;
+			final GridHeadingPropertySet tmp = new GridHeadingPropertySet(this.cols);
+
 			tmp.eraseSavedConfig = eraseSavedConfig;
 
 			return tmp;
@@ -550,6 +556,9 @@ public class GridHeadingPropertySet
 	 */
 	public void applyToGrid(final Grid grid, final String uniqueId)
 	{
+		this.grid = grid;
+		this.uniqueId = uniqueId;
+
 		try
 		{
 			final GeneratedPropertyContainer gpc = wrapGridContainer(grid);
@@ -576,9 +585,9 @@ public class GridHeadingPropertySet
 									+ grid.getContainerDataSource().getContainerPropertyIds().toString());
 				}
 
-				grid.getDefaultHeaderRow().getCell(propertyId).setText(column.getHeader());
 				colsToShow.add(propertyId);
 				final Column gridColumn = grid.getColumn(propertyId);
+				gridColumn.setHeaderCaption(column.getHeader());
 
 				if (column.getWidth() != null)
 				{
@@ -611,9 +620,12 @@ public class GridHeadingPropertySet
 				eraseSavedConfig(uniqueId);
 			}
 
-			configureSaveColumnWidths(grid, uniqueId);
-			configureSaveColumnOrder(grid, uniqueId);
-			configureSaveColumnVisible(grid, uniqueId);
+			if (!deferLoadSettings)
+			{
+				configureSaveColumnWidths(grid, uniqueId);
+				configureSaveColumnOrder(grid, uniqueId);
+				configureSaveColumnVisible(grid, uniqueId);
+			}
 		}
 		catch (Exception e)
 		{
@@ -637,6 +649,20 @@ public class GridHeadingPropertySet
 		}
 
 		return (GeneratedPropertyContainer) gridContainer;
+	}
+
+	public void setDeferLoadSettings(final boolean deferLoadSettings)
+	{
+		this.deferLoadSettings = deferLoadSettings;
+	}
+
+	public void applySettingsToColumns()
+	{
+		Preconditions.checkState(grid != null, "You must call applytoGrid first");
+
+		configureSaveColumnWidths(grid, uniqueId);
+		configureSaveColumnOrder(grid, uniqueId);
+		configureSaveColumnVisible(grid, uniqueId);
 	}
 
 	private void configureSaveColumnWidths(final Grid grid, final String uniqueId)

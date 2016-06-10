@@ -8,6 +8,7 @@ import org.vaadin.teemusa.gridextensions.refresher.GridRefresher;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Container.Filterable;
 import com.vaadin.data.Container.Indexed;
+import com.vaadin.data.sort.Sort;
 import com.vaadin.data.util.GeneratedPropertyContainer;
 import com.vaadin.data.util.converter.Converter;
 import com.vaadin.event.ContextClickEvent.ContextClickListener;
@@ -44,7 +45,6 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 	private static final long serialVersionUID = 1L;
 
 	private boolean initialised;
-	private String uniqueId;
 	private TextField searchField = new TextField();
 	private AbstractLayout advancedSearchLayout;
 	private AbstractLayout searchBar;
@@ -53,6 +53,7 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 	private Grid grid;
 	private T container;
 	private String filterString = "";
+	private GridHeadingPropertySet headingPropertySet;
 
 	public SearchableGrid(String uniqueId)
 	{
@@ -63,7 +64,6 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 			return;
 		}
 
-		this.uniqueId = uniqueId;
 		container = getContainer();
 		grid = new Grid(new GeneratedPropertyContainer(container));
 		grid.setSizeFull();
@@ -77,7 +77,9 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 		layout.addComponent(grid);
 		layout.setExpandRatio(grid, 1);
 		this.setCompositionRoot(layout);
-		// triggerFilter();
+		headingPropertySet = getHeadingPropertySet();
+		headingPropertySet.setDeferLoadSettings(true);
+		headingPropertySet.applyToGrid(grid, uniqueId);
 	}
 
 	@Override
@@ -86,7 +88,7 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 		super.beforeClientResponse(initial);
 		if (!initialised)
 		{
-			getHeadingPropertySet().applyToGrid(grid, uniqueId);
+			headingPropertySet.applySettingsToColumns();
 			initialised = true;
 		}
 	}
@@ -364,7 +366,7 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 
 	public void refresh()
 	{
-		GridRefresher refresher = GridRefresher.extend(grid);
+		final GridRefresher refresher = GridRefresher.extend(grid);
 		for (Object itemId : grid.getContainerDataSource().getItemIds())
 		{
 			refresher.refresh(itemId);
@@ -381,4 +383,10 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 	{
 		grid.setCellDescriptionGenerator(generator);
 	}
+
+	public void sort(final Sort sort)
+	{
+		grid.sort(sort);
+	}
+
 }
