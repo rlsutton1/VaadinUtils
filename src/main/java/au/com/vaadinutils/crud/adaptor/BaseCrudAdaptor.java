@@ -57,7 +57,7 @@ public class BaseCrudAdaptor<P, E extends CrudEntity> extends BaseCrudView<E> im
 	}
 
 	@Override
-	public void init(Class<E> entityClass, JPAContainer<E> container, HeadingPropertySet<E> headings)
+	public void init(Class<E> entityClass, JPAContainer<E> container, HeadingPropertySet headings)
 	{
 		super.init(entityClass, container, headings);
 	}

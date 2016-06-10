@@ -28,11 +28,13 @@ import com.vaadin.ui.renderers.TextRenderer;
 import au.com.vaadinutils.dao.Path;
 import au.com.vaadinutils.user.UserSettingsStorageFactory;
 
-public class GridHeadingPropertySet<E>
+public class GridHeadingPropertySet
 {
-	private List<GridHeadingToPropertyId<E>> cols = new LinkedList<GridHeadingToPropertyId<E>>();
+	private List<GridHeadingToPropertyId> cols = new LinkedList<GridHeadingToPropertyId>();
 
 	private Logger logger = LogManager.getLogger();
+
+	private boolean eraseSavedConfig = false;
 
 	private GridHeadingPropertySet()
 	{
@@ -44,16 +46,50 @@ public class GridHeadingPropertySet<E>
 		return new Builder<E>();
 	}
 
-	public static class Builder<E>
+	interface Start<E>
 	{
-		private List<GridHeadingToPropertyId<E>> cols = new LinkedList<GridHeadingToPropertyId<E>>();
+		public AddingColumn<E> createColumn(String heading, String propertyId);
 
-		public GridHeadingPropertySet<E> build()
+		public <T> AddingColumn<E> createColumn(String heading, SingularAttribute<E, T> headingPropertyId);
+
+		public GridHeadingPropertySet build();
+	}
+
+	public interface AddingColumn<E>
+	{
+
+		public AddingColumn<E> setLockedState(boolean lockedState);
+
+		public AddingColumn<E> setDefaultVisibleState(boolean defaultVisibleState);
+
+		public AddingColumn<E> setWidth(Integer width);
+
+		public AddingColumn<E> setColumnGenerator(PropertyValueGenerator<?> columnGenerator);
+
+	}
+
+	public static class Builder<E> implements AddingColumn<E>, Start<E>
+	{
+		private List<GridHeadingToPropertyId> cols = new LinkedList<GridHeadingToPropertyId>();
+
+		private boolean eraseSavedConfig = false;
+
+		@Override
+		public GridHeadingPropertySet build()
 		{
-			final GridHeadingPropertySet<E> tmp = new GridHeadingPropertySet<E>();
+
+			addColumn();
+
+			final GridHeadingPropertySet tmp = new GridHeadingPropertySet();
 			tmp.cols = this.cols;
+			tmp.eraseSavedConfig = eraseSavedConfig;
 
 			return tmp;
+		}
+
+		public void setEraseSavedConfig()
+		{
+			eraseSavedConfig = true;
 		}
 
 		/* Add column methods */
@@ -76,8 +112,72 @@ public class GridHeadingPropertySet<E>
 		public Builder<E> addColumn(final String heading, final String headingPropertyId,
 				final boolean defaultVisibleState, final boolean lockedState, final int width)
 		{
-			cols.add(new GridHeadingToPropertyId<E>(heading, headingPropertyId, null, defaultVisibleState, lockedState,
-					null));
+			createColumn(heading, headingPropertyId).setDefaultVisibleState(defaultVisibleState)
+					.setLockedState(lockedState).setWidth(width);
+
+			this.addColumn();
+			return this;
+		}
+
+		GridHeadingToPropertyId.Builder columnBuilder = null;
+
+		@Override
+		public AddingColumn<E> createColumn(String heading, String propertyId)
+		{
+
+			addColumn();
+
+			columnBuilder = new GridHeadingToPropertyId.Builder(heading, propertyId);
+			return this;
+		}
+
+		@Override
+		public <T> AddingColumn<E> createColumn(String heading, SingularAttribute<E, T> headingPropertyId)
+		{
+
+			addColumn();
+
+			columnBuilder = new GridHeadingToPropertyId.Builder(heading, headingPropertyId.getName());
+			return this;
+
+		}
+
+		private Builder<E> addColumn()
+		{
+			if (columnBuilder != null)
+			{
+				cols.add(columnBuilder.build());
+			}
+			// fail fast rather than have weird behaviour
+			columnBuilder = null;
+			return this;
+		}
+
+		@Override
+		public AddingColumn<E> setLockedState(boolean lockedState)
+		{
+			columnBuilder.setLockedState(lockedState);
+			return this;
+		}
+
+		@Override
+		public AddingColumn<E> setDefaultVisibleState(boolean defaultVisibleState)
+		{
+			columnBuilder.setDefaultVisibleState(defaultVisibleState);
+			return this;
+		}
+
+		@Override
+		public AddingColumn<E> setWidth(Integer width)
+		{
+			columnBuilder.setWidth(width);
+			return this;
+		}
+
+		@Override
+		public AddingColumn<E> setColumnGenerator(PropertyValueGenerator<?> columnGenerator)
+		{
+			columnBuilder.setColumnGenerator(columnGenerator);
 			return this;
 		}
 
@@ -85,13 +185,16 @@ public class GridHeadingPropertySet<E>
 				final SingularAttribute<E, T> headingPropertyId, final boolean defaultVisibleState,
 				final boolean lockedState, int width)
 		{
-			return addColumn(heading, headingPropertyId.getName(), defaultVisibleState, lockedState, width);
+			createColumn(heading, headingPropertyId.getName()).setDefaultVisibleState(defaultVisibleState)
+					.setLockedState(lockedState).setWidth(width);
+			this.addColumn();
+			return this;
 		}
 
 		public <T extends Object> Builder<E> addColumn(final String heading, final String headingPropertyId,
 				final boolean defaultVisibleState, final boolean lockedState)
 		{
-			cols.add(new GridHeadingToPropertyId<E>(heading, headingPropertyId, null, defaultVisibleState, lockedState,
+			cols.add(new GridHeadingToPropertyId(heading, headingPropertyId, null, defaultVisibleState, lockedState,
 					null));
 			return this;
 		}
@@ -126,7 +229,7 @@ public class GridHeadingPropertySet<E>
 				final PropertyValueGenerator<?> columnGenerator, final boolean defaultVisibleState,
 				final boolean lockedState, final int width)
 		{
-			cols.add(new GridHeadingToPropertyId<E>(heading, headingPropertyId, columnGenerator, defaultVisibleState,
+			cols.add(new GridHeadingToPropertyId(heading, headingPropertyId, columnGenerator, defaultVisibleState,
 					lockedState, width));
 			return this;
 		}
@@ -143,7 +246,7 @@ public class GridHeadingPropertySet<E>
 				final PropertyValueGenerator<?> columnGenerator, final boolean defaultVisibleState,
 				final boolean lockedState)
 		{
-			cols.add(new GridHeadingToPropertyId<E>(heading, headingPropertyId, columnGenerator, defaultVisibleState,
+			cols.add(new GridHeadingToPropertyId(heading, headingPropertyId, columnGenerator, defaultVisibleState,
 					lockedState, null));
 			return this;
 		}
@@ -312,12 +415,14 @@ public class GridHeadingPropertySet<E>
 		 *            - the format for the Date. format is passed to a
 		 *            SimpleDateFormat
 		 */
-		//		public Builder<E> addColumn(String headingLabel, SingularAttribute<E, Date> column, String dateFormat,
-		//				int width)
-		//		{
-		//			return addGeneratedColumn(headingLabel, column.getName(),
-		//					new DateColumnGenerator<E>(column.getName(), dateFormat), true, false, width);
-		//		}
+		// public Builder<E> addColumn(String headingLabel, SingularAttribute<E,
+		// Date> column, String dateFormat,
+		// int width)
+		// {
+		// return addGeneratedColumn(headingLabel, column.getName(),
+		// new DateColumnGenerator<E>(column.getName(), dateFormat), true,
+		// false, width);
+		// }
 
 		/**
 		 * Add a date column and format it.
@@ -330,17 +435,19 @@ public class GridHeadingPropertySet<E>
 		 *            - the format for the Date. format is passed to a
 		 *            SimpleDateFormat
 		 */
-		//		public Builder<E> addColumn(String headingLabel, String headingPropertyId, String dateFormat, int width)
-		//		{
-		//			// We make the alias the same as the underlying property so that we
-		//			// can sort this column.
-		//			// Generated columns are not normally sortable however by mapping
-		//			// our generated column to the underlying date column our generated
-		//			// column becomes sortable.
-		//			return addGeneratedColumn(headingLabel, headingPropertyId,
-		//					new DateColumnGenerator<E>(headingPropertyId, dateFormat), true, false, width);
+		// public Builder<E> addColumn(String headingLabel, String
+		// headingPropertyId, String dateFormat, int width)
+		// {
+		// // We make the alias the same as the underlying property so that we
+		// // can sort this column.
+		// // Generated columns are not normally sortable however by mapping
+		// // our generated column to the underlying date column our generated
+		// // column becomes sortable.
+		// return addGeneratedColumn(headingLabel, headingPropertyId,
+		// new DateColumnGenerator<E>(headingPropertyId, dateFormat), true,
+		// false, width);
 		//
-		//		}
+		// }
 
 	}
 
@@ -351,59 +458,61 @@ public class GridHeadingPropertySet<E>
 	 *
 	 * @param <E>
 	 */
-	//	static class DateColumnGenerator<E> implements ColumnGenerator
-	//	{
-	//		private static final long serialVersionUID = 1;
-	//		private Logger logger = LogManager.getLogger();
+	// static class DateColumnGenerator<E> implements ColumnGenerator
+	// {
+	// private static final long serialVersionUID = 1;
+	// private Logger logger = LogManager.getLogger();
 	//
-	//		final private SimpleDateFormat sdf;
-	//		final private SimpleDateFormat sdfParse = new SimpleDateFormat("yyyy-MM-dd");
-	//		final private String headingPropertyId;
+	// final private SimpleDateFormat sdf;
+	// final private SimpleDateFormat sdfParse = new
+	// SimpleDateFormat("yyyy-MM-dd");
+	// final private String headingPropertyId;
 	//
-	//		DateColumnGenerator(String headingPropertyId, String format)
-	//		{
-	//			this.headingPropertyId = headingPropertyId;
-	//			this.sdf = new SimpleDateFormat(format);
-	//		}
+	// DateColumnGenerator(String headingPropertyId, String format)
+	// {
+	// this.headingPropertyId = headingPropertyId;
+	// this.sdf = new SimpleDateFormat(format);
+	// }
 	//
-	//		@Override
-	//		public Object generateCell(Table source, Object itemId, Object columnId)
-	//		{
-	//			Item item = source.getItem(itemId);
+	// @Override
+	// public Object generateCell(Table source, Object itemId, Object columnId)
+	// {
+	// Item item = source.getItem(itemId);
 	//
-	//			Object objDate = item.getItemProperty(headingPropertyId).getValue();
+	// Object objDate = item.getItemProperty(headingPropertyId).getValue();
 	//
-	//			String formattedDate = "";
+	// String formattedDate = "";
 	//
-	//			if (objDate instanceof Date)
-	//			{
-	//				formattedDate = sdf.format((Date) objDate);
-	//			}
-	//			else if (objDate != null)
-	//			{
-	//				String strDate = objDate.toString();
-	//				try
-	//				{
-	//					formattedDate = sdf.format(sdfParse.parse(strDate));
-	//				}
-	//				catch (ParseException e)
-	//				{
-	//					// just so we have a value.
-	//					formattedDate = "Invalid";
-	//					logger.error(
-	//							"Looks like our assumptions about the format of dates is wrong. Please update the parse format to match:"
-	//									+ strDate +" "+sdf.toPattern());
-	//				}
-	//			}
+	// if (objDate instanceof Date)
+	// {
+	// formattedDate = sdf.format((Date) objDate);
+	// }
+	// else if (objDate != null)
+	// {
+	// String strDate = objDate.toString();
+	// try
+	// {
+	// formattedDate = sdf.format(sdfParse.parse(strDate));
+	// }
+	// catch (ParseException e)
+	// {
+	// // just so we have a value.
+	// formattedDate = "Invalid";
+	// logger.error(
+	// "Looks like our assumptions about the format of dates is wrong. Please
+	// update the parse format to match:"
+	// + strDate +" "+sdf.toPattern());
+	// }
+	// }
 	//
-	//			Label label = new Label(formattedDate);
+	// Label label = new Label(formattedDate);
 	//
-	//			return label;
-	//		}
+	// return label;
+	// }
 	//
-	//	}
+	// }
 
-	public List<GridHeadingToPropertyId<E>> getColumns()
+	public List<GridHeadingToPropertyId> getColumns()
 	{
 		return cols;
 	}
@@ -416,9 +525,13 @@ public class GridHeadingPropertySet<E>
 			if (!call.getClassName().contains("au.com.vaadinutils"))
 			{
 				if (call.getClassName().contains("."))
+				{
 					applyToGrid(grid, call.getClassName().substring(call.getClassName().lastIndexOf(".")));
+				}
 				else
+				{
 					applyToGrid(grid, call.getClassName());
+				}
 
 				return;
 			}
@@ -442,7 +555,7 @@ public class GridHeadingPropertySet<E>
 			final GeneratedPropertyContainer gpc = wrapGridContainer(grid);
 
 			final List<String> colsToShow = new LinkedList<String>();
-			for (GridHeadingToPropertyId<E> column : getColumns())
+			for (GridHeadingToPropertyId column : getColumns())
 			{
 				final String propertyId = column.getPropertyId();
 				if (column.isGenerated())
@@ -451,32 +564,52 @@ public class GridHeadingPropertySet<E>
 					gpc.addGeneratedProperty(propertyId, columnGenerator);
 					final Column gridColumn = grid.getColumn(propertyId);
 					if (columnGenerator.getType() == String.class && gridColumn.getRenderer() instanceof TextRenderer)
+					{
 						gridColumn.setRenderer(new HtmlRenderer(), null);
+					}
 				}
 				else
+				{
 					Preconditions.checkArgument(
 							grid.getContainerDataSource().getContainerPropertyIds().contains(propertyId),
 							propertyId + " is not a valid property id, valid property ids are "
 									+ grid.getContainerDataSource().getContainerPropertyIds().toString());
+				}
 
 				grid.getDefaultHeaderRow().getCell(propertyId).setText(column.getHeader());
 				colsToShow.add(propertyId);
 				final Column gridColumn = grid.getColumn(propertyId);
 
 				if (column.getWidth() != null)
+				{
 					gridColumn.setWidth(column.getWidth());
+				}
+				else
+				{
+					gridColumn.setExpandRatio(1);
+					gridColumn.setMinimumWidth(1);
+				}
 
 				if (column.isLocked())
+				{
 					gridColumn.setHidable(false);
+				}
 				else
 				{
 					gridColumn.setHidable(true);
 					if (!column.isVisibleByDefault())
+					{
 						gridColumn.setHidden(true);
+					}
 				}
 			}
 
 			grid.setColumns(colsToShow.toArray());
+
+			if (eraseSavedConfig)
+			{
+				eraseSavedConfig(uniqueId);
+			}
 
 			configureSaveColumnWidths(grid, uniqueId);
 			configureSaveColumnOrder(grid, uniqueId);
@@ -486,6 +619,11 @@ public class GridHeadingPropertySet<E>
 		{
 			logger.error(e, e);
 		}
+	}
+
+	void eraseSavedConfig(final String uniqueTableId)
+	{
+		UserSettingsStorageFactory.getUserSettingsStorage().erase(uniqueTableId);
 	}
 
 	private GeneratedPropertyContainer wrapGridContainer(final Grid grid)
@@ -505,12 +643,14 @@ public class GridHeadingPropertySet<E>
 	{
 		final String keyStub = uniqueId + "-width";
 
-		for (GridHeadingToPropertyId<E> id : getColumns())
+		for (GridHeadingToPropertyId id : getColumns())
 		{
 			final String setWidth = UserSettingsStorageFactory.getUserSettingsStorage()
 					.get(keyStub + "-" + id.getPropertyId());
 			if (setWidth != null && setWidth.length() > 0)
+			{
 				grid.getColumn(id.getPropertyId()).setWidth(Double.parseDouble(setWidth));
+			}
 		}
 
 		grid.addColumnResizeListener(new ColumnResizeListener()
@@ -537,7 +677,9 @@ public class GridHeadingPropertySet<E>
 		{
 			final Object[] parsedColumns = columns.split(", ?");
 			if (parsedColumns.length > 0)
+			{
 				grid.setColumns(calculateColumnOrder(availableColumns, parsedColumns));
+			}
 		}
 
 		grid.addColumnReorderListener(new ColumnReorderListener()
@@ -552,7 +694,9 @@ public class GridHeadingPropertySet<E>
 				{
 					String parsedColumns = "";
 					for (Column column : columns)
+					{
 						parsedColumns += column.getPropertyId() + ", ";
+					}
 
 					parsedColumns = parsedColumns.substring(0, parsedColumns.length() - 2);
 					UserSettingsStorageFactory.getUserSettingsStorage().store(keyStub, "" + parsedColumns);
@@ -600,12 +744,14 @@ public class GridHeadingPropertySet<E>
 	{
 		final String keyStub = uniqueId + "-visible";
 
-		for (GridHeadingToPropertyId<E> id : getColumns())
+		for (GridHeadingToPropertyId id : getColumns())
 		{
 			final String setVisible = UserSettingsStorageFactory.getUserSettingsStorage()
 					.get(keyStub + "-" + id.getPropertyId());
 			if (setVisible != null && !setVisible.isEmpty())
+			{
 				grid.getColumn(id.getPropertyId()).setHidden(!Boolean.parseBoolean(setVisible));
+			}
 		}
 		grid.addColumnVisibilityChangeListener(new ColumnVisibilityChangeListener()
 		{

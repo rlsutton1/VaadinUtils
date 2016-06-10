@@ -65,7 +65,7 @@ public class ChildCrudAdaptor<P extends CrudEntity, E extends ChildCrudEntity> e
 	}
 
 	@Override
-	public void init(Class<E> entityClass, JPAContainer<E> container, HeadingPropertySet<E> headings)
+	public void init(Class<E> entityClass, JPAContainer<E> container, HeadingPropertySet headings)
 	{
 		super.init(entityClass, container, headings);
 	}

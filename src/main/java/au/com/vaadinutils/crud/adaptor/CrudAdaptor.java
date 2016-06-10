@@ -24,7 +24,7 @@ import au.com.vaadinutils.crud.HeadingPropertySet;
 public interface CrudAdaptor<P, E extends CrudEntity>
 {
 
-	void init(Class<E> class1, JPAContainer<E> container, HeadingPropertySet<E> headings);
+	void init(Class<E> class1, JPAContainer<E> container, HeadingPropertySet headings);
 
 	void setSplitPosition(int normalSplitSize);
 

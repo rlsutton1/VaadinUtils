@@ -182,7 +182,7 @@ abstract public class WizardView<Parent extends CrudEntity, Child extends CrudEn
 	
 	abstract protected R getRecipient(Long recipientId);
 
-	abstract protected HeadingPropertySet<Child> getVisibleSelectColumns();
+	abstract protected HeadingPropertySet getVisibleSelectColumns();
 
 	abstract protected SingularAttribute<Parent, String> getParentDisplayProperty();
 

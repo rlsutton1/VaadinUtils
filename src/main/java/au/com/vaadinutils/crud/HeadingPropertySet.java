@@ -28,9 +28,9 @@ import com.vaadin.ui.Table.ColumnResizeListener;
 import au.com.vaadinutils.dao.Path;
 import au.com.vaadinutils.user.UserSettingsStorageFactory;
 
-public class HeadingPropertySet<E>
+public class HeadingPropertySet
 {
-	private List<HeadingToPropertyId<E>> cols = new LinkedList<HeadingToPropertyId<E>>();
+	private List<HeadingToPropertyId> cols = new LinkedList<HeadingToPropertyId>();
 
 	private Logger logger = LogManager.getLogger();
 
@@ -38,7 +38,7 @@ public class HeadingPropertySet<E>
 
 	private boolean eraseSavedConfig = false;
 
-	public HeadingPropertySet() 
+	public HeadingPropertySet()
 	{
 		// use the builder!
 	}
@@ -50,13 +50,13 @@ public class HeadingPropertySet<E>
 
 	public static class Builder<E>
 	{
-		private List<HeadingToPropertyId<E>> cols = new LinkedList<HeadingToPropertyId<E>>();
+		private List<HeadingToPropertyId> cols = new LinkedList<HeadingToPropertyId>();
 		private boolean autoExpandColumns = false;
 		private boolean eraseSavedConfig = false;
 
-		public HeadingPropertySet<E> build()
+		public HeadingPropertySet build()
 		{
-			final HeadingPropertySet<E> tmp = new HeadingPropertySet<E>();
+			final HeadingPropertySet tmp = new HeadingPropertySet();
 			tmp.cols = this.cols;
 			tmp.autoExpandColumns = autoExpandColumns;
 			tmp.eraseSavedConfig = eraseSavedConfig;
@@ -84,8 +84,7 @@ public class HeadingPropertySet<E>
 		public Builder<E> addColumn(final String heading, final String headingPropertyId,
 				final boolean defaultVisibleState, final boolean lockedState, final int width)
 		{
-			cols.add(new HeadingToPropertyId<E>(heading, headingPropertyId, null, defaultVisibleState, lockedState,
-					null));
+			cols.add(new HeadingToPropertyId(heading, headingPropertyId, null, defaultVisibleState, lockedState, null));
 			return this;
 		}
 
@@ -99,8 +98,7 @@ public class HeadingPropertySet<E>
 		public <T extends Object> Builder<E> addColumn(final String heading, final String headingPropertyId,
 				final boolean defaultVisibleState, final boolean lockedState)
 		{
-			cols.add(new HeadingToPropertyId<E>(heading, headingPropertyId, null, defaultVisibleState, lockedState,
-					null));
+			cols.add(new HeadingToPropertyId(heading, headingPropertyId, null, defaultVisibleState, lockedState, null));
 			return this;
 		}
 
@@ -134,7 +132,7 @@ public class HeadingPropertySet<E>
 				final ColumnGenerator columnGenerator, final boolean defaultVisibleState, final boolean lockedState,
 				final int width)
 		{
-			cols.add(new HeadingToPropertyId<E>(heading, headingPropertyId, columnGenerator, defaultVisibleState,
+			cols.add(new HeadingToPropertyId(heading, headingPropertyId, columnGenerator, defaultVisibleState,
 					lockedState, width));
 			return this;
 		}
@@ -150,7 +148,7 @@ public class HeadingPropertySet<E>
 		public Builder<E> addGeneratedColumn(final String heading, final String headingPropertyId,
 				final ColumnGenerator columnGenerator, final boolean defaultVisibleState, final boolean lockedState)
 		{
-			cols.add(new HeadingToPropertyId<E>(heading, headingPropertyId, columnGenerator, defaultVisibleState,
+			cols.add(new HeadingToPropertyId(heading, headingPropertyId, columnGenerator, defaultVisibleState,
 					lockedState, null));
 			return this;
 		}
@@ -419,7 +417,7 @@ public class HeadingPropertySet<E>
 
 	}
 
-	public List<HeadingToPropertyId<E>> getColumns()
+	public List<HeadingToPropertyId> getColumns()
 	{
 		return cols;
 	}
@@ -460,7 +458,7 @@ public class HeadingPropertySet<E>
 		try
 		{
 			final List<String> colsToShow = new LinkedList<String>();
-			for (HeadingToPropertyId<E> column : getColumns())
+			for (HeadingToPropertyId column : getColumns())
 			{
 				colsToShow.add(column.getPropertyId());
 				table.setColumnHeader(column.getPropertyId(), column.getHeader());
@@ -525,13 +523,20 @@ public class HeadingPropertySet<E>
 	{
 		final String keyStub = uniqueTableId + "-width";
 
-		for (HeadingToPropertyId<E> id : getColumns())
+		for (HeadingToPropertyId id : getColumns())
 		{
 			final String setWidth = UserSettingsStorageFactory.getUserSettingsStorage()
 					.get(keyStub + "-" + id.getPropertyId());
 			if (setWidth != null && setWidth.length() > 0)
 			{
-				table.setColumnWidth(id.getPropertyId(), Integer.parseInt(setWidth));
+				try
+				{
+					table.setColumnWidth(id.getPropertyId(), Integer.parseInt(setWidth));
+				}
+				catch (Exception e)
+				{
+					logger.warn(e);
+				}
 			}
 		}
 
@@ -612,7 +617,7 @@ public class HeadingPropertySet<E>
 	{
 		final String keyStub = uniqueTableId + "-visible";
 
-		for (HeadingToPropertyId<E> id : getColumns())
+		for (HeadingToPropertyId id : getColumns())
 		{
 			final String setVisible = UserSettingsStorageFactory.getUserSettingsStorage()
 					.get(keyStub + "-" + id.getPropertyId());

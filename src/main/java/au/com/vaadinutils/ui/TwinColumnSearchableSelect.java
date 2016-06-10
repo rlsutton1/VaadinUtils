@@ -235,7 +235,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 			private static final long serialVersionUID = 1L;
 
 			@Override
-			public HeadingPropertySet<C> getHeadingPropertySet()
+			public HeadingPropertySet getHeadingPropertySet()
 			{
 				return new HeadingPropertySet.Builder<C>().addColumn(availableColumnHeader, itemLabel).build();
 			}

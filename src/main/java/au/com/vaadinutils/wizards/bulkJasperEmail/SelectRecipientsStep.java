@@ -27,7 +27,7 @@ public class SelectRecipientsStep<C extends CrudEntity> implements WizardStep
 
 		EntityContainer<C> childContainer = wizardView.getChildContainer();
 		
-		HeadingPropertySet<C> headings = wizardView.getVisibleSelectColumns();
+		HeadingPropertySet headings = wizardView.getVisibleSelectColumns();
 		
 		selectableTable = new SelectableEntityTable<C>(childContainer, headings,this.getClass().getSimpleName());
 		selectableTable.setSizeFull();

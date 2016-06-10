@@ -23,7 +23,7 @@ public class ExampleLayout extends BaseCrudView<TblExample>
 	{
 		JPAContainer<TblExample> container = makeJPAContainer();
 
-		HeadingPropertySet<TblExample> headings = new HeadingPropertySet.Builder<TblExample>()
+		HeadingPropertySet headings = new HeadingPropertySet.Builder<TblExample>()
 				.addColumn("Name", "name").addColumn("Host", "host").addColumn("Type", "type").build();
 
 		init(TblExample.class, container, headings);

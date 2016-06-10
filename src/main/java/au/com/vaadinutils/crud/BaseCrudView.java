@@ -84,7 +84,7 @@ import au.com.vaadinutils.menu.Menus;
 public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 		implements RowChangeListener<E>, Selected<E>, DirtyListener, ButtonListener, ParentCrud<E>
 {
-  
+
 	private static transient Logger logger = LogManager.getLogger(BaseCrudView.class);
 	private static final long serialVersionUID = 1L;
 
@@ -131,7 +131,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 	private Button advancedSearchButton;
 	private Set<RowChangedListener<E>> rowChangedListeners = new CopyOnWriteArraySet<RowChangedListener<E>>();
 	private int minSearchTextLength = 0;
-	protected HeadingPropertySet<E> headings;
+	protected HeadingPropertySet headings;
 	private boolean dragAndDropOrderingEnabled = false;
 	private SingularAttribute<E, Long> ordinalField;
 	protected CrudAction<E> exportAction;
@@ -148,7 +148,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 		this.displayMode = mode;
 	}
 
-	protected void init(Class<E> entityClass, JPAContainer<E> container, HeadingPropertySet<E> headings)
+	protected void init(Class<E> entityClass, JPAContainer<E> container, HeadingPropertySet headings)
 	{
 		this.entityClass = entityClass;
 		this.container = container;
@@ -368,7 +368,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 		entityTable.addGeneratedColumn(idName, generator);
 	}
 
-	protected EntityList<E> getTable(JPAContainer<E> container, HeadingPropertySet<E> headings)
+	protected EntityList<E> getTable(JPAContainer<E> container, HeadingPropertySet headings)
 	{
 		return new EntityTable<E>(container, headings);
 	}

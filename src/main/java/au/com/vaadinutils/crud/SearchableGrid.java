@@ -91,7 +91,7 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 		}
 	}
 
-	abstract public GridHeadingPropertySet<E> getHeadingPropertySet();
+	abstract public GridHeadingPropertySet getHeadingPropertySet();
 
 	abstract public T getContainer();
 

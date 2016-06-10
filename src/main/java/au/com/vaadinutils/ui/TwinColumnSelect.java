@@ -141,7 +141,7 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 			private static final long serialVersionUID = 1L;
 
 			@Override
-			public GridHeadingPropertySet<C> getHeadingPropertySet()
+			public GridHeadingPropertySet getHeadingPropertySet()
 			{
 				return new GridHeadingPropertySet.Builder<C>()
 						.addColumn(availableColumnHeader, itemCaptionProperty.getName(), true, true).build();

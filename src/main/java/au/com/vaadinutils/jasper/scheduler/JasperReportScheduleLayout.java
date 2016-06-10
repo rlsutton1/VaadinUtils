@@ -91,7 +91,7 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 
 		JPAContainer<ReportEmailScheduleEntity> container = makeJPAContainer();
 
-		HeadingPropertySet<ReportEmailScheduleEntity> headings = new HeadingPropertySet.Builder<ReportEmailScheduleEntity>()
+		HeadingPropertySet headings = new HeadingPropertySet.Builder<ReportEmailScheduleEntity>()
 
 				.addGeneratedColumn("Status", getStatusColumnGenerator())
 				.addColumn("Report", ReportEmailScheduleEntity_.reportTitle)
@@ -144,7 +144,7 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 		this.scheduleCreater = creater;
 		JPAContainer<ReportEmailScheduleEntity> container = makeJPAContainer();
 
-		HeadingPropertySet<ReportEmailScheduleEntity> headings = new HeadingPropertySet.Builder<ReportEmailScheduleEntity>()
+		HeadingPropertySet headings = new HeadingPropertySet.Builder<ReportEmailScheduleEntity>()
 
 				.addColumn("Report", ReportEmailScheduleEntity_.reportTitle)
 				.addColumn("Subject", ReportEmailScheduleEntity_.subject)

@@ -157,7 +157,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 //	}
 
 	@Override
-	protected void init(Class<E> entityClass, JPAContainer<E> container, HeadingPropertySet<E> headings)
+	protected void init(Class<E> entityClass, JPAContainer<E> container, HeadingPropertySet headings)
 	{
 
 		setBogusParentFilter();

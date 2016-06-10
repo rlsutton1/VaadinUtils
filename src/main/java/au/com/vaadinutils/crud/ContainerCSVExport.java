@@ -19,11 +19,6 @@ import org.apache.logging.log4j.Logger;
 import org.jsoup.Jsoup;
 import org.jsoup.examples.HtmlToPlainText;
 
-import au.com.bytecode.opencsv.CSVWriter;
-import au.com.vaadinutils.fields.ClickableLabel;
-import au.com.vaadinutils.jasper.AttachmentType;
-import au.com.vaadinutils.util.PipedOutputStreamWrapper;
-
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.server.FileDownloader;
@@ -40,17 +35,22 @@ import com.vaadin.ui.Table.ColumnGenerator;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 
+import au.com.bytecode.opencsv.CSVWriter;
+import au.com.vaadinutils.fields.ClickableLabel;
+import au.com.vaadinutils.jasper.AttachmentType;
+import au.com.vaadinutils.util.PipedOutputStreamWrapper;
+
 public class ContainerCSVExport<E>
 {
 	// Logger logger = LogManager.getLogger();
 
 	PipedOutputStreamWrapper stream = new PipedOutputStreamWrapper();
 	Logger logger = LogManager.getLogger();
-	private HeadingPropertySet<E> headingsSet;
+	private HeadingPropertySet headingsSet;
 	private Table table;
 	private LinkedHashMap<String, Object> extraColumnHeadersAndPropertyIds;
 
-	public ContainerCSVExport(final String fileName, final Table table, final HeadingPropertySet<E> headingsSet)
+	public ContainerCSVExport(final String fileName, final Table table, final HeadingPropertySet headingsSet)
 	{
 
 		this.table = table;
@@ -150,15 +150,15 @@ public class ContainerCSVExport<E>
 		return downloadButton;
 	}
 
-	public void export(Table table, Writer stream, HeadingPropertySet<E> headingsSet) throws IOException
+	public void export(Table table, Writer stream, HeadingPropertySet headingsSet) throws IOException
 	{
 
 		CSVWriter writer = new CSVWriter(stream);
 
 		Map<String, Object> headerPropertyMap = new LinkedHashMap<>();
 
-		List<HeadingToPropertyId<E>> cols = headingsSet.getColumns();
-		for (HeadingToPropertyId<E> col : cols)
+		List<HeadingToPropertyId> cols = headingsSet.getColumns();
+		for (HeadingToPropertyId col : cols)
 		{
 			headerPropertyMap.put(col.getHeader(), col.getPropertyId());
 		}
@@ -198,11 +198,17 @@ public class ContainerCSVExport<E>
 				{
 					Object value = generator.generateCell(table, id, propertyId);
 					if (value instanceof Label)
+					{
 						value = new HtmlToPlainText().getPlainText(Jsoup.parse(((Label) value).getValue()));
+					}
 					if (value instanceof AbstractLayout)
+					{
 						value = new HtmlToPlainText().getPlainText(Jsoup.parse(itemProperty.getValue().toString()));
+					}
 					if (value != null)
+					{
 						values[i++] = value.toString();
+					}
 				}
 				else
 				{
@@ -263,8 +269,7 @@ public class ContainerCSVExport<E>
 
 	private void writeHeaders(CSVWriter writer, List<String> headers)
 	{
-		writer.writeNext(headers.toArray(new String[]
-		{}));
+		writer.writeNext(headers.toArray(new String[] {}));
 	}
 
 	/**

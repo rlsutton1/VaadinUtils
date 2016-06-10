@@ -103,7 +103,7 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 		});
 	}
 
-	abstract public HeadingPropertySet<E> getHeadingPropertySet();
+	abstract public HeadingPropertySet getHeadingPropertySet();
 
 	abstract public Filterable getContainer();
 

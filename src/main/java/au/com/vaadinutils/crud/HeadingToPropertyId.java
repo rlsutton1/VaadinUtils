@@ -3,7 +3,7 @@ package au.com.vaadinutils.crud;
 import com.google.gwt.thirdparty.guava.common.base.Preconditions;
 import com.vaadin.ui.Table.ColumnGenerator;
 
-public class HeadingToPropertyId<E>
+public class HeadingToPropertyId
 {
 	private final String heading;
 	private final String propertyId;
@@ -40,19 +40,19 @@ public class HeadingToPropertyId<E>
 		this.width = width;
 	}
 
-	public HeadingToPropertyId<E> setVisibleByDefault(final boolean defaultVisibleState)
+	public HeadingToPropertyId setVisibleByDefault(final boolean defaultVisibleState)
 	{
 		this.defaultVisibleState = defaultVisibleState;
 		return this;
 	}
 
-	public HeadingToPropertyId<E> setLocked()
+	public HeadingToPropertyId setLocked()
 	{
 		lockedState = true;
 		return this;
 	}
 
-	public HeadingToPropertyId<E> setWidth(final Integer width)
+	public HeadingToPropertyId setWidth(final Integer width)
 	{
 		this.width = width;
 		return this;

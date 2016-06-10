@@ -42,11 +42,11 @@ public class GridContainerCSVExport<E>
 {
 	PipedOutputStreamWrapper stream = new PipedOutputStreamWrapper();
 	Logger logger = LogManager.getLogger();
-	private GridHeadingPropertySet<E> headingsSet;
+	private GridHeadingPropertySet headingsSet;
 	private Grid grid;
 	private LinkedHashMap<String, Object> extraColumnHeadersAndPropertyIds;
 
-	public GridContainerCSVExport(final String fileName, final Grid grid, final GridHeadingPropertySet<E> headingsSet)
+	public GridContainerCSVExport(final String fileName, final Grid grid, final GridHeadingPropertySet headingsSet)
 	{
 
 		this.grid = grid;
@@ -146,15 +146,15 @@ public class GridContainerCSVExport<E>
 		return downloadButton;
 	}
 
-	public void export(Grid grid, Writer stream, GridHeadingPropertySet<E> headingsSet) throws IOException
+	public void export(Grid grid, Writer stream, GridHeadingPropertySet headingsSet) throws IOException
 	{
 
 		CSVWriter writer = new CSVWriter(stream);
 
 		Map<String, Object> headerPropertyMap = new LinkedHashMap<>();
 
-		List<GridHeadingToPropertyId<E>> cols = headingsSet.getColumns();
-		for (GridHeadingToPropertyId<E> col : cols)
+		List<GridHeadingToPropertyId> cols = headingsSet.getColumns();
+		for (GridHeadingToPropertyId col : cols)
 		{
 			headerPropertyMap.put(col.getHeader(), col.getPropertyId());
 		}
@@ -193,20 +193,32 @@ public class GridContainerCSVExport<E>
 				if (value != null)
 				{
 					if (value instanceof Label)
+					{
 						value = new HtmlToPlainText().getPlainText(Jsoup.parse(((Label) value).getValue()));
+					}
 					if (value instanceof AbstractLayout)
+					{
 						value = new HtmlToPlainText().getPlainText(Jsoup.parse(itemProperty.getValue().toString()));
+					}
 
 					if (value != null)
+					{
 						values[i++] = value.toString();
+					}
 					else
+					{
 						values[i++] = "";
+					}
 				}
 				else
+				{
 					values[i++] = "";
+				}
 			}
 			else
+			{
 				values[i++] = "";
+			}
 		}
 
 		for (Object columnId : extraColumnHeadersAndPropertyIds.values())
@@ -224,8 +236,7 @@ public class GridContainerCSVExport<E>
 
 	private void writeHeaders(CSVWriter writer, List<String> headers)
 	{
-		writer.writeNext(headers.toArray(new String[]
-		{}));
+		writer.writeNext(headers.toArray(new String[] {}));
 	}
 
 	/**

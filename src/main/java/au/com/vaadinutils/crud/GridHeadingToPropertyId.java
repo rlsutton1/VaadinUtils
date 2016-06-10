@@ -3,7 +3,7 @@ package au.com.vaadinutils.crud;
 import com.google.gwt.thirdparty.guava.common.base.Preconditions;
 import com.vaadin.data.util.PropertyValueGenerator;
 
-public class GridHeadingToPropertyId<E>
+public class GridHeadingToPropertyId
 {
 	private final String heading;
 	private final String propertyId;
@@ -28,8 +28,9 @@ public class GridHeadingToPropertyId<E>
 	 * @param width
 	 *            the width of the column
 	 */
-	GridHeadingToPropertyId(final String heading, final String propertyId, final PropertyValueGenerator<?> columnGenerator,
-			final boolean defaultVisibleState, final boolean lockedState, final Integer width)
+	GridHeadingToPropertyId(final String heading, final String propertyId,
+			final PropertyValueGenerator<?> columnGenerator, final boolean defaultVisibleState,
+			final boolean lockedState, final Integer width)
 	{
 		Preconditions.checkNotNull(propertyId);
 		this.heading = heading;
@@ -40,19 +41,66 @@ public class GridHeadingToPropertyId<E>
 		this.width = width;
 	}
 
-	public GridHeadingToPropertyId<E> setVisibleByDefault(final boolean defaultVisibleState)
+	static final class Builder
+	{
+		private final String heading;
+		private final String propertyId;
+		private PropertyValueGenerator<?> columnGenerator = null;
+		private Integer width;
+		private boolean defaultVisibleState = true;
+		private boolean lockedState = false;
+
+		Builder(String heading, String propertyId)
+		{
+			this.heading = heading;
+			this.propertyId = propertyId;
+		}
+
+		GridHeadingToPropertyId build()
+		{
+			return new GridHeadingToPropertyId(heading, propertyId, columnGenerator, defaultVisibleState, lockedState,
+					width);
+		}
+
+		public Builder setLockedState(boolean lockedState)
+		{
+			this.lockedState = lockedState;
+			return this;
+		}
+
+		public Builder setDefaultVisibleState(boolean defaultVisibleState)
+		{
+			this.defaultVisibleState = defaultVisibleState;
+			return this;
+		}
+
+		public Builder setWidth(Integer width)
+		{
+			this.width = width;
+			return this;
+		}
+
+		public Builder setColumnGenerator(PropertyValueGenerator<?> columnGenerator)
+		{
+			this.columnGenerator = columnGenerator;
+			return this;
+		}
+
+	}
+
+	public GridHeadingToPropertyId setVisibleByDefault(final boolean defaultVisibleState)
 	{
 		this.defaultVisibleState = defaultVisibleState;
 		return this;
 	}
 
-	public GridHeadingToPropertyId<E> setLocked()
+	public GridHeadingToPropertyId setLocked()
 	{
 		lockedState = true;
 		return this;
 	}
 
-	public GridHeadingToPropertyId<E> setWidth(final Integer width)
+	public GridHeadingToPropertyId setWidth(final Integer width)
 	{
 		this.width = width;
 		return this;

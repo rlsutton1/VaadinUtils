@@ -15,7 +15,7 @@ public class SelectableEntityTable<E> extends TableCheckBoxSelect
 	private static final long serialVersionUID = 1L;
 	private String uniqueId;
 
-	public SelectableEntityTable(Container.Filterable childContainer, HeadingPropertySet<E> headingPropertySet,
+	public SelectableEntityTable(Container.Filterable childContainer, HeadingPropertySet headingPropertySet,
 			String uniqueId)
 	{
 		super();
@@ -33,7 +33,7 @@ public class SelectableEntityTable<E> extends TableCheckBoxSelect
 	 * @param headingPropertySet2
 	 * @return
 	 */
-	private void buildSelectableContainer(HeadingPropertySet<E> visibleColumns)
+	private void buildSelectableContainer(HeadingPropertySet visibleColumns)
 	{
 		visibleColumns.applyToTable(this, uniqueId);
 
