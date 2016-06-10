@@ -24,12 +24,10 @@ import com.vaadin.data.Property;
 import com.vaadin.server.FileDownloader;
 import com.vaadin.server.StreamResource;
 import com.vaadin.server.StreamResource.StreamSource;
-import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
@@ -192,15 +190,15 @@ public class GridContainerCSVExport<E>
 				Object value = itemProperty.getValue();
 				if (value != null)
 				{
-					if (value instanceof Label)
-						value = new HtmlToPlainText().getPlainText(Jsoup.parse(((Label) value).getValue()));
-					if (value instanceof AbstractLayout)
-						value = new HtmlToPlainText().getPlainText(Jsoup.parse(itemProperty.getValue().toString()));
-
-					if (value != null)
-						values[i++] = value.toString();
+					if (value instanceof String)
+						value = new HtmlToPlainText().getPlainText(Jsoup.parse((String) value.toString()));
 					else
-						values[i++] = "";
+						value = value.toString();
+					
+					if (value == null)
+						value = "";
+
+					values[i++] = (String) value;
 				}
 				else
 					values[i++] = "";
