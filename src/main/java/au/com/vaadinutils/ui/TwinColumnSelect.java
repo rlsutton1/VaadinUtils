@@ -118,7 +118,7 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 				}
 			}
 		});
-	} 
+	}
 
 	private BeanContainer<Long, C> createSelectedContainer()
 	{
@@ -134,7 +134,7 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 		return selectedBeans;
 	}
 
-	private void createAvailableGrid()
+	protected void createAvailableGrid()
 	{
 		createAvailableContainer();
 		// TODO: Add proper uniqueId
@@ -554,6 +554,16 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 	public void setAvailableColumnHeader(String availableColumnHeader)
 	{
 		this.availableColumnHeader = availableColumnHeader;
+	}
+
+	public SearchableGrid<C, JPAContainer<C>> getAvailableGrid()
+	{
+		return availableGrid;
+	}
+
+	public void setAvailableGrid(SearchableGrid<C, JPAContainer<C>> availableGrid)
+	{
+		this.availableGrid = availableGrid;
 	}
 
 	public String getSelectedColumnHeader()
