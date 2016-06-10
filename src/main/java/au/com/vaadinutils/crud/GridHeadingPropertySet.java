@@ -38,9 +38,9 @@ public class GridHeadingPropertySet<E>
 	// Set to true if you would like to defer loading settings until applySettingsToColumns is called
 	private boolean deferLoadSettings = false;
 
-	private GridHeadingPropertySet()
+	public GridHeadingPropertySet(final List<GridHeadingToPropertyId<E>> cols)
 	{
-		// use the builder!
+		this.cols = cols;
 	}
 
 	public static <E> Builder<E> getBuilder(Class<E> Class)
@@ -54,10 +54,7 @@ public class GridHeadingPropertySet<E>
 
 		public GridHeadingPropertySet<E> build()
 		{
-			final GridHeadingPropertySet<E> tmp = new GridHeadingPropertySet<E>();
-			tmp.cols = this.cols;
-
-			return tmp;
+			return new GridHeadingPropertySet<E>(cols);
 		}
 
 		/* Add column methods */
