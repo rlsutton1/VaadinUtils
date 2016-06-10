@@ -30,16 +30,13 @@ import au.com.vaadinutils.user.UserSettingsStorageFactory;
 
 public class GridHeadingPropertySet
 {
-	private List<GridHeadingToPropertyId> cols = new LinkedList<GridHeadingToPropertyId>();
-
 	private Logger logger = LogManager.getLogger();
-
+	private List<GridHeadingToPropertyId> cols = new LinkedList<GridHeadingToPropertyId>();
 	private boolean eraseSavedConfig = false;
 	private Grid grid;
 	private String uniqueId;
 
-	// Set to true if you would like to defer loading settings until
-	// applySettingsToColumns is called
+	// Set to true if you would like to defer loading settings until applySettingsToColumns is called
 	private boolean deferLoadSettings = false;
 
 	public GridHeadingPropertySet(final List<GridHeadingToPropertyId> cols)
@@ -421,14 +418,12 @@ public class GridHeadingPropertySet
 		 *            - the format for the Date. format is passed to a
 		 *            SimpleDateFormat
 		 */
-		// public Builder<E> addColumn(String headingLabel, SingularAttribute<E,
-		// Date> column, String dateFormat,
-		// int width)
-		// {
-		// return addGeneratedColumn(headingLabel, column.getName(),
-		// new DateColumnGenerator<E>(column.getName(), dateFormat), true,
-		// false, width);
-		// }
+		//		public Builder<E> addColumn(String headingLabel, SingularAttribute<E, Date> column, String dateFormat,
+		//				int width)
+		//		{
+		//			return addGeneratedColumn(headingLabel, column.getName(),
+		//					new DateColumnGenerator<E>(column.getName(), dateFormat), true, false, width);
+		//		}
 
 		/**
 		 * Add a date column and format it.
@@ -441,19 +436,17 @@ public class GridHeadingPropertySet
 		 *            - the format for the Date. format is passed to a
 		 *            SimpleDateFormat
 		 */
-		// public Builder<E> addColumn(String headingLabel, String
-		// headingPropertyId, String dateFormat, int width)
-		// {
-		// // We make the alias the same as the underlying property so that we
-		// // can sort this column.
-		// // Generated columns are not normally sortable however by mapping
-		// // our generated column to the underlying date column our generated
-		// // column becomes sortable.
-		// return addGeneratedColumn(headingLabel, headingPropertyId,
-		// new DateColumnGenerator<E>(headingPropertyId, dateFormat), true,
-		// false, width);
+		//		public Builder<E> addColumn(String headingLabel, String headingPropertyId, String dateFormat, int width)
+		//		{
+		//			// We make the alias the same as the underlying property so that we
+		//			// can sort this column.
+		//			// Generated columns are not normally sortable however by mapping
+		//			// our generated column to the underlying date column our generated
+		//			// column becomes sortable.
+		//			return addGeneratedColumn(headingLabel, headingPropertyId,
+		//					new DateColumnGenerator<E>(headingPropertyId, dateFormat), true, false, width);
 		//
-		// }
+		//		}
 
 	}
 
@@ -464,59 +457,57 @@ public class GridHeadingPropertySet
 	 *
 	 * @param <E>
 	 */
-	// static class DateColumnGenerator<E> implements ColumnGenerator
-	// {
-	// private static final long serialVersionUID = 1;
-	// private Logger logger = LogManager.getLogger();
+	//	static class DateColumnGenerator<E> implements ColumnGenerator
+	//	{
+	//		private static final long serialVersionUID = 1;
+	//		private Logger logger = LogManager.getLogger();
 	//
-	// final private SimpleDateFormat sdf;
-	// final private SimpleDateFormat sdfParse = new
-	// SimpleDateFormat("yyyy-MM-dd");
-	// final private String headingPropertyId;
+	//		final private SimpleDateFormat sdf;
+	//		final private SimpleDateFormat sdfParse = new SimpleDateFormat("yyyy-MM-dd");
+	//		final private String headingPropertyId;
 	//
-	// DateColumnGenerator(String headingPropertyId, String format)
-	// {
-	// this.headingPropertyId = headingPropertyId;
-	// this.sdf = new SimpleDateFormat(format);
-	// }
+	//		DateColumnGenerator(String headingPropertyId, String format)
+	//		{
+	//			this.headingPropertyId = headingPropertyId;
+	//			this.sdf = new SimpleDateFormat(format);
+	//		}
 	//
-	// @Override
-	// public Object generateCell(Table source, Object itemId, Object columnId)
-	// {
-	// Item item = source.getItem(itemId);
+	//		@Override
+	//		public Object generateCell(Table source, Object itemId, Object columnId)
+	//		{
+	//			Item item = source.getItem(itemId);
 	//
-	// Object objDate = item.getItemProperty(headingPropertyId).getValue();
+	//			Object objDate = item.getItemProperty(headingPropertyId).getValue();
 	//
-	// String formattedDate = "";
+	//			String formattedDate = "";
 	//
-	// if (objDate instanceof Date)
-	// {
-	// formattedDate = sdf.format((Date) objDate);
-	// }
-	// else if (objDate != null)
-	// {
-	// String strDate = objDate.toString();
-	// try
-	// {
-	// formattedDate = sdf.format(sdfParse.parse(strDate));
-	// }
-	// catch (ParseException e)
-	// {
-	// // just so we have a value.
-	// formattedDate = "Invalid";
-	// logger.error(
-	// "Looks like our assumptions about the format of dates is wrong. Please
-	// update the parse format to match:"
-	// + strDate +" "+sdf.toPattern());
-	// }
-	// }
+	//			if (objDate instanceof Date)
+	//			{
+	//				formattedDate = sdf.format((Date) objDate);
+	//			}
+	//			else if (objDate != null)
+	//			{
+	//				String strDate = objDate.toString();
+	//				try
+	//				{
+	//					formattedDate = sdf.format(sdfParse.parse(strDate));
+	//				}
+	//				catch (ParseException e)
+	//				{
+	//					// just so we have a value.
+	//					formattedDate = "Invalid";
+	//					logger.error(
+	//							"Looks like our assumptions about the format of dates is wrong. Please update the parse format to match:"
+	//									+ strDate +" "+sdf.toPattern());
+	//				}
+	//			}
 	//
-	// Label label = new Label(formattedDate);
+	//			Label label = new Label(formattedDate);
 	//
-	// return label;
-	// }
+	//			return label;
+	//		}
 	//
-	// }
+	//	}
 
 	public List<GridHeadingToPropertyId> getColumns()
 	{
@@ -671,11 +662,20 @@ public class GridHeadingPropertySet
 
 		for (GridHeadingToPropertyId id : getColumns())
 		{
-			final String setWidth = UserSettingsStorageFactory.getUserSettingsStorage()
-					.get(keyStub + "-" + id.getPropertyId());
+			final String setting = keyStub + "-" + id.getPropertyId();
+			final String setWidth = UserSettingsStorageFactory.getUserSettingsStorage().get(setting);
 			if (setWidth != null && setWidth.length() > 0)
 			{
-				grid.getColumn(id.getPropertyId()).setWidth(Double.parseDouble(setWidth));
+				try
+				{
+					final Double width = Double.parseDouble(setWidth);
+					if (width > 0)
+						grid.getColumn(id.getPropertyId()).setWidth(Double.parseDouble(setWidth));
+				}
+				catch (NumberFormatException e)
+				{
+					logger.error("Invalid width setting for " + setting);
+				}
 			}
 		}
 
