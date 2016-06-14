@@ -2,6 +2,7 @@ package au.com.vaadinutils.crud;
 
 import com.google.gwt.thirdparty.guava.common.base.Preconditions;
 import com.vaadin.data.util.PropertyValueGenerator;
+import com.vaadin.ui.Grid.AbstractRenderer;
 
 public class GridHeadingToPropertyId
 {
@@ -11,6 +12,8 @@ public class GridHeadingToPropertyId
 	private Integer width;
 	private boolean defaultVisibleState = true;
 	private boolean lockedState = false;
+
+	private AbstractRenderer<?> renderer = null;
 
 	/**
 	 * Instantiates a new heading to property id.
@@ -49,6 +52,7 @@ public class GridHeadingToPropertyId
 		private Integer width;
 		private boolean defaultVisibleState = true;
 		private boolean lockedState = false;
+		private AbstractRenderer<?> renderer = null;
 
 		Builder(String heading, String propertyId)
 		{
@@ -58,8 +62,10 @@ public class GridHeadingToPropertyId
 
 		GridHeadingToPropertyId build()
 		{
-			return new GridHeadingToPropertyId(heading, propertyId, columnGenerator, defaultVisibleState, lockedState,
-					width);
+			GridHeadingToPropertyId tmp = new GridHeadingToPropertyId(heading, propertyId, columnGenerator,
+					defaultVisibleState, lockedState, width);
+			tmp.setRenderer(renderer);
+			return tmp;
 		}
 
 		public Builder setLockedState(boolean lockedState)
@@ -86,12 +92,25 @@ public class GridHeadingToPropertyId
 			return this;
 		}
 
+		public Builder setRenderer(AbstractRenderer<?> renderer)
+		{
+			this.renderer = renderer;
+			return this;
+
+		}
+
 	}
 
 	public GridHeadingToPropertyId setVisibleByDefault(final boolean defaultVisibleState)
 	{
 		this.defaultVisibleState = defaultVisibleState;
 		return this;
+	}
+
+	public void setRenderer(AbstractRenderer<?> renderer)
+	{
+		this.renderer = renderer;
+
 	}
 
 	public GridHeadingToPropertyId setLocked()
@@ -145,5 +164,10 @@ public class GridHeadingToPropertyId
 	public boolean isLocked()
 	{
 		return lockedState;
+	}
+
+	public AbstractRenderer<?> getRenderer()
+	{
+		return renderer;
 	}
 }

@@ -38,7 +38,7 @@ public class HeadingPropertySet
 
 	private boolean eraseSavedConfig = false;
 
-	public HeadingPropertySet()
+	private HeadingPropertySet()
 	{
 		// use the builder!
 	}
@@ -48,14 +48,39 @@ public class HeadingPropertySet
 		return new Builder<E>();
 	}
 
-	public static class Builder<E>
+	interface Start<E>
+	{
+		public AddingColumn<E> createColumn(String heading, String propertyId);
+
+		public <T> AddingColumn<E> createColumn(String heading, SingularAttribute<E, T> headingPropertyId);
+
+		public HeadingPropertySet build();
+	}
+
+	public interface AddingColumn<E>
+	{
+
+		public AddingColumn<E> setLockedState(boolean lockedState);
+
+		public AddingColumn<E> setDefaultVisibleState(boolean defaultVisibleState);
+
+		public AddingColumn<E> setWidth(Integer width);
+
+		public AddingColumn<E> setColumnGenerator(ColumnGenerator columnGenerator);
+
+	}
+
+	public static class Builder<E> implements AddingColumn<E>, Start<E>
 	{
 		private List<HeadingToPropertyId> cols = new LinkedList<HeadingToPropertyId>();
 		private boolean autoExpandColumns = false;
 		private boolean eraseSavedConfig = false;
 
+		@Override
 		public HeadingPropertySet build()
 		{
+			addColumn();
+
 			final HeadingPropertySet tmp = new HeadingPropertySet();
 			tmp.cols = this.cols;
 			tmp.autoExpandColumns = autoExpandColumns;
@@ -85,6 +110,68 @@ public class HeadingPropertySet
 				final boolean defaultVisibleState, final boolean lockedState, final int width)
 		{
 			cols.add(new HeadingToPropertyId(heading, headingPropertyId, null, defaultVisibleState, lockedState, null));
+			return this;
+		}
+
+		HeadingToPropertyId.Builder columnBuilder = null;
+
+		@Override
+		public AddingColumn<E> createColumn(String heading, String propertyId)
+		{
+
+			addColumn();
+
+			columnBuilder = new HeadingToPropertyId.Builder(heading, propertyId);
+			return this;
+		}
+
+		@Override
+		public <T> AddingColumn<E> createColumn(String heading, SingularAttribute<E, T> headingPropertyId)
+		{
+
+			addColumn();
+
+			columnBuilder = new HeadingToPropertyId.Builder(heading, headingPropertyId.getName());
+			return this;
+
+		}
+
+		private Builder<E> addColumn()
+		{
+			if (columnBuilder != null)
+			{
+				cols.add(columnBuilder.build());
+			}
+			// fail fast rather than have weird behaviour
+			columnBuilder = null;
+			return this;
+		}
+
+		@Override
+		public AddingColumn<E> setLockedState(boolean lockedState)
+		{
+			columnBuilder.setLockedState(lockedState);
+			return this;
+		}
+
+		@Override
+		public AddingColumn<E> setDefaultVisibleState(boolean defaultVisibleState)
+		{
+			columnBuilder.setDefaultVisibleState(defaultVisibleState);
+			return this;
+		}
+
+		@Override
+		public AddingColumn<E> setWidth(Integer width)
+		{
+			columnBuilder.setWidth(width);
+			return this;
+		}
+
+		@Override
+		public AddingColumn<E> setColumnGenerator(ColumnGenerator columnGenerator)
+		{
+			columnBuilder.setColumnGenerator(columnGenerator);
 			return this;
 		}
 

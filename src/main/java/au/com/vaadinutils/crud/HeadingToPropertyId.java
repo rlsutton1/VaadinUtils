@@ -5,6 +5,7 @@ import com.vaadin.ui.Table.ColumnGenerator;
 
 public class HeadingToPropertyId
 {
+
 	private final String heading;
 	private final String propertyId;
 	private final ColumnGenerator columnGenerator;
@@ -38,6 +39,53 @@ public class HeadingToPropertyId
 		this.defaultVisibleState = defaultVisibleState;
 		this.lockedState = lockedState;
 		this.width = width;
+	}
+
+	static final class Builder
+	{
+		private final String heading;
+		private final String propertyId;
+		private ColumnGenerator columnGenerator = null;
+		private Integer width;
+		private boolean defaultVisibleState = true;
+		private boolean lockedState = false;
+
+		Builder(String heading, String propertyId)
+		{
+			this.heading = heading;
+			this.propertyId = propertyId;
+		}
+
+		HeadingToPropertyId build()
+		{
+			return new HeadingToPropertyId(heading, propertyId, columnGenerator, defaultVisibleState, lockedState,
+					width);
+		}
+
+		public Builder setLockedState(boolean lockedState)
+		{
+			this.lockedState = lockedState;
+			return this;
+		}
+
+		public Builder setDefaultVisibleState(boolean defaultVisibleState)
+		{
+			this.defaultVisibleState = defaultVisibleState;
+			return this;
+		}
+
+		public Builder setWidth(Integer width)
+		{
+			this.width = width;
+			return this;
+		}
+
+		public Builder setColumnGenerator(ColumnGenerator columnGenerator)
+		{
+			this.columnGenerator = columnGenerator;
+			return this;
+		}
+
 	}
 
 	public HeadingToPropertyId setVisibleByDefault(final boolean defaultVisibleState)
