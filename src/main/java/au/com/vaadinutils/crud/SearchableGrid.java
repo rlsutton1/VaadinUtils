@@ -313,6 +313,11 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 		grid.deselectAll();
 	}
 
+	public SelectionModel getSelectionModel()
+	{
+		return grid.getSelectionModel();
+	}
+
 	public SelectionModel setSelectionMode(SelectionMode selectionMode)
 	{
 		return grid.setSelectionMode(selectionMode);
