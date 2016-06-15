@@ -54,9 +54,11 @@ public class GridContainerCSVExport<E>
 		window.center();
 		window.setHeight("100");
 		window.setWidth("300");
+		window.setResizable(false);
 		window.setModal(true);
 
-		HorizontalLayout layout = new HorizontalLayout();
+		final HorizontalLayout layout = new HorizontalLayout();
+		layout.setSizeFull();
 		layout.setMargin(true);
 
 		window.setContent(layout);
@@ -68,9 +70,6 @@ public class GridContainerCSVExport<E>
 
 		layout.addComponent(downloadButton);
 		layout.setComponentAlignment(downloadButton, Alignment.MIDDLE_CENTER);
-
-		layout.addComponent(downloadButton);
-
 	}
 
 	private Button createDownloadButton(final String fileName, final Window window)
