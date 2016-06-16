@@ -27,6 +27,9 @@ import org.vaadin.addons.lazyquerycontainer.EntityContainer;
 import com.google.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 
+import au.com.vaadinutils.entity.BaseCrudEntity;
+import au.com.vaadinutils.entity.BaseCrudEntity_;
+
 public class JpaBaseDao<E, K> implements Dao<E, K>
 {
 	protected Class<E> entityClass;
@@ -646,6 +649,21 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 	public JpaDslBuilder<E> jpaContainerDelegate(CriteriaQuery<E> criteria)
 	{
 		return new JpaDslBuilder<E>(criteria, entityClass);
+	}
+
+	@SuppressWarnings("unchecked")
+	public <K extends BaseCrudEntity> K findByEntityId(K entity)
+	{
+		if (entity.getId() != null)
+		{
+			// lookup by id
+			return (K) getEntityManager().find(entityClass, entity.getId());
+		}
+
+		// lookup by guid
+		JpaDslBuilder<K> q = (JpaDslBuilder<K>) find();
+		return q.where(q.eq(BaseCrudEntity_.guid, entity.getGuid())).getSingleResultOrNull();
+
 	}
 
 	public class FindBuilder

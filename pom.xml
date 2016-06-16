@@ -104,9 +104,9 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                        <additionalparam>${javadoc.opts}</additionalparam>
-                </configuration>
+				<configuration>
+					<additionalparam>${javadoc.opts}</additionalparam>
+				</configuration>
 				<executions>
 					<execution>
 						<id>attach-javadocs</id>
@@ -368,9 +368,9 @@
 		</dependency>
 
 		<dependency>
-   			<groupId>org.vaadin.addons</groupId>
-   			<artifactId>legacycombobox</artifactId>
-   			<version>0.1.4</version>
+			<groupId>org.vaadin.addons</groupId>
+			<artifactId>legacycombobox</artifactId>
+			<version>0.1.4</version>
 		</dependency>
 		<dependency>
 			<groupId>org.vaadin.addons</groupId>
@@ -382,20 +382,31 @@
 			<artifactId>gridextensionpack</artifactId>
 			<version>1.0.0</version>
 		</dependency>
+		<dependency>
+			<groupId>de.datenhahn.vaadin</groupId>
+			<artifactId>componentrenderer</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.vaadin.addons</groupId>
+			<artifactId>vaadin-sliderpanel</artifactId>
+			<version>1.3.0</version>
+		</dependency>
 
 	</dependencies>
 
-<profiles>
-    <profile>
-      <id>doclint-java8-disable</id>
-      <activation>
-        <jdk>[1.8,)</jdk>
-      </activation>
-      <properties>
-        <javadoc.opts>-Xdoclint:none</javadoc.opts>
-      </properties>
-    </profile>
-  </profiles>
+	<profiles>
+		<profile>
+			<id>doclint-java8-disable</id>
+			<activation>
+				<jdk>[1.8,)</jdk>
+			</activation>
+			<properties>
+				<javadoc.opts>-Xdoclint:none</javadoc.opts>
+			</properties>
+		</profile>
+	</profiles>
 
 
 </project>
