@@ -190,17 +190,25 @@ public class GridContainerCSVExport<E>
 				if (value != null)
 				{
 					if (value instanceof String)
-						value = new HtmlToPlainText().getPlainText(Jsoup.parse((String) value.toString()));
+					{
+						value = new HtmlToPlainText().getPlainText(Jsoup.parse(value.toString()));
+					}
 					else
+					{
 						value = value.toString();
+					}
 
 					if (value == null)
+					{
 						value = "";
+					}
 
 					values[i++] = (String) value;
 				}
 				else
+				{
 					values[i++] = "";
+				}
 			}
 		}
 
@@ -219,8 +227,7 @@ public class GridContainerCSVExport<E>
 
 	private void writeHeaders(CSVWriter writer, List<String> headers)
 	{
-		writer.writeNext(headers.toArray(new String[]
-		{}));
+		writer.writeNext(headers.toArray(new String[] {}));
 	}
 
 	/**
