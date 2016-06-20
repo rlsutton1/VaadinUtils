@@ -1,9 +1,13 @@
 package au.com.vaadinutils.js;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.vaadin.ui.JavaScript;
 import com.vaadin.ui.JavaScriptFunction;
 
 import au.com.vaadinutils.dao.JpaEntityHelper;
+import au.com.vaadinutils.errorHandling.ErrorWindow;
 import elemental.json.JsonArray;
 
 public class JSCallWithReturnValue
@@ -12,6 +16,10 @@ public class JSCallWithReturnValue
 
 	private String hookName;
 	private String jsToExecute;
+	private String errorHookName;
+
+	Logger logger = LogManager.getLogger();
+	private Exception trace;
 
 	/**
 	 * 
@@ -36,6 +44,7 @@ public class JSCallWithReturnValue
 	public JSCallWithReturnValue(final String jsToExecute)
 	{
 		this.hookName = "callback" + JpaEntityHelper.getGuid().replace("-", "_");
+		this.errorHookName = "error" + JpaEntityHelper.getGuid().replace("-", "_");
 		this.jsToExecute = jsToExecute;
 
 	}
@@ -51,12 +60,22 @@ public class JSCallWithReturnValue
 			@Override
 			public void call(JsonArray arguments)
 			{
-				callback.callback(arguments.getBoolean(0));
-				JavaScript.getCurrent().removeFunction(hookName);
+				try
+				{
+					callback.callback(arguments.getBoolean(0));
+					JavaScript.getCurrent().removeFunction(hookName);
+					logger.warn("Responded");
+				}
+				catch (Exception e)
+				{
+					logger.error(e.getMessage());
+					logger.error(trace, trace);
+				}
 			}
 		});
 
-		final String wrappedJs = wrapJSInTryCatch(jsToExecute, hookName);
+		final String wrappedJs = wrapJSInTryCatch(jsToExecute);
+		setupErrorHook();
 		JavaScript.getCurrent().execute(wrappedJs);
 	}
 
@@ -73,19 +92,108 @@ public class JSCallWithReturnValue
 			{
 				callback.callback(null);
 				JavaScript.getCurrent().removeFunction(hookName);
+				JavaScript.getCurrent().removeFunction(errorHookName);
+				logger.warn("Responded");
+
+			}
+		});
+		setupErrorHook();
+		JavaScript.getCurrent().execute(wrapJSInTryCatch(jsToExecute));
+	}
+
+	private void setupErrorHook()
+	{
+		trace = new JavaScriptException("Java Script Invoked From Here, JS:" + jsToExecute);
+
+		final JavaScriptCallback<String> callback = new JavaScriptCallback<String>()
+		{
+
+			@Override
+			public void callback(String value)
+			{
+
+				JavaScript.getCurrent().removeFunction(hookName);
+				JavaScript.getCurrent().removeFunction(errorHookName);
+				logger.error(jsToExecute + " -> resulted in the error: " + value, trace);
+				Exception ex = new JavaScriptException(trace.getMessage() + " , JS Cause: " + value, trace);
+				ErrorWindow.showErrorWindow(ex);
+
+			}
+		};
+
+		JavaScript.getCurrent().addFunction(errorHookName, new JavaScriptFunction()
+		{
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void call(JsonArray arguments)
+			{
+				callback.callback(arguments.getString(0));
+				JavaScript.getCurrent().removeFunction(hookName);
+				JavaScript.getCurrent().removeFunction(errorHookName);
 
 			}
 		});
 
-		JavaScript.getCurrent().execute(wrapJSInTryCatch(jsToExecute, hookName));
 	}
 
-	private String wrapJSInTryCatch(String js, String hookName)
+	private String wrapJSInTryCatch(String js)
 	{
-		return "try{" + hookName + "(" + js + ");}"
+		js = js.trim();
+		if (js.endsWith(";"))
+		{
+			js = js.substring(0, js.length() - 1);
+		}
+
+		final String wrapped = "try{" + hookName + "(" + js + ");}"
 
 				+ "catch(err)"
 
-				+ "{alert(err);};";
+				+ "{console.error(err);" + errorHookName + "(err.message);};";
+		logger.error(wrapped);
+
+		return wrapped;
+	}
+
+	void callBlind(final JavaScriptCallback<Void> javaScriptCallback)
+	{
+		JavaScript.getCurrent().addFunction(hookName, new JavaScriptFunction()
+		{
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void call(JsonArray arguments)
+			{
+				javaScriptCallback.callback(null);
+				JavaScript.getCurrent().removeFunction(hookName);
+				JavaScript.getCurrent().removeFunction(errorHookName);
+				logger.warn("Responded");
+
+			}
+		});
+		setupErrorHook();
+		JavaScript.getCurrent().execute(wrapJSInTryCatchBlind(jsToExecute));
+
+	}
+
+	private String wrapJSInTryCatchBlind(String js)
+	{
+
+		js = js.trim();
+		if (js.endsWith(";"))
+		{
+			js = js.substring(0, js.length() - 1);
+		}
+
+		final String wrapped = "try{" + js + ";" + hookName + "();}"
+
+				+ "catch(err)"
+
+				+ "{console.error(err);" + errorHookName + "(err.message);};";
+
+		// logger.error(wrapped);
+		return wrapped;
 	}
 }
