@@ -15,6 +15,7 @@ import com.vaadin.addon.jpacontainer.QueryModifierDelegate;
 import com.vaadin.addon.jpacontainer.fieldfactory.MultiSelectConverter;
 import com.vaadin.data.Container;
 import com.vaadin.data.Container.Filter;
+import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.Validator;
@@ -363,7 +364,14 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 			for (Long id : ids)
 			{
 				ctr++;
-				selection += "" + table.getItem(id).getItemProperty(displayField.getName()) + ",";
+				final Item item = table.getItem(id);
+
+				// we get nulls if the entity is deleted from the database after
+				// the report parameter is saved
+				if (item != null)
+				{
+					selection += "" + item.getItemProperty(displayField.getName()) + ",";
+				}
 				if (ctr > 2)
 				{
 					break;
