@@ -1,0 +1,82 @@
+    .gridstack-wrapper {
+    .v-panel-content {
+      background: #DDD;
+      padding-top: 1em;
+      padding-bottom: 1em;
+    }
+  }
+    .grid-stack-item-content {
+    border: 1px solid silver;
+    box-sizing: border-box;
+    background: white;
+    box-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+
+    // Valo has so big padding, that scaling done when inside gridstack might be good idea
+    .v-verticallayout {
+      &.v-margin-top {
+        padding-top: 10px;
+      }
+      &.v-margin-left {
+        padding-left: 10px;
+      }
+      &.v-margin-bottom {
+        padding-bottom: 10px;
+      }
+      &.v-margin-right {
+        padding-right: 10px;
+      }
+    }
+
+    > .v-label {
+      padding-left: 0.3em;
+      padding-top: 0.2em;
+    }
+  }
+
+  // Usually good idea to have this, to avoid grid-stack sizing itself smaller than it should
+  .v-panel-content > .grid-stack {
+    min-height: 100%;
+  }
+
+  // Just a example how to define columns styling if more than 8 columns
+  .grid-stack.eight-column-grid-stack {
+    //@include gridstacklayout-columns(8);
+  }
+
+  .image-wrapper {
+    background: #333;
+
+    img {
+      border: 1px rgba(255,255,255,0.4) solid;
+      margin-left: auto;
+      margin-right: auto;
+      display: block;
+    }
+  }
+
+  .eventconsole-wrapper {
+    background: #333;
+    color: white;
+
+    .v-captiontext {
+       margin-left: 25px;
+    }
+  }
+
+  .hep-layout {
+    padding-top: 0.1em;
+    padding-left: 0.3em;
+
+    .v-label {
+      padding-bottom: 0.2em;
+    }
+  }
+
+  .grid-stack-item-content > .v-label {
+    padding: 0.5em 0.5em;
+  }
+
+  .info-text {
+    font-size: 80%;
+  }
+  
