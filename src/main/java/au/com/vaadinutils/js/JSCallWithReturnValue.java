@@ -1,8 +1,15 @@
 package au.com.vaadinutils.js;
 
+import java.util.Date;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.google.common.base.Stopwatch;
 import com.vaadin.ui.JavaScript;
 import com.vaadin.ui.JavaScriptFunction;
 
@@ -14,12 +21,20 @@ public class JSCallWithReturnValue
 {
 	// Logger logger = LogManager.getLogger();
 
+	private static final int EXPECTED_RESPONSE_TIME_MS = 1500;
+
+	// this is a particularly large value as this time may include considerable
+	// server side processing time
+	protected static final int RESPONSE_TIMEOUT_MS = 5000;
 	private String hookName;
 	private String jsToExecute;
 	private String errorHookName;
 
 	Logger logger = LogManager.getLogger();
 	private Exception trace;
+
+	// setting the pool size to 1, we will hopefully never execute any events
+	private final static ScheduledExecutorService pool = Executors.newScheduledThreadPool(1);
 
 	/**
 	 * 
@@ -51,6 +66,8 @@ public class JSCallWithReturnValue
 
 	public void callBoolean(final JavaScriptCallback<Boolean> callback)
 	{
+		final Stopwatch timer = Stopwatch.createStarted();
+		final ScheduledFuture<?> future = createTimeoutHook();
 
 		JavaScript.getCurrent().addFunction(hookName, new JavaScriptFunction()
 		{
@@ -63,8 +80,13 @@ public class JSCallWithReturnValue
 				try
 				{
 					callback.callback(arguments.getBoolean(0));
+					future.cancel(false);
 					JavaScript.getCurrent().removeFunction(hookName);
-					logger.warn("Responded");
+					JavaScript.getCurrent().removeFunction(errorHookName);
+					if (timer.elapsed(TimeUnit.MILLISECONDS) > EXPECTED_RESPONSE_TIME_MS)
+					{
+						logger.warn("Responded after {}ms", timer.elapsed(TimeUnit.MILLISECONDS));
+					}
 				}
 				catch (Exception e)
 				{
@@ -75,12 +97,15 @@ public class JSCallWithReturnValue
 		});
 
 		final String wrappedJs = wrapJSInTryCatch(jsToExecute);
-		setupErrorHook();
+		setupErrorHook(future);
 		JavaScript.getCurrent().execute(wrappedJs);
+
 	}
 
 	public void callVoid(final JavaScriptCallback<Void> callback)
 	{
+		final Stopwatch timer = Stopwatch.createStarted();
+		final ScheduledFuture<?> future = createTimeoutHook();
 
 		JavaScript.getCurrent().addFunction(hookName, new JavaScriptFunction()
 		{
@@ -91,35 +116,52 @@ public class JSCallWithReturnValue
 			public void call(JsonArray arguments)
 			{
 				callback.callback(null);
+				future.cancel(false);
 				JavaScript.getCurrent().removeFunction(hookName);
 				JavaScript.getCurrent().removeFunction(errorHookName);
-				logger.warn("Responded");
+				if (timer.elapsed(TimeUnit.MILLISECONDS) > EXPECTED_RESPONSE_TIME_MS)
+				{
+					logger.warn("Responded after {}ms", timer.elapsed(TimeUnit.MILLISECONDS));
+				}
+			}
+		});
+		setupErrorHook(future);
+		JavaScript.getCurrent().execute(wrapJSInTryCatch(jsToExecute));
+
+	}
+
+	void callBlind(final JavaScriptCallback<Void> javaScriptCallback)
+	{
+		final Stopwatch timer = Stopwatch.createStarted();
+		final ScheduledFuture<?> future = createTimeoutHook();
+
+		JavaScript.getCurrent().addFunction(hookName, new JavaScriptFunction()
+		{
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void call(JsonArray arguments)
+			{
+				javaScriptCallback.callback(null);
+				future.cancel(false);
+				JavaScript.getCurrent().removeFunction(hookName);
+				JavaScript.getCurrent().removeFunction(errorHookName);
+				if (timer.elapsed(TimeUnit.MILLISECONDS) > EXPECTED_RESPONSE_TIME_MS)
+				{
+					logger.warn("Responded after {}ms", timer.elapsed(TimeUnit.MILLISECONDS));
+				}
 
 			}
 		});
-		setupErrorHook();
-		JavaScript.getCurrent().execute(wrapJSInTryCatch(jsToExecute));
+		setupErrorHook(future);
+		JavaScript.getCurrent().execute(wrapJSInTryCatchBlind(jsToExecute));
+
 	}
 
-	private void setupErrorHook()
+	private void setupErrorHook(final ScheduledFuture<?> future)
 	{
 		trace = new JavaScriptException("Java Script Invoked From Here, JS:" + jsToExecute);
-
-		final JavaScriptCallback<String> callback = new JavaScriptCallback<String>()
-		{
-
-			@Override
-			public void callback(String value)
-			{
-
-				JavaScript.getCurrent().removeFunction(hookName);
-				JavaScript.getCurrent().removeFunction(errorHookName);
-				logger.error(jsToExecute + " -> resulted in the error: " + value, trace);
-				Exception ex = new JavaScriptException(trace.getMessage() + " , JS Cause: " + value, trace);
-				ErrorWindow.showErrorWindow(ex);
-
-			}
-		};
 
 		JavaScript.getCurrent().addFunction(errorHookName, new JavaScriptFunction()
 		{
@@ -129,13 +171,35 @@ public class JSCallWithReturnValue
 			@Override
 			public void call(JsonArray arguments)
 			{
-				callback.callback(arguments.getString(0));
+				String value = arguments.getString(0);
+				future.cancel(false);
 				JavaScript.getCurrent().removeFunction(hookName);
 				JavaScript.getCurrent().removeFunction(errorHookName);
+				logger.error(jsToExecute + " -> resulted in the error: " + value, trace);
+				Exception ex = new JavaScriptException(trace.getMessage() + " , JS Cause: " + value, trace);
+				ErrorWindow.showErrorWindow(ex);
 
 			}
 		});
 
+	}
+
+	ScheduledFuture<?> createTimeoutHook()
+	{
+		final Date requestedAt = new Date();
+		Runnable runner = new Runnable()
+		{
+
+			@Override
+			public void run()
+			{
+				logger.error(jsToExecute + " -> Timeout " + RESPONSE_TIMEOUT_MS + " requested at " + requestedAt + "ms",
+						trace);
+
+			}
+		};
+		ScheduledFuture<?> future = pool.schedule(runner, RESPONSE_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+		return future;
 	}
 
 	private String wrapJSInTryCatch(String js)
@@ -151,31 +215,9 @@ public class JSCallWithReturnValue
 				+ "catch(err)"
 
 				+ "{console.error(err);" + errorHookName + "(err.message);};";
-		logger.error(wrapped);
+		logger.info(wrapped);
 
 		return wrapped;
-	}
-
-	void callBlind(final JavaScriptCallback<Void> javaScriptCallback)
-	{
-		JavaScript.getCurrent().addFunction(hookName, new JavaScriptFunction()
-		{
-
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void call(JsonArray arguments)
-			{
-				javaScriptCallback.callback(null);
-				JavaScript.getCurrent().removeFunction(hookName);
-				JavaScript.getCurrent().removeFunction(errorHookName);
-				logger.warn("Responded");
-
-			}
-		});
-		setupErrorHook();
-		JavaScript.getCurrent().execute(wrapJSInTryCatchBlind(jsToExecute));
-
 	}
 
 	private String wrapJSInTryCatchBlind(String js)
