@@ -1297,7 +1297,6 @@ public abstract class JpaDslAbstract<E, R>
 			{
 				return builder.isNull(path.path);
 			}
-
 		};
 	}
 
@@ -1313,9 +1312,7 @@ public abstract class JpaDslAbstract<E, R>
 
 				return builder.greaterThanOrEqualTo(field.path, value);
 			}
-
 		};
-
 	}
 
 	public <V extends Comparable<? super V>> Condition<E> lessThanOrEqualTo(final TypedPath<E, V> field, final V value)
@@ -1329,9 +1326,7 @@ public abstract class JpaDslAbstract<E, R>
 
 				return builder.lessThanOrEqualTo(field.path, value);
 			}
-
 		};
-
 	}
 
 	public <T> Expression<T> coalesce(final SingularAttribute<E, T> attribute1,
@@ -1344,5 +1339,18 @@ public abstract class JpaDslAbstract<E, R>
 	{
 		criteria.groupBy(expressions);
 		return this;
+	}
+	
+	// Useful when building dynamic queries
+	public Condition<E> oneEqualsOne()
+	{
+		return new AbstractCondition<E>()
+		{
+			@Override
+			public Predicate getPredicates()
+			{
+				return builder.equal(builder.literal(1), 1);
+			}
+		};
 	}
 }
