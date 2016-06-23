@@ -1,6 +1,7 @@
 package au.com.vaadinutils.dao;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.persistence.metamodel.SingularAttribute;
@@ -15,7 +16,7 @@ import com.vaadin.data.util.filter.Or;
  */
 public class InFilter
 {
-	public static Or getLongFilter(final SingularAttribute<?, Long> attribute, final List<Long> longValues)
+	public static Or getLongFilter(final SingularAttribute<?, Long> attribute, final Collection<Long> longValues)
 	{
 		final List<Filter> orFilters = new ArrayList<Filter>(longValues.size());
 		for (Long longValue : longValues)
