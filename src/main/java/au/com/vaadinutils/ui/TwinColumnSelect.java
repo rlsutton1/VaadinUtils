@@ -118,7 +118,7 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 				}
 			}
 		});
-	} 
+	}
 
 	private BeanContainer<Long, C> createSelectedContainer()
 	{
@@ -127,9 +127,7 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 		beanIdField = type.getDeclaredId(Long.class);
 		selectedBeans = new BeanContainer<Long, C>(itemClass);
 		selectedBeans.setBeanIdProperty(beanIdField.getName());
-		selectedBeans.sort(new Object[]
-		{ itemCaptionProperty.getName() }, new boolean[]
-		{ sortAscending });
+		sortSelectedBeans();
 
 		return selectedBeans;
 	}
@@ -176,9 +174,7 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 
 		// Needs to be here after availableContainer creation,
 		// otherwise sorting goes away
-		availableContainer.sort(new Object[]
-		{ itemCaptionProperty.getName() }, new boolean[]
-		{ sortAscending });
+		sortAvailableContainer();
 
 		availableGrid.addItemClickListener(new ItemClickListener()
 		{
@@ -201,9 +197,7 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 	private JPAContainer<C> createAvailableContainer()
 	{
 		availableContainer = JpaBaseDao.getGenericDao(itemClass).createVaadinContainer();
-		availableContainer.sort(new Object[]
-		{ itemCaptionProperty.getName() }, new boolean[]
-		{ sortAscending });
+		sortAvailableContainer();
 
 		return availableContainer;
 	}
@@ -340,6 +334,20 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 		}
 	}
 
+	public void sortAvailableContainer()
+	{
+		availableContainer.sort(new Object[]
+		{ itemCaptionProperty.getName() }, new boolean[]
+		{ sortAscending });
+	}
+
+	public void sortSelectedBeans()
+	{
+		selectedBeans.sort(new Object[]
+		{ itemCaptionProperty.getName() }, new boolean[]
+		{ sortAscending });
+	}
+
 	public interface ValueChangeListener<C>
 	{
 		void valueChanged(Collection<C> value);
@@ -437,6 +445,7 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 		sourceValue = getConvertedValue();
 
 		refreshSelected();
+		sortSelectedBeans();
 	}
 
 	@Override
@@ -595,9 +604,7 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 
 					availableGrid.select(null);
 					refreshSelected();
-					selectedBeans.sort(new Object[]
-					{ itemCaptionProperty.getName() }, new boolean[]
-					{ sortAscending });
+					sortSelectedBeans();
 				}
 
 			}
@@ -623,9 +630,7 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 
 					availableGrid.select(null);
 					refreshSelected();
-					selectedBeans.sort(new Object[]
-					{ itemCaptionProperty.getName() }, new boolean[]
-					{ sortAscending });
+					sortSelectedBeans();
 				}
 			}
 		};
