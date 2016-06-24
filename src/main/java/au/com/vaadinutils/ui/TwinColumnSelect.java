@@ -94,7 +94,7 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 		createSelectedGrid();
 		createAvailableGrid();
 
-		// refreshSelected();
+		addNewButton.setVisible(false);
 	}
 
 	private void createSelectedGrid()
@@ -255,8 +255,6 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 		layout.setComponentAlignment(addAllButton, Alignment.MIDDLE_CENTER);
 		layout.setComponentAlignment(removeAllButton, Alignment.MIDDLE_CENTER);
 		layout.setComponentAlignment(addNewButton, Alignment.MIDDLE_CENTER);
-
-		addNewButton.setVisible(false);
 
 		return layout;
 	}
