@@ -111,6 +111,25 @@ public abstract class JpaDslAbstract<E, R>
 		};
 	}
 
+	@SuppressWarnings("unchecked")
+	public Condition<E> and(final Condition<E>... conditions)
+	{
+		return new AbstractCondition<E>()
+		{
+			@Override
+			public Predicate getPredicates()
+			{
+				final List<Predicate> predicates = new ArrayList<>(conditions.length);
+				for (Condition<E> condition : conditions)
+				{
+					predicates.add(condition.getPredicates());
+				}
+
+				return builder.and(predicates.toArray(new Predicate[predicates.size()]));
+			}
+		};
+	}
+
 	public <L> Condition<E> equal(final SingularAttribute<? super E, L> field, final L value)
 	{
 
@@ -547,11 +566,29 @@ public abstract class JpaDslAbstract<E, R>
 	{
 		return new AbstractCondition<E>()
 		{
-
 			@Override
 			public Predicate getPredicates()
 			{
 				return builder.or(c1.getPredicates(), c2.getPredicates());
+			}
+		};
+	}
+
+	@SuppressWarnings("unchecked")
+	public Condition<E> or(final Condition<E>... conditions)
+	{
+		return new AbstractCondition<E>()
+		{
+			@Override
+			public Predicate getPredicates()
+			{
+				final List<Predicate> predicates = new ArrayList<>(conditions.length);
+				for (Condition<E> condition : conditions)
+				{
+					predicates.add(condition.getPredicates());
+				}
+
+				return builder.or(predicates.toArray(new Predicate[predicates.size()]));
 			}
 		};
 	}
@@ -1260,7 +1297,6 @@ public abstract class JpaDslAbstract<E, R>
 			{
 				return builder.isNull(path.path);
 			}
-
 		};
 	}
 
@@ -1276,9 +1312,7 @@ public abstract class JpaDslAbstract<E, R>
 
 				return builder.greaterThanOrEqualTo(field.path, value);
 			}
-
 		};
-
 	}
 
 	public <V extends Comparable<? super V>> Condition<E> lessThanOrEqualTo(final TypedPath<E, V> field, final V value)
@@ -1292,9 +1326,7 @@ public abstract class JpaDslAbstract<E, R>
 
 				return builder.lessThanOrEqualTo(field.path, value);
 			}
-
 		};
-
 	}
 
 	public <T> Expression<T> coalesce(final SingularAttribute<E, T> attribute1,
@@ -1307,5 +1339,18 @@ public abstract class JpaDslAbstract<E, R>
 	{
 		criteria.groupBy(expressions);
 		return this;
+	}
+	
+	// Useful when building dynamic queries
+	public Condition<E> oneEqualsOne()
+	{
+		return new AbstractCondition<E>()
+		{
+			@Override
+			public Predicate getPredicates()
+			{
+				return builder.equal(builder.literal(1), 1);
+			}
+		};
 	}
 }
