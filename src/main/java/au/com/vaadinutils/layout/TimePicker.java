@@ -164,6 +164,7 @@ public class TimePicker extends HorizontalLayout implements Field<Date>
 		}
 	}
 
+	@Override
 	public void focus()
 	{
 		super.focus();
@@ -193,7 +194,7 @@ public class TimePicker extends HorizontalLayout implements Field<Date>
 		final Window window = new Window(title);
 		window.setModal(true);
 		window.setResizable(false);
-		window.setWidth("430");
+		window.setWidth("550");
 		window.setHeight("220");
 		window.setClosable(false);
 

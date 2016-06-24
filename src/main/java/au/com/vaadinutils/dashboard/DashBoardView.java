@@ -56,12 +56,47 @@ public abstract class DashBoardView extends HorizontalLayout implements View
 
 	private SliderPanel dashboardsSlider;
 
+	UI ui = UI.getCurrent();
+
 	@Override
 	public void enter(ViewChangeEvent event)
 	{
 		setMargin(new MarginInfo(false, false, true, false));
 		setSizeFull();
 
+		// defer the load of the dashboard to a separate request, otherwise on a
+		// refresh(F5) it will be blank
+		new Thread(new Runnable()
+		{
+
+			@Override
+			public void run()
+			{
+				try (AutoCloseable closer = EntityManagerProvider.setThreadLocalEntityManagerTryWithResources())
+				{
+					Thread.sleep(50);
+					ui.access(new Runnable()
+					{
+
+						@Override
+						public void run()
+						{
+							postLoad();
+						}
+					});
+
+				}
+				catch (Exception e)
+				{
+					logger.error(e, e);
+				}
+			}
+		}).start();
+
+	}
+
+	void postLoad()
+	{
 		VerticalLayout sliderHolder = new VerticalLayout();
 		sliderHolder.setWidth("30");
 		sliderHolder.setHeight("100%");
