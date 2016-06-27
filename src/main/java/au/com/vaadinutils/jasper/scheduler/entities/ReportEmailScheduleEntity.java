@@ -25,14 +25,14 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 
+import com.google.common.base.Preconditions;
+
 import au.com.vaadinutils.crud.CrudEntity;
 import au.com.vaadinutils.jasper.JasperManager.OutputFormat;
 import au.com.vaadinutils.jasper.scheduler.ReportEmailParameter;
 import au.com.vaadinutils.jasper.scheduler.ReportEmailSchedule;
 import au.com.vaadinutils.jasper.scheduler.ScheduledDateParameter;
 import au.com.vaadinutils.jasper.ui.JasperReportProperties;
-
-import com.google.common.base.Preconditions;
 
 @Entity
 @Table(name = "tblreportemailschedule")
@@ -62,14 +62,12 @@ public class ReportEmailScheduleEntity implements Serializable, CrudEntity, Repo
 
 	private String JasperReportPropertiesClassName;
 
-	@OneToMany(cascade =
-	{ CascadeType.REMOVE, CascadeType.PERSIST })
+	@OneToMany(cascade = { CascadeType.REMOVE, CascadeType.PERSIST })
 	private List<ReportEmailScheduledDateParameter> dateParameters = new LinkedList<>();
 
 	boolean enabled = true;
 
-	@OneToOne(cascade =
-	{ CascadeType.REMOVE, CascadeType.PERSIST })
+	@OneToOne(cascade = { CascadeType.PERSIST })
 	private ReportEmailSender sender;
 
 	@Temporal(TemporalType.TIMESTAMP)
@@ -88,8 +86,7 @@ public class ReportEmailScheduleEntity implements Serializable, CrudEntity, Repo
 
 	private String scheduledDaysOfWeek = "";
 
-	@OneToMany(cascade =
-	{ CascadeType.REMOVE, CascadeType.PERSIST })
+	@OneToMany(cascade = { CascadeType.REMOVE, CascadeType.PERSIST })
 	private List<ReportEmailParameterEntity> reportParameters;
 
 	@NotNull
@@ -105,8 +102,7 @@ public class ReportEmailScheduleEntity implements Serializable, CrudEntity, Repo
 	 */
 	private String reportLog;
 
-	@ManyToMany(cascade =
-	{ CascadeType.PERSIST })
+	@ManyToMany(cascade = { CascadeType.PERSIST })
 	private List<ReportEmailRecipient> recipients = new LinkedList<ReportEmailRecipient>();
 
 	private String reportFileName;
