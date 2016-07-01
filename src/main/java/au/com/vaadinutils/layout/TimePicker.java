@@ -176,14 +176,20 @@ public class TimePicker extends HorizontalLayout implements Field<Date>
 
 		try
 		{
-			Date value = parseDate(field.getValue());
-			int hourNumber = value.getHours() % 12;
-			if (hourNumber == 0)
+			if (field.getValue() != null)
 			{
-				hourNumber = 12;
-			}
+				Date value = parseDate(field.getValue());
+				if (value != null)
+				{
+					int hourNumber = value.getHours() % 12;
+					if (hourNumber == 0)
+					{
+						hourNumber = 12;
+					}
 
-			displayTime.setValue(field.getValue());
+					displayTime.setValue(field.getValue());
+				}
+			}
 		}
 		catch (Exception e)
 		{
