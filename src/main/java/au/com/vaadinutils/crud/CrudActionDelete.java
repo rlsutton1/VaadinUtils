@@ -56,33 +56,45 @@ public class CrudActionDelete<E extends CrudEntity> implements CrudAction<E>
 		if (response.canDelete)
 		{
 
-			ConfirmDialog.show(UI.getCurrent(), "Confirm Delete", "Are you sure you want to delete "
-					+ entity.getEntity().getName() + "? " + message, "Delete", "Cancel", new ConfirmDialog.Listener()
+			String titleText = crud.getTitleText();
+			if (titleText.contains("getTitleText()"))
 			{
-				private static final long serialVersionUID = 1L;
-
-				@Override
-				public void onClose(ConfirmDialog dialog)
-				{
-					if (dialog.isConfirmed())
+				titleText = entity.getEntity().getClass().getSimpleName() + " (getTitleText() not implemented)";
+			}
+			String name = entity.getEntity().getName();
+			if (name == null)
+			{
+				name = "" + entity.getEntity().getId();
+			}
+			ConfirmDialog.show(UI.getCurrent(), "Confirm Delete",
+					"Are you sure you want to delete " + titleText + " - '" + name + "' ? " + message, "Delete",
+					"Cancel", new ConfirmDialog.Listener()
 					{
-						if (action != null)
+						private static final long serialVersionUID = 1L;
+
+						@Override
+						public void onClose(ConfirmDialog dialog)
 						{
-							try
+							if (dialog.isConfirmed())
 							{
-								action.delete(entity);
-							}
-							catch (Exception e)
-							{
-								logger.error(e, e);
-								Notification.show("Errors occurred when deleting " + e.getMessage(), Type.ERROR_MESSAGE);
+								if (action != null)
+								{
+									try
+									{
+										action.delete(entity);
+									}
+									catch (Exception e)
+									{
+										logger.error(e, e);
+										Notification.show("Errors occurred when deleting " + e.getMessage(),
+												Type.ERROR_MESSAGE);
+									}
+								}
+								crud.delete();
 							}
 						}
-						crud.delete();
-					}
-				}
 
-			});
+					});
 		}
 		else
 		{
@@ -105,11 +117,13 @@ public class CrudActionDelete<E extends CrudEntity> implements CrudAction<E>
 
 	}
 
+	@Override
 	public String toString()
 	{
 		return "Delete";
 	}
 
+	@Override
 	public boolean isDefault()
 	{
 		return isDefault;

@@ -194,13 +194,12 @@ public class TimePicker extends HorizontalLayout implements Field<Date>
 		final Window window = new Window(title);
 		window.setModal(true);
 		window.setResizable(false);
-		window.setWidth("550");
-		window.setHeight("220");
+		// window.setWidth("550");
+		// window.setHeight("220");
 		window.setClosable(false);
 
 		HorizontalLayout layout = new HorizontalLayout();
 		layout.setSizeFull();
-		layout.setMargin(true);
 		layout.setSpacing(true);
 		layout.setStyleName(Reindeer.BUTTON_SMALL);
 
@@ -226,43 +225,31 @@ public class TimePicker extends HorizontalLayout implements Field<Date>
 		});
 
 		VerticalLayout hourPanelLabelWrapper = new VerticalLayout();
+		hourPanelLabelWrapper.setWidth("225");
 
 		Label hourLabel = new Label("Hour");
 
-		// hourLabel.setBackgroundColor(headerColor);
 		hourLabel.setWidth("230");
-		// hourLabel.setHeight("30");
-		// hourLabel.setAutoFit(false);
 		HorizontalLayout innerHourLabelPanel = new HorizontalLayout();
 
-		// innerHourLabelPanel.setPadding(5);
 		innerHourLabelPanel.addComponent(hourLabel);
 		innerHourLabelPanel.setWidth("100");
-		// innerHourLabelPanel.setHeight("30");
 		hourPanelLabelWrapper.addComponent(innerHourLabelPanel);
 
 		VerticalLayout minuteLabelWrapper = new VerticalLayout();
 		minuteLabelWrapper.setWidth("60");
 		Label minuteLabel = new Label("Minute");
-		// minuteLabel.setBackgroundColor(headerColor);
-		// minuteLabel.setStyleName("njadmin-search-colour");
 
 		minuteLabel.setWidth("45");
-		// minuteLabel.setHeight("30");
-		// minuteLabel.setAutoFit(false);
 		VerticalLayout innerMinuteLabelPanel = new VerticalLayout();
-		// innerMinuteLabelPanel.setPadding(5);
 		innerMinuteLabelPanel.addComponent(minuteLabel);
 		innerMinuteLabelPanel.setWidth("45");
-		// innerMinuteLabelPanel.setHeight("30");
 
 		minuteLabelWrapper.addComponent(innerMinuteLabelPanel);
 
 		HorizontalLayout hourPanel = new HorizontalLayout();
-		// hourPanel.setPadding(5);
 
 		HorizontalLayout amPmPanel = new HorizontalLayout();
-		// amPmPanel.setPadding(5);
 
 		VerticalLayout amPmButtonPanel = new VerticalLayout();
 		amPmPanel.addComponent(amPmButtonPanel);
@@ -273,7 +260,6 @@ public class TimePicker extends HorizontalLayout implements Field<Date>
 		addHourButtons(hourButtonPanel, 2, 6);
 
 		HorizontalLayout minutePanel = new HorizontalLayout();
-		// minutePanel.setPadding(5);
 		HorizontalLayout minuteButtonPanel = new HorizontalLayout();
 		minutePanel.addComponent(minuteButtonPanel);
 		addMinuteButtons(minuteButtonPanel, 2, 4);
@@ -287,8 +273,7 @@ public class TimePicker extends HorizontalLayout implements Field<Date>
 
 		minuteLabelWrapper.addComponent(minutePanel);
 		layout.addComponent(minuteLabelWrapper);
-		layout.setExpandRatio(hourPanelLabelWrapper, 0.7f);
-		layout.setExpandRatio(minuteLabelWrapper, 0.3f);
+		layout.setExpandRatio(minuteLabelWrapper, 1);
 
 		HorizontalLayout okcancel = new HorizontalLayout();
 		okcancel.setSizeFull();
@@ -351,18 +336,16 @@ public class TimePicker extends HorizontalLayout implements Field<Date>
 		okcancel.addComponent(cancel);
 		okcancel.addComponent(clear);
 		okcancel.addComponent(ok);
-		okcancel.setMargin(true);
 		okcancel.setSpacing(true);
 		okcancel.setExpandRatio(displayTime, 0.50f);
 
 		VerticalLayout wrapper = new VerticalLayout();
 
-		wrapper.setSizeFull();
 		wrapper.addComponent(layout);
 		wrapper.addComponent(okcancel);
-		wrapper.setExpandRatio(layout, 0.9f);
-		wrapper.setExpandRatio(okcancel, 0.5f);
 		window.setContent(wrapper);
+		wrapper.setMargin(true);
+		wrapper.setSpacing(true);
 
 		UI.getCurrent().addWindow(window);
 
