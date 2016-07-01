@@ -70,6 +70,7 @@ import net.sf.jasperreports.engine.util.JRSwapFile;
 import net.sf.jasperreports.web.servlets.AsyncJasperPrintAccessor;
 import net.sf.jasperreports.web.servlets.ReportExecutionStatus;
 
+@SuppressWarnings("deprecation")
 public class JasperManager implements Runnable
 {
 	private JasperReport jasperReport;
@@ -857,6 +858,7 @@ public class JasperManager implements Runnable
 			reportProperties.prepareForOutputFormat(exportMethod);
 			CustomJRHyperlinkProducerFactory.setUseCustomHyperLinks(true);
 
+			@SuppressWarnings("rawtypes")
 			JRAbstractExporter exporter = null;
 
 			queueEntry.setStatus("Gathering report data phase 2");
@@ -1026,6 +1028,7 @@ public class JasperManager implements Runnable
 
 	}
 
+	@SuppressWarnings("rawtypes")
 	private void createPageProgressMonitor(JRAbstractExporter exporter)
 	{
 		exporter.setParameter(JRExporterParameter.PROGRESS_MONITOR, new JRExportProgressMonitor()
