@@ -68,7 +68,7 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 		grid = new Grid(new GeneratedPropertyContainer(container));
 		grid.setSizeFull();
 		final Label title = new Label(getTitle());
-		title.setStyleName(Reindeer.LABEL_H1);
+		title.setStyleName(setTitleStyleName());
 		searchBar = buildSearchBar();
 		final VerticalLayout layout = new VerticalLayout();
 		layout.setSizeFull();
@@ -387,6 +387,11 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 	public void setCellDescriptionGenerator(CellDescriptionGenerator generator)
 	{
 		grid.setCellDescriptionGenerator(generator);
+	}
+
+	public String setTitleStyleName()
+	{
+		return Reindeer.LABEL_H1;
 	}
 
 	public void sort(final Sort sort)
