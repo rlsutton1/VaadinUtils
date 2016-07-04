@@ -248,7 +248,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 		dragAndDropOrderingEnabled = true;
 		this.ordinalField = ordinalField;
 
-		container.sort(new Object[] { ordinalField.getName() }, new boolean[] { true });
+		container.sort(new Object[]
+		{ ordinalField.getName() }, new boolean[]
+		{ true });
 
 		this.entityTable.setDragMode(TableDragMode.ROW);
 		this.entityTable.setDropHandler(new DropHandler()
@@ -317,7 +319,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 
 				container.commit();
 				container.refresh();
-				container.sort(new Object[] { ordinalField.getName() }, new boolean[] { true });
+				container.sort(new Object[]
+				{ ordinalField.getName() }, new boolean[]
+				{ true });
 
 				// cause this crud to save, or if its a child cause the parent
 				// to save.
@@ -725,7 +729,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 		if (advancedSearchLayout != null)
 		{
 
-			advancedSearchButton = new Button("Advanced");
+			advancedSearchButton = new Button(getAdvancedCaption());
 			advancedSearchOn = false;
 
 			advancedSearchButton.setImmediate(true);
@@ -746,12 +750,12 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 					}
 					if (!advancedSearchOn)
 					{
-						advancedSearchButton.setCaption("Advanced");
+						advancedSearchButton.setCaption(getAdvancedCaption());
 						advancedSearchButton.removeStyleName(ValoTheme.BUTTON_FRIENDLY);
 					}
 					else
 					{
-						advancedSearchButton.setCaption("Basic");
+						advancedSearchButton.setCaption(getBasicCaption());
 						advancedSearchButton.setStyleName(ValoTheme.BUTTON_FRIENDLY);
 					}
 
@@ -768,7 +772,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 	{
 		advancedSearchOn = true;
 		advancedSearchLayout.setVisible(advancedSearchOn);
-		advancedSearchButton.setCaption("Basic");
+		advancedSearchButton.setCaption(getBasicCaption());
 		advancedSearchButton.setStyleName(ValoTheme.BUTTON_FRIENDLY);
 
 		if (lockAdvancedSearch)
@@ -782,7 +786,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 		clearAdvancedFilters();
 		advancedSearchOn = false;
 		advancedSearchLayout.setVisible(advancedSearchOn);
-		advancedSearchButton.setCaption("Advanced");
+		advancedSearchButton.setCaption(getAdvancedCaption());
 		advancedSearchButton.removeStyleName(ValoTheme.BUTTON_FRIENDLY);
 	}
 
@@ -1797,8 +1801,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 			}
 
 			// TODO: we shouldn't be removing the apply button but rather just
-			// the Delete
-			// action.
+			// the Delete action.
 			if (this.applyButton != null)
 			{
 				this.applyButton.setEnabled(false);
@@ -2388,4 +2391,13 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 		return container.getItem(id);
 	}
 
+	protected String getAdvancedCaption()
+	{
+		return "Advanced";
+	}
+
+	protected String getBasicCaption()
+	{
+		return "Basic";
+	}
 }
