@@ -48,7 +48,7 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 	private TextField searchField = new TextField();
 	private AbstractLayout advancedSearchLayout;
 	private AbstractLayout searchBar;
-	private Button advancedSearchCheckbox;
+	private Button advancedSearchButton;
 	private boolean advancedSearchOn = false;
 	private Grid grid;
 	private T container;
@@ -138,7 +138,7 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 		final AbstractLayout advancedSearch = buildAdvancedSearch();
 		if (advancedSearch != null)
 		{
-			basicSearchLayout.addComponent(advancedSearchCheckbox);
+			basicSearchLayout.addComponent(advancedSearchButton);
 		}
 
 		searchField.setInputPrompt("Search");
@@ -197,11 +197,11 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 		advancedSearchLayout = getAdvancedSearchLayout();
 		if (advancedSearchLayout != null)
 		{
-			advancedSearchCheckbox = new Button("Advanced");
+			advancedSearchButton = new Button(getAdvancedCaption());
 			advancedSearchOn = false;
 
-			advancedSearchCheckbox.setImmediate(true);
-			advancedSearchCheckbox.addClickListener(new ClickListener()
+			advancedSearchButton.setImmediate(true);
+			advancedSearchButton.addClickListener(new ClickListener()
 			{
 				private static final long serialVersionUID = 7777043506655571664L;
 
@@ -217,11 +217,13 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 					}
 					if (!advancedSearchOn)
 					{
-						advancedSearchCheckbox.removeStyleName(ValoTheme.BUTTON_FRIENDLY);
+						advancedSearchButton.setCaption(getAdvancedCaption());
+						advancedSearchButton.removeStyleName(ValoTheme.BUTTON_FRIENDLY);
 					}
 					else
 					{
-						advancedSearchCheckbox.setStyleName(ValoTheme.BUTTON_FRIENDLY);
+						advancedSearchButton.setCaption(getBasicCaption());
+						advancedSearchButton.setStyleName(ValoTheme.BUTTON_FRIENDLY);
 					}
 				}
 			});
@@ -382,6 +384,16 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 	public void addContextClickListener(ContextClickListener listener)
 	{
 		grid.addContextClickListener(listener);
+	}
+
+	protected String getAdvancedCaption()
+	{
+		return "Advanced";
+	}
+
+	protected String getBasicCaption()
+	{
+		return "Basic";
 	}
 
 	public void setCellDescriptionGenerator(CellDescriptionGenerator generator)
