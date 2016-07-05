@@ -407,6 +407,18 @@ public abstract class JpaDslAbstract<E, R>
 		};
 	}
 
+	public <L, J> Condition<E> isNull(final JoinBuilder<E, L> join, final SingularAttribute<L, J> field)
+	{
+		return new AbstractCondition<E>()
+		{
+			@Override
+			public Predicate getPredicates()
+			{
+				return builder.isNull(getJoin(join).get(field));
+			}
+		};
+	}
+
 	public <J> Condition<E> joinLike(final SingularAttribute<E, J> joinAttribute, final JoinType joinType,
 			final SingularAttribute<J, String> field, final String value)
 	{
@@ -832,6 +844,18 @@ public abstract class JpaDslAbstract<E, R>
 		return this;
 	}
 
+	@SuppressWarnings("unchecked")
+	public JpaDslAbstract<E, R> where(final Condition<E>... conditions)
+	{
+		final List<Predicate> predicates = new ArrayList<>(conditions.length);
+		for (Condition<E> condition : conditions)
+		{
+			predicates.add(condition.getPredicates());
+		}
+		predicate = builder.and(predicates.toArray(new Predicate[predicates.size()]));
+		return this;
+	}
+
 	public abstract class AbstractCondition<Z> implements Condition<Z>
 	{
 		@Override
@@ -1026,7 +1050,8 @@ public abstract class JpaDslAbstract<E, R>
 		return new AbstractCondition<E>()
 		{
 
-			@SuppressWarnings({ "unchecked", "rawtypes" })
+			@SuppressWarnings(
+			{ "unchecked", "rawtypes" })
 			@Override
 			public Predicate getPredicates()
 			{
@@ -1340,7 +1365,7 @@ public abstract class JpaDslAbstract<E, R>
 		criteria.groupBy(expressions);
 		return this;
 	}
-	
+
 	// Useful when building dynamic queries
 	public Condition<E> oneEqualsOne()
 	{
@@ -1350,6 +1375,30 @@ public abstract class JpaDslAbstract<E, R>
 			public Predicate getPredicates()
 			{
 				return builder.equal(builder.literal(1), 1);
+			}
+		};
+	}
+
+	public Condition<E> isTrue(final SingularAttribute<E, Boolean> field)
+	{
+		return new AbstractCondition<E>()
+		{
+			@Override
+			public Predicate getPredicates()
+			{
+				return builder.isTrue(root.get(field));
+			}
+		};
+	}
+
+	public <L> Condition<E> isTrue(final JoinBuilder<E, L> join, final SingularAttribute<L, Boolean> field)
+	{
+		return new AbstractCondition<E>()
+		{
+			@Override
+			public Predicate getPredicates()
+			{
+				return builder.isNotNull(getJoin(join).get(field));
 			}
 		};
 	}
