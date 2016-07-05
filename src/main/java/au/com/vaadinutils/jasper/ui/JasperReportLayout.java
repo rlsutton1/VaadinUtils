@@ -667,7 +667,6 @@ class JasperReportLayout extends VerticalLayout
 						for (String parameterName : param.getParameterNames())
 						{
 							name += "-" + param.getDisplayValue(parameterName);
-							System.out.println(name);
 						}
 					}
 				}

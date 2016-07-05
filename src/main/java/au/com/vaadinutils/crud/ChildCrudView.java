@@ -41,8 +41,7 @@ import au.com.vaadinutils.errorHandling.ErrorWindow;
  *
  * @author rsutton
  *
- * @param
- * 			<P>
+ * @param <P>
  * @param <E>
  */
 public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEntity> extends BaseCrudView<E>
@@ -97,64 +96,65 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 
 	}
 
-//	public ChildCrudView(final BaseCrudView<P> parentCrud, Class<P> parentType, Class<E> childType,
-//			SingularAttribute<? extends CrudEntity, ? extends Object> parentKey,
-//			SingularAttribute<? extends CrudEntity, ? extends Object> childKey)
-//	{
-//		super(CrudDisplayMode.VERTICAL);
-//		this.parentKey = parentKey.getName();
-//		this.childKey = childKey.getName();
-//		this.parentType = parentType;
-//		this.childType = childType;
-//		this.parentCrud = new ParentCrud<P>(){
-//
-//			@Override
-//			public EntityItem<P> getContainerItem(Long id)
-//			{
-//				return parentCrud.getContainer().getItem(id);
-//			}
-//
-//			@Override
-//			public void fieldGroupIsDirty(boolean b)
-//			{
-//				 parentCrud.fieldGroupIsDirty(b);
-//				
-//			}
-//
-//			@Override
-//			public P getCurrent()
-//			{
-//				return parentCrud.getCurrent();
-//			}
-//
-//			@Override
-//			public boolean isDirty()
-//			{
-//				return parentCrud.isDirty();
-//			}
-//
-//			@Override
-//			public void reloadDataFromDB()
-//			{
-//				parentCrud.reloadDataFromDB();
-//				
-//			}
-//
-//			@Override
-//			public void save()
-//			{
-//				parentCrud.save();
-//				
-//			}
-//
-//			@Override
-//			public void setSplitPosition(float pos)
-//			{
-//				parentCrud.setSplitPosition(pos);
-//				
-//			}};
-//		
-//	}
+	// public ChildCrudView(final BaseCrudView<P> parentCrud, Class<P>
+	// parentType, Class<E> childType,
+	// SingularAttribute<? extends CrudEntity, ? extends Object> parentKey,
+	// SingularAttribute<? extends CrudEntity, ? extends Object> childKey)
+	// {
+	// super(CrudDisplayMode.VERTICAL);
+	// this.parentKey = parentKey.getName();
+	// this.childKey = childKey.getName();
+	// this.parentType = parentType;
+	// this.childType = childType;
+	// this.parentCrud = new ParentCrud<P>(){
+	//
+	// @Override
+	// public EntityItem<P> getContainerItem(Long id)
+	// {
+	// return parentCrud.getContainer().getItem(id);
+	// }
+	//
+	// @Override
+	// public void fieldGroupIsDirty(boolean b)
+	// {
+	// parentCrud.fieldGroupIsDirty(b);
+	//
+	// }
+	//
+	// @Override
+	// public P getCurrent()
+	// {
+	// return parentCrud.getCurrent();
+	// }
+	//
+	// @Override
+	// public boolean isDirty()
+	// {
+	// return parentCrud.isDirty();
+	// }
+	//
+	// @Override
+	// public void reloadDataFromDB()
+	// {
+	// parentCrud.reloadDataFromDB();
+	//
+	// }
+	//
+	// @Override
+	// public void save()
+	// {
+	// parentCrud.save();
+	//
+	// }
+	//
+	// @Override
+	// public void setSplitPosition(float pos)
+	// {
+	// parentCrud.setSplitPosition(pos);
+	//
+	// }};
+	//
+	// }
 
 	@Override
 	protected void init(Class<E> entityClass, JPAContainer<E> container, HeadingPropertySet headings)
@@ -190,8 +190,8 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 		}
 		catch (InstantiationException | IllegalAccessException e)
 		{
-			logger.warn("Failed to instance "+parentType+" to create bogus parent filter");
-			
+			logger.warn("Failed to instance " + parentType + " to create bogus parent filter");
+
 		}
 	}
 
@@ -461,6 +461,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 		E entity = dao.findById((Long) entityId);
 		EntityManagerProvider.remove(entity);
 		parentCrud.reloadDataFromDB();
+		entityTable.select(null);
 		reloadDataFromDB();
 
 		postChildDelete(entityId);
@@ -522,7 +523,9 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 		// for child new is always enabled unless explicitly disallowed
 		boolean showNew = true;
 		if (isDisallowNew())
+		{
 			showNew = false;
+		}
 		newButton.setEnabled(showNew);
 	}
 
@@ -639,6 +642,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 	public void saveEditsToTemp()
 	{
 		if (saving == false)
+		{
 			try
 			{
 				saving = true;
@@ -737,8 +741,9 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 				splitPanel.showFirstComponet();
 				saving = false;
 			}
-		// }
-		// }
+			// }
+			// }
+		}
 
 	}
 
