@@ -1398,7 +1398,7 @@ public abstract class JpaDslAbstract<E, R>
 			@Override
 			public Predicate getPredicates()
 			{
-				return builder.isNotNull(getJoin(join).get(field));
+				return builder.isTrue(getJoin(join).get(field));
 			}
 		};
 	}
