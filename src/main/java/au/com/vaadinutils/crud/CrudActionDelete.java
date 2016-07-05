@@ -98,20 +98,7 @@ public class CrudActionDelete<E extends CrudEntity> implements CrudAction<E>
 		}
 		else
 		{
-			ConfirmDialog dialog = ConfirmDialog.show(UI.getCurrent(), "Cannot Delete", response.getMessage(), "OK",
-					"Cance", new ConfirmDialog.Listener()
-					{
-						private static final long serialVersionUID = 1L;
-
-						@Override
-						public void onClose(ConfirmDialog dialog)
-						{
-
-						}
-
-					});
-			dialog.getCancelButton().setVisible(false);
-			dialog.center();
+			Notification.show(response.getMessage(), Type.ERROR_MESSAGE);
 
 		}
 

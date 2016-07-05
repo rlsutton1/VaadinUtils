@@ -172,8 +172,6 @@ public abstract class BasePortal extends VerticalLayout implements Portal
 				final String property = (String) event.getPropertyId();
 				final boolean isVisible = !table.isColumnCollapsed(property);
 
-				System.out.println("Collapse " + event + " " + isVisible);
-				// .......slakdjflaksjdfl;kajsd;lfkjasl;dkfjal;skdjf;laskdjf;lkjdf;lakjs;lkjdfal;ksjdflkasjlfkjsald;fkjasl;kdfjal;skdfjl;kj
 			}
 		});
 
