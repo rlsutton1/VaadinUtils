@@ -25,6 +25,8 @@ import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.CellDescriptionGenerator;
+import com.vaadin.ui.Grid.CellStyleGenerator;
+import com.vaadin.ui.Grid.RowStyleGenerator;
 import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.Grid.SelectionModel;
 import com.vaadin.ui.HorizontalLayout;
@@ -399,6 +401,16 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 	public void setCellDescriptionGenerator(CellDescriptionGenerator generator)
 	{
 		grid.setCellDescriptionGenerator(generator);
+	}
+
+	public void setCellStyleGenerator(CellStyleGenerator generator)
+	{
+		grid.setCellStyleGenerator(generator);
+	}
+
+	public void setRowStyleGenerator(RowStyleGenerator generator)
+	{
+		grid.setRowStyleGenerator(generator);
 	}
 
 	public String setTitleStyleName()
