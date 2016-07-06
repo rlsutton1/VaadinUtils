@@ -10,12 +10,12 @@ import javax.persistence.metamodel.ListAttribute;
 import javax.persistence.metamodel.SetAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 
-public class JoinBuilder<  E, K>
+public class JoinBuilder<E, K>
 {
 
-	
-
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
@@ -27,7 +27,9 @@ public class JoinBuilder<  E, K>
 		return result;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
@@ -64,7 +66,8 @@ public class JoinBuilder<  E, K>
 	@SuppressWarnings("rawtypes")
 	List<JoinMetaData> joins = new LinkedList<>();
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings(
+	{ "rawtypes", "unchecked" })
 	public JoinBuilder(SingularAttribute<? super E, K> attribute, JoinType type)
 	{
 		joins.add(new JoinMetaDataSingular(attribute, type));
@@ -75,20 +78,23 @@ public class JoinBuilder<  E, K>
 		// TODO Auto-generated constructor stub
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings(
+	{ "unchecked", "rawtypes" })
 	public JoinBuilder(SetAttribute<? super E, K> attribute, JoinType type)
 	{
 		joins.add(new JoinMetaDataSet(attribute, type));
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings(
+	{ "unchecked", "rawtypes" })
 	public JoinBuilder(ListAttribute<? super E, K> attribute, JoinType type)
 	{
 		joins.add(new JoinMetaDataList(attribute, type));
 
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings(
+	{ "rawtypes", "unchecked" })
 	public Join<E, K> getJoin(Root<E> root)
 	{
 		Join p = null;
@@ -97,19 +103,18 @@ public class JoinBuilder<  E, K>
 			if (p == null)
 			{
 				p = join.getJoin(root);
-				
 			}
 			else
 			{
 				p = join.getJoin(p);
-				
 			}
 		}
-		return p;
 
+		return p;
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings(
+	{ "unchecked", "rawtypes" })
 	public <T> JoinBuilder<E, T> join(final SingularAttribute<K, T> attribute)
 	{
 
@@ -119,7 +124,8 @@ public class JoinBuilder<  E, K>
 		return jb;
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings(
+	{ "unchecked", "rawtypes" })
 	public <T> JoinBuilder<E, T> join(final ListAttribute<K, T> attribute)
 	{
 
@@ -129,7 +135,8 @@ public class JoinBuilder<  E, K>
 		return jb;
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings(
+	{ "unchecked", "rawtypes" })
 	public <T> JoinBuilder<E, T> join(final SetAttribute<K, T> attribute)
 	{
 
@@ -139,7 +146,8 @@ public class JoinBuilder<  E, K>
 		return jb;
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings(
+	{ "unchecked", "rawtypes" })
 	public <T> JoinBuilder<E, T> join(final ListAttribute<K, T> attribute, JoinType type)
 	{
 
@@ -148,8 +156,9 @@ public class JoinBuilder<  E, K>
 		jb.joins.add(new JoinMetaDataList(attribute, type));
 		return jb;
 	}
-	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+
+	@SuppressWarnings(
+	{ "unchecked", "rawtypes" })
 	public <T> JoinBuilder<E, T> join(final SingularAttribute<K, T> attribute, JoinType type)
 	{
 
@@ -158,8 +167,9 @@ public class JoinBuilder<  E, K>
 		jb.joins.add(new JoinMetaDataSingular(attribute, type));
 		return jb;
 	}
-	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+
+	@SuppressWarnings(
+	{ "unchecked", "rawtypes" })
 	public <T> JoinBuilder<E, T> join(final SetAttribute<K, T> attribute, JoinType type)
 	{
 
@@ -167,5 +177,24 @@ public class JoinBuilder<  E, K>
 		jb.joins.addAll(joins);
 		jb.joins.add(new JoinMetaDataSet(attribute, type));
 		return jb;
+	}
+
+	@SuppressWarnings("rawtypes")
+	@Override
+	public String toString()
+	{
+		String stringValue = "";
+		final int listSize = joins.size();
+		for (int i = 0; i < listSize; i++)
+		{
+			final JoinMetaData join = joins.get(i);
+			stringValue += join.toString();
+			if ((i + 1) < listSize)
+			{
+				stringValue += ", ";
+			}
+		}
+
+		return stringValue;
 	}
 }
