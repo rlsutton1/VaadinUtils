@@ -248,9 +248,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 		dragAndDropOrderingEnabled = true;
 		this.ordinalField = ordinalField;
 
-		container.sort(new Object[]
-		{ ordinalField.getName() }, new boolean[]
-		{ true });
+		container.sort(new Object[] { ordinalField.getName() }, new boolean[] { true });
 
 		this.entityTable.setDragMode(TableDragMode.ROW);
 		this.entityTable.setDropHandler(new DropHandler()
@@ -319,9 +317,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 
 				container.commit();
 				container.refresh();
-				container.sort(new Object[]
-				{ ordinalField.getName() }, new boolean[]
-				{ true });
+				container.sort(new Object[] { ordinalField.getName() }, new boolean[] { true });
 
 				// cause this crud to save, or if its a child cause the parent
 				// to save.
@@ -2171,9 +2167,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 			container.refresh();
 		}
 
-		entityTable.select(null);
 		if (selectedId == null)
 		{
+			entityTable.select(null);
 			entityTable.select(entityTable.firstItemId());
 		}
 		else
