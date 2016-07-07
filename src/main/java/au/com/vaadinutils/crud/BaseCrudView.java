@@ -186,12 +186,12 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 		// call createExportAction before calling initLayout since crudActions
 		// will be needed in initLayout-->buildActionLayout
 		exportAction = createExportAction();
-		initLayout();
 
 		initializeEntityTable();
-
+		initLayout();
 		initSearch();
 		initButtons();
+
 		this.setVisible(true);
 		showNoSelectionMessage();
 		entityTable.select(entityTable.firstItemId());
