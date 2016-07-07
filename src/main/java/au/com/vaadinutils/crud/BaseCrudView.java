@@ -98,9 +98,15 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 	protected boolean restoreDelete;
 
 	protected TextField searchField = new TextField();
-	protected Button newButton = new Button("New");
-	protected Button applyButton = new Button("Apply");
+	protected HorizontalLayout actionLayout;
+	protected CssLayout actionGroupLayout = new CssLayout();
+	protected ComboBox actionCombo;
+	protected Label actionLabel;
+	protected Label actionMessage;
+	protected Button actionNewButton = new Button("New");
+	protected Button actionApplyButton = new Button("Apply");
 	protected Button searchButton = new Button("Search");
+	protected CrudAction<E> exportAction;
 	private boolean dynamicSearch = true;
 	protected Class<E> entityClass;
 	protected ValidatingFieldGroup<E> fieldGroup;
@@ -118,13 +124,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 	private VerticalLayout searchLayout;
 	protected Set<ChildCrudListener<E>> childCrudListeners = new HashSet<ChildCrudListener<E>>();
 	private CrudDisplayMode displayMode = CrudDisplayMode.HORIZONTAL;
-	protected HorizontalLayout actionLayout;
-	protected ComboBox actionCombo;
 	private boolean disallowEditing = false;
 	private boolean disallowNew = false;
-	protected CssLayout group = new CssLayout();
-	protected Label actionLabel;
-	protected Label actionMessage;
 	private boolean noEditor;
 	public boolean advancedSearchOn = false;
 	private boolean triggerFilterOnClear = true;
@@ -134,7 +135,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 	protected HeadingPropertySet headings;
 	private boolean dragAndDropOrderingEnabled = false;
 	private SingularAttribute<E, Long> ordinalField;
-	protected CrudAction<E> exportAction;
 
 	private boolean isMainView = true;
 
@@ -519,30 +519,30 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 		actionLabel.setContentMode(ContentMode.HTML);
 		actionLabel.setWidth("50");
 
-		group.addStyleName("v-component-group");
-		actionLayout.addComponent(group);
-		group.addComponent(actionLabel);
+		actionGroupLayout.addStyleName("v-component-group");
+		actionLayout.addComponent(actionGroupLayout);
+		actionGroupLayout.addComponent(actionLabel);
 
 		actionCombo = new ComboBox(null);
 		actionCombo.setWidth("160");
 		actionCombo.setNullSelectionAllowed(false);
 		actionCombo.setTextInputAllowed(false);
-		group.addComponent(actionCombo);
+		actionGroupLayout.addComponent(actionCombo);
 
 		addCrudActions();
-		group.addComponent(applyButton);
-		applyButton.setId("applyButton");
+		actionGroupLayout.addComponent(actionApplyButton);
+		actionApplyButton.setId("applyButton");
 
 		actionMessage = new Label("", ContentMode.HTML);
-		group.addComponent(actionMessage);
+		actionGroupLayout.addComponent(actionMessage);
 
-		newButton.setCaption(getNewButtonLabel());
-		newButton.setId("CrudNewButton-" + getNewButtonLabel());
-		actionLayout.addComponent(newButton);
+		actionNewButton.setCaption(getNewButtonLabel());
+		actionNewButton.setId("CrudNewButton-" + getNewButtonLabel());
+		actionLayout.addComponent(actionNewButton);
 
-		actionLayout.setComponentAlignment(group, Alignment.MIDDLE_LEFT);
-		actionLayout.setComponentAlignment(newButton, Alignment.MIDDLE_RIGHT);
-		actionLayout.setExpandRatio(group, 1.0f);
+		actionLayout.setComponentAlignment(actionGroupLayout, Alignment.MIDDLE_LEFT);
+		actionLayout.setComponentAlignment(actionNewButton, Alignment.MIDDLE_RIGHT);
+		actionLayout.setExpandRatio(actionGroupLayout, 1.0f);
 		actionLayout.setHeight("35");
 	}
 
@@ -559,12 +559,19 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 	private void addCrudActions()
 	{
 		final List<CrudAction<E>> actions = getCrudActions();
-		// If there are no actions then remove the combo box and button
-		if (actions.isEmpty())
+		// If there are no actions...
+		if (actions == null || actions.isEmpty())
 		{
-			actionCombo.setVisible(false);
-			applyButton.setVisible(false);
-			actionLabel.setVisible(false);
+			// ...and the new button is disable, remove the bottom panel...
+			if (disallowNew)
+			{
+				actionLayout.setVisible(false);
+			}
+			// ...otherwise just remove the combo box and button
+			else
+			{
+				actionGroupLayout.setVisible(false);
+			}
 
 			return;
 		}
@@ -804,14 +811,14 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 	protected void activateEditMode(boolean activate)
 	{
 		actionCombo.setEnabled(!activate);
-		applyButton.setEnabled(!activate);
+		actionApplyButton.setEnabled(!activate);
 
 		boolean showNew = !activate;
 		if (disallowNew)
 		{
 			showNew = false;
 		}
-		newButton.setEnabled(showNew);
+		actionNewButton.setEnabled(showNew);
 	}
 
 	/**
@@ -884,7 +891,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 			if (this.actionCombo.size() == 0)
 			{
 				this.actionCombo.setVisible(false);
-				this.applyButton.setVisible(false);
+				this.actionApplyButton.setVisible(false);
 				this.actionLabel.setVisible(false);
 			}
 		}
@@ -893,7 +900,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 			this.actionCombo.removeAllItems();
 			addCrudActions();
 			this.actionCombo.setVisible(true);
-			this.applyButton.setVisible(true);
+			this.actionApplyButton.setVisible(true);
 			this.actionLabel.setVisible(true);
 		}
 
@@ -910,7 +917,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 			show = false;
 		}
 
-		newButton.setVisible(show);
+		actionNewButton.setVisible(show);
 	}
 
 	/**
@@ -946,7 +953,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 
 	private void initButtons()
 	{
-		newButton.addClickListener(new ClickEventLogged.ClickListener()
+		actionNewButton.addClickListener(new ClickEventLogged.ClickListener()
 		{
 			private static final long serialVersionUID = 1L;
 
@@ -960,7 +967,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 
 		});
 
-		applyButton.addClickListener(new ClickEventLogged.ClickListener()
+		actionApplyButton.addClickListener(new ClickEventLogged.ClickListener()
 		{
 			private static final long serialVersionUID = 1L;
 
@@ -1781,9 +1788,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 				}
 			}
 
-			if (this.applyButton != null)
+			if (this.actionApplyButton != null)
 			{
-				this.applyButton.setEnabled(true);
+				this.actionApplyButton.setEnabled(true);
 			}
 		}
 		else
@@ -1802,9 +1809,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 
 			// TODO: we shouldn't be removing the apply button but rather just
 			// the Delete action.
-			if (this.applyButton != null)
+			if (this.actionApplyButton != null)
 			{
-				this.applyButton.setEnabled(false);
+				this.actionApplyButton.setEnabled(false);
 			}
 
 		}
@@ -1825,7 +1832,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 	protected void showNoSelectionMessage()
 	{
 		String message = "";
-		if (newButton.isVisible())
+		if (actionNewButton.isVisible())
 		{
 			message = "Click New to create a new record.";
 			if (entityTable.firstItemId() != null)
@@ -1987,7 +1994,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 					rowChanged(newEntity);
 					// Can't delete when you are adding a new record.
 					// Use cancel instead.
-					if (applyButton.isVisible())
+					if (actionApplyButton.isVisible())
 					{
 						restoreDelete = true;
 						activateEditMode(true);

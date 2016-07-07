@@ -518,7 +518,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 	protected void activateEditMode(boolean activate)
 	{
 		actionCombo.setEnabled(!activate);
-		applyButton.setEnabled(!activate);
+		actionApplyButton.setEnabled(!activate);
 
 		// for child new is always enabled unless explicitly disallowed
 		boolean showNew = true;
@@ -526,7 +526,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 		{
 			showNew = false;
 		}
-		newButton.setEnabled(showNew);
+		actionNewButton.setEnabled(showNew);
 	}
 
 	/**
@@ -579,7 +579,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 
 			// Can't delete when you are adding a new record.
 			// Use cancel instead.
-			if (applyButton.isVisible())
+			if (actionApplyButton.isVisible())
 			{
 				restoreDelete = true;
 				activateEditMode(true);
