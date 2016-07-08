@@ -248,7 +248,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 		dragAndDropOrderingEnabled = true;
 		this.ordinalField = ordinalField;
 
-		container.sort(new Object[] { ordinalField.getName() }, new boolean[] { true });
+		container.sort(new Object[]
+		{ ordinalField.getName() }, new boolean[]
+		{ true });
 
 		this.entityTable.setDragMode(TableDragMode.ROW);
 		this.entityTable.setDropHandler(new DropHandler()
@@ -317,7 +319,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 
 				container.commit();
 				container.refresh();
-				container.sort(new Object[] { ordinalField.getName() }, new boolean[] { true });
+				container.sort(new Object[]
+				{ ordinalField.getName() }, new boolean[]
+				{ true });
 
 				// cause this crud to save, or if its a child cause the parent
 				// to save.
@@ -771,6 +775,13 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 		return advancedSearchLayout;
 	}
 
+	/**
+	 * Show advanced search and, if lockAdvancedSearch is true, lock it into
+	 * place
+	 *
+	 * @param lockAdvancedSearch
+	 *            lock advanced search into place
+	 */
 	public void showAdvancedSearch(boolean lockAdvancedSearch)
 	{
 		advancedSearchOn = true;
