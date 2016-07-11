@@ -34,7 +34,6 @@ public class DashBoard extends GridStackLayout
 			@Override
 			public void onGridStackMove(Collection<GridStackMoveEvent> events)
 			{
-				Tblportallayout layout = new Tblportallayout();
 				for (GridStackMoveEvent event : events)
 				{
 					((Portal) event.getMovedChild()).savePosition(event);
