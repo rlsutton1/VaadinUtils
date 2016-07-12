@@ -192,7 +192,6 @@ public class DateTimePickerInline extends TimePicker
 		// innerMinuteLabelPanel.setPadding(5);
 		innerMinuteLabelPanel.addComponent(minuteLabel);
 		innerMinuteLabelPanel.setWidth("45");
-		// innerMinuteLabelPanel.setHeight("30");
 
 		minuteLabelWrapper.addComponent(innerMinuteLabelPanel);
 
@@ -215,6 +214,7 @@ public class DateTimePickerInline extends TimePicker
 		HorizontalLayout minuteButtonPanel = new HorizontalLayout();
 		minutePanel.addComponent(minuteButtonPanel);
 		addMinuteButtons(minuteButtonPanel, 2, 4);
+		minuteButtonPanel.setHeight("70");
 
 		HorizontalLayout amPmHourWrapper = new HorizontalLayout();
 		amPmHourWrapper.addComponent(hourPanel);
