@@ -390,7 +390,7 @@
 		<dependency>
 			<groupId>org.vaadin.alump.gridstack</groupId>
 			<artifactId>gridstack-addon</artifactId>
-			<version>0.3.0</version>
+			<version>0.3.1-nj-SNAPSHOT</version>
 		</dependency>
 
 	</dependencies>

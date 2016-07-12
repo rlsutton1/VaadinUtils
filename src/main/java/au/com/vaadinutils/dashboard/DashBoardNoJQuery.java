@@ -2,17 +2,17 @@ package au.com.vaadinutils.dashboard;
 
 import java.util.Collection;
 
-import org.vaadin.alump.gridstack.GridStackLayout;
+import org.vaadin.alump.gridstack.GridStackLayoutNoJQuery;
 import org.vaadin.alump.gridstack.GridStackMoveEvent;
 import org.vaadin.alump.gridstack.GridStackMoveEvent.GridStackMoveListener;
 
-public class DashBoard extends GridStackLayout
+public class DashBoardNoJQuery extends GridStackLayoutNoJQuery
 {
 	// Logger logger = LogManager.getLogger();
 
 	private static final long serialVersionUID = 1L;
 
-	public DashBoard()
+	public DashBoardNoJQuery()
 	{
 		super(8);
 

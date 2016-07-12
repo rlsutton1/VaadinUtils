@@ -1,18 +1,25 @@
 package au.com.vaadinutils.dashboard.example;
 
+import org.vaadin.alump.gridstack.GridStackLayoutNoJQuery;
+
 import com.vaadin.ui.AbstractLayout;
 
-import au.com.vaadinutils.dashboard.DashBoard;
 import au.com.vaadinutils.dashboard.DashBoardView;
 import au.com.vaadinutils.dashboard.PortalEnumIfc;
 
 public class ExampleDashboard extends DashBoardView
 {
 
+	protected ExampleDashboard(boolean loadJQuery)
+	{
+		// load the JQuery...
+		super(true);
+	}
+
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	public AbstractLayout createToolBar(DashBoard dashBoard, String guid)
+	public AbstractLayout createToolBar(GridStackLayoutNoJQuery dashBoard, String guid)
 	{
 		return new ExampleToolBar(dashBoard, guid);
 	}
