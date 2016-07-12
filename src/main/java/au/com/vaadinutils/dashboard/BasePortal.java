@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.vaadin.alump.gridstack.GridStackLayoutNoJQuery;
 import org.vaadin.alump.gridstack.GridStackMoveEvent;
 
 import com.vaadin.data.sort.SortOrder;
@@ -53,7 +54,7 @@ public abstract class BasePortal extends VerticalLayout implements Portal
 	Logger logger = LogManager.getLogger();
 	private PortalConfigDelgate configDelegate;
 
-	protected BasePortal(Tblportal portal, DashBoard dashBoard, PortalConfigDelgate configDelegate)
+	protected BasePortal(Tblportal portal, GridStackLayoutNoJQuery dashBoard, PortalConfigDelgate configDelegate)
 	{
 		guid = portal.getGuid();
 
@@ -83,7 +84,7 @@ public abstract class BasePortal extends VerticalLayout implements Portal
 		return configDelegate;
 	}
 
-	private HorizontalLayout createHeader(String title, final DashBoard dashBoard)
+	private HorizontalLayout createHeader(String title, final GridStackLayoutNoJQuery dashBoard)
 	{
 		HorizontalLayout header = new HorizontalLayout();
 		header.setWidth("100%");

@@ -652,16 +652,16 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 	}
 
 	@SuppressWarnings("unchecked")
-	public <K extends BaseCrudEntity> K findByEntityId(K entity)
+	public <M extends BaseCrudEntity> M findByEntityId(M entity)
 	{
 		if (entity.getId() != null)
 		{
 			// lookup by id
-			return (K) getEntityManager().find(entityClass, entity.getId());
+			return (M) getEntityManager().find(entityClass, entity.getId());
 		}
 
 		// lookup by guid
-		JpaDslBuilder<K> q = (JpaDslBuilder<K>) find();
+		JpaDslBuilder<M> q = (JpaDslBuilder<M>) find();
 		return q.where(q.eq(BaseCrudEntity_.guid, entity.getGuid())).getSingleResultOrNull();
 
 	}

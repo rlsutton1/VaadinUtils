@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.vaadin.alump.gridstack.GridStackLayoutNoJQuery;
 import org.vaadin.sliderpanel.SliderPanel;
 import org.vaadin.sliderpanel.SliderPanelBuilder;
 import org.vaadin.sliderpanel.SliderPanelStyles;
@@ -46,7 +47,7 @@ public abstract class DashBoardView extends HorizontalLayout implements View
 
 	Logger logger = LogManager.getLogger();
 
-	private DashBoard dashBoard;
+	private GridStackLayoutNoJQuery dashBoard;
 
 	private SliderPanel toolbarSlider;
 
@@ -57,6 +58,13 @@ public abstract class DashBoardView extends HorizontalLayout implements View
 	private SliderPanel dashboardsSlider;
 
 	UI ui = UI.getCurrent();
+
+	private boolean loadJQuery;
+
+	protected DashBoardView(boolean loadJQuery)
+	{
+		this.loadJQuery = loadJQuery;
+	}
 
 	@Override
 	public void enter(ViewChangeEvent event)
@@ -134,7 +142,15 @@ public abstract class DashBoardView extends HorizontalLayout implements View
 		{
 			removeComponent(dashBoard);
 		}
-		dashBoard = new DashBoard();
+		if (loadJQuery)
+		{
+			dashBoard = new DashBoard();
+		}
+		else
+		{
+			dashBoard = new DashBoardNoJQuery();
+		}
+
 		addComponent(dashBoard);
 		setExpandRatio(dashBoard, 1);
 
@@ -147,7 +163,7 @@ public abstract class DashBoardView extends HorizontalLayout implements View
 
 	}
 
-	public abstract AbstractLayout createToolBar(DashBoard dashBoard, String guid);
+	public abstract AbstractLayout createToolBar(GridStackLayoutNoJQuery dashBoard2, String guid);
 
 	public abstract Long getAccountId();
 
@@ -333,7 +349,7 @@ public abstract class DashBoardView extends HorizontalLayout implements View
 
 	}
 
-	private void loadDashboard(Tblportallayout portalLayout, DashBoard dashBoard)
+	private void loadDashboard(Tblportallayout portalLayout, GridStackLayoutNoJQuery dashBoard2)
 
 	{
 		for (Tblportal portal : portalLayout.getPortals())
@@ -342,7 +358,7 @@ public abstract class DashBoardView extends HorizontalLayout implements View
 			{
 				PortalAdderIfc panel = getEnumFromType(portal.getType()).instancePortalAdder(portalLayout.getGuid());
 
-				panel.addPortal(dashBoard, portal);
+				panel.addPortal(dashBoard2, portal);
 			}
 			catch (Throwable e)
 			{

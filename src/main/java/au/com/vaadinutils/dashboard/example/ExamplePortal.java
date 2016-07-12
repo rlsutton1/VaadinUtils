@@ -1,6 +1,7 @@
 package au.com.vaadinutils.dashboard.example;
 
 import org.apache.commons.lang3.StringUtils;
+import org.vaadin.alump.gridstack.GridStackLayoutNoJQuery;
 
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.FontAwesome;
@@ -14,7 +15,6 @@ import com.vaadin.ui.themes.ValoTheme;
 
 import au.com.vaadinutils.dashboard.BasePortal;
 import au.com.vaadinutils.dashboard.BasePortalAdder;
-import au.com.vaadinutils.dashboard.DashBoard;
 import au.com.vaadinutils.dashboard.Portal;
 import au.com.vaadinutils.dashboard.PortalConfigDelgate;
 import au.com.vaadinutils.dashboard.Tblportal;
@@ -44,7 +44,7 @@ public class ExamplePortal extends BasePortalAdder
 	}
 
 	@Override
-	protected Portal instancePortal(DashBoard dashBoard, Tblportal portal)
+	protected Portal instancePortal(GridStackLayoutNoJQuery dashBoard, Tblportal portal)
 	{
 		return new IFramePortal(portal, dashBoard, this);
 
@@ -55,7 +55,7 @@ public class ExamplePortal extends BasePortalAdder
 		private static final long serialVersionUID = 1L;
 		final BrowserFrame iFrame = new BrowserFrame();
 
-		public IFramePortal(Tblportal portal, DashBoard dashBoard, PortalConfigDelgate configDelegate)
+		public IFramePortal(Tblportal portal, GridStackLayoutNoJQuery dashBoard, PortalConfigDelgate configDelegate)
 		{
 			super(portal, dashBoard, configDelegate);
 

@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.vaadin.alump.gridstack.GridStackCoordinates;
+import org.vaadin.alump.gridstack.GridStackLayoutNoJQuery;
 
 import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.AbstractLayout;
@@ -28,7 +29,7 @@ public abstract class BasePortalAdder extends VerticalLayout implements PortalCo
 	}
 
 	@Override
-	public AbstractLayout getVaadinAddLayout(final DashBoard dashBoard)
+	public AbstractLayout getVaadinAddLayout(final GridStackLayoutNoJQuery dashBoard)
 	{
 		final String title = getTitle();
 		ClickableLabel label = new ClickableLabel(FontAwesome.PLUS.getHtml() + " " + title);
@@ -59,7 +60,7 @@ public abstract class BasePortalAdder extends VerticalLayout implements PortalCo
 	protected abstract Enum<?> getPortalEnum();
 
 	@Override
-	public void addPortal(final DashBoard dashBoard, Tblportal portal)
+	public void addPortal(final GridStackLayoutNoJQuery dashBoard, Tblportal portal)
 	{
 
 		Portal component = instancePortal(dashBoard, portal);
@@ -83,7 +84,7 @@ public abstract class BasePortalAdder extends VerticalLayout implements PortalCo
 		return 5;
 	}
 
-	protected abstract Portal instancePortal(final DashBoard dashBoard, Tblportal portal);
+	protected abstract Portal instancePortal(final GridStackLayoutNoJQuery dashBoard, Tblportal portal);
 
 	@Override
 	public Map<String, Integer> getValuesLikeInt(Tblportal portal, String string)
