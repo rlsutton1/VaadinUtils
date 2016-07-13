@@ -3,7 +3,6 @@ package au.com.vaadinutils.jasper.parameter;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import javax.persistence.metamodel.SingularAttribute;
 
@@ -12,53 +11,52 @@ import org.apache.logging.log4j.Logger;
 
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.QueryModifierDelegate;
-import com.vaadin.addon.jpacontainer.fieldfactory.MultiSelectConverter;
 import com.vaadin.data.Container;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Item;
+import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
-import com.vaadin.data.Validator;
+import com.vaadin.data.sort.SortOrder;
 import com.vaadin.data.util.filter.SimpleStringFilter;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
+import com.vaadin.event.SelectionEvent;
+import com.vaadin.event.SelectionEvent.SelectionListener;
 import com.vaadin.server.ErrorMessage;
-import com.vaadin.ui.AbstractField;
+import com.vaadin.shared.data.sort.SortDirection;
 import com.vaadin.ui.Alignment;
-import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.Grid;
+import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Table.ColumnHeaderMode;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
 import au.com.vaadinutils.crud.CrudEntity;
+import au.com.vaadinutils.crud.GridHeadingPropertySet;
 import au.com.vaadinutils.dao.JpaBaseDao;
-import au.com.vaadinutils.fields.SelectionListener;
-import au.com.vaadinutils.fields.TableCheckBoxSelect;
 import au.com.vaadinutils.jasper.scheduler.entities.DateParameterType;
 
-@SuppressWarnings("deprecation")
 public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<String>
 		implements ReportParameterSelectionListener<T>
 {
 
-	protected TableCheckBoxSelect table;
+	protected Grid grid;
 	private Long defaultValue = null;
 	JPAContainer<T> container = null;
-	private VerticalLayout layout;
-	private String caption;
+	protected VerticalLayout layout;
+	protected String caption;
 	Logger logger = LogManager.getLogger();
-	private SingularAttribute<T, String> displayField;
+	protected SingularAttribute<T, String> displayField;
 
 	public ReportParameterTable(String caption, String parameterName, Class<T> tableClass,
 			SingularAttribute<T, String> displayField)
 	{
 		super(caption, parameterName);
 		init(caption, tableClass, displayField);
-		setNotEmpty();
-
+		setSelectionMode(SelectionMode.MULTI);
 	}
 
 	public ReportParameterTable(String caption, String parameterName, Class<T> tableClass,
@@ -67,12 +65,35 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 		super(caption, parameterName);
 		init(caption, tableClass, displayField);
 		this.defaultValue = defaultValue;
-		setNotEmpty();
+		setSelectionMode(SelectionMode.MULTI);
+
 	}
 
 	protected void addComponentToLayout(Component comp)
 	{
 		layout.addComponent(comp);
+	}
+
+	void setSelectionMode(SelectionMode mode)
+	{
+		if (mode == SelectionMode.MULTI)
+		{
+			grid.setSelectionMode(SelectionMode.MULTI);
+
+			grid.setSelectionModel(new Grid.MultiSelectionModel());
+		}
+		else if (mode == SelectionMode.SINGLE)
+		{
+			grid.setSelectionMode(SelectionMode.SINGLE);
+
+			grid.setSelectionModel(new Grid.SingleSelectionModel());
+
+		}
+		else
+		{
+			throw new RuntimeException("SelectionMode none not supported");
+		}
+
 	}
 
 	protected void init(String caption, Class<T> tableClass, final SingularAttribute<T, String> displayField)
@@ -107,79 +128,54 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 			}
 		});
 
-		table = new TableCheckBoxSelect();
+		grid = new Grid();
+		grid.setImmediate(true);
 
-		table.setSizeFull();
+		grid.setSizeFull();
 		// table.setHeight("150");
 
-		table.setContainerDataSource(container);
+		grid.setContainerDataSource(container);
 
-		table.setConverter(MultiSelectConverter.class);
+		new GridHeadingPropertySet.Builder<T>().createColumn(caption, displayField.getName()).build().applyToGrid(grid);
 
-		table.setColumnHeaderMode(ColumnHeaderMode.HIDDEN);
-		setVisibleColumns(displayField);
-		table.setColumnWidth(displayField.getName(), 130);
-		table.setColumnExpandRatio(displayField.getName(), 1);
-		table.setNewItemsAllowed(false);
-		table.setNullSelectionAllowed(false);
-		table.setMultiSelect(true);
-
-		CheckBox selectAll = new CheckBox("Select all");
-
-		selectAll.addValueChangeListener(new ValueChangeListener()
-		{
-
-			private static final long serialVersionUID = 3046649134868865285L;
-
-			@Override
-			public void valueChange(ValueChangeEvent event)
-			{
-				if ((Boolean) event.getProperty().getValue() == true)
-				{
-					table.selectAll();
-				}
-				else
-				{
-					table.deselectAll();
-				}
-
-			}
-		});
+		List<SortOrder> orders = new LinkedList<>();
+		orders.add(new SortOrder(displayField.getName(), SortDirection.ASCENDING));
+		grid.setSortOrder(orders);
 
 		final Label selectionCount = new Label("0 selected");
 
 		// removed for concertina
 		// layout.addComponent(new Label(caption));
 		layout.addComponent(searchText);
-		layout.addComponent(table);
+		layout.addComponent(grid);
 
 		HorizontalLayout selectionLayout = new HorizontalLayout();
 		selectionLayout.setHeight("30");
 		selectionLayout.setWidth("100%");
-		selectionLayout.addComponent(selectAll);
 		selectionLayout.addComponent(selectionCount);
-		selectionLayout.setComponentAlignment(selectAll, Alignment.MIDDLE_LEFT);
 		selectionLayout.setComponentAlignment(selectionCount, Alignment.MIDDLE_RIGHT);
 		layout.addComponent(selectionLayout);
-		table.addSelectionListener(new SelectionListener()
+		grid.addSelectionListener(new SelectionListener()
 		{
 
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
 			@Override
-			public void selectedItems(int count)
+			public void select(SelectionEvent event)
 			{
-				selectionCount.setValue("" + count + " selected");
+				validate();
+
+				selectionCount.setValue("" + event.getSelected().size() + " selected");
 
 			}
 		});
 
-		layout.setExpandRatio(table, 1);
+		layout.setExpandRatio(grid, 1);
 		// layout.setComponentAlignment(selectAll, Alignment.BOTTOM_RIGHT);
 
-	}
-
-	protected void setVisibleColumns(final SingularAttribute<T, String> displayField)
-	{
-		table.setVisibleColumns(displayField.getName());
 	}
 
 	/**
@@ -210,19 +206,96 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 	}
 
 	@Override
-	public void addSelectionListener(ValueChangeListener listener)
+	public void addSelectionListener(final ValueChangeListener listener)
 	{
-		table.addValueChangeListener(listener);
+		grid.addSelectionListener(new SelectionListener()
+		{
+
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void select(SelectionEvent event)
+			{
+
+				listener.valueChange(new ValueChangeEvent()
+				{
+
+					/**
+					 * 
+					 */
+					private static final long serialVersionUID = 1L;
+
+					@Override
+					public Property<Collection<Long>> getProperty()
+					{
+						return new Property<Collection<Long>>()
+						{
+
+							/**
+							 * 
+							 */
+							private static final long serialVersionUID = 1L;
+
+							@Override
+							public Collection<Long> getValue()
+							{
+								return getSelectedIds();
+							}
+
+							@Override
+							public void setValue(Collection<Long> newValue)
+									throws com.vaadin.data.Property.ReadOnlyException
+							{
+
+							}
+
+							@Override
+							public Class<? extends Collection<Long>> getType()
+							{
+								return null;
+							}
+
+							@Override
+							public boolean isReadOnly()
+							{
+								return false;
+							}
+
+							@Override
+							public void setReadOnly(boolean newStatus)
+							{
+
+							}
+						};
+					}
+				});
+
+			}
+		});
+
+	}
+
+	private Collection<Long> getSelectedIds()
+	{
+		Collection<Long> ids = new LinkedList<>();
+		for (Object id : grid.getSelectedRows())
+		{
+			ids.add((Long) id);
+		}
+		return ids;
 	}
 
 	public void removeAllContainerFilters()
 	{
-		((Container.Filterable) table.getContainerDataSource()).removeAllContainerFilters();
+		((Container.Filterable) grid.getContainerDataSource()).removeAllContainerFilters();
 	}
 
 	public void addContainerFilter(Filter filter)
 	{
-		((Container.Filterable) table.getContainerDataSource()).addContainerFilter(filter);
+		((Container.Filterable) grid.getContainerDataSource()).addContainerFilter(filter);
 	}
 
 	@Override
@@ -231,10 +304,9 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 
 		try
 		{
-			@SuppressWarnings("unchecked")
-			Set<Long> ids = (Set<Long>) table.getSelectedItems();
+			Collection<Object> ids = grid.getSelectedRows();
 			String selection = "";
-			for (Long id : ids)
+			for (Object id : ids)
 			{
 				selection += "" + id + ",";
 			}
@@ -258,72 +330,53 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public boolean validate()
 	{
-		return super.validateField((AbstractField) table);
+		validateMe();
+		return getValue().size() > 0;
 	}
 
-	public void allowEmpty()
+	public void validateMe()
 	{
-		table.removeAllValidators();
-	}
 
-	private ReportParameter<?> setNotEmpty()
-	{
-		Validator validator = new Validator()
+		grid.setComponentError(null);
+		setComponentErrorForValidateListener(null);
+		grid.setComponentError(null);
+		setComponentErrorForValidateListener(null);
+		Collection<Long> ids = getSelectedIds();
+		if (ids.size() == 0)
 		{
-
-			/**
-			 * 
-			 */
-			private static final long serialVersionUID = 8942263638713110223L;
-
-			@SuppressWarnings("unchecked")
-			@Override
-			public void validate(Object value) throws InvalidValueException
+			ErrorMessage error = new ErrorMessage()
 			{
-				setValidateListenerComponentError(null);
-				table.setComponentError(null);
-				setValidateListenerComponentError(null);
-				table.setComponentError(null);
-				Collection<Long> ids = (Collection<Long>) table.getSelectedItems();
-				if (ids.size() == 0)
+
+				private static final long serialVersionUID = -6437991860908562482L;
+
+				@Override
+				public ErrorLevel getErrorLevel()
 				{
-					ErrorMessage error = new ErrorMessage()
-					{
-
-						private static final long serialVersionUID = -6437991860908562482L;
-
-						@Override
-						public ErrorLevel getErrorLevel()
-						{
-							return ErrorLevel.ERROR;
-						}
-
-						@Override
-						public String getFormattedHtmlMessage()
-						{
-							return "You must select at least one " + caption;
-						}
-					};
-					setValidateListenerComponentError(error);
-					throw new Validator.EmptyValueException("You must select at least one " + caption);
+					return ErrorLevel.ERROR;
 				}
 
-			}
-
-			private void setValidateListenerComponentError(ErrorMessage error)
-			{
-				if (validateListener != null)
+				@Override
+				public String getFormattedHtmlMessage()
 				{
-					validateListener.setComponentError(error);
+					return "You must select at least one " + caption;
 				}
-			}
-		};
-		table.addValidator(validator);
-		return this;
+			};
+			grid.setComponentError(error);
+			setComponentErrorForValidateListener(error);
+
+		}
+
+	}
+
+	private void setComponentErrorForValidateListener(ErrorMessage error)
+	{
+		if (validateListener != null)
+		{
+			validateListener.setComponentError(error);
+		}
 	}
 
 	@Override
@@ -357,14 +410,13 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 		try
 		{
 
-			@SuppressWarnings({ "unchecked" })
-			Set<Long> ids = (Set<Long>) table.getSelectedItems();
+			Collection<Object> ids = grid.getSelectedRows();
 			String selection = "";
 			int ctr = 0;
-			for (Long id : ids)
+			for (Object id : ids)
 			{
 				ctr++;
-				final Item item = table.getItem(id);
+				final Item item = grid.getContainerDataSource().getItem(id);
 
 				// we get nulls if the entity is deleted from the database after
 				// the report parameter is saved
@@ -388,7 +440,7 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 			// supply default if emtpy
 			if (selection.length() == 0 && defaultValue != null)
 			{
-				selection = "" + table.getItemCaption(defaultValue);
+				selection = "" + defaultValue;
 			}
 			return selection;
 
@@ -423,7 +475,18 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 		}
 		if (idList.size() > 0)
 		{
-			table.setSelectedValue(idList);
+			for (Long id : idList)
+			{
+				try
+				{
+					grid.select(id);
+				}
+				catch (IllegalArgumentException e)
+				{
+					logger.warn("Id doesn't exist in container");
+				}
+			}
+
 		}
 
 	}
@@ -438,6 +501,13 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 	public DateParameterType getDateParameterType()
 	{
 		throw new RuntimeException("Not implemented");
+	}
+
+	@Override
+	public Collection<Object> getValue()
+	{
+
+		return grid.getSelectedRows();
 	}
 
 }

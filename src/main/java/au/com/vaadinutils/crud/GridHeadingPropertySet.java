@@ -73,6 +73,8 @@ public class GridHeadingPropertySet
 
 		public AddingColumn<E> setRenderer(AbstractRenderer<?> renderer);
 
+		public GridHeadingPropertySet build();
+
 	}
 
 	public static class Builder<E> implements AddingColumn<E>, Start<E>
