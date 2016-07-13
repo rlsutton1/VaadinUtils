@@ -25,7 +25,7 @@ public class Tblportallayout extends BaseCrudEntity implements Serializable
 	private Long account;
 
 	@Column(name = "`default`")
-	private byte default_;
+	private Boolean default_ = false;
 
 	private String name;
 
@@ -46,12 +46,12 @@ public class Tblportallayout extends BaseCrudEntity implements Serializable
 	@OneToMany(mappedBy = "portalLayout")
 	private Set<Tblportal> portals = new HashSet<>();
 
-	public byte getDefault_()
+	public Boolean getDefault_()
 	{
 		return this.default_;
 	}
 
-	public void setDefault_(byte default_)
+	public void setDefault_(Boolean default_)
 	{
 		this.default_ = default_;
 	}
@@ -85,6 +85,16 @@ public class Tblportallayout extends BaseCrudEntity implements Serializable
 
 		portals.remove(portal);
 
+	}
+
+	@Override
+	public String toString()
+	{
+		if (default_)
+		{
+			return "* " + name;
+		}
+		return name;
 	}
 
 }

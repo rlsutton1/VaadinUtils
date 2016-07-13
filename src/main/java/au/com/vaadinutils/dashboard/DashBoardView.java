@@ -20,7 +20,6 @@ import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.AbstractLayout;
-import com.vaadin.ui.AbstractSelect.ItemCaptionMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
@@ -35,6 +34,7 @@ import com.vaadin.ui.themes.ValoTheme;
 
 import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.dao.JpaBaseDao;
+import au.com.vaadinutils.dao.JpaDslBuilder;
 import au.com.vaadinutils.editors.InputFormDialog;
 import au.com.vaadinutils.editors.InputFormDialogRecipient;
 
@@ -122,6 +122,7 @@ public abstract class DashBoardView extends HorizontalLayout implements View
 
 		Tblportallayout portalLayout = findDefaultPortal();
 		createDashboard(portalLayout);
+		dashBoardSelector.select(portalLayout);
 
 	}
 
@@ -208,6 +209,7 @@ public abstract class DashBoardView extends HorizontalLayout implements View
 
 		buttonLayout.addComponent(newDashboard);
 		buttonLayout.addComponent(rename);
+		buttonLayout.addComponent(createMakeDefaultButton());
 		// buttonLayout.addComponent(copy);
 		// buttonLayout.addComponent(share);
 
@@ -277,6 +279,45 @@ public abstract class DashBoardView extends HorizontalLayout implements View
 		return rename;
 	}
 
+	private Button createMakeDefaultButton()
+	{
+		Button rename = new Button(FontAwesome.STAR);
+		rename.setDescription("Make Default Dashboard");
+		rename.setStyleName(ValoTheme.BUTTON_ICON_ONLY);
+
+		rename.addClickListener(new ClickListener()
+		{
+
+			private static final long serialVersionUID = 1058348590862935257L;
+
+			@Override
+			public void buttonClick(ClickEvent event)
+			{
+
+				// set all portals to not default
+				JpaDslBuilder<Tblportallayout> q = JpaBaseDao.getGenericDao(Tblportallayout.class).find();
+				List<Tblportallayout> portals = q.where(q.eq(Tblportallayout_.account, getAccountId())).getResultList();
+				for (Tblportallayout portal : portals)
+				{
+					portal.setDefault_(false);
+				}
+
+				// set selected portal to default
+				Tblportallayout portalLayout = (Tblportallayout) dashBoardSelector.getValue();
+				portalLayout = JpaBaseDao.getGenericDao(Tblportallayout.class).findById(portalLayout.getId());
+				portalLayout.setDefault_(true);
+
+				// load list and select and display portal
+				loadDashboardList();
+				dashBoardSelector.select(portalLayout);
+				dashboardsSlider.setCaption("Dashboards: " + portalLayout.getName());
+
+			}
+		});
+
+		return rename;
+	}
+
 	private Button createDeleteButton()
 	{
 		Button delete = new Button(FontAwesome.TRASH);
@@ -318,14 +359,11 @@ public abstract class DashBoardView extends HorizontalLayout implements View
 		dashBoardSelector.setHeight("100%");
 		dashBoardSelector.setWidth("200");
 
-		dashBoardSelector.setItemCaptionPropertyId(Tblportallayout_.name.getName());
-		dashBoardSelector.setItemCaptionMode(ItemCaptionMode.PROPERTY);
+		// dashBoardSelector.setItemCaptionPropertyId(Tblportallayout_.name.getName());
+		// dashBoardSelector.setItemCaptionMode(ItemCaptionMode.PROPERTY);
 
-		Long account = getAccountId();
-		List<Tblportallayout> layouts = JpaBaseDao.getGenericDao(Tblportallayout.class)
-				.findAllByAttribute(Tblportallayout_.account, account, null);
 		container = new BeanItemContainer<>(Tblportallayout.class);
-		container.addAll(layouts);
+		loadDashboardList();
 		dashBoardSelector.setContainerDataSource(container);
 		dashBoardSelector.setNullSelectionAllowed(false);
 
@@ -347,6 +385,16 @@ public abstract class DashBoardView extends HorizontalLayout implements View
 			}
 		});
 
+	}
+
+	private void loadDashboardList()
+	{
+		Long account = getAccountId();
+		JpaDslBuilder<Tblportallayout> q = JpaBaseDao.getGenericDao(Tblportallayout.class).find();
+		List<Tblportallayout> layouts = q.where(q.eq(Tblportallayout_.account, account))
+				.orderBy(Tblportallayout_.default_, false).orderBy(Tblportallayout_.name, true).getResultList();
+		container.removeAllItems();
+		container.addAll(layouts);
 	}
 
 	private void loadDashboard(Tblportallayout portalLayout, GridStackLayoutNoJQuery dashBoard2)
@@ -373,10 +421,15 @@ public abstract class DashBoardView extends HorizontalLayout implements View
 	private Tblportallayout findDefaultPortal()
 	{
 		Long account = getAccountId();
-		Tblportallayout portalLayout = JpaBaseDao.getGenericDao(Tblportallayout.class)
-				.findOneByAttribute(Tblportallayout_.account, account);
+		JpaDslBuilder<Tblportallayout> q = JpaBaseDao.getGenericDao(Tblportallayout.class).find();
+		List<Tblportallayout> layouts = q.where(q.eq(Tblportallayout_.account, account))
+				.orderBy(Tblportallayout_.default_, false).orderBy(Tblportallayout_.name, true).getResultList();
 
-		return portalLayout;
+		if (layouts.size() == 0)
+		{
+			return null;
+		}
+		return layouts.get(0);
 	}
 
 }
