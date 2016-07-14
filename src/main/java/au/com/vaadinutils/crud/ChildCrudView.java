@@ -457,12 +457,15 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 		entityTable.select(previousItemId);
 
 		dirty = true;
+		container.removeItem(entityId);
 		JpaBaseDao<E, Long> dao = new JpaBaseDao<E, Long>(entityClass);
 		E entity = dao.findById((Long) entityId);
-		EntityManagerProvider.remove(entity);
+		if (entity != null)
+		{
+			EntityManagerProvider.remove(entity);
+		}
 		parentCrud.reloadDataFromDB();
 		entityTable.select(null);
-		reloadDataFromDB();
 
 		postChildDelete(entityId);
 
