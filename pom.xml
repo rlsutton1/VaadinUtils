@@ -392,7 +392,11 @@
 			<artifactId>gridstack-addon</artifactId>
 			<version>0.3.1-nj-SNAPSHOT</version>
 		</dependency>
-
+		<dependency>
+		   <groupId>org.vaadin</groupId>
+		   <artifactId>viritin</artifactId>
+		   <version>1.54</version>
+		</dependency>
 	</dependencies>
 
 	<profiles>
