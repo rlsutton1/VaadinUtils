@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
 
+import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.Table;
@@ -898,7 +899,25 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 			return builder.isNull(root.get(field));
 
 		}
-
 	}
 
+	public int getEntityCount()
+	{
+		final String entityName = entityClass.getSimpleName();
+		final Entity annotation = entityClass.getAnnotation(Entity.class);
+		String tableName;
+		if (annotation != null && !annotation.name().isEmpty())
+		{
+			tableName = annotation.name();
+		}
+		else
+		{
+			tableName = entityName;
+		}
+
+		final String qry = "SELECT COUNT(" + tableName + ") FROM " + tableName + " " + tableName;
+		final TypedQuery<Long> query = getEntityManager().createQuery(qry, Long.class);
+
+		return query.getSingleResult().intValue();
+	}
 }
