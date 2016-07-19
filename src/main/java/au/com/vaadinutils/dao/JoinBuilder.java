@@ -1,17 +1,25 @@
 package au.com.vaadinutils.dao;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.persistence.metamodel.Attribute;
 import javax.persistence.metamodel.ListAttribute;
 import javax.persistence.metamodel.SetAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 
+import au.com.vaadinutils.dao.JoinOnBuilder.JoinOnType;
+
 public class JoinBuilder<E, K>
 {
+	List<JoinOnBuilder<K, ?>> joinOnBuilders = new LinkedList<>();
 
 	/*
 	 * (non-Javadoc)
@@ -95,7 +103,7 @@ public class JoinBuilder<E, K>
 
 	@SuppressWarnings(
 	{ "rawtypes", "unchecked" })
-	public Join<E, K> getJoin(Root<E> root)
+	public Join<E, K> getJoin(Root<E> root, CriteriaBuilder builder)
 	{
 		Join p = null;
 		for (JoinMetaData join : joins)
@@ -108,9 +116,60 @@ public class JoinBuilder<E, K>
 			{
 				p = join.getJoin(p);
 			}
+
+			if (!joinOnBuilders.isEmpty())
+			{
+				p = getOnJoin(p, builder);
+			}
 		}
 
 		return p;
+	}
+
+	public <V> Join<E, K> getOnJoin(Join<E, K> join, CriteriaBuilder builder)
+	{
+		List<Predicate> predicates = new ArrayList<>(joinOnBuilders.size());
+		for (JoinOnBuilder<K, ?> joinOnBuilder : joinOnBuilders)
+		{
+			switch (joinOnBuilder.getType())
+			{
+				case EQUAL:
+					predicates
+							.add(builder.equal(castGet(joinOnBuilder.getAttribute(), join), joinOnBuilder.getValue()));
+			}
+		}
+
+		return join.on(builder.and(predicates.toArray(new Predicate[joinOnBuilders.size()])));
+	}
+
+	@SuppressWarnings("unchecked")
+	private <V> Expression<?> castGet(final Attribute<K, V> attribute, Join<E, K> join)
+	{
+		if (attribute instanceof SingularAttribute)
+		{
+			return join.get((SingularAttribute<K, V>) attribute);
+		}
+		else if (attribute instanceof ListAttribute)
+		{
+			return join.get((ListAttribute<K, V>) attribute);
+		}
+		else if (attribute instanceof SetAttribute)
+		{
+			return join.get((SetAttribute<K, V>) attribute);
+		}
+		else
+		{
+			return null;
+		}
+	}
+
+	public <T, V> JoinBuilder<E, K> onEq(final SingularAttribute<K, V> attribute, final V value)
+	{
+		JoinBuilder<E, K> jb = new JoinBuilder<E, K>();
+		jb.joins.addAll(joins);
+		jb.joinOnBuilders.addAll(joinOnBuilders);
+		jb.joinOnBuilders.add(new JoinOnBuilder<K, V>(attribute, value, JoinOnType.EQUAL));
+		return jb;
 	}
 
 	@SuppressWarnings(
