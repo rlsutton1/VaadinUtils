@@ -40,7 +40,7 @@ import au.com.vaadinutils.editors.InputFormDialogRecipient;
 
 /** A start view for navigating to the main view */
 
-public abstract class DashBoardView extends HorizontalLayout implements View
+public abstract class DashBoardView extends VerticalLayout implements View
 {
 
 	private static final long serialVersionUID = 1L;
@@ -48,8 +48,6 @@ public abstract class DashBoardView extends HorizontalLayout implements View
 	Logger logger = LogManager.getLogger();
 
 	private GridStackLayoutNoJQuery dashBoard;
-
-	private SliderPanel toolbarSlider;
 
 	private ListSelect dashBoardSelector;
 
@@ -60,6 +58,8 @@ public abstract class DashBoardView extends HorizontalLayout implements View
 	UI ui = UI.getCurrent();
 
 	private boolean loadJQuery;
+
+	private VerticalLayout toolbarHolder;
 
 	protected DashBoardView(boolean loadJQuery)
 	{
@@ -106,19 +106,14 @@ public abstract class DashBoardView extends HorizontalLayout implements View
 	void postLoad()
 	{
 		VerticalLayout sliderHolder = new VerticalLayout();
-		sliderHolder.setWidth("30");
-		sliderHolder.setHeight("100%");
+		sliderHolder.setWidth("100%");
+		sliderHolder.setHeight("40");
 		addComponent(sliderHolder);
 
-		dashboardsSlider = new SliderPanelBuilder(dashboardManagement()).expanded(false).mode(SliderMode.LEFT)
-				.tabPosition(SliderTabPosition.BEGINNING).style(SliderPanelStyles.COLOR_GREEN).caption("Dashboards")
+		dashboardsSlider = new SliderPanelBuilder(dashboardPanels()).expanded(false).mode(SliderMode.TOP)
+				.tabPosition(SliderTabPosition.MIDDLE).style(SliderPanelStyles.ICON_WHITE).caption("Dashboards")
 				.animationDuration(400).tabSize(30).autoCollapseSlider(true).build();
 		sliderHolder.addComponent(dashboardsSlider);
-
-		toolbarSlider = new SliderPanelBuilder(new VerticalLayout()).expanded(false).mode(SliderMode.LEFT)
-				.caption("Add Widgets").style(SliderPanelStyles.COLOR_WHITE).animationDuration(400)
-				.tabPosition(SliderTabPosition.BEGINNING).autoCollapseSlider(true).tabSize(30).build();
-		sliderHolder.addComponent(toolbarSlider);
 
 		Tblportallayout portalLayout = findDefaultPortal();
 		createDashboard(portalLayout);
@@ -156,17 +151,30 @@ public abstract class DashBoardView extends HorizontalLayout implements View
 		setExpandRatio(dashBoard, 1);
 
 		AbstractLayout dashboardToolBar = createToolBar(dashBoard, portalLayout.getGuid());
+		toolbarHolder.removeAllComponents();
+		toolbarHolder.addComponent(dashboardToolBar);
 
-		toolbarSlider.setContent(dashboardToolBar);
 		loadDashboard(portalLayout, dashBoard);
 		dashBoardSelector.setValue(portalLayout);
-		dashboardsSlider.setCaption("Dashboards: " + portalLayout.getName());
+		dashboardsSlider.setCaption(portalLayout.getName());
 
 	}
 
 	public abstract AbstractLayout createToolBar(GridStackLayoutNoJQuery dashBoard2, String guid);
 
 	public abstract Long getAccountId();
+
+	private Component dashboardPanels()
+	{
+		HorizontalLayout layout = new HorizontalLayout();
+
+		layout.addComponent(dashboardManagement());
+
+		toolbarHolder = new VerticalLayout();
+
+		layout.addComponent(toolbarHolder);
+		return layout;
+	}
 
 	private Component dashboardManagement()
 	{

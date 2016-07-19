@@ -171,13 +171,20 @@ public class JSCallWithReturnValue
 			@Override
 			public void call(JsonArray arguments)
 			{
-				String value = arguments.getString(0);
-				future.cancel(false);
-				JavaScript.getCurrent().removeFunction(hookName);
-				JavaScript.getCurrent().removeFunction(errorHookName);
-				logger.error(jsToExecute + " -> resulted in the error: " + value, trace);
-				Exception ex = new JavaScriptException(trace.getMessage() + " , JS Cause: " + value, trace);
-				ErrorWindow.showErrorWindow(ex);
+				try
+				{
+					String value = arguments.getString(0);
+					future.cancel(false);
+					JavaScript.getCurrent().removeFunction(hookName);
+					JavaScript.getCurrent().removeFunction(errorHookName);
+					logger.error(jsToExecute + " -> resulted in the error: " + value, trace);
+					Exception ex = new JavaScriptException(trace.getMessage() + " , JS Cause: " + value, trace);
+					ErrorWindow.showErrorWindow(ex);
+				}
+				catch (Exception e)
+				{
+					ErrorWindow.showErrorWindow(trace);
+				}
 
 			}
 		});

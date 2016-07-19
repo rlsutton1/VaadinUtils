@@ -11,20 +11,20 @@ import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import au.com.vaadinutils.crud.CrudSecurityManager;
-import au.com.vaadinutils.crud.security.SecurityManagerFactoryProxy;
-
 import com.google.common.base.Preconditions;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.View;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.MenuItem;
 
+import au.com.vaadinutils.crud.CrudSecurityManager;
+import au.com.vaadinutils.crud.security.SecurityManagerFactoryProxy;
+
 public class MenuBuilder implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 	private List<ViewMapping> viewMap;
-	
+
 	Logger logger = LogManager.getLogger();
 
 	public MenuBuilder(Navigator navigator, List<ViewMapping> viewMap)
@@ -65,7 +65,7 @@ public class MenuBuilder implements Serializable
 				CrudSecurityManager model = SecurityManagerFactoryProxy.getSecurityManager(viewmap.getView());
 				if (model.canUserView())
 				{
-					
+
 					addMenuItems(menubar, unusedTopLevelMenus, viewmap);
 				}
 			}
@@ -90,8 +90,7 @@ public class MenuBuilder implements Serializable
 
 			if (pathElements.length == 2)
 			{
-				menu.actionType().createLeafItem(new MenuWrapper(menubar), menu, menu.display(), viewmap,
-						menu.atTop());
+				menu.actionType().createLeafItem(new MenuWrapper(menubar), menu, menu.display(), viewmap, menu.atTop());
 			}
 			else
 			{
@@ -142,8 +141,8 @@ public class MenuBuilder implements Serializable
 				// Time to insert the actual menu item
 
 				// First see if the item is already on the menubar
-				menu.actionType()
-						.createLeafItem(new MenuWrapper(menuItem), menu, menu.display(), viewmap, menu.atTop());
+				menu.actionType().createLeafItem(new MenuWrapper(menuItem), menu, menu.display(), viewmap,
+						menu.atTop());
 			}
 			else
 			{
