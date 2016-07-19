@@ -13,7 +13,7 @@ public class ExampleDashboard extends DashBoardView
 	protected ExampleDashboard(boolean loadJQuery)
 	{
 		// load the JQuery...
-		super(true);
+		super(true, null);
 	}
 
 	private static final long serialVersionUID = 1L;

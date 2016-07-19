@@ -20,6 +20,7 @@ import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.AbstractLayout;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
@@ -61,9 +62,17 @@ public abstract class DashBoardView extends VerticalLayout implements View
 
 	private VerticalLayout toolbarHolder;
 
-	protected DashBoardView(boolean loadJQuery)
+	private String style;
+
+	protected DashBoardView(boolean loadJQuery, String style)
 	{
 		this.loadJQuery = loadJQuery;
+		if (style == null)
+		{
+			this.style = SliderPanelStyles.COLOR_GREEN;
+		}
+		this.style = style;
+
 	}
 
 	@Override
@@ -106,13 +115,14 @@ public abstract class DashBoardView extends VerticalLayout implements View
 	void postLoad()
 	{
 		VerticalLayout sliderHolder = new VerticalLayout();
-		sliderHolder.setWidth("100%");
+		sliderHolder.setWidth("80%");
 		sliderHolder.setHeight("40");
 		addComponent(sliderHolder);
+		setComponentAlignment(sliderHolder, Alignment.TOP_CENTER);
 
 		dashboardsSlider = new SliderPanelBuilder(dashboardPanels()).expanded(false).mode(SliderMode.TOP)
-				.tabPosition(SliderTabPosition.MIDDLE).style(SliderPanelStyles.ICON_WHITE).caption("Dashboards")
-				.animationDuration(400).tabSize(30).autoCollapseSlider(true).build();
+				.tabPosition(SliderTabPosition.MIDDLE).style(style).caption("Dashboards").animationDuration(400)
+				.tabSize(30).autoCollapseSlider(true).build();
 		sliderHolder.addComponent(dashboardsSlider);
 
 		Tblportallayout portalLayout = findDefaultPortal();
@@ -179,7 +189,7 @@ public abstract class DashBoardView extends VerticalLayout implements View
 	private Component dashboardManagement()
 	{
 		VerticalLayout layout = new VerticalLayout();
-		layout.setHeight("100%");
+		layout.setHeight("300");
 		layout.setMargin(new MarginInfo(true, true, true, true));
 
 		HorizontalLayout buttonLayout = new HorizontalLayout();
