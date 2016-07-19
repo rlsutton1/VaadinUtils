@@ -781,7 +781,7 @@ public abstract class JpaDslAbstract<E, R>
 		{
 			query.where(predicate);
 		}
-		query.select(builder.countDistinct(query.from(entityClass)));
+		query.select(builder.countDistinct(root));
 
 		return getEntityManager().createQuery(query).getSingleResult();
 	}
