@@ -1065,13 +1065,13 @@ public abstract class JpaDslAbstract<E, R>
 	boolean isJpaContainerDelegate;
 
 	@SuppressWarnings("unchecked")
-	protected <K> Join<E, K> getJoin(JoinBuilder<E, K> builder)
+	protected <K> Join<E, K> getJoin(JoinBuilder<E, K> joinBuilder)
 	{
-		Join<E, K> join = (Join<E, K>) joins2.get(builder);
+		Join<E, K> join = (Join<E, K>) joins2.get(joinBuilder);
 		if (join == null)
 		{
-			join = builder.getJoin(root);
-			joins2.put(builder, join);
+			join = joinBuilder.getJoin(root, builder);
+			joins2.put(joinBuilder, join);
 		}
 		return join;
 	}
