@@ -1,7 +1,5 @@
 package au.com.vaadinutils.dashboard;
 
-import org.vaadin.alump.gridstack.GridStackLayoutNoJQuery;
-
 import com.vaadin.ui.Component;
 
 public interface PortalAdderIfc
@@ -9,8 +7,8 @@ public interface PortalAdderIfc
 
 	String getTitle();
 
-	Component getVaadinAddLayout(GridStackLayoutNoJQuery dashBoard);
+	Component getVaadinAddLayout(DashBoardController dashBoard);
 
-	void addPortal(GridStackLayoutNoJQuery dashBoard2, Tblportal portal);
+	void addPortal(DashBoardController dashBoard2, Tblportal portal);
 
 }

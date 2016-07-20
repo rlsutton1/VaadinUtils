@@ -1,8 +1,8 @@
 package au.com.vaadinutils.dashboard.example;
 
-import org.vaadin.alump.gridstack.GridStackLayoutNoJQuery;
-
 import com.vaadin.ui.VerticalLayout;
+
+import au.com.vaadinutils.dashboard.DashBoardController;
 
 public class ExampleToolBar extends VerticalLayout
 {
@@ -10,7 +10,7 @@ public class ExampleToolBar extends VerticalLayout
 
 	private static final long serialVersionUID = 1L;
 
-	ExampleToolBar(GridStackLayoutNoJQuery dashBoard, String portalLayoutGuid)
+	ExampleToolBar(DashBoardController dashBoard, String portalLayoutGuid)
 	{
 		setSizeFull();
 		setWidth("450");

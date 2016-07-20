@@ -27,6 +27,7 @@ import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
@@ -38,6 +39,8 @@ import au.com.vaadinutils.dao.JpaBaseDao;
 import au.com.vaadinutils.dao.JpaDslBuilder;
 import au.com.vaadinutils.editors.InputFormDialog;
 import au.com.vaadinutils.editors.InputFormDialogRecipient;
+import au.com.vaadinutils.js.JSCallWithReturnValue;
+import au.com.vaadinutils.js.JavaScriptCallback;
 
 /** A start view for navigating to the main view */
 
@@ -81,13 +84,19 @@ public abstract class DashBoardView extends VerticalLayout implements View
 		setMargin(new MarginInfo(false, false, true, false));
 		setSizeFull();
 
+		final Label preparing = new Label("Preparing your dashboard...");
+		preparing.setStyleName(ValoTheme.LABEL_H1);
+
+		addComponent(preparing);
+
 		// defer the load of the dashboard to a separate request, otherwise on a
 		// refresh(F5) it will be blank
-		new Thread(new Runnable()
+
+		new JSCallWithReturnValue("true").callBoolean(new JavaScriptCallback<Boolean>()
 		{
 
 			@Override
-			public void run()
+			public void callback(Boolean value)
 			{
 				try (AutoCloseable closer = EntityManagerProvider.setThreadLocalEntityManagerTryWithResources())
 				{
@@ -98,6 +107,7 @@ public abstract class DashBoardView extends VerticalLayout implements View
 						@Override
 						public void run()
 						{
+							removeComponent(preparing);
 							postLoad();
 						}
 					});
@@ -108,7 +118,8 @@ public abstract class DashBoardView extends VerticalLayout implements View
 					logger.error(e, e);
 				}
 			}
-		}).start();
+		});
+		;
 
 	}
 
@@ -160,17 +171,17 @@ public abstract class DashBoardView extends VerticalLayout implements View
 		addComponent(dashBoard);
 		setExpandRatio(dashBoard, 1);
 
-		AbstractLayout dashboardToolBar = createToolBar(dashBoard, portalLayout.getGuid());
+		AbstractLayout dashboardToolBar = createToolBar(new DashBoardController(dashBoard), portalLayout.getGuid());
 		toolbarHolder.removeAllComponents();
 		toolbarHolder.addComponent(dashboardToolBar);
 
-		loadDashboard(portalLayout, dashBoard);
+		loadDashboard(portalLayout, new DashBoardController(dashBoard));
 		dashBoardSelector.setValue(portalLayout);
 		dashboardsSlider.setCaption(portalLayout.getName());
 
 	}
 
-	public abstract AbstractLayout createToolBar(GridStackLayoutNoJQuery dashBoard2, String guid);
+	public abstract AbstractLayout createToolBar(DashBoardController dashBoard2, String guid);
 
 	public abstract Long getAccountId();
 
@@ -415,7 +426,7 @@ public abstract class DashBoardView extends VerticalLayout implements View
 		container.addAll(layouts);
 	}
 
-	private void loadDashboard(Tblportallayout portalLayout, GridStackLayoutNoJQuery dashBoard2)
+	private void loadDashboard(Tblportallayout portalLayout, DashBoardController dashBoard2)
 
 	{
 		for (Tblportal portal : portalLayout.getPortals())
