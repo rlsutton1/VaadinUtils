@@ -115,14 +115,14 @@ public class JSCallWithReturnValue
 			@Override
 			public void call(JsonArray arguments)
 			{
-				callback.callback(null);
-				future.cancel(false);
-				JavaScript.getCurrent().removeFunction(hookName);
-				JavaScript.getCurrent().removeFunction(errorHookName);
 				if (timer.elapsed(TimeUnit.MILLISECONDS) > EXPECTED_RESPONSE_TIME_MS)
 				{
 					logger.warn("Responded after {}ms", timer.elapsed(TimeUnit.MILLISECONDS));
 				}
+				callback.callback(null);
+				future.cancel(false);
+				JavaScript.getCurrent().removeFunction(hookName);
+				JavaScript.getCurrent().removeFunction(errorHookName);
 			}
 		});
 		setupErrorHook(future);
