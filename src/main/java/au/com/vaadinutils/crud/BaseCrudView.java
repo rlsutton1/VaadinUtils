@@ -2414,4 +2414,14 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 	{
 		return "Basic";
 	}
+
+	public VerticalLayout getLeftLayout()
+	{
+		return leftLayout;
+	}
+
+	public VerticalLayout getRightLayout()
+	{
+		return rightLayout;
+	}
 }
