@@ -143,8 +143,8 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 			@Override
 			public GridHeadingPropertySet getHeadingPropertySet()
 			{
-				return new GridHeadingPropertySet.Builder<C>().addColumn(availableColumnHeader,
-						itemCaptionProperty.getName(), true, true).build();
+				return new GridHeadingPropertySet.Builder<C>()
+						.addColumn(availableColumnHeader, itemCaptionProperty.getName(), true, true).build();
 			}
 
 			@Override
@@ -209,8 +209,9 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 		if (!initialised)
 		{
 			// TODO: Add proper uniqueId
-			new GridHeadingPropertySet.Builder<C>().addColumn(selectedColumnHeader, itemCaptionProperty.getName())
-					.build().applyToGrid(selectedGrid, this.getClass().getSimpleName());
+			new GridHeadingPropertySet.Builder<C>()
+					.addColumn(selectedColumnHeader, itemCaptionProperty.getName(), true, true).build()
+					.applyToGrid(selectedGrid, this.getClass().getSimpleName());
 			initialised = true;
 		}
 	}
