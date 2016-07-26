@@ -2424,5 +2424,4 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 	{
 		return rightLayout;
 	}
-
 }
