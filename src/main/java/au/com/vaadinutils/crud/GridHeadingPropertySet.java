@@ -571,7 +571,17 @@ public class GridHeadingPropertySet
 
 		try
 		{
-			final GeneratedPropertyContainer gpc = wrapGridContainer(grid);
+			// Changing the bound container at this point can cause issues
+			// elsewhere, so we avoid it if possible
+			Indexed gridContainer = grid.getContainerDataSource();
+			for (GridHeadingToPropertyId column : getColumns())
+			{
+				if (column.isGenerated())
+				{
+					gridContainer = wrapGridContainer(grid);
+					break;
+				}
+			}
 
 			final List<String> colsToShow = new LinkedList<String>();
 			for (GridHeadingToPropertyId column : getColumns())
@@ -580,7 +590,7 @@ public class GridHeadingPropertySet
 				if (column.isGenerated())
 				{
 					final PropertyValueGenerator<?> columnGenerator = column.getColumnGenerator();
-					gpc.addGeneratedProperty(propertyId, columnGenerator);
+					((GeneratedPropertyContainer) gridContainer).addGeneratedProperty(propertyId, columnGenerator);
 					final Column gridColumn = grid.getColumn(propertyId);
 					if (columnGenerator.getType() == String.class && gridColumn.getRenderer() instanceof TextRenderer)
 					{
@@ -659,7 +669,7 @@ public class GridHeadingPropertySet
 		Indexed gridContainer = grid.getContainerDataSource();
 		if (!(gridContainer instanceof GeneratedPropertyContainer))
 		{
-			final GeneratedPropertyContainer gpc = new GeneratedPropertyContainer(grid.getContainerDataSource());
+			final GeneratedPropertyContainer gpc = new GeneratedPropertyContainer(gridContainer);
 			grid.setContainerDataSource(gpc);
 			gridContainer = gpc;
 		}
