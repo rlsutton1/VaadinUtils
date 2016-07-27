@@ -35,6 +35,9 @@ public class Tblportal extends BaseCrudEntity
 	{
 	}
 
+	@JoinColumn(name = "portalDataId")
+	TblPortalData data;
+
 	public String getType()
 	{
 		return this.type;
@@ -107,6 +110,12 @@ public class Tblportal extends BaseCrudEntity
 	public Tblportallayout getPortalLayout()
 	{
 		return portalLayout;
+	}
+
+	public TblPortalData getData()
+	{
+		return data;
+
 	}
 
 }

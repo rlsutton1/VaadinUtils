@@ -24,3 +24,16 @@ CREATE TABLE `tblportalconfig` (
   `guid` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB;
+
+alter table tblportal add column portalDataId bigint(20) default null;
+
+create table tblportaldata
+(
+	`id` bigint(20) NOT NULL AUTO_INCREMENT,
+  portalid bigint(20) not null,
+   `guid` varchar(45) DEFAULT NULL,
+  data MEDIUMBLOB ,
+  PRIMARY KEY (`id`)
+
+
+)ENGINE=InnoDB;

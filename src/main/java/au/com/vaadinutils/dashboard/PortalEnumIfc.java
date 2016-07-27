@@ -5,4 +5,6 @@ public interface PortalEnumIfc
 
 	PortalAdderIfc instancePortalAdder(String guid);
 
+	String getGroup();
+
 }

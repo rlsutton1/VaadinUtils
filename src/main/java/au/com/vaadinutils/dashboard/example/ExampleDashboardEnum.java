@@ -13,6 +13,12 @@ public enum ExampleDashboardEnum implements PortalEnumIfc
 		{
 			return new ExamplePortal(guid);
 		}
+
+		@Override
+		public String getGroup()
+		{
+			return "Example Group";
+		}
 	};
 
 	@Override
