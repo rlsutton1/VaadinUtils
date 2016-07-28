@@ -67,6 +67,8 @@ public abstract class DashBoardView extends VerticalLayout implements View
 
 	private String style;
 
+	private boolean loading = false;
+
 	protected DashBoardView(boolean loadJQuery, String style)
 	{
 		this.loadJQuery = loadJQuery;
@@ -90,7 +92,8 @@ public abstract class DashBoardView extends VerticalLayout implements View
 		addComponent(preparing);
 
 		// defer the load of the dashboard to a separate request, otherwise on a
-		// refresh(F5) it will be blank
+		// refresh(F5) it will be blank. I think this is due to the DashBoard
+		// widget needing to be initialized (client side) first
 
 		new JSCallWithReturnValue("true").callBoolean(new JavaScriptCallback<Boolean>()
 		{
@@ -98,28 +101,52 @@ public abstract class DashBoardView extends VerticalLayout implements View
 			@Override
 			public void callback(Boolean value)
 			{
-				try (AutoCloseable closer = EntityManagerProvider.setThreadLocalEntityManagerTryWithResources())
+
+				final UI ui = UI.getCurrent();
+
+				new Thread(getLoadRunner(preparing, ui), "Dash Board Delayed Loader").start();
+
+			}
+
+			private Runnable getLoadRunner(final Label preparing, final UI ui)
+			{
+				return new Runnable()
 				{
-					Thread.sleep(50);
-					ui.access(new Runnable()
+
+					@Override
+					public void run()
 					{
-
-						@Override
-						public void run()
+						try
 						{
-							removeComponent(preparing);
-							postLoad();
+							Thread.sleep(500);
 						}
-					});
+						catch (InterruptedException e1)
+						{
+							logger.error(e1);
+						}
+						try (AutoCloseable closer = EntityManagerProvider.setThreadLocalEntityManagerTryWithResources())
+						{
 
-				}
-				catch (Exception e)
-				{
-					logger.error(e, e);
-				}
+							ui.access(new Runnable()
+							{
+
+								@Override
+								public void run()
+								{
+									removeComponent(preparing);
+									postLoad();
+								}
+							});
+
+						}
+						catch (Exception e)
+						{
+							logger.error(e, e);
+						}
+					}
+				};
 			}
 		});
-		;
 
 	}
 
@@ -175,8 +202,11 @@ public abstract class DashBoardView extends VerticalLayout implements View
 		toolbarHolder.removeAllComponents();
 		toolbarHolder.addComponent(dashboardToolBar);
 
-		loadDashboard(portalLayout, new DashBoardController(dashBoard));
+		loading = true;
 		dashBoardSelector.setValue(portalLayout);
+		loadDashboard(portalLayout, new DashBoardController(dashBoard));
+		loading = false;
+
 		dashboardsSlider.setCaption(portalLayout.getName());
 
 	}
@@ -206,7 +236,7 @@ public abstract class DashBoardView extends VerticalLayout implements View
 		HorizontalLayout buttonLayout = new HorizontalLayout();
 		buttonLayout.setWidth("100%");
 
-		Button newDashboard = new Button(FontAwesome.DASHBOARD);
+		Button newDashboard = new Button(FontAwesome.PLUS);
 		newDashboard.setDescription("New");
 		newDashboard.setStyleName(ValoTheme.BUTTON_ICON_ONLY);
 
@@ -405,11 +435,14 @@ public abstract class DashBoardView extends VerticalLayout implements View
 			public void valueChange(ValueChangeEvent event)
 			{
 
-				Tblportallayout portalLayout = (Tblportallayout) event.getProperty().getValue();
-				if (portalLayout != null)
+				if (!loading)
 				{
-					portalLayout = JpaBaseDao.getGenericDao(Tblportallayout.class).findByEntityId(portalLayout);
-					createDashboard(portalLayout);
+					Tblportallayout portalLayout = (Tblportallayout) event.getProperty().getValue();
+					if (portalLayout != null)
+					{
+						portalLayout = JpaBaseDao.getGenericDao(Tblportallayout.class).findByEntityId(portalLayout);
+						createDashboard(portalLayout);
+					}
 				}
 			}
 		});
@@ -429,6 +462,7 @@ public abstract class DashBoardView extends VerticalLayout implements View
 	private void loadDashboard(Tblportallayout portalLayout, DashBoardController dashBoard2)
 
 	{
+		logger.info("Load dash board");
 		for (Tblportal portal : portalLayout.getPortals())
 		{
 			try

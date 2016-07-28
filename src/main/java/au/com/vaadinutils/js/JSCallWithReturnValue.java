@@ -66,6 +66,7 @@ public class JSCallWithReturnValue
 
 	public void callBoolean(final JavaScriptCallback<Boolean> callback)
 	{
+
 		final Stopwatch timer = Stopwatch.createStarted();
 		final ScheduledFuture<?> future = createTimeoutHook();
 
@@ -79,14 +80,15 @@ public class JSCallWithReturnValue
 			{
 				try
 				{
-					callback.callback(arguments.getBoolean(0));
-					future.cancel(false);
-					JavaScript.getCurrent().removeFunction(hookName);
-					JavaScript.getCurrent().removeFunction(errorHookName);
 					if (timer.elapsed(TimeUnit.MILLISECONDS) > EXPECTED_RESPONSE_TIME_MS)
 					{
 						logger.warn("Responded after {}ms", timer.elapsed(TimeUnit.MILLISECONDS));
 					}
+					logger.info("Handling response for " + hookName);
+					callback.callback(arguments.getBoolean(0));
+					future.cancel(false);
+					removeHooks(hookName, errorHookName);
+
 				}
 				catch (Exception e)
 				{
@@ -143,10 +145,10 @@ public class JSCallWithReturnValue
 			@Override
 			public void call(JsonArray arguments)
 			{
+				logger.error("Handling response for " + hookName);
 				javaScriptCallback.callback(null);
 				future.cancel(false);
-				JavaScript.getCurrent().removeFunction(hookName);
-				JavaScript.getCurrent().removeFunction(errorHookName);
+				removeHooks(hookName, errorHookName);
 				if (timer.elapsed(TimeUnit.MILLISECONDS) > EXPECTED_RESPONSE_TIME_MS)
 				{
 					logger.warn("Responded after {}ms", timer.elapsed(TimeUnit.MILLISECONDS));
@@ -156,6 +158,14 @@ public class JSCallWithReturnValue
 		});
 		setupErrorHook(future);
 		JavaScript.getCurrent().execute(wrapJSInTryCatchBlind(jsToExecute));
+
+	}
+
+	void removeHooks(final String hook1, final String hook2)
+	{
+		final JavaScript js = JavaScript.getCurrent();
+		js.removeFunction(hook1);
+		js.removeFunction(hook2);
 
 	}
 

@@ -21,7 +21,7 @@ public class TblPortalData extends BaseCrudEntity implements Serializable
 	private static final long serialVersionUID = 1L;
 
 	@Lob
-	@Column(length = 100000)
+	@Column(length = 10000000)
 	private byte[] data;
 
 	@JoinColumn(name = "portalId")

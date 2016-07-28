@@ -10,7 +10,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<vaadin.version>7.6.6</vaadin.version>
 		<vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
-		<jasperreports.version>5.6.1</jasperreports.version>
+		<jasperreports.version>6.3.0</jasperreports.version>
 	</properties>
 
 	<repositories>
@@ -390,7 +390,7 @@
 		<dependency>
 			<groupId>org.vaadin.alump.gridstack</groupId>
 			<artifactId>gridstack-addon</artifactId>
-			<version>0.3.1-nj-SNAPSHOT</version>
+			<version>0.3.1-nj</version>
 		</dependency>
 		<dependency>
 		   <groupId>org.vaadin</groupId>
