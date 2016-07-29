@@ -287,7 +287,7 @@ public abstract class DashBoardView extends VerticalLayout implements View
 
 	private Button createRenameButton()
 	{
-		Button rename = new Button(FontAwesome.GEAR);
+		Button rename = new Button(FontAwesome.EDIT);
 		rename.setDescription("Rename");
 		rename.setStyleName(ValoTheme.BUTTON_ICON_ONLY);
 
