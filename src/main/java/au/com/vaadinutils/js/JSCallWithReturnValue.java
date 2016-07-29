@@ -86,14 +86,17 @@ public class JSCallWithReturnValue
 					}
 					logger.info("Handling response for " + hookName);
 					callback.callback(arguments.getBoolean(0));
-					future.cancel(false);
-					removeHooks(hookName, errorHookName);
 
 				}
 				catch (Exception e)
 				{
-					logger.error(e.getMessage());
+					logger.error(e, e);
 					logger.error(trace, trace);
+				}
+				finally
+				{
+					future.cancel(false);
+					removeHooks(hookName, errorHookName);
 				}
 			}
 		});
@@ -145,7 +148,7 @@ public class JSCallWithReturnValue
 			@Override
 			public void call(JsonArray arguments)
 			{
-				logger.error("Handling response for " + hookName);
+				logger.info("Handling response for " + hookName);
 				javaScriptCallback.callback(null);
 				future.cancel(false);
 				removeHooks(hookName, errorHookName);
@@ -184,9 +187,6 @@ public class JSCallWithReturnValue
 				try
 				{
 					String value = arguments.getString(0);
-					future.cancel(false);
-					JavaScript.getCurrent().removeFunction(hookName);
-					JavaScript.getCurrent().removeFunction(errorHookName);
 					logger.error(jsToExecute + " -> resulted in the error: " + value, trace);
 					Exception ex = new JavaScriptException(trace.getMessage() + " , JS Cause: " + value, trace);
 					ErrorWindow.showErrorWindow(ex);
@@ -194,6 +194,13 @@ public class JSCallWithReturnValue
 				catch (Exception e)
 				{
 					ErrorWindow.showErrorWindow(trace);
+				}
+				finally
+				{
+					future.cancel(false);
+					JavaScript.getCurrent().removeFunction(hookName);
+					JavaScript.getCurrent().removeFunction(errorHookName);
+
 				}
 
 			}
