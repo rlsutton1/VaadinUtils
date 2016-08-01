@@ -1152,7 +1152,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 				BaseCrudView.this.entityTable.select(id);
 
 			}
-			splitPanel.showFirstComponet();
+			splitPanel.showFirstComponent();
 			if (entityTable.getCurrent() == null)
 			{
 				showNoSelectionMessage();
@@ -1344,7 +1344,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 
 			entityTable.select(newEntity.getId());
 
-			splitPanel.showFirstComponet();
+			splitPanel.showFirstComponent();
 			Notification.show("Changes Saved", "Any changes you have made have been saved.", Type.TRAY_NOTIFICATION);
 
 			// return save/edit buttons to default settings
@@ -1744,7 +1744,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 	public void rowChanged(EntityItem<E> item)
 	{
 
-		splitPanel.showSecondComponet();
+		splitPanel.showSecondComponent();
 		fieldGroup.setItemDataSource(item);
 
 		Map<String, Long> times = new HashMap<>();

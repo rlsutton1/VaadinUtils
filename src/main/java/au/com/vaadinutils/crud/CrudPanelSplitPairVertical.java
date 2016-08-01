@@ -19,14 +19,14 @@ public class CrudPanelSplitPairVertical extends VerticalSplitPanel implements Cr
 	}
 
 	@Override
-	public void showFirstComponet()
+	public void showFirstComponent()
 	{
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void showSecondComponet()
+	public void showSecondComponent()
 	{
 		// TODO Auto-generated method stub
 		
