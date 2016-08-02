@@ -69,12 +69,10 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 		container = getContainer();
 		grid = new Grid(new GeneratedPropertyContainer(container));
 		grid.setSizeFull();
-		final Label title = new Label(getTitle());
-		title.setStyleName(setTitleStyleName());
 		searchBar = buildSearchBar();
 		final VerticalLayout layout = new VerticalLayout();
 		layout.setSizeFull();
-		layout.addComponent(title);
+		addTitle(layout);
 		layout.addComponent(searchBar);
 		layout.addComponent(grid);
 		layout.setExpandRatio(grid, 1);
@@ -82,6 +80,17 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 		headingPropertySet = getHeadingPropertySet();
 		headingPropertySet.setDeferLoadSettings(true);
 		headingPropertySet.applyToGrid(grid, uniqueId);
+	}
+
+	private void addTitle(final VerticalLayout layout)
+	{
+		final String titleText = getTitle();
+		if (titleText != null && !titleText.isEmpty())
+		{
+			final Label titleLabel = new Label(getTitle());
+			titleLabel.setStyleName(setTitleStyleName());
+			layout.addComponent(titleLabel);
+		}
 	}
 
 	@Override
@@ -415,7 +424,7 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 
 	public String setTitleStyleName()
 	{
-		return Reindeer.LABEL_H1;
+		return "";
 	}
 
 	public void sort(final Sort sort)
