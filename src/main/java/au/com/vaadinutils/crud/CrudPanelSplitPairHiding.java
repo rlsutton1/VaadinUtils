@@ -44,14 +44,14 @@ public class CrudPanelSplitPairHiding extends VerticalLayout implements CrudPane
 	}
 
 	@Override
-	public void showFirstComponet()
+	public void showFirstComponent()
 	{
 		removeAllComponents();
 		addComponent(firstPanel);
 	}
 
 	@Override
-	public void showSecondComponet()
+	public void showSecondComponent()
 	{
 		removeAllComponents();
 		addComponent(secondPanel);

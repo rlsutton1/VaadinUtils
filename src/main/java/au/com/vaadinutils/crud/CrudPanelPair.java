@@ -14,9 +14,9 @@ public interface CrudPanelPair
 
 	public void setSplitPosition(float pos);
 
-	public void showFirstComponet();
+	public void showFirstComponent();
 
-	public void showSecondComponet();
+	public void showSecondComponent();
 
 	void setLocked(boolean locked);
 

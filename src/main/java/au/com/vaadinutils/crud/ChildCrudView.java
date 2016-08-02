@@ -741,7 +741,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 						restoreDelete = false;
 					}
 				}
-				splitPanel.showFirstComponet();
+				splitPanel.showFirstComponent();
 				saving = false;
 			}
 			// }
