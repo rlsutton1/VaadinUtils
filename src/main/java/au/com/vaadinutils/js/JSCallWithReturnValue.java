@@ -66,6 +66,47 @@ public class JSCallWithReturnValue
 
 	public void callBoolean(final JavaScriptCallback<Boolean> callback)
 	{
+		call(new JavaScriptCallback<JsonArray>()
+		{
+
+			@Override
+			public void callback(JsonArray arguments)
+			{
+				callback.callback(arguments.getBoolean(0));
+			}
+		});
+
+	}
+
+	public void callString(final JavaScriptCallback<String> callback)
+	{
+		call(new JavaScriptCallback<JsonArray>()
+		{
+
+			@Override
+			public void callback(JsonArray arguments)
+			{
+				callback.callback(arguments.getString(0));
+			}
+		});
+
+	}
+
+	public void callVoid(final JavaScriptCallback<Void> callback)
+	{
+		call(new JavaScriptCallback<JsonArray>()
+		{
+
+			@Override
+			public void callback(JsonArray value)
+			{
+				callback.callback(null);
+			}
+		});
+	}
+
+	public void call(final JavaScriptCallback<JsonArray> callback)
+	{
 
 		final Stopwatch timer = Stopwatch.createStarted();
 		final ScheduledFuture<?> future = createTimeoutHook();
@@ -85,7 +126,7 @@ public class JSCallWithReturnValue
 						logger.warn("Responded after {}ms", timer.elapsed(TimeUnit.MILLISECONDS));
 					}
 					logger.info("Handling response for " + hookName);
-					callback.callback(arguments.getBoolean(0));
+					callback.callback(arguments);
 
 				}
 				catch (Exception e)
@@ -104,34 +145,6 @@ public class JSCallWithReturnValue
 		final String wrappedJs = wrapJSInTryCatch(jsToExecute);
 		setupErrorHook(future);
 		JavaScript.getCurrent().execute(wrappedJs);
-
-	}
-
-	public void callVoid(final JavaScriptCallback<Void> callback)
-	{
-		final Stopwatch timer = Stopwatch.createStarted();
-		final ScheduledFuture<?> future = createTimeoutHook();
-
-		JavaScript.getCurrent().addFunction(hookName, new JavaScriptFunction()
-		{
-
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void call(JsonArray arguments)
-			{
-				if (timer.elapsed(TimeUnit.MILLISECONDS) > EXPECTED_RESPONSE_TIME_MS)
-				{
-					logger.warn("Responded after {}ms", timer.elapsed(TimeUnit.MILLISECONDS));
-				}
-				callback.callback(null);
-				future.cancel(false);
-				JavaScript.getCurrent().removeFunction(hookName);
-				JavaScript.getCurrent().removeFunction(errorHookName);
-			}
-		});
-		setupErrorHook(future);
-		JavaScript.getCurrent().execute(wrapJSInTryCatch(jsToExecute));
 
 	}
 
