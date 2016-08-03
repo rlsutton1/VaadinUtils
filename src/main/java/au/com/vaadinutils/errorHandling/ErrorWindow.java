@@ -2,11 +2,13 @@ package au.com.vaadinutils.errorHandling;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.SocketException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.vaadin.addons.screenshot.Screenshot;
@@ -24,7 +26,6 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.UI;
-import com.vaadin.ui.UIDetachedException;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
@@ -128,44 +129,70 @@ public class ErrorWindow
 
 		final String finalCauseClass = causeClass;
 
-		if (UI.getCurrent() != null)
+		if (!isExempted(cause))
 		{
-			UI.getCurrent().access(new Runnable()
+			if (UI.getCurrent() != null)
 			{
-
-				@Override
-				public void run()
+				UI.getCurrent().access(new Runnable()
 				{
-					displayVaadinErrorWindow(finalCauseClass, finalId, time, finalId, finalTrace, reference);
 
-				}
-			});
-		}
-		else
-		{
-			// limit the number of errors that can be emailed without human
-			// action. also suppress some types of errors
-			if (emailRateController.acquire() && !(cause instanceof SocketException)
-					&& !(cause instanceof UIDetachedException))
-			{
-				try
-				{
-					final String supportEmail = getTargetEmailAddress();
+					@Override
+					public void run()
+					{
+						displayVaadinErrorWindow(finalCauseClass, finalId, time, finalId, finalTrace, reference);
 
-					generateEmail(time, finalId, finalTrace, reference, "Error not displayed to user", supportEmail, "",
-							"", "", null);
-				}
-				catch (Exception e)
-				{
-					logger.error(e, e);
-				}
+					}
+				});
 			}
 			else
 			{
-				logger.error("Not sending error email");
-			}
 
+				// limit the number of errors that can be emailed without human
+				// action. also suppress some types of errors
+				if (emailRateController.acquire())
+				{
+					try
+					{
+						final String supportEmail = getTargetEmailAddress();
+
+						generateEmail(time, finalId, finalTrace, reference, "Error not displayed to user", supportEmail,
+								"", "", "", null);
+					}
+					catch (Exception e)
+					{
+						logger.error(e, e);
+					}
+				}
+				else
+				{
+					logger.error("Not sending error email");
+				}
+			}
 		}
+		else
+		{
+			logger.error("Not Sending email or displaying error as cause is exempted.");
+		}
+	}
+
+	boolean isExempted(Throwable cause)
+	{
+		Map<String, String> exemptedExceptions = new HashMap<>();
+		exemptedExceptions.put("ClientAbortException", "");
+		exemptedExceptions.put("SocketException", "");
+		exemptedExceptions.put("UIDetachedException", "");
+		exemptedExceptions.put("IOException", "Pipe closed");
+
+		String expectedMessage = exemptedExceptions.get(cause.getClass().getSimpleName());
+		if (expectedMessage != null)
+		{
+			if (StringUtils.isNotEmpty(expectedMessage))
+			{
+				return cause.getMessage().equalsIgnoreCase(expectedMessage);
+			}
+			return true;
+		}
+		return false;
 	}
 
 	private void displayVaadinErrorWindow(final String causeClass, final String id, final Date time,
