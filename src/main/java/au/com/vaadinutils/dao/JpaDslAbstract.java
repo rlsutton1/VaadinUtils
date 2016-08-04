@@ -1,6 +1,7 @@
 package au.com.vaadinutils.dao;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -631,6 +632,34 @@ public abstract class JpaDslAbstract<E, R>
 		else
 		{
 			orders.add(builder.desc(getJoin(join).get(field)));
+		}
+
+		return this;
+	}
+
+	public JpaDslAbstract<E, R> orderBy(String field, boolean asc)
+	{
+		List<String> attributes = Arrays.asList(field.split("\\."));
+		Path<Object> path = null;
+		for (String attribute : attributes)
+		{
+			if (path == null)
+			{
+				path = root.get(attribute);
+			}
+			else
+			{
+				path = path.get(attribute);
+			}
+		}
+
+		if (asc)
+		{
+			orders.add(builder.asc(path));
+		}
+		else
+		{
+			orders.add(builder.desc(path));
 		}
 
 		return this;
