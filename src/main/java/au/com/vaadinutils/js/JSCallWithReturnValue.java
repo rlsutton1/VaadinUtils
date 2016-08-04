@@ -105,7 +105,7 @@ public class JSCallWithReturnValue
 		});
 	}
 
-	public void call(final JavaScriptCallback<JsonArray> callback)
+	void call(final JavaScriptCallback<JsonArray> callback)
 	{
 
 		final Stopwatch timer = Stopwatch.createStarted();
@@ -125,7 +125,7 @@ public class JSCallWithReturnValue
 					{
 						logger.warn("Responded after {}ms", timer.elapsed(TimeUnit.MILLISECONDS));
 					}
-					logger.info("Handling response for " + hookName);
+					logger.debug("Handling response for " + hookName);
 					callback.callback(arguments);
 
 				}
@@ -161,7 +161,7 @@ public class JSCallWithReturnValue
 			@Override
 			public void call(JsonArray arguments)
 			{
-				logger.info("Handling response for " + hookName);
+				logger.debug("Handling response for " + hookName);
 				javaScriptCallback.callback(null);
 				future.cancel(false);
 				removeHooks(hookName, errorHookName);
@@ -251,8 +251,8 @@ public class JSCallWithReturnValue
 
 				+ "catch(err)"
 
-				+ "{console.error(err);" + errorHookName + "(err.message);};";
-		logger.info(wrapped);
+				+ "{debugger;console.error(err);" + errorHookName + "(err.message+' '+err.stack);};";
+		logger.debug(wrapped);
 
 		return wrapped;
 	}
@@ -270,7 +270,7 @@ public class JSCallWithReturnValue
 
 				+ "catch(err)"
 
-				+ "{console.error(err);" + errorHookName + "(err.message);};";
+				+ "{console.error(err);" + errorHookName + "(err.message+' '+err.stack);};";
 
 		// logger.error(wrapped);
 		return wrapped;

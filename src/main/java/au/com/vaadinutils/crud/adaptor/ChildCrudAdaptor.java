@@ -26,8 +26,7 @@ import au.com.vaadinutils.crud.ValidatingFieldGroup;
  * 
  * @author rsutton
  *
- * @param
- * 			<P>
+ * @param <P>
  * @param <E>
  */
 public class ChildCrudAdaptor<P extends CrudEntity, E extends ChildCrudEntity> extends ChildCrudView<P, E>
@@ -83,6 +82,12 @@ public class ChildCrudAdaptor<P extends CrudEntity, E extends ChildCrudEntity> e
 	}
 
 	@Override
+	public void enableDragAndDropOrdering(final SingularAttribute<E, Long> ordinalField)
+	{
+		super.enableDragAndDropOrdering(ordinalField);
+	}
+
+	@Override
 	public String getTitleText()
 	{
 		return client.getTitleText();
@@ -104,7 +109,7 @@ public class ChildCrudAdaptor<P extends CrudEntity, E extends ChildCrudEntity> e
 	public void createNewEntity(E previousEntity) throws InstantiationException, IllegalAccessException
 	{
 		super.createNewEntity(previousEntity);
-		newEntity= client.createNewEntity(newEntity,previousEntity);
+		newEntity = client.createNewEntity(newEntity, previousEntity);
 	}
 
 	@Override
