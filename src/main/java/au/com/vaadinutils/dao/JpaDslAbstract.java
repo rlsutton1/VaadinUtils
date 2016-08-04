@@ -794,37 +794,37 @@ public abstract class JpaDslAbstract<E, R>
 
 	public <K> JoinBuilder<E, K> join(final SingularAttribute<? super E, K> attribute)
 	{
-		return new JoinBuilder<E, K>(attribute, JoinType.INNER);
+		return new JoinBuilder<>(attribute, JoinType.INNER);
 	}
 
 	public <K> JoinBuilder<E, K> join(final ListAttribute<? super E, K> attribute)
 	{
-		return new JoinBuilder<E, K>(attribute, JoinType.INNER);
+		return new JoinBuilder<>(attribute, JoinType.INNER);
 	}
 
 	public <K> JoinBuilder<E, K> join(final SetAttribute<? super E, K> attribute)
 	{
-		return new JoinBuilder<E, K>(attribute, JoinType.INNER);
+		return new JoinBuilder<>(attribute, JoinType.INNER);
 	}
 
 	public <K> JoinBuilder<E, K> join(final SingularAttribute<? super E, K> attribute, JoinType type)
 	{
-		return new JoinBuilder<E, K>(attribute, type);
+		return new JoinBuilder<>(attribute, type);
 	}
 
 	public <K> JoinBuilder<E, K> leftJoin(final SingularAttribute<? super E, K> attribute)
 	{
-		return new JoinBuilder<E, K>(attribute, JoinType.LEFT);
+		return new JoinBuilder<>(attribute, JoinType.LEFT);
 	}
 
 	public <K> JoinBuilder<E, K> join(final ListAttribute<? super E, K> attribute, JoinType type)
 	{
-		return new JoinBuilder<E, K>(attribute, type);
+		return new JoinBuilder<>(attribute, type);
 	}
 
 	public <K> JoinBuilder<E, K> join(final SetAttribute<? super E, K> attribute, JoinType type)
 	{
-		return new JoinBuilder<E, K>(attribute, type);
+		return new JoinBuilder<>(attribute, type);
 	}
 
 	public JpaDslAbstract<E, R> where(Condition<E> condition)
@@ -897,6 +897,19 @@ public abstract class JpaDslAbstract<E, R>
 			public Predicate getPredicates()
 			{
 				return getJoin(join).get(attribute).in(values);
+			}
+		};
+	}
+
+	public <V> Condition<E> in(final SingularAttribute<E, V> attribute, final V[] values)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+				return root.get(attribute).in(values);
 			}
 		};
 	}
@@ -1050,8 +1063,7 @@ public abstract class JpaDslAbstract<E, R>
 		return new AbstractCondition<E>()
 		{
 
-			@SuppressWarnings(
-			{ "unchecked", "rawtypes" })
+			@SuppressWarnings({ "unchecked", "rawtypes" })
 			@Override
 			public Predicate getPredicates()
 			{
@@ -1167,7 +1179,7 @@ public abstract class JpaDslAbstract<E, R>
 
 	public <J> JpaDslSubqueryBuilder<E, J> subQuery(Class<J> target)
 	{
-		return new JpaDslSubqueryBuilder<E, J>(target, criteria, root);
+		return new JpaDslSubqueryBuilder<>(target, criteria, root);
 	}
 
 	public JpaDslAbstract<E, R> distinct()
@@ -1308,7 +1320,7 @@ public abstract class JpaDslAbstract<E, R>
 
 	public <V, J> TypedPath<E, V> path(SingularAttribute<? super E, J> partA, SingularAttribute<J, V> partB)
 	{
-		return new TypedPath<E, V>(root.get(partA).get(partB));
+		return new TypedPath<>(root.get(partA).get(partB));
 
 	}
 
