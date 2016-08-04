@@ -2,6 +2,8 @@ package au.com.vaadinutils.crud.adaptor;
 
 import java.util.List;
 
+import javax.persistence.metamodel.SingularAttribute;
+
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.data.Container.Filter;
@@ -22,8 +24,7 @@ import au.com.vaadinutils.crud.ValidatingFieldGroup;
  * 
  * @author rsutton
  *
- * @param
- * 			<P>
+ * @param <P>
  * @param <E>
  */
 public class BaseCrudAdaptor<P, E extends CrudEntity> extends BaseCrudView<E> implements CrudAdaptor<P, E>
@@ -48,6 +49,12 @@ public class BaseCrudAdaptor<P, E extends CrudEntity> extends BaseCrudView<E> im
 	protected Filter getContainerFilter(String filterString, boolean advancedSearchActive)
 	{
 		return client.getContainerFilter(filterString, advancedSearchActive);
+	}
+
+	@Override
+	public void enableDragAndDropOrdering(final SingularAttribute<E, Long> ordinalField)
+	{
+		super.enableDragAndDropOrdering(ordinalField);
 	}
 
 	@Override
@@ -96,7 +103,7 @@ public class BaseCrudAdaptor<P, E extends CrudEntity> extends BaseCrudView<E> im
 	public void createNewEntity(E previousEntity) throws InstantiationException, IllegalAccessException
 	{
 		super.createNewEntity(previousEntity);
-		newEntity= client.createNewEntity(newEntity,previousEntity);
+		newEntity = client.createNewEntity(newEntity, previousEntity);
 	}
 
 	@Override
