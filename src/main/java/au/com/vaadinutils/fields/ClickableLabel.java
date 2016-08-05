@@ -45,6 +45,12 @@ public class ClickableLabel extends VerticalLayout
 		label.setStyleName(style);
 	}
 
+	@Override
+	public void addStyleName(String style)
+	{
+		label.addStyleName(style);
+	}
+
 	public void setContentMode(ContentMode contentMode)
 	{
 		label.setContentMode(contentMode);
