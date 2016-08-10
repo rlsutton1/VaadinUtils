@@ -24,9 +24,7 @@ public class ClickableLabel extends VerticalLayout
 
 	public ClickableLabel(String value)
 	{
-		label = new Label(value, ContentMode.HTML);
-		addComponent(label);
-		setImmediate(true);
+		this(value, ContentMode.HTML);
 	}
 
 	public ClickableLabel(String value, ContentMode contentMode)
@@ -41,9 +39,16 @@ public class ClickableLabel extends VerticalLayout
 		label.setValue(value);
 	}
 
+	@Override
 	public void setStyleName(String style)
 	{
 		label.setStyleName(style);
+	}
+
+	@Override
+	public void addStyleName(String style)
+	{
+		label.addStyleName(style);
 	}
 
 	public void setContentMode(ContentMode contentMode)

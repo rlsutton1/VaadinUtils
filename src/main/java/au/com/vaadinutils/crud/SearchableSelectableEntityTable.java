@@ -71,9 +71,14 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 
 		searchBar = buildSearchBar();
 
-		Label title = new Label(getTitle());
-		title.setStyleName(Reindeer.LABEL_H1);
-		this.addComponent(title);
+		final String titleText = getTitle();
+		if (titleText != null && !titleText.isEmpty())
+		{
+			Label title = new Label(getTitle());
+			title.setStyleName(Reindeer.LABEL_H1);
+			this.addComponent(title);
+		}
+
 		this.addComponent(searchBar);
 		this.addComponent(selectableTable);
 		this.setExpandRatio(selectableTable, 1);
