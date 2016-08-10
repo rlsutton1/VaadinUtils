@@ -45,4 +45,8 @@ public interface CrudAdaptor<P, E extends CrudEntity>
 
 	void enableDragAndDropOrdering(final SingularAttribute<E, Long> ordinalField);
 
+	boolean isNew();
+
+	public boolean isDirty();
+
 }
