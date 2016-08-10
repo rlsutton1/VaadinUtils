@@ -128,6 +128,7 @@ public class ChildCrudAdaptor<P extends CrudEntity, E extends ChildCrudEntity> e
 	@Override
 	protected void postNew(EntityItem<E> newEntity)
 	{
+		super.postNew(newEntity);
 		client.postNew(newEntity);
 	}
 

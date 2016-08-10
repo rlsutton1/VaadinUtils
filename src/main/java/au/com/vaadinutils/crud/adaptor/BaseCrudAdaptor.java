@@ -122,6 +122,7 @@ public class BaseCrudAdaptor<P, E extends CrudEntity> extends BaseCrudView<E> im
 	@Override
 	protected void postNew(EntityItem<E> newEntity)
 	{
+		super.postNew(newEntity);
 		client.postNew(newEntity);
 	}
 
