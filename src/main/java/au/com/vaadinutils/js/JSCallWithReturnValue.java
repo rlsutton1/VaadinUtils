@@ -66,6 +66,48 @@ public class JSCallWithReturnValue
 
 	public void callBoolean(final JavaScriptCallback<Boolean> callback)
 	{
+		call(new JavaScriptCallback<JsonArray>()
+		{
+
+			@Override
+			public void callback(JsonArray arguments)
+			{
+				callback.callback(arguments.getBoolean(0));
+			}
+		});
+
+	}
+
+	public void callString(final JavaScriptCallback<String> callback)
+	{
+		call(new JavaScriptCallback<JsonArray>()
+		{
+
+			@Override
+			public void callback(JsonArray arguments)
+			{
+				callback.callback(arguments.getString(0));
+			}
+		});
+
+	}
+
+	public void callVoid(final JavaScriptCallback<Void> callback)
+	{
+		call(new JavaScriptCallback<JsonArray>()
+		{
+
+			@Override
+			public void callback(JsonArray value)
+			{
+				callback.callback(null);
+			}
+		});
+	}
+
+	void call(final JavaScriptCallback<JsonArray> callback)
+	{
+
 		final Stopwatch timer = Stopwatch.createStarted();
 		final ScheduledFuture<?> future = createTimeoutHook();
 
@@ -83,8 +125,8 @@ public class JSCallWithReturnValue
 					{
 						logger.warn("Responded after {}ms", timer.elapsed(TimeUnit.MILLISECONDS));
 					}
-					logger.info("Handling response for " + hookName);
-					callback.callback(arguments.getBoolean(0));
+					logger.debug("Handling response for " + hookName);
+					callback.callback(arguments);
 
 				}
 				catch (Exception e)
@@ -95,8 +137,7 @@ public class JSCallWithReturnValue
 				finally
 				{
 					future.cancel(false);
-					JavaScript.getCurrent().removeFunction(hookName);
-					JavaScript.getCurrent().removeFunction(errorHookName);
+					removeHooks(hookName, errorHookName);
 				}
 			}
 		});
@@ -104,34 +145,6 @@ public class JSCallWithReturnValue
 		final String wrappedJs = wrapJSInTryCatch(jsToExecute);
 		setupErrorHook(future);
 		JavaScript.getCurrent().execute(wrappedJs);
-
-	}
-
-	public void callVoid(final JavaScriptCallback<Void> callback)
-	{
-		final Stopwatch timer = Stopwatch.createStarted();
-		final ScheduledFuture<?> future = createTimeoutHook();
-
-		JavaScript.getCurrent().addFunction(hookName, new JavaScriptFunction()
-		{
-
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void call(JsonArray arguments)
-			{
-				if (timer.elapsed(TimeUnit.MILLISECONDS) > EXPECTED_RESPONSE_TIME_MS)
-				{
-					logger.warn("Responded after {}ms", timer.elapsed(TimeUnit.MILLISECONDS));
-				}
-				callback.callback(null);
-				future.cancel(false);
-				JavaScript.getCurrent().removeFunction(hookName);
-				JavaScript.getCurrent().removeFunction(errorHookName);
-			}
-		});
-		setupErrorHook(future);
-		JavaScript.getCurrent().execute(wrapJSInTryCatch(jsToExecute));
 
 	}
 
@@ -148,11 +161,10 @@ public class JSCallWithReturnValue
 			@Override
 			public void call(JsonArray arguments)
 			{
-				logger.info("Handling response for " + hookName);
+				logger.debug("Handling response for " + hookName);
 				javaScriptCallback.callback(null);
 				future.cancel(false);
-				JavaScript.getCurrent().removeFunction(hookName);
-				JavaScript.getCurrent().removeFunction(errorHookName);
+				removeHooks(hookName, errorHookName);
 				if (timer.elapsed(TimeUnit.MILLISECONDS) > EXPECTED_RESPONSE_TIME_MS)
 				{
 					logger.warn("Responded after {}ms", timer.elapsed(TimeUnit.MILLISECONDS));
@@ -162,6 +174,14 @@ public class JSCallWithReturnValue
 		});
 		setupErrorHook(future);
 		JavaScript.getCurrent().execute(wrapJSInTryCatchBlind(jsToExecute));
+
+	}
+
+	void removeHooks(final String hook1, final String hook2)
+	{
+		final JavaScript js = JavaScript.getCurrent();
+		js.removeFunction(hook1);
+		js.removeFunction(hook2);
 
 	}
 
@@ -231,8 +251,8 @@ public class JSCallWithReturnValue
 
 				+ "catch(err)"
 
-				+ "{console.error(err);" + errorHookName + "(err.message);};";
-		logger.info(wrapped);
+				+ "{debugger;console.error(err);" + errorHookName + "(err.message+' '+err.stack);};";
+		logger.debug(wrapped);
 
 		return wrapped;
 	}
@@ -250,7 +270,7 @@ public class JSCallWithReturnValue
 
 				+ "catch(err)"
 
-				+ "{console.error(err);" + errorHookName + "(err.message);};";
+				+ "{console.error(err);" + errorHookName + "(err.message+' '+err.stack);};";
 
 		// logger.error(wrapped);
 		return wrapped;
