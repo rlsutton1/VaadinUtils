@@ -1,5 +1,7 @@
 package au.com.vaadinutils.entity;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -10,9 +12,11 @@ import au.com.vaadinutils.crud.ChildCrudEntity;
 import au.com.vaadinutils.dao.JpaEntityHelper;
 
 @MappedSuperclass
-public abstract class BaseCrudEntity implements ChildCrudEntity
+public abstract class BaseCrudEntity implements ChildCrudEntity, Serializable
 {
 	// Logger logger = LogManager.getLogger();
+
+	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
