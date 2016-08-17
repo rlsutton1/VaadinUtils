@@ -23,6 +23,11 @@ import au.com.vaadinutils.entity.BaseCrudEntity;
 public class Tblportal extends BaseCrudEntity
 {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6749641927189770291L;
+
 	@JoinColumn(name = "layoutId")
 	private Tblportallayout portalLayout;
 
