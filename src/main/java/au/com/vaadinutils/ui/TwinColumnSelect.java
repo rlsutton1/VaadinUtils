@@ -74,7 +74,6 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 	private String selectedColumnHeader = "Selected";
 
 	private LinkedHashSet<ValueChangeListener<C>> valueChangeListeners = null;
-	private ValueChangeListener<C> listener;
 	private CreateNewCallback<C> createNewCallback;
 
 	private boolean sortAscending = true;
@@ -524,9 +523,12 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 		if (item != null)
 		{
 			selectedBeans.addBean(item);
-			if (listener != null)
+			if (valueChangeListeners != null)
 			{
-				listener.valueChanged(getValue());
+				for (ValueChangeListener<C> listener : valueChangeListeners)
+				{
+					listener.valueChanged(getValue());
+				}
 			}
 		}
 	}
@@ -534,18 +536,24 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 	protected void removeAction(Long id)
 	{
 		selectedBeans.removeItem(id);
-		if (listener != null)
+		if (valueChangeListeners != null)
 		{
-			listener.valueChanged(getValue());
+			for (ValueChangeListener<C> listener : valueChangeListeners)
+			{
+				listener.valueChanged(getValue());
+			}
 		}
 	}
 
 	protected void removeAllAction()
 	{
 		selectedBeans.removeAllItems();
-		if (listener != null)
+		if (valueChangeListeners != null)
 		{
-			listener.valueChanged(getValue());
+			for (ValueChangeListener<C> listener : valueChangeListeners)
+			{
+				listener.valueChanged(getValue());
+			}
 		}
 	}
 
