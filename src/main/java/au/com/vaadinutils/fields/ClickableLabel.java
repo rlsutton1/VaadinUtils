@@ -81,4 +81,9 @@ public class ClickableLabel extends VerticalLayout
 		});
 
 	}
+
+	public Label getLabel()
+	{
+		return label;
+	}
 }
