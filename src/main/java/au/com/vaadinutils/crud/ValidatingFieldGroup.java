@@ -64,7 +64,7 @@ public class ValidatingFieldGroup<E> extends FieldGroup
 		this.groupIsDirty = groupIsDirty;
 	}
 
-	private Set<Field<?>> knownFields = new HashSet<Field<?>>();
+	private Set<Field<?>> knownFields = new HashSet<>();
 
 	/*
 	 * Override configureField to add a bean validator to each field.
@@ -124,6 +124,7 @@ public class ValidatingFieldGroup<E> extends FieldGroup
 
 	}
 
+	@Override
 	public void discard()
 	{
 		groupIsDirty = false;
@@ -135,6 +136,7 @@ public class ValidatingFieldGroup<E> extends FieldGroup
 
 	}
 
+	@Override
 	public void setItemDataSource(Item itemDataSource)
 	{
 		groupIsDirty = false;
@@ -159,8 +161,8 @@ public class ValidatingFieldGroup<E> extends FieldGroup
 		{
 			if (field.isModified())
 			{
-				logger.warn("Dirty: {} {}", field.getCaption(), field.getClass().getSimpleName());
-				logger.warn("Dirty value: " + field.getValue());
+				logger.debug("Dirty: {} {}", field.getCaption(), field.getClass().getSimpleName());
+				logger.debug("Dirty value: " + field.getValue());
 
 				return true;
 			}
@@ -168,6 +170,7 @@ public class ValidatingFieldGroup<E> extends FieldGroup
 		return false;
 	}
 
+	@Override
 	public void bind(Field<?> field, Object propertyId) throws BindException
 	{
 
