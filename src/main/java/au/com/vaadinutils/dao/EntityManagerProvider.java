@@ -79,7 +79,7 @@ public enum EntityManagerProvider
 
 	private static List<Runnable> registeredPostActions = new ArrayList<>();
 
-	private ThreadLocal<EntityManager> entityManagerThreadLocal = new ThreadLocal<EntityManager>();
+	private ThreadLocal<EntityManager> entityManagerThreadLocal = new ThreadLocal<>();
 	private javax.persistence.EntityManagerFactory emf;
 
 	/**
@@ -436,6 +436,23 @@ public enum EntityManagerProvider
 				}
 			}
 		}
+	}
+
+	/**
+	 * this is useful when you need to run code in a separate transaction and thread after the current transaction commits 
+	 */
+	public static void registerTransientPostActionOnNewThread(final Runnable runnable)
+	{
+		registerTransientPostAction(new Runnable()
+		{
+
+			@Override
+			public void run()
+			{
+				new Thread(runnable).start();
+
+			}
+		});
 	}
 
 	/**
