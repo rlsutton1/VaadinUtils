@@ -25,7 +25,7 @@ import javax.mail.util.ByteArrayDataSource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.google.gwt.thirdparty.guava.common.base.Preconditions;
+import com.google.common.base.Preconditions;
 import com.vaadin.server.Page;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.server.WrappedSession;
@@ -77,7 +77,7 @@ public class JasperManager implements Runnable
 
 	private static transient Logger logger = LogManager.getLogger(JasperManager.class);
 
-	private final Map<String, Object> boundParams = new HashMap<String, Object>();
+	private final Map<String, Object> boundParams = new HashMap<>();
 
 	private CustomAsynchronousFillHandle fillHandle;
 
@@ -170,7 +170,7 @@ public class JasperManager implements Runnable
 	 * key: report filename <br>
 	 * value: last time it was compiled
 	 */
-	final static Map<String, Long> compiledReports = new ConcurrentHashMap<String, Long>();
+	final static Map<String, Long> compiledReports = new ConcurrentHashMap<>();
 
 	/**
 	 *
@@ -742,11 +742,11 @@ public class JasperManager implements Runnable
 
 		if (params == null)
 		{
-			params = new LinkedList<ReportParameter<?>>();
+			params = new LinkedList<>();
 		}
 		this.params = params;
 
-		images = new ConcurrentHashMap<String, byte[]>();
+		images = new ConcurrentHashMap<>();
 
 		if (UI.getCurrent() != null)
 		{
@@ -802,7 +802,7 @@ public class JasperManager implements Runnable
 		thread.start();
 	}
 
-	static final LinkedBlockingQueue<QueueEntry> jobQueue = new LinkedBlockingQueue<QueueEntry>();
+	static final LinkedBlockingQueue<QueueEntry> jobQueue = new LinkedBlockingQueue<>();
 
 	@Override
 	public void run()

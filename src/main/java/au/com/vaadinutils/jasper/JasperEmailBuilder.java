@@ -9,10 +9,11 @@ import javax.activation.FileDataSource;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.ImageHtmlEmail;
 
-import com.google.gwt.thirdparty.guava.common.base.Preconditions;
+import com.google.common.base.Preconditions;
 
 /**
  * Use this class to send a Jasper Report as an email.
+ * 
  * @author bsutton
  *
  */
@@ -20,10 +21,10 @@ public class JasperEmailBuilder
 {
 	private JasperEmailSettings settings;
 
-	private ArrayList<DataSource> attachments = new ArrayList<DataSource>();
-	private ArrayList<String> tos = new ArrayList<String>();
-	private ArrayList<String> ccs = new ArrayList<String>();
-	private ArrayList<String> bccs = new ArrayList<String>();
+	private ArrayList<DataSource> attachments = new ArrayList<>();
+	private ArrayList<String> tos = new ArrayList<>();
+	private ArrayList<String> ccs = new ArrayList<>();
+	private ArrayList<String> bccs = new ArrayList<>();
 	private String subject;
 	private String fromAddress;
 

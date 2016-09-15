@@ -1,6 +1,6 @@
 package au.com.vaadinutils.crud;
 
-import com.google.gwt.thirdparty.guava.common.base.Preconditions;
+import com.google.common.base.Preconditions;
 import com.vaadin.data.util.PropertyValueGenerator;
 import com.vaadin.ui.Grid.AbstractRenderer;
 

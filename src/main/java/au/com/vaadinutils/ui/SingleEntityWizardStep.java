@@ -9,7 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.vaadin.teemu.wizards.WizardStep;
 
-import com.google.gwt.thirdparty.guava.common.base.Preconditions;
+import com.google.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.JPAContainer.ProviderChangedEvent;
@@ -45,7 +45,7 @@ public abstract class SingleEntityWizardStep<E extends CrudEntity> implements Wi
 	{
 		this.entityClass = entityClass;
 		this.container = entityDao.createVaadinContainer();
-		fieldGroup = new ValidatingFieldGroup<E>(entityClass);
+		fieldGroup = new ValidatingFieldGroup<>(entityClass);
 
 	}
 
@@ -204,7 +204,7 @@ public abstract class SingleEntityWizardStep<E extends CrudEntity> implements Wi
 	{
 		// don't really need an AtomicReference, just using it as a mutable
 		// final variable to be used in the callback
-		final AtomicReference<E> newEntity = new AtomicReference<E>();
+		final AtomicReference<E> newEntity = new AtomicReference<>();
 
 		// call back to collect the id of the new record when the container
 		// fires the ItemSetChangeEvent
