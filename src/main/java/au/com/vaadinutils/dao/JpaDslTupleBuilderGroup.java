@@ -1,5 +1,6 @@
 package au.com.vaadinutils.dao;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -56,13 +57,14 @@ import au.com.vaadinutils.dao.JpaBaseDao.Condition;
 public class JpaDslTupleBuilderGroup<E>
 {
 
-	private List<JpaDslTupleBuilderGroupItem<E>> builders = new LinkedList<>();
+	private List<JpaDslTupleBuilderGroupItem<E>> builders = new ArrayList<>();
 	private JpaDslTupleBuilderGroupCommon<E> common;
 	private Class<E> entityClass;
-	private List<Tuple> results = new LinkedList<>();
+	private List<Tuple> results = new ArrayList<>();
 	private boolean distinct = false;
 	private Map<SingularAttribute<E, ?>, Integer> multiselects = new LinkedHashMap<>();
 	private int positionCounter = 0;
+	private List<JpaDslOrder> orders = new ArrayList<>();
 
 	public JpaDslTupleBuilderGroup(final Class<E> entityClass)
 	{
@@ -102,7 +104,8 @@ public class JpaDslTupleBuilderGroup<E>
 
 	public Object get(final Tuple tuple, final String alias)
 	{
-		// IllegalArgumentException will be thrown if tuple doesn't exist in query
+		// IllegalArgumentException will be thrown if tuple doesn't exist in
+		// query
 		// If this is the case then just return null
 		try
 		{
@@ -124,7 +127,9 @@ public class JpaDslTupleBuilderGroup<E>
 			}
 		}
 		else
+		{
 			results.addAll(makeQuery(null));
+		}
 
 		return results;
 	}
@@ -139,13 +144,28 @@ public class JpaDslTupleBuilderGroup<E>
 		}
 
 		final List<Condition<E>> conditions = new LinkedList<>();
+
 		if (common != null)
+		{
 			common.conditionsWillBeAdded(q, conditions);
+		}
+
 		if (builder != null)
+		{
 			builder.conditionsWillBeAdded(q, conditions);
+		}
+
 		if (distinct)
+		{
 			q.distinct();
+		}
+
 		q.where(conditions);
+
+		for (JpaDslOrder order : orders)
+		{
+			q.orderBy(order.getField(), order.getAscending());
+		}
 
 		return q.getResultList();
 	}
@@ -153,5 +173,10 @@ public class JpaDslTupleBuilderGroup<E>
 	public void distinct()
 	{
 		distinct = true;
+	}
+
+	public void orderBy(final String field, final boolean ascending)
+	{
+		orders.add(new JpaDslOrder(field, ascending));
 	}
 }

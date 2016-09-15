@@ -1,5 +1,6 @@
 package au.com.vaadinutils.dao;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -18,7 +19,7 @@ import au.com.vaadinutils.dao.JpaBaseDao.Condition;
  * final JpaDslBuilderGroup<TblSalesCustCallItem> queryGroup = new JpaDslBuilderGroup<>(TblSalesCustCallItem.class);
  * queryGroup.setCommon(new JpaDslBuilderGroupCommon<TblSalesCustCallItem>()
  * {
- * 		@Override
+ * 		&#64;Override
  * 		public void conditionsWillBeAdded(JpaDslBuilder<TblSalesCustCallItem> builder,
  * 				List<Condition<TblSalesCustCallItem>> conditions)
  * 		{
@@ -28,7 +29,7 @@ import au.com.vaadinutils.dao.JpaBaseDao.Condition;
  *  
  * queryGroup.addItem(new JpaDslBuilderGroupItem<TblSalesCustCallItem>()
  * {
- * 		@Override
+ * 		&#64;Override
  * 		public void conditionsWillBeAdded(JpaDslBuilder<TblSalesCustCallItem> builder,
  * 				List<Condition<TblSalesCustCallItem>> conditions)
  * 		{
@@ -44,11 +45,12 @@ import au.com.vaadinutils.dao.JpaBaseDao.Condition;
 public class JpaDslBuilderGroup<E>
 {
 
-	private List<JpaDslBuilderGroupItem<E>> builders = new LinkedList<>();
+	private List<JpaDslBuilderGroupItem<E>> builders = new ArrayList<>();
 	private JpaDslBuilderGroupCommon<E> common;
 	private Class<E> entityClass;
-	private List<E> results = new LinkedList<>();
+	private List<E> results = new ArrayList<>();
 	private boolean distinct = false;
+	private List<JpaDslOrder> orders = new ArrayList<>();
 
 	public JpaDslBuilderGroup(final Class<E> entityClass)
 	{
@@ -85,7 +87,9 @@ public class JpaDslBuilderGroup<E>
 			}
 		}
 		else
+		{
 			results.addAll(makeQuery(null));
+		}
 
 		return results;
 	}
@@ -94,13 +98,28 @@ public class JpaDslBuilderGroup<E>
 	{
 		final JpaDslBuilder<E> q = new JpaDslBuilder<E>(entityClass);
 		final List<Condition<E>> conditions = new LinkedList<>();
+
 		if (common != null)
+		{
 			common.conditionsWillBeAdded(q, conditions);
+		}
+
 		if (builder != null)
+		{
 			builder.conditionsWillBeAdded(q, conditions);
+		}
+
 		if (distinct)
+		{
 			q.distinct();
+		}
+
 		q.where(conditions);
+
+		for (JpaDslOrder order : orders)
+		{
+			q.orderBy(order.getField(), order.getAscending());
+		}
 
 		return q.getResultList();
 	}
@@ -108,5 +127,10 @@ public class JpaDslBuilderGroup<E>
 	public void distinct()
 	{
 		distinct = true;
+	}
+
+	public void orderBy(final String field, final boolean ascending)
+	{
+		orders.add(new JpaDslOrder(field, ascending));
 	}
 }
