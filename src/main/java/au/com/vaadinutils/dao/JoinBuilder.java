@@ -1,6 +1,7 @@
 package au.com.vaadinutils.dao;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -136,6 +137,11 @@ public class JoinBuilder<E, K>
 				case EQUAL:
 					predicates
 							.add(builder.equal(castGet(joinOnBuilder.getAttribute(), join), joinOnBuilder.getValue()));
+					break;
+				case IN:
+					predicates.add(
+							castGet(joinOnBuilder.getAttribute(), join).in((Collection<?>) joinOnBuilder.getValue()));
+					break;
 			}
 		}
 
@@ -169,6 +175,15 @@ public class JoinBuilder<E, K>
 		jb.joins.addAll(joins);
 		jb.joinOnBuilders.addAll(joinOnBuilders);
 		jb.joinOnBuilders.add(new JoinOnBuilder<K, V>(attribute, value, JoinOnType.EQUAL));
+		return jb;
+	}
+
+	public <T, V> JoinBuilder<E, K> onIn(final SingularAttribute<K, V> attribute, final Collection<V> value)
+	{
+		JoinBuilder<E, K> jb = new JoinBuilder<E, K>();
+		jb.joins.addAll(joins);
+		jb.joinOnBuilders.addAll(joinOnBuilders);
+		jb.joinOnBuilders.add(new JoinOnBuilder<K, V>(attribute, value, JoinOnType.IN));
 		return jb;
 	}
 

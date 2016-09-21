@@ -6,7 +6,7 @@ public class JoinOnBuilder<K, V>
 {
 	enum JoinOnType
 	{
-		EQUAL;
+		EQUAL, IN;
 	}
 
 	private Attribute<K, V> attribute;
