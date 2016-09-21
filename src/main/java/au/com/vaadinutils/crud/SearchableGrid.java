@@ -292,16 +292,21 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 	{
 	}
 
+	public void addItemClickListener(ItemClickListener listener)
+	{
+		grid.addItemClickListener(listener);
+
+	}
+
 	public void addSelectionListener(SelectionListener listener)
 	{
 		grid.addSelectionListener(listener);
 
 	}
 
-	public void addItemClickListener(ItemClickListener listener)
+	public void addStyleName(String style)
 	{
-		grid.addItemClickListener(listener);
-
+		grid.addStyleName(style);
 	}
 
 	public void removeAllContainerFilters()
