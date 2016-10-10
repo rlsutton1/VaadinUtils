@@ -922,6 +922,10 @@ public abstract class JpaDslAbstract<E, R>
 			@Override
 			public Predicate getPredicates()
 			{
+				if (values.isEmpty())
+				{
+					throw new RuntimeException("Empty set supplied for IN clause");
+				}
 				return root.get(attribute).in(values);
 			}
 		};
