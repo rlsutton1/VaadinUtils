@@ -44,25 +44,33 @@ public class GridContextMenu extends ContextMenu
 			public void contextClick(ContextClickEvent event)
 			{
 				if (!(event instanceof GridContextClickEvent))
+				{
 					return;
+				}
 
 				final GridContextClickEvent e = (GridContextClickEvent) event;
 				switch (e.getSection())
 				{
-				case BODY:
-					if (onRow)
-						openContext(e);
-					break;
-				case FOOTER:
-					if (onFooter)
-						openContext(e);
-					break;
-				case HEADER:
-					if (onHeader)
-						openContext(e);
-					break;
-				default:
-					break;
+					case BODY:
+						if (onRow)
+						{
+							openContext(e);
+						}
+						break;
+					case FOOTER:
+						if (onFooter)
+						{
+							openContext(e);
+						}
+						break;
+					case HEADER:
+						if (onHeader)
+						{
+							openContext(e);
+						}
+						break;
+					default:
+						break;
 				}
 			}
 		});
@@ -70,10 +78,22 @@ public class GridContextMenu extends ContextMenu
 
 	private void openContext(final GridContextClickEvent event)
 	{
-		grid.select(event.getItemId());
-		for (GridContextMenuEvent events : eventsList)
-			events.preContextMenuOpen();
-		open(event.getClientX(), event.getClientY());
+		try
+		{
+			grid.select(event.getItemId());
+			for (GridContextMenuEvent events : eventsList)
+			{
+				events.preContextMenuOpen();
+			}
+			open(event.getClientX(), event.getClientY());
+		}
+		catch (IllegalArgumentException e)
+		{
+			// This usually means we have tried to select something that doesn't
+			// exist in the grid. This can happen when trying to open a context
+			// menu on old items while the grid is still refreshing with new
+			// items.
+		}
 	}
 
 	public void addEvents(final GridContextMenuEvent events)
