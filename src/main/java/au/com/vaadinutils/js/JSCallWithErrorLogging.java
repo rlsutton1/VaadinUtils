@@ -30,4 +30,19 @@ public class JSCallWithErrorLogging
 		});
 	}
 
+	/**
+	 * 
+	 * @param jsToExecute
+	 *            - the actual JS you want to execute alert('hello'); <br>
+	 *            <br>
+	 * 
+	 *            new
+	 *            JSCallWithErrorLogging(JavaScriptFunctionCall("alert","hello"));
+	 * 
+	 */
+	public JSCallWithErrorLogging(final JavaScriptFunctionCall call)
+	{
+		this(call.getCall());
+	}
+
 }

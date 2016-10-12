@@ -64,6 +64,31 @@ public class JSCallWithReturnValue
 
 	}
 
+	/**
+	 * 
+	 * @param jsToExecute
+	 *            - the actual JS you want to execute and get a return value for
+	 *            like... new Date(); <br>
+	 *            <br>
+	 *            JavaScriptCallback <Boolean> callback = new JavaScriptCallback
+	 *            <Boolean>()<br>
+	 *            {<br>
+	 * 
+	 *            public void callback(Boolean value)<br>
+	 *            { <br>
+	 *            // do something here with value<br>
+	 *            }<br>
+	 *            };<br>
+	 * 
+	 *            new
+	 *            JSCallWithReturnValue(JavaScriptFunctionCall("myMethod",true,1)).callBoolean(callback);
+	 * 
+	 */
+	public JSCallWithReturnValue(final JavaScriptFunctionCall call)
+	{
+		this(call.getCall());
+	}
+
 	public void callBoolean(final JavaScriptCallback<Boolean> callback)
 	{
 		call(new JavaScriptCallback<JsonArray>()
