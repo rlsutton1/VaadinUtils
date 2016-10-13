@@ -967,6 +967,18 @@ public abstract class JpaDslAbstract<E, R>
 		return lessThanOrEqualTo(field, value);
 	}
 
+	public <V> Condition<E> ltEq(final JoinBuilder<E, V> joinBuilder, final SingularAttribute<V, Date> field,
+			final Date value)
+	{
+		return lessThanOrEqualTo(joinBuilder, field, value);
+	}
+
+	public <V> Condition<E> gtEq(final JoinBuilder<E, V> joinBuilder, final SingularAttribute<V, Date> field,
+			final Date value)
+	{
+		return greaterThanOrEqualTo(joinBuilder, field, value);
+	}
+
 	public <J, V extends Comparable<? super V>> Condition<E> ltEq(final SetAttribute<? super E, J> joinAttribute,
 			final JoinType joinType, final SingularAttribute<J, V> field, final V value)
 	{
