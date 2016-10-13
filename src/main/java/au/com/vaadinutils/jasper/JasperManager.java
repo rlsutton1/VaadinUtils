@@ -256,7 +256,7 @@ public class JasperManager implements Runnable
 
 		double pageWidth = designFile.getPageWidth() + (margin * 2);
 
-		double ratio = 0.75; // landscape;
+		double ratio = 0.75; // landscape
 		if (designFile.getPageHeight() / pageWidth >= 1)
 		{
 			ratio = 1.5; // portrait

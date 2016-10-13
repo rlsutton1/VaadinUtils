@@ -4,7 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.ParseException;
 import java.util.Date;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import com.google.common.base.Preconditions;
@@ -20,7 +20,7 @@ import au.com.vaadinutils.jasper.scheduler.entities.DateParameterType;
 
 public abstract class ReportParameter<T>
 {
-	final Set<String> parameters = new HashSet<String>();
+	final Set<String> parameters = new LinkedHashSet<String>();
 	final protected String label;
 	protected ValidateListener validateListener;
 
