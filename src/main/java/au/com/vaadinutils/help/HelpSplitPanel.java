@@ -161,6 +161,7 @@ public class HelpSplitPanel extends HorizontalLayout implements View, HelpPageLi
 
 		helpPane.setContent(splashHolder);
 		helpPane.setSizeFull();
+
 	}
 
 	private void resizeHelp()
@@ -262,6 +263,7 @@ public class HelpSplitPanel extends HorizontalLayout implements View, HelpPageLi
 			@Override
 			public void success()
 			{
+
 				helpPane.setContent(helpHolder);
 				addFooter();
 				resizeHelp();
