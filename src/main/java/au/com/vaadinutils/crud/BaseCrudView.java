@@ -122,7 +122,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 	protected BaseCrudSaveCancelButtonTray buttonLayout;
 	protected AbstractLayout advancedSearchLayout;
 	private VerticalLayout searchLayout;
-	protected Set<ChildCrudListener<E>> childCrudListeners = new HashSet<ChildCrudListener<E>>();
+	protected Set<ChildCrudListener<E>> childCrudListeners = new HashSet<>();
 	private CrudDisplayMode displayMode = CrudDisplayMode.HORIZONTAL;
 	private boolean disallowEditing = false;
 	private boolean disallowNew = false;
@@ -130,7 +130,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 	public boolean advancedSearchOn = false;
 	private boolean triggerFilterOnClear = true;
 	private Button advancedSearchButton;
-	private Set<RowChangedListener<E>> rowChangedListeners = new CopyOnWriteArraySet<RowChangedListener<E>>();
+	private Set<RowChangedListener<E>> rowChangedListeners = new CopyOnWriteArraySet<>();
 	private int minSearchTextLength = 0;
 	protected HeadingPropertySet headings;
 	private boolean dragAndDropOrderingEnabled = false;
@@ -166,7 +166,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 			logger.error(e, e);
 			throw new RuntimeException(e);
 		}
-		fieldGroup = new ValidatingFieldGroup<E>(container, entityClass);
+		fieldGroup = new ValidatingFieldGroup<>(container, entityClass);
 		fieldGroup.setBuffered(true);
 
 		// disable this, as the disabling of the save/cancel button is buggy
@@ -248,9 +248,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 		dragAndDropOrderingEnabled = true;
 		this.ordinalField = ordinalField;
 
-		container.sort(new Object[]
-		{ ordinalField.getName() }, new boolean[]
-		{ true });
+		container.sort(new Object[] { ordinalField.getName() }, new boolean[] { true });
 
 		this.entityTable.setDragMode(TableDragMode.ROW);
 		this.entityTable.setDropHandler(new DropHandler()
@@ -319,9 +317,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 
 				container.commit();
 				container.refresh();
-				container.sort(new Object[]
-				{ ordinalField.getName() }, new boolean[]
-				{ true });
+				container.sort(new Object[] { ordinalField.getName() }, new boolean[] { true });
 
 				// cause this crud to save, or if its a child cause the parent
 				// to save.
@@ -374,7 +370,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 
 	protected EntityList<E> getTable(JPAContainer<E> container, HeadingPropertySet headings)
 	{
-		return new EntityTable<E>(container, headings);
+		return new EntityTable<>(container, headings);
 	}
 
 	/*
@@ -537,7 +533,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 		actionGroupLayout.addComponent(actionMessage);
 
 		actionNewButton.setCaption(getNewButtonLabel());
-		actionNewButton.setId("CrudNewButton-" + getNewButtonLabel());
+		actionNewButton.setId("CrudNewButton-" + getNewButtonLabel().replace(" ", ""));
 		actionLayout.addComponent(actionNewButton);
 
 		actionLayout.setComponentAlignment(actionGroupLayout, Alignment.MIDDLE_LEFT);
@@ -606,8 +602,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 	 */
 	protected List<CrudAction<E>> getCrudActions()
 	{
-		List<CrudAction<E>> actions = new LinkedList<CrudAction<E>>();
-		CrudAction<E> crudAction = new CrudActionDelete<E>();
+		List<CrudAction<E>> actions = new LinkedList<>();
+		CrudAction<E> crudAction = new CrudActionDelete<>();
 		actions.add(crudAction);
 
 		actions.add(exportAction);
@@ -1422,7 +1418,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 	{
 		// don't really need an AtomicReference, just using it as a mutable
 		// final variable to be used in the callback
-		final AtomicReference<E> entityReference = new AtomicReference<E>();
+		final AtomicReference<E> entityReference = new AtomicReference<>();
 
 		// call back to collect the id of the new record when the container
 		// fires the ItemSetChangeEvent
