@@ -142,6 +142,8 @@ public class JasperEmailBuilder
 
 		if (StringUtils.isNotEmpty(this.htmlBody))
 			email.setHtmlMsg(this.htmlBody);
+		else
+			email.setHtmlMsg("The body of this email was left blank");
 
 		if (this.renderedReportBody != null)
 			email.setHtmlMsg(this.renderedReportBody.getBodyAsHtml());
