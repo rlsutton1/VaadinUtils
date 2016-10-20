@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.ImageHtmlEmail;
 
@@ -139,7 +140,7 @@ public class JasperEmailBuilder
 		for (String bcc : this.bccs)
 			email.addBcc(bcc);
 
-		if (this.htmlBody != null)
+		if (StringUtils.isNotEmpty(this.htmlBody))
 			email.setHtmlMsg(this.htmlBody);
 
 		if (this.renderedReportBody != null)
