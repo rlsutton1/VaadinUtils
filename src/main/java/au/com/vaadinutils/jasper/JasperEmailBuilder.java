@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.ImageHtmlEmail;
 
@@ -13,6 +14,7 @@ import com.google.gwt.thirdparty.guava.common.base.Preconditions;
 
 /**
  * Use this class to send a Jasper Report as an email.
+ * 
  * @author bsutton
  *
  */
@@ -20,10 +22,10 @@ public class JasperEmailBuilder
 {
 	private JasperEmailSettings settings;
 
-	private ArrayList<DataSource> attachments = new ArrayList<DataSource>();
-	private ArrayList<String> tos = new ArrayList<String>();
-	private ArrayList<String> ccs = new ArrayList<String>();
-	private ArrayList<String> bccs = new ArrayList<String>();
+	private ArrayList<DataSource> attachments = new ArrayList<>();
+	private ArrayList<String> tos = new ArrayList<>();
+	private ArrayList<String> ccs = new ArrayList<>();
+	private ArrayList<String> bccs = new ArrayList<>();
 	private String subject;
 	private String fromAddress;
 
@@ -138,8 +140,10 @@ public class JasperEmailBuilder
 		for (String bcc : this.bccs)
 			email.addBcc(bcc);
 
-		if (this.htmlBody != null)
+		if (StringUtils.isNotEmpty(this.htmlBody))
 			email.setHtmlMsg(this.htmlBody);
+		else
+			email.setHtmlMsg("The body of this email was left blank");
 
 		if (this.renderedReportBody != null)
 			email.setHtmlMsg(this.renderedReportBody.getBodyAsHtml());
