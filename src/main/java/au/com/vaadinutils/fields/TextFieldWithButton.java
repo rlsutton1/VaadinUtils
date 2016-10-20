@@ -1,6 +1,7 @@
 package au.com.vaadinutils.fields;
 
 import com.vaadin.addon.jpacontainer.EntityItemProperty;
+import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.server.Resource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickListener;
@@ -39,12 +40,12 @@ public class TextFieldWithButton extends CustomComponent
 	{
 		textField.setNullRepresentation(nullRepresentation);
 	}
-	
+
 	public void setButtonCaption(String caption)
 	{
 		button.setCaption(caption);
 	}
-	
+
 	public void setButtonIcon(Resource icon)
 	{
 		button.setIcon(icon);
@@ -54,25 +55,30 @@ public class TextFieldWithButton extends CustomComponent
 	{
 		return textField.getValue();
 	}
-	
+
 	public void addButtonClickListener(ClickListener listener)
 	{
 		button.addClickListener(listener);
 	}
-	
+
+	public void addTextFieldValueChangeListener(ValueChangeListener listener)
+	{
+		textField.addValueChangeListener(listener);
+	}
+
 	public void setButtonDescription(String description)
 	{
 		button.setDescription(description);
 	}
-	
+
 	public void setReadOnly(boolean readOnly)
 	{
 		textField.setReadOnly(readOnly);
 	}
-	
+
 	public void setButtonEnabled(boolean enabled)
 	{
 		button.setEnabled(enabled);
 	}
-	
+
 }
