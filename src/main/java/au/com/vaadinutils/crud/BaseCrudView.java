@@ -532,8 +532,13 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 		actionMessage = new Label("", ContentMode.HTML);
 		actionGroupLayout.addComponent(actionMessage);
 
-		actionNewButton.setCaption(getNewButtonLabel());
-		actionNewButton.setId("CrudNewButton-" + getNewButtonLabel().replace(" ", ""));
+		String newButtonLabel = getNewButtonLabel();
+		if (newButtonLabel == null)
+		{
+			newButtonLabel = "";
+		}
+		actionNewButton.setCaption(newButtonLabel);
+		actionNewButton.setId("CrudNewButton-" + newButtonLabel.replace(" ", ""));
 		actionLayout.addComponent(actionNewButton);
 
 		actionLayout.setComponentAlignment(actionGroupLayout, Alignment.MIDDLE_LEFT);
