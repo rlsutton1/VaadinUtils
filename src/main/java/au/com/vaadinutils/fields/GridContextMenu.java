@@ -80,7 +80,13 @@ public class GridContextMenu extends ContextMenu
 	{
 		try
 		{
-			grid.select(event.getItemId());
+			final Object itemId = event.getItemId();
+			if (itemId == null)
+			{
+				return;
+			}
+
+			grid.select(itemId);
 			for (GridContextMenuEvent events : eventsList)
 			{
 				events.preContextMenuOpen();

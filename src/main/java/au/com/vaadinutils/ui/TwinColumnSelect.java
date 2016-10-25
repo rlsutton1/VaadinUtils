@@ -707,4 +707,9 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 	{
 		return new SimpleStringFilter(itemCaptionProperty.getName(), filterString, true, false);
 	}
+
+	protected void triggerFilterForAvailableGrid()
+	{
+		availableGrid.triggerFilter();
+	}
 }
