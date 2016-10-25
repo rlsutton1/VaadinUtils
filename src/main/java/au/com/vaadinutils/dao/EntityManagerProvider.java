@@ -400,6 +400,8 @@ public enum EntityManagerProvider
 	 */
 	public static void registerTransientPostAction(Runnable runnable)
 	{
+		Preconditions.checkNotNull(getEntityManager());
+		Preconditions.checkState(getEntityManager().isOpen());
 		List<Runnable> actionList = transientPostTransactionActions.get();
 		if (actionList == null)
 		{
@@ -439,7 +441,8 @@ public enum EntityManagerProvider
 	}
 
 	/**
-	 * this is useful when you need to run code in a separate transaction and thread after the current transaction commits 
+	 * this is useful when you need to run code in a separate transaction and
+	 * thread after the current transaction commits
 	 */
 	public static void registerTransientPostActionOnNewThread(final Runnable runnable)
 	{
