@@ -43,6 +43,18 @@ abstract public class ReportParameterDependantTable<P extends CrudEntity, T exte
 	@Override
 	public void setValueAsString(String value, String parameterName)
 	{
+		reapplyParentFilters();
+		super.setValueAsString(value, parameterName);
+	}
+
+	@Override
+	public void removeAllContainerFilters()
+	{
+		reapplyParentFilters();
+	}
+
+	private void reapplyParentFilters()
+	{
 		if (parent != null)
 		{
 			Collection<Long> ids = new LinkedList<>();
@@ -53,7 +65,6 @@ abstract public class ReportParameterDependantTable<P extends CrudEntity, T exte
 
 			applyParentFilters(ids);
 		}
-		super.setValueAsString(value, parameterName);
 	}
 
 	/**
@@ -87,7 +98,7 @@ abstract public class ReportParameterDependantTable<P extends CrudEntity, T exte
 
 	private void applyParentFilters(Collection<Long> selectedIds)
 	{
-		removeAllContainerFilters();
+		super.removeAllContainerFilters();
 		boolean filtersAdded = false;
 		if (selectedIds.size() > 0)
 		{
