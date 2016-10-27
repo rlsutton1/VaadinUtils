@@ -119,7 +119,7 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 			public void textChange(TextChangeEvent event)
 			{
 				String value = event.getText();
-				container.removeAllContainerFilters();
+				removeAllContainerFilters();
 				if (value.length() > 0)
 				{
 					container.addContainerFilter(new SimpleStringFilter(displayField.getName(), value, true, false));
@@ -460,7 +460,7 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 	public void setValueAsString(String value, String parameterName)
 	{
 		String[] values = value.split(",");
-		List<Long> idList = new LinkedList<Long>();
+		List<Long> idList = new LinkedList<>();
 
 		for (String id : values)
 		{
