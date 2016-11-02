@@ -66,7 +66,7 @@ import elemental.json.JsonObject;
  */
 class JasperReportLayout extends VerticalLayout
 {
-	private static final int MAX_FILENAME_LENGTH = 125;
+	private static final int MAX_FILENAME_LENGTH = 100;
 
 	/**
 	 *
