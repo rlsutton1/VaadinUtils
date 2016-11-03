@@ -115,6 +115,11 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		return findById((K) new Long(id));
 	}
 
+	public <T> JpaDslSelectAttributeBuilder<E, T> find(SingularAttribute<E, T> attribute)
+	{
+		return new JpaDslSelectAttributeBuilder<>(entityClass, attribute);
+	}
+
 	@Override
 	public E findById(K id)
 	{
