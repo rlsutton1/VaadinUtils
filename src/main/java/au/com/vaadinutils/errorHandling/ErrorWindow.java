@@ -16,6 +16,7 @@ import org.vaadin.addons.screenshot.ScreenshotImage;
 import org.vaadin.addons.screenshot.ScreenshotListener;
 import org.vaadin.addons.screenshot.ScreenshotMimeType;
 
+import com.google.common.base.Stopwatch;
 import com.vaadin.server.DefaultErrorHandler;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button;
@@ -139,39 +140,61 @@ public class ErrorWindow
 					@Override
 					public void run()
 					{
-						displayVaadinErrorWindow(finalCauseClass, finalId, time, finalId, finalTrace, reference);
 
+						Stopwatch lastTime = (Stopwatch) UI.getCurrent().getSession()
+								.getAttribute("Last Time Error Window Shown");
+
+						// don't display the error window more than once every 2
+						// seconds
+						if (lastTime == null || lastTime.elapsed(TimeUnit.SECONDS) > 2)
+						{
+
+							displayVaadinErrorWindow(finalCauseClass, finalId, time, finalId, finalTrace, reference);
+
+							UI.getCurrent().getSession().setAttribute("Last Time Error Window Shown",
+									Stopwatch.createStarted());
+						}
+						else
+						{
+							emailErrorWithoutShowing(time, finalId, finalTrace, reference);
+						}
 					}
 				});
 			}
 			else
 			{
 
-				// limit the number of errors that can be emailed without human
-				// action. also suppress some types of errors
-				if (emailRateController.acquire())
-				{
-					try
-					{
-						final String supportEmail = getTargetEmailAddress();
-
-						generateEmail(time, finalId, finalTrace, reference, "Error not displayed to user", supportEmail,
-								"", "", "", null);
-					}
-					catch (Exception e)
-					{
-						logger.error(e, e);
-					}
-				}
-				else
-				{
-					logger.error("Not sending error email");
-				}
+				emailErrorWithoutShowing(time, finalId, finalTrace, reference);
 			}
 		}
 		else
 		{
 			logger.error("Not Sending email or displaying error as cause is exempted.");
+		}
+	}
+
+	private void emailErrorWithoutShowing(final Date time, final String finalId, final String finalTrace,
+			final String reference)
+	{
+		// limit the number of errors that can be emailed without human
+		// action. also suppress some types of errors
+		if (emailRateController.acquire())
+		{
+			try
+			{
+				final String supportEmail = getTargetEmailAddress();
+
+				generateEmail(time, finalId, finalTrace, reference, "Error not displayed to user", supportEmail, "", "",
+						"", null);
+			}
+			catch (Exception e)
+			{
+				logger.error(e, e);
+			}
+		}
+		else
+		{
+			logger.error("Not sending error email");
 		}
 	}
 
