@@ -221,7 +221,7 @@ class JasperReportLayout extends VerticalLayout
 
 					JsonObject params = arguments.getObject(1);
 
-					List<ReportParameter<?>> subFilters = new LinkedList<ReportParameter<?>>();
+					List<ReportParameter<?>> subFilters = new LinkedList<>();
 
 					boolean insitue = false;
 					String[] itr = params.keys();
@@ -233,7 +233,7 @@ class JasperReportLayout extends VerticalLayout
 						}
 						else
 						{
-							subFilters.add(new ReportParameterConstant<String>(key, params.getString(key), key,
+							subFilters.add(new ReportParameterConstant<>(key, params.getString(key), key,
 									params.getString(key)));
 						}
 					}
@@ -674,6 +674,7 @@ class JasperReportLayout extends VerticalLayout
 				{
 					name = name.substring(0, MAX_FILENAME_LENGTH);
 				}
+				name = name.replace("/", "-");
 
 				return name + outputFormat.getFileExtension();
 			}
