@@ -337,6 +337,13 @@ public class HelpSplitPanel extends HorizontalLayout implements View, HelpPageLi
 
 			}
 
+			@Override
+			public void showHelpLoadingSplash()
+			{
+				HelpSplitPanel.this.showHelpLoadingSplash();
+
+			}
+
 		});
 
 	}
