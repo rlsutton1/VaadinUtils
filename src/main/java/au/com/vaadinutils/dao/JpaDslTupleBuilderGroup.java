@@ -41,7 +41,7 @@ import au.com.vaadinutils.dao.JpaBaseDao.Condition;
  * 		public void conditionsWillBeAdded(JpaDslTupleBuilder<TblSalesCustCallItem> builder,
  * 				List<Condition<TblSalesCustCallItem>> conditions)
  * 		{
- * 			conditions.add(builder.eq(TblSalesCustCallItem_.tblSalesPerson, salesperson));
+ * 			conditions.add(builder.eq(TblSalesCustCallItem_.salesperson, salesperson));
  * 		}
  * 	});
  * 

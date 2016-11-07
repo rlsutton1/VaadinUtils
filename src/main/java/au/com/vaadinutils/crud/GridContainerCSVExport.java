@@ -189,7 +189,15 @@ public class GridContainerCSVExport<E>
 				Object value = itemProperty.getValue();
 				if (value != null)
 				{
-					values[i++] = (String) sanitiseValue(value);
+					final Object convertedValue = convert(value);
+					if (convertedValue != null)
+					{
+						values[i++] = sanitiseValue(convertedValue);
+					}
+					else
+					{
+						values[i++] = "";
+					}
 				}
 				else
 				{
@@ -211,23 +219,30 @@ public class GridContainerCSVExport<E>
 
 	}
 
-	public Object sanitiseValue(Object value)
+	public Object convert(Object value)
 	{
+		return value;
+	}
+
+	public String sanitiseValue(final Object value)
+	{
+		String sanitisedValue;
+
 		if (value instanceof String)
 		{
-			value = new HtmlToPlainText().getPlainText(Jsoup.parse(value.toString()));
+			sanitisedValue = new HtmlToPlainText().getPlainText(Jsoup.parse(value.toString()));
 		}
 		else
 		{
-			value = value.toString();
+			sanitisedValue = value.toString();
 		}
 
-		if (value == null)
+		if (sanitisedValue == null)
 		{
-			value = "";
+			sanitisedValue = "";
 		}
 
-		return value;
+		return sanitisedValue;
 	}
 
 	private void writeHeaders(CSVWriter writer, List<String> headers)
