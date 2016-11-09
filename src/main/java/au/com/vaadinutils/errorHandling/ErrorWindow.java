@@ -71,6 +71,8 @@ public class ErrorWindow
 		new ErrorWindow(true).internalShowErrorWindow(e);
 	}
 
+	static final ThreadLocal<String> lastSeenError = new ThreadLocal<>();
+
 	private void internalShowErrorWindow(Throwable error)
 	{
 
@@ -118,6 +120,14 @@ public class ErrorWindow
 			id = "" + hashId;
 
 		}
+
+		if (lastSeenError.get() != null && lastSeenError.get().equals(id))
+		{
+			logger.error("Skipping repeated error " + error.getMessage());
+			return;
+		}
+
+		lastSeenError.set(id);
 
 		final String finalId = id;
 		final String finalTrace = fullTrace;
