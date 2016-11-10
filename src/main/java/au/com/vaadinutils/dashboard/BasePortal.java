@@ -111,7 +111,7 @@ public abstract class BasePortal extends VerticalLayout implements Portal
 				if (portal != null)
 				{
 					portal.getPortalLayout().removePortal(portal);
-					JpaDslBuilder<Tblportalconfig> q = JpaBaseDao.getGenericDao(Tblportalconfig.class).find();
+					JpaDslBuilder<Tblportalconfig> q = JpaBaseDao.getGenericDao(Tblportalconfig.class).select();
 					q.where(q.eq(Tblportalconfig_.portal, portal)).delete();
 					EntityManagerProvider.remove(portal);
 				}

@@ -264,7 +264,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 	public <V> E findOneByAttribute(SingularAttribute<? super E, V> vKey, V value)
 	{
-		JpaDslBuilder<E> q = find();
+		JpaDslBuilder<E> q = select();
 		return q.where(q.eq(vKey, value)).getSingleResultOrNull();
 
 	}
@@ -641,7 +641,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		return new FindBuilder();
 	}
 
-	public JpaDslBuilder<E> find()
+	public JpaDslBuilder<E> select()
 	{
 		return new JpaDslBuilder<E>(entityClass);
 	}
@@ -666,7 +666,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		}
 
 		// lookup by guid
-		JpaDslBuilder<M> q = (JpaDslBuilder<M>) find();
+		JpaDslBuilder<M> q = (JpaDslBuilder<M>) select();
 		return q.where(q.eq(BaseCrudEntity_.guid, entity.getGuid())).getSingleResultOrNull();
 
 	}
@@ -907,6 +907,6 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 	public int getEntityCount()
 	{
-		return getGenericDao(entityClass).find().count().intValue();
+		return getGenericDao(entityClass).select().count().intValue();
 	}
 }

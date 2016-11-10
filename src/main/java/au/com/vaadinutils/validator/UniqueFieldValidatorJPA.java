@@ -67,7 +67,7 @@ public class UniqueFieldValidatorJPA<E extends CrudEntity, UNIQUE_FIELD_TYPE, FI
 		if (value != null && !("".equals(value.toString())))
 		{
 
-			JpaDslBuilder<E> q = new JpaBaseDao<E, Long>(table).find();
+			JpaDslBuilder<E> q = new JpaBaseDao<E, Long>(table).select();
 
 			Condition<E> criteria = q.eq(matchField, (UNIQUE_FIELD_TYPE) value);
 			if (filterAttribute != null && filterCallback.getValue() != null)

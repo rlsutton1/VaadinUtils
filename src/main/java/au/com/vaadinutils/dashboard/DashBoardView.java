@@ -354,7 +354,7 @@ public abstract class DashBoardView extends VerticalLayout implements View
 			{
 
 				// set all portals to not default
-				JpaDslBuilder<Tblportallayout> q = JpaBaseDao.getGenericDao(Tblportallayout.class).find();
+				JpaDslBuilder<Tblportallayout> q = JpaBaseDao.getGenericDao(Tblportallayout.class).select();
 				List<Tblportallayout> portals = q.where(q.eq(Tblportallayout_.account, getAccountId())).getResultList();
 				for (Tblportallayout portal : portals)
 				{
@@ -452,7 +452,7 @@ public abstract class DashBoardView extends VerticalLayout implements View
 	private void loadDashboardList()
 	{
 		Long account = getAccountId();
-		JpaDslBuilder<Tblportallayout> q = JpaBaseDao.getGenericDao(Tblportallayout.class).find();
+		JpaDslBuilder<Tblportallayout> q = JpaBaseDao.getGenericDao(Tblportallayout.class).select();
 		List<Tblportallayout> layouts = q.where(q.eq(Tblportallayout_.account, account))
 				.orderBy(Tblportallayout_.default_, false).orderBy(Tblportallayout_.name, true).getResultList();
 		container.removeAllItems();
@@ -484,7 +484,7 @@ public abstract class DashBoardView extends VerticalLayout implements View
 	private Tblportallayout findDefaultPortal()
 	{
 		Long account = getAccountId();
-		JpaDslBuilder<Tblportallayout> q = JpaBaseDao.getGenericDao(Tblportallayout.class).find();
+		JpaDslBuilder<Tblportallayout> q = JpaBaseDao.getGenericDao(Tblportallayout.class).select();
 		List<Tblportallayout> layouts = q.where(q.eq(Tblportallayout_.account, account))
 				.orderBy(Tblportallayout_.default_, false).orderBy(Tblportallayout_.name, true).getResultList();
 
