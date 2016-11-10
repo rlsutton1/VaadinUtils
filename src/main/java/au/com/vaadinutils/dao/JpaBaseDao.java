@@ -646,7 +646,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		return new JpaDslBuilder<E>(entityClass);
 	}
 
-	public JpaDslTupleBuilder<E> findTuple()
+	public JpaDslTupleBuilder<E> selectTuple()
 	{
 		return new JpaDslTupleBuilder<E>(entityClass);
 	}
