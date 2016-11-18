@@ -1108,7 +1108,8 @@ public abstract class JpaDslAbstract<E, R>
 		return new AbstractCondition<E>()
 		{
 
-			@SuppressWarnings({ "unchecked", "rawtypes" })
+			@SuppressWarnings(
+			{ "unchecked", "rawtypes" })
 			@Override
 			public Predicate getPredicates()
 			{
@@ -1320,6 +1321,11 @@ public abstract class JpaDslAbstract<E, R>
 	public <T extends Number> Expression<T> sum(final SingularAttribute<E, T> attribute)
 	{
 		return builder.sum(root.get(attribute));
+	}
+
+	public <K, T> Expression<Long> count(final SingularAttribute<E, T> attribute)
+	{
+		return builder.count(root.get(attribute));
 	}
 
 	public <K, T> Expression<Long> count(final JoinBuilder<E, K> join, final SingularAttribute<K, T> attribute)
