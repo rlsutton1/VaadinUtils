@@ -15,6 +15,8 @@ import org.apache.logging.log4j.Logger;
 
 import com.google.common.base.Preconditions;
 import com.vaadin.data.Item;
+import com.vaadin.server.FontAwesome;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.ColumnCollapseEvent;
@@ -440,6 +442,48 @@ public class HeadingPropertySet
 		public void setEraseSavedConfig()
 		{
 			eraseSavedConfig = true;
+		}
+
+		public Builder<E> addGeneratedBooleanIconColumn(String heading, final SingularAttribute<E, Boolean> attribute,
+				final FontAwesome trueIcon, final FontAwesome falseIcon)
+		{
+
+			ColumnGenerator generator = new ColumnGenerator()
+			{
+
+				private static final long serialVersionUID = -7730752061513328598L;
+
+				@Override
+				public Object generateCell(Table source, Object itemId, Object columnId)
+				{
+					Boolean checked = (Boolean) source.getItem(itemId).getItemProperty(attribute.getName()).getValue();
+
+					final Label label = new Label();
+					label.setContentMode(ContentMode.HTML);
+					if (checked)
+					{
+						if (trueIcon != null)
+						{
+							label.setValue(trueIcon.getHtml());
+						}
+					}
+					else
+					{
+						if (falseIcon != null)
+						{
+							label.setValue(falseIcon.getHtml());
+						}
+					}
+
+					return label;
+
+				}
+			};
+
+			addGeneratedColumn(heading, attribute, generator);
+
+			return this;
+
 		}
 
 	}
