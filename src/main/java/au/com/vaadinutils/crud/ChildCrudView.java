@@ -315,7 +315,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 	 *
 	 * @return
 	 */
-	abstract public SingularAttribute<E, String> getGuidAttribute();
+	abstract public SingularAttribute<? super E, String> getGuidAttribute();
 
 	/**
 	 * commits the container and retrieves the new recordid
