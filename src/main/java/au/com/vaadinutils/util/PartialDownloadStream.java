@@ -105,8 +105,8 @@ public class PartialDownloadStream extends DownloadStream
 			}
 			if (start != null && end == null)
 			{
-				response.setHeader("Content-Range", "bytes " + start + "-" + (contentLength - 1) + "/"
-						+ (contentLength));
+				response.setHeader("Content-Range",
+						"bytes " + start + "-" + (contentLength - 1) + "/" + (contentLength));
 				response.setHeader("Content-Length", String.valueOf(contentLength - start));
 
 			}
@@ -156,6 +156,10 @@ public class PartialDownloadStream extends DownloadStream
 			{
 				logger.error("Error {}", (contentLength - (start)) - totalWritten);
 			}
+		}
+		catch (IOException e)
+		{
+			logger.warn(e.getMessage());
 		}
 		catch (Exception e)
 		{
