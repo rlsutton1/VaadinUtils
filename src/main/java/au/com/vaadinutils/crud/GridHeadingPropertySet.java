@@ -4,16 +4,22 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.ejt.vaadin.sizereporter.ComponentResizeEvent;
+import com.ejt.vaadin.sizereporter.ComponentResizeListener;
+import com.ejt.vaadin.sizereporter.SizeReporter;
 import com.google.common.base.Preconditions;
 import com.vaadin.data.Container.Indexed;
 import com.vaadin.data.util.GeneratedPropertyContainer;
 import com.vaadin.data.util.PropertyValueGenerator;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.AbstractRenderer;
 import com.vaadin.ui.Grid.Column;
@@ -28,6 +34,7 @@ import com.vaadin.ui.renderers.TextRenderer;
 
 import au.com.vaadinutils.dao.Path;
 import au.com.vaadinutils.user.UserSettingsStorageFactory;
+import de.datenhahn.vaadin.componentrenderer.ComponentRenderer;
 
 public class GridHeadingPropertySet
 {
@@ -36,6 +43,7 @@ public class GridHeadingPropertySet
 	private boolean eraseSavedConfig = false;
 	private Grid grid;
 	private String uniqueId;
+	private boolean dynamicColumnWidth = false;
 
 	// Set to true if you would like to defer loading settings until
 	// applySettingsToColumns is called
@@ -82,18 +90,17 @@ public class GridHeadingPropertySet
 		private List<GridHeadingToPropertyId> cols = new LinkedList<GridHeadingToPropertyId>();
 
 		private boolean eraseSavedConfig = false;
+		private boolean dynamicColumnWidth = false;
 
 		@Override
 		public GridHeadingPropertySet build()
 		{
-
 			addColumn();
+			final GridHeadingPropertySet propertySet = new GridHeadingPropertySet(this.cols);
+			propertySet.eraseSavedConfig = eraseSavedConfig;
+			propertySet.dynamicColumnWidth = dynamicColumnWidth;
 
-			final GridHeadingPropertySet tmp = new GridHeadingPropertySet(this.cols);
-
-			tmp.eraseSavedConfig = eraseSavedConfig;
-
-			return tmp;
+			return propertySet;
 		}
 
 		@Override
@@ -106,6 +113,19 @@ public class GridHeadingPropertySet
 		public void setEraseSavedConfig()
 		{
 			eraseSavedConfig = true;
+		}
+
+		/**
+		 * Setting dynamic column width ensures that the total width of columns
+		 * is always equal to the width of the component. This prevents
+		 * horizontal scrolling as well as ensures that the complete width of
+		 * the component is always utilised. If a column is resized, then all
+		 * columns to the right of it are also resized based on how much space
+		 * there is remaining to the edge of the component.
+		 */
+		public void setDynamicColumnWidth()
+		{
+			dynamicColumnWidth = true;
 		}
 
 		/* Add column methods */
@@ -419,114 +439,7 @@ public class GridHeadingPropertySet
 		{
 			return addGeneratedColumn(heading, columnGenerator, false, false);
 		}
-
-		/**
-		 * Add a date column and format it.
-		 *
-		 * @param heading
-		 *            - the headling label for this column
-		 * @param column
-		 *            - the Date column that is to be displayed in the column
-		 * @param format
-		 *            - the format for the Date. format is passed to a
-		 *            SimpleDateFormat
-		 */
-		// public Builder<E> addColumn(String headingLabel, SingularAttribute<E,
-		// Date> column, String dateFormat,
-		// int width)
-		// {
-		// return addGeneratedColumn(headingLabel, column.getName(),
-		// new DateColumnGenerator<E>(column.getName(), dateFormat), true,
-		// false, width);
-		// }
-
-		/**
-		 * Add a date column and format it.
-		 *
-		 * @param heading
-		 *            - the headling label for this column
-		 * @param column
-		 *            - the Date column that is to be displayed in the column
-		 * @param format
-		 *            - the format for the Date. format is passed to a
-		 *            SimpleDateFormat
-		 */
-		// public Builder<E> addColumn(String headingLabel, String
-		// headingPropertyId, String dateFormat, int width)
-		// {
-		// // We make the alias the same as the underlying property so that we
-		// // can sort this column.
-		// // Generated columns are not normally sortable however by mapping
-		// // our generated column to the underlying date column our generated
-		// // column becomes sortable.
-		// return addGeneratedColumn(headingLabel, headingPropertyId,
-		// new DateColumnGenerator<E>(headingPropertyId, dateFormat), true,
-		// false, width);
-		//
-		// }
-
 	}
-
-	/**
-	 * Date Column generator used to format Date columns.
-	 *
-	 * @author bsutton
-	 *
-	 * @param <E>
-	 */
-	// static class DateColumnGenerator<E> implements ColumnGenerator
-	// {
-	// private static final long serialVersionUID = 1;
-	// private Logger logger = LogManager.getLogger();
-	//
-	// final private SimpleDateFormat sdf;
-	// final private SimpleDateFormat sdfParse = new
-	// SimpleDateFormat("yyyy-MM-dd");
-	// final private String headingPropertyId;
-	//
-	// DateColumnGenerator(String headingPropertyId, String format)
-	// {
-	// this.headingPropertyId = headingPropertyId;
-	// this.sdf = new SimpleDateFormat(format);
-	// }
-	//
-	// @Override
-	// public Object generateCell(Table source, Object itemId, Object columnId)
-	// {
-	// Item item = source.getItem(itemId);
-	//
-	// Object objDate = item.getItemProperty(headingPropertyId).getValue();
-	//
-	// String formattedDate = "";
-	//
-	// if (objDate instanceof Date)
-	// {
-	// formattedDate = sdf.format((Date) objDate);
-	// }
-	// else if (objDate != null)
-	// {
-	// String strDate = objDate.toString();
-	// try
-	// {
-	// formattedDate = sdf.format(sdfParse.parse(strDate));
-	// }
-	// catch (ParseException e)
-	// {
-	// // just so we have a value.
-	// formattedDate = "Invalid";
-	// logger.error(
-	// "Looks like our assumptions about the format of dates is wrong. Please
-	// update the parse format to match:"
-	// + strDate +" "+sdf.toPattern());
-	// }
-	// }
-	//
-	// Label label = new Label(formattedDate);
-	//
-	// return label;
-	// }
-	//
-	// }
 
 	public List<GridHeadingToPropertyId> getColumns()
 	{
@@ -595,6 +508,10 @@ public class GridHeadingPropertySet
 					if (columnGenerator.getType() == String.class && gridColumn.getRenderer() instanceof TextRenderer)
 					{
 						gridColumn.setRenderer(new HtmlRenderer(), null);
+					}
+					else if (columnGenerator.getType() == Component.class)
+					{
+						gridColumn.setRenderer(new ComponentRenderer());
 					}
 				}
 				else
@@ -695,18 +612,19 @@ public class GridHeadingPropertySet
 	{
 		final String keyStub = uniqueId + "-width";
 
-		for (GridHeadingToPropertyId id : getColumns())
+		for (GridHeadingToPropertyId column : getColumns())
 		{
-			final String setting = keyStub + "-" + id.getPropertyId();
-			final String setWidth = UserSettingsStorageFactory.getUserSettingsStorage().get(setting);
-			if (setWidth != null && setWidth.length() > 0)
+			final String columnId = column.getPropertyId();
+			final String setting = keyStub + "-" + columnId;
+			final String columnWidth = UserSettingsStorageFactory.getUserSettingsStorage().get(setting);
+			if (columnWidth != null && columnWidth.length() > 0)
 			{
 				try
 				{
-					final Double width = Double.parseDouble(setWidth);
+					final Double width = Double.parseDouble(columnWidth);
 					if (width > 0)
 					{
-						grid.getColumn(id.getPropertyId()).setWidth(Double.parseDouble(setWidth));
+						grid.getColumn(columnId).setWidth(Double.parseDouble(columnWidth));
 					}
 				}
 				catch (NumberFormatException e)
@@ -726,6 +644,70 @@ public class GridHeadingPropertySet
 				final String propertyId = (String) event.getColumn().getPropertyId();
 				final double width = event.getColumn().getWidth();
 				UserSettingsStorageFactory.getUserSettingsStorage().store(keyStub + "-" + propertyId, "" + width);
+			}
+		});
+
+		if (dynamicColumnWidth)
+		{
+			configureDynamicColumnWidth();
+		}
+	}
+
+	private void configureDynamicColumnWidth()
+	{
+		final AtomicInteger gridWidth = new AtomicInteger();
+		final SizeReporter sizeReporter = new SizeReporter(grid);
+		sizeReporter.addResizeListener(new ComponentResizeListener()
+		{
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void sizeChanged(ComponentResizeEvent event)
+			{
+				gridWidth.set(event.getWidth());
+			}
+		});
+
+		final AtomicBoolean resizing = new AtomicBoolean(false);
+		grid.addColumnResizeListener(new ColumnResizeListener()
+		{
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void columnResize(ColumnResizeEvent event)
+			{
+				if (gridWidth.get() > 0 && !resizing.get())
+				{
+					resizing.set(true);
+
+					final List<Column> gridColumns = grid.getColumns();
+					final int totalColumns = gridColumns.size();
+					final Column resizedColumn = event.getColumn();
+					final double resizedColumnWidth = resizedColumn.getWidth();
+					final int resizedColumnIndex = gridColumns.indexOf(resizedColumn);
+
+					// availableWidth = grid width - width of column being
+					// resized - widths of columns to the left
+					double availableWidth = gridWidth.get() - resizedColumnWidth;
+					for (int i = 0; i < resizedColumnIndex; i++)
+					{
+						availableWidth -= gridColumns.get(i).getWidth();
+					}
+
+					// columnsToResize = total columns - column being resized -
+					// number of columns to the right
+					final int columnsToResize = totalColumns - resizedColumnIndex - 1;
+					final double perColumnWidth = availableWidth / columnsToResize;
+
+					for (int i = (resizedColumnIndex + 1); i < totalColumns; i++)
+					{
+						gridColumns.get(i).setWidth(perColumnWidth);
+					}
+
+					resizing.set(false);
+				}
 			}
 		});
 	}
