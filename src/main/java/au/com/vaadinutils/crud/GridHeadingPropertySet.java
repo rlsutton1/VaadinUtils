@@ -655,6 +655,8 @@ public class GridHeadingPropertySet
 
 	private void configureDynamicColumnWidth()
 	{
+
+		final AtomicBoolean resizing = new AtomicBoolean(false);
 		final AtomicInteger gridWidth = new AtomicInteger();
 		final SizeReporter sizeReporter = new SizeReporter(grid);
 		sizeReporter.addResizeListener(new ComponentResizeListener()
@@ -665,11 +667,32 @@ public class GridHeadingPropertySet
 			@Override
 			public void sizeChanged(ComponentResizeEvent event)
 			{
-				gridWidth.set(event.getWidth());
+				final int newGridWidth = event.getWidth();
+				gridWidth.set(newGridWidth);
+				final List<Column> gridColumns = grid.getColumns();
+
+				double columnsTotalWidth = 0;
+				for (Column column : gridColumns)
+				{
+					columnsTotalWidth += column.getWidth();
+				}
+
+				final double widthDiscrepancy = gridWidth.get() - columnsTotalWidth;
+
+				if (widthDiscrepancy != 0)
+				{
+					final double perColumnChange = widthDiscrepancy / gridColumns.size();
+
+					for (Column column : gridColumns)
+					{
+						resizing.set(true);
+						column.setWidth(column.getWidth() + perColumnChange);
+						resizing.set(false);
+					}
+				}
 			}
 		});
 
-		final AtomicBoolean resizing = new AtomicBoolean(false);
 		grid.addColumnResizeListener(new ColumnResizeListener()
 		{
 
