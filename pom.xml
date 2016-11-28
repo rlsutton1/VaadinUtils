@@ -397,6 +397,11 @@
 		   <artifactId>viritin</artifactId>
 		   <version>1.58</version>
 		</dependency>
+		<dependency>
+			<groupId>org.vaadin.addons</groupId>
+			<artifactId>sizereporter</artifactId>
+			<version>0.1.4</version>
+		</dependency>
 	</dependencies>
 
 	<profiles>
