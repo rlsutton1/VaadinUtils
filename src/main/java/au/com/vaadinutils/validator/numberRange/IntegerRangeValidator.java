@@ -5,6 +5,12 @@ public class IntegerRangeValidator extends RangeValidator<Integer>
 
 	private static final long serialVersionUID = 1L;
 
+	public IntegerRangeValidator(String label, Integer minValue, Integer maxValue)
+	{
+		super(Integer.class, label + " is not a valid number",
+				label + " must be between " + minValue + " and " + maxValue, minValue, maxValue, true, true);
+	}
+
 	public IntegerRangeValidator(Class<Integer> type, String parseErrorMessage, String rangeErrorMessage,
 			Integer minValue, Integer maxValue, Boolean minInclusive, Boolean maxInclusive)
 	{
