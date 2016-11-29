@@ -89,9 +89,9 @@ public class JoinBuilder<E, K>
 
 	@SuppressWarnings(
 	{ "unchecked", "rawtypes" })
-	public JoinBuilder(SetAttribute<? super E, K> attribute, JoinType type)
+	public JoinBuilder(final SetAttribute<? super E, K> attribute, final JoinType type, final boolean fetch)
 	{
-		joins.add(new JoinMetaDataSet(attribute, type));
+		joins.add(new JoinMetaDataSet(attribute, type, fetch));
 	}
 
 	@SuppressWarnings(
@@ -216,7 +216,7 @@ public class JoinBuilder<E, K>
 
 		JoinBuilder<E, T> jb = new JoinBuilder<E, T>();
 		jb.joins.addAll(joins);
-		jb.joins.add(new JoinMetaDataSet(attribute, JoinType.INNER));
+		jb.joins.add(new JoinMetaDataSet(attribute, JoinType.INNER, false));
 		return jb;
 	}
 
@@ -249,7 +249,7 @@ public class JoinBuilder<E, K>
 
 		JoinBuilder<E, T> jb = new JoinBuilder<E, T>();
 		jb.joins.addAll(joins);
-		jb.joins.add(new JoinMetaDataSet(attribute, type));
+		jb.joins.add(new JoinMetaDataSet(attribute, type, false));
 		return jb;
 	}
 
