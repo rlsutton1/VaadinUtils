@@ -833,7 +833,7 @@ public abstract class JpaDslAbstract<E, R>
 
 	public <K> JoinBuilder<E, K> join(final SetAttribute<? super E, K> attribute)
 	{
-		return new JoinBuilder<>(attribute, JoinType.INNER);
+		return new JoinBuilder<>(attribute, JoinType.INNER, false);
 	}
 
 	public <K> JoinBuilder<E, K> join(final SingularAttribute<? super E, K> attribute, JoinType type)
@@ -853,7 +853,12 @@ public abstract class JpaDslAbstract<E, R>
 
 	public <K> JoinBuilder<E, K> join(final SetAttribute<? super E, K> attribute, JoinType type)
 	{
-		return new JoinBuilder<>(attribute, type);
+		return new JoinBuilder<>(attribute, type, false);
+	}
+
+	public <K> JoinBuilder<E, K> joinFetch(final SetAttribute<? super E, K> attribute, JoinType type)
+	{
+		return new JoinBuilder<>(attribute, type, true);
 	}
 
 	public JpaDslAbstract<E, R> where(Condition<E> condition)
@@ -1108,7 +1113,8 @@ public abstract class JpaDslAbstract<E, R>
 		return new AbstractCondition<E>()
 		{
 
-			@SuppressWarnings({ "unchecked", "rawtypes" })
+			@SuppressWarnings(
+			{ "unchecked", "rawtypes" })
 			@Override
 			public Predicate getPredicates()
 			{
