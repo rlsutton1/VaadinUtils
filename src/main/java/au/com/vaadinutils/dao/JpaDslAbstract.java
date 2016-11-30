@@ -1247,6 +1247,19 @@ public abstract class JpaDslAbstract<E, R>
 		};
 	}
 
+	public Condition<E> eq(final Expression<String> expression, final String value)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+				return builder.equal(expression, value);
+			}
+		};
+	}
+
 	public Condition<E> isNull(final Condition<E> condition)
 	{
 		return new AbstractCondition<E>()
