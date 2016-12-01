@@ -49,7 +49,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 {
 
 	private static final long serialVersionUID = -7756584349283089830L;
-	transient Logger logger = LogManager.getLogger(ChildCrudView.class);
+	private transient Logger loggerChildCrud = LogManager.getLogger(ChildCrudView.class);
 	private String parentKey;
 	protected String childKey;
 	public Object parentId;
@@ -190,7 +190,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 		}
 		catch (InstantiationException | IllegalAccessException e)
 		{
-			logger.warn("Failed to instance " + parentType + " to create bogus parent filter");
+			loggerChildCrud.warn("Failed to instance " + parentType + " to create bogus parent filter");
 
 		}
 	}
@@ -222,7 +222,8 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 			EntityItemProperty reference = item.getItemProperty(childKey);
 			if (reference == null)
 			{
-				logger.error("Child key " + childKey + " doesn't exist in the container " + container.getEntityClass());
+				loggerChildCrud.error(
+						"Child key " + childKey + " doesn't exist in the container " + container.getEntityClass());
 			}
 			if (reference == null || reference.getValue() == null)
 			{
@@ -239,7 +240,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 					}
 					else
 					{
-						logger.warn(
+						loggerChildCrud.warn(
 								"Child key type is not the same as the Parent type, if it's an ID thats probably ok?");
 						// special handling when the child key is an id(Long)
 						// rather than an entity.
@@ -250,7 +251,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 				}
 				catch (Exception e)
 				{
-					logger.error(e, e);
+					loggerChildCrud.error(e, e);
 				}
 
 			}
@@ -259,7 +260,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 
 		}
 		// container.commit();
-		logger.warn("Committing for " + this.getClass());
+		loggerChildCrud.warn("Committing for " + this.getClass());
 		commitContainerWithHooks();
 
 		// on a new parent, the parent id changes and the container becomes
@@ -302,7 +303,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 				}
 				else
 				{
-					logger.warn(
+					loggerChildCrud.warn(
 							"Unable to locate newly created child entity, will not be able to select it for the user.");
 				}
 			}
@@ -447,7 +448,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 		}
 		catch (Exception e)
 		{
-			logger.warn(e, e);
+			loggerChildCrud.warn(e, e);
 		}
 
 		entityTable.removeItem(entityId);
@@ -458,7 +459,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 
 		dirty = true;
 		container.removeItem(entityId);
-		JpaBaseDao<E, Long> dao = new JpaBaseDao<E, Long>(entityClass);
+		JpaBaseDao<E, Long> dao = new JpaBaseDao<>(entityClass);
 		E entity = dao.findById((Long) entityId);
 		if (entity != null)
 		{
@@ -601,17 +602,17 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 		}
 		catch (InstantiationException e)
 		{
-			logger.error(e, e);
+			loggerChildCrud.error(e, e);
 			throw new RuntimeException(e);
 		}
 		catch (IllegalAccessException e)
 		{
-			logger.error(e, e);
+			loggerChildCrud.error(e, e);
 			throw new RuntimeException(e);
 		}
 		catch (Exception e)
 		{
-			logger.error(e, e);
+			loggerChildCrud.error(e, e);
 			throw new RuntimeException(e);
 		}
 		finally
@@ -684,7 +685,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 				{
 					if (getCurrent() != null)
 					{
-						logger.info("There are no dirty fields, not saving record {} {}",
+						loggerChildCrud.info("There are no dirty fields, not saving record {} {}",
 								getCurrent().getClass().getSimpleName(), getCurrent());
 					}
 				}
@@ -700,12 +701,12 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 			}
 			catch (PersistenceException e)
 			{
-				logger.error(e, e);
+				loggerChildCrud.error(e, e);
 				Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
 			}
 			catch (ConstraintViolationException e)
 			{
-				logger.error(e, e);
+				loggerChildCrud.error(e, e);
 				FormHelper.showConstraintViolation(e);
 			}
 			catch (InvalidValueException e)
@@ -720,13 +721,13 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 				}
 				else
 				{
-					logger.error(e, e);
+					loggerChildCrud.error(e, e);
 					Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
 				}
 			}
 			catch (Exception e)
 			{
-				logger.error(e, e);
+				loggerChildCrud.error(e, e);
 				Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
 			}
 
@@ -794,7 +795,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 
 			if (item != null && item.getEntity() != null)
 			{
-				logger.debug("Parent Row Changed {} {}", item.getEntity().getId(), item.getEntity().getName());
+				loggerChildCrud.debug("Parent Row Changed {} {}", item.getEntity().getId(), item.getEntity().getName());
 			}
 
 			searchField.setValue("");
@@ -830,7 +831,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 				// so we'll simulate one!
 				rowChanged(entityTable.getCurrent());
 			}
-			logger.debug("Child crud load {} took {}", this.getClass().getSimpleName(),
+			loggerChildCrud.debug("Child crud load {} took {}", this.getClass().getSimpleName(),
 					timer.elapsed(TimeUnit.MILLISECONDS));
 
 			Object id = entityTable.firstItemId();
@@ -846,7 +847,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 				}
 				catch (Exception e)
 				{
-					logger.warn(e, e);
+					loggerChildCrud.warn(e, e);
 					// ignore this. if we don't do this the child continues
 					// to
 					// show data from the previously selected row
