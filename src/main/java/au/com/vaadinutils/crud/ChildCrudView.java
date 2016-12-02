@@ -282,7 +282,8 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 			// Another example is when resetFilter has been overridden and the
 			// resulting filters eliminate the new child
 			throw new IllegalStateException(changeInItems
-					+ ", The number of items in the container is not the same as it was before the refresh.");
+					+ ", The number of items in the container is not the same as it was before the refresh. "
+					+ this.getClass().getSimpleName());
 		}
 		associateChildren(newParentId);
 		dirty = false;

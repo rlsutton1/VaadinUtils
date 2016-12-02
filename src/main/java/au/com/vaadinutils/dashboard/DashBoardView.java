@@ -80,6 +80,11 @@ public abstract class DashBoardView extends VerticalLayout implements View
 
 	}
 
+	public void closeToolBar()
+	{
+		dashboardsSlider.collapse();
+	}
+
 	@Override
 	public void enter(ViewChangeEvent event)
 	{

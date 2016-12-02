@@ -55,4 +55,5 @@ public class DashBoardController
 		actualDashBoard.removeComponent(basePortal);
 
 	}
+
 }

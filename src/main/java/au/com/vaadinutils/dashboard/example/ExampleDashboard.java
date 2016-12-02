@@ -20,7 +20,7 @@ public class ExampleDashboard extends DashBoardView
 	@Override
 	public AbstractLayout createToolBar(DashBoardController dashBoard, String guid)
 	{
-		return new ExampleToolBar(dashBoard, guid);
+		return new ExampleToolBar(dashBoard, guid, this);
 	}
 
 	@Override

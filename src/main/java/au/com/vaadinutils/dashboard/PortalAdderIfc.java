@@ -7,7 +7,7 @@ public interface PortalAdderIfc
 
 	String getTitle();
 
-	Component getVaadinAddLayout(DashBoardController dashBoard);
+	Component getVaadinAddLayout(DashBoardController dashBoard, DashBoardView view);
 
 	void addPortal(DashBoardController dashBoard2, Tblportal portal);
 

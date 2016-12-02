@@ -28,7 +28,7 @@ public abstract class BasePortalAdder extends VerticalLayout implements PortalCo
 	}
 
 	@Override
-	public AbstractLayout getVaadinAddLayout(final DashBoardController dashBoard)
+	public AbstractLayout getVaadinAddLayout(final DashBoardController dashBoard, final DashBoardView view)
 	{
 		final String title = getTitle();
 		ClickableLabel label = new ClickableLabel(FontAwesome.PLUS.getHtml() + " " + title);
@@ -48,6 +48,8 @@ public abstract class BasePortalAdder extends VerticalLayout implements PortalCo
 				EntityManagerProvider.persist(portal);
 
 				addPortal(dashBoard, portal);
+				view.closeToolBar();
+
 			}
 
 		});
