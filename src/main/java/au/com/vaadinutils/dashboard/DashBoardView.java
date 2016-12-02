@@ -447,6 +447,7 @@ public abstract class DashBoardView extends VerticalLayout implements View
 					{
 						portalLayout = JpaBaseDao.getGenericDao(Tblportallayout.class).findByEntityId(portalLayout);
 						createDashboard(portalLayout);
+						closeToolBar();
 					}
 				}
 			}
