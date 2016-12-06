@@ -4,6 +4,8 @@ import java.util.Map;
 
 import org.vaadin.alump.gridstack.GridStackCoordinates;
 
+import com.vaadin.ui.HorizontalLayout;
+
 public interface PortalConfigDelgate
 {
 
@@ -22,5 +24,7 @@ public interface PortalConfigDelgate
 	Map<String, Integer> getValuesLikeInt(Tblportal portal, String string);
 
 	void deleteValuesLike(Tblportal portal, String baseKey);
+
+	void addCustomHeaderButtons(HorizontalLayout controlLayout);
 
 }

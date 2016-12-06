@@ -241,7 +241,10 @@ public enum EntityManagerProvider
 							}
 							finally
 							{
-								em.close();
+								if (em.isOpen())
+								{
+									em.close();
+								}
 							}
 						}
 						finally

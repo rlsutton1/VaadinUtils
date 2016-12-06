@@ -25,7 +25,7 @@ public class JSCallWithReturnValue
 
 	// this is a particularly large value as this time may include considerable
 	// server side processing time
-	protected static final int RESPONSE_TIMEOUT_MS = 30000;
+	protected static final int RESPONSE_TIMEOUT_MS = 15000;
 	private String hookName;
 	private String jsToExecute;
 	private String errorHookName;

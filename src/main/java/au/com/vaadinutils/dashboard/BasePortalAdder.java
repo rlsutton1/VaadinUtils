@@ -11,6 +11,7 @@ import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.VerticalLayout;
 
 import au.com.vaadinutils.dao.EntityManagerProvider;
@@ -164,6 +165,12 @@ public abstract class BasePortalAdder extends VerticalLayout implements PortalCo
 		setValue(portal, "Y", event.getY());
 		setValue(portal, "Width", event.getWidth());
 		setValue(portal, "Height", event.getHeight());
+
+	}
+
+	@Override
+	public void addCustomHeaderButtons(HorizontalLayout controlLayout)
+	{
 
 	}
 
