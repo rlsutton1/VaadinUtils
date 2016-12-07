@@ -48,9 +48,9 @@ public abstract class BasePortal extends VerticalLayout implements Portal
 
 	private static final String COLUMN_VISABLE = "column-visable-";
 
-	String guid = null;
+	private String guid = null;
 
-	Logger logger = LogManager.getLogger();
+	private Logger logger = LogManager.getLogger();
 	private PortalConfigDelgate configDelegate;
 
 	protected BasePortal(Tblportal portal, DashBoardController dashBoard, PortalConfigDelgate configDelegate)

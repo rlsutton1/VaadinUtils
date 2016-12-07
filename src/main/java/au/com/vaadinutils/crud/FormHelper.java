@@ -1262,7 +1262,7 @@ public class FormHelper<E> implements Serializable
 	}
 
 	@SuppressWarnings("unchecked")
-	static public Container createContainerFromMap(String fieldName, Map<?, String> hashMap)
+	static public IndexedContainer createContainerFromMap(String fieldName, Map<?, String> hashMap)
 	{
 		IndexedContainer container = new IndexedContainer();
 		container.addContainerProperty(fieldName, String.class, "");
