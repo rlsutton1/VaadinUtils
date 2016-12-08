@@ -29,6 +29,8 @@ import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.ListSelect;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
@@ -69,6 +71,8 @@ public abstract class DashBoardView extends VerticalLayout implements View
 
 	private boolean loading = false;
 
+	Panel dashBoardHolderPanel = new Panel();
+
 	protected DashBoardView(boolean loadJQuery, String style)
 	{
 		this.loadJQuery = loadJQuery;
@@ -88,7 +92,7 @@ public abstract class DashBoardView extends VerticalLayout implements View
 	@Override
 	public void enter(ViewChangeEvent event)
 	{
-		setMargin(new MarginInfo(false, false, true, false));
+		setMargin(new MarginInfo(false, false, false, false));
 		setSizeFull();
 
 		final Label preparing = new Label("Preparing your dashboard...");
@@ -171,6 +175,10 @@ public abstract class DashBoardView extends VerticalLayout implements View
 		Tblportallayout portalLayout = findDefaultPortal();
 		createDashboard(portalLayout);
 		dashBoardSelector.select(portalLayout);
+		dashBoardHolderPanel.setSizeFull();
+
+		addComponent(dashBoardHolderPanel);
+		setExpandRatio(dashBoardHolderPanel, 1);
 
 	}
 
@@ -179,7 +187,7 @@ public abstract class DashBoardView extends VerticalLayout implements View
 		if (portalLayout == null)
 		{
 			portalLayout = new Tblportallayout();
-			portalLayout.setName("New Dashboard " + System.currentTimeMillis());
+			portalLayout.setName("Dashboard " + (getNumberOfPortals() + 1));
 			portalLayout.setAccount(getAccountId());
 
 			EntityManagerProvider.persist(portalLayout);
@@ -187,10 +195,6 @@ public abstract class DashBoardView extends VerticalLayout implements View
 
 		}
 
-		if (dashBoard != null)
-		{
-			removeComponent(dashBoard);
-		}
 		if (loadJQuery)
 		{
 			dashBoard = new DashBoard();
@@ -200,8 +204,7 @@ public abstract class DashBoardView extends VerticalLayout implements View
 			dashBoard = new DashBoardNoJQuery();
 		}
 
-		addComponent(dashBoard);
-		setExpandRatio(dashBoard, 1);
+		dashBoardHolderPanel.setContent(dashBoard);
 
 		AbstractLayout dashboardToolBar = createToolBar(new DashBoardController(dashBoard), portalLayout.getGuid());
 		toolbarHolder.removeAllComponents();
@@ -223,20 +226,24 @@ public abstract class DashBoardView extends VerticalLayout implements View
 	private Component dashboardPanels()
 	{
 		HorizontalLayout layout = new HorizontalLayout();
+		layout.setMargin(true);
+		layout.setSpacing(true);
 
-		layout.addComponent(dashboardManagement());
+		Component dashboardManagement = dashboardManagement();
+		layout.addComponent(dashboardManagement);
+		layout.setComponentAlignment(dashboardManagement, Alignment.TOP_CENTER);
 
 		toolbarHolder = new VerticalLayout();
 
 		layout.addComponent(toolbarHolder);
+		layout.setComponentAlignment(toolbarHolder, Alignment.TOP_CENTER);
+
 		return layout;
 	}
 
 	private Component dashboardManagement()
 	{
 		VerticalLayout layout = new VerticalLayout();
-		layout.setHeight("300");
-		layout.setMargin(new MarginInfo(true, true, true, true));
 
 		HorizontalLayout buttonLayout = new HorizontalLayout();
 		buttonLayout.setWidth("100%");
@@ -281,13 +288,16 @@ public abstract class DashBoardView extends VerticalLayout implements View
 
 		buttonLayout.addComponent(createDeleteButton());
 
+		TabSheet selectorHolder = new TabSheet();
+		selectorHolder.addTab(layout, "Dashboards");
+
 		layout.addComponent(dashBoardSelector);
 		layout.setExpandRatio(dashBoardSelector, 1);
 
 		layout.addComponent(buttonLayout);
 
 		// layout.setSizeFull();
-		return layout;
+		return selectorHolder;
 	}
 
 	private Button createRenameButton()
@@ -419,9 +429,9 @@ public abstract class DashBoardView extends VerticalLayout implements View
 
 	private void createDashboardSelector()
 	{
-		dashBoardSelector = new ListSelect("Dashboards");
+		dashBoardSelector = new ListSelect();
 		dashBoardSelector.setHeight("100%");
-		dashBoardSelector.setWidth("200");
+		dashBoardSelector.setWidth("300");
 
 		// dashBoardSelector.setItemCaptionPropertyId(Tblportallayout_.name.getName());
 		// dashBoardSelector.setItemCaptionMode(ItemCaptionMode.PROPERTY);
@@ -499,6 +509,14 @@ public abstract class DashBoardView extends VerticalLayout implements View
 			return null;
 		}
 		return layouts.get(0);
+	}
+
+	private long getNumberOfPortals()
+	{
+		Long account = getAccountId();
+		JpaDslBuilder<Tblportallayout> q = JpaBaseDao.getGenericDao(Tblportallayout.class).select();
+		return q.where(q.eq(Tblportallayout_.account, account)).count();
+
 	}
 
 }

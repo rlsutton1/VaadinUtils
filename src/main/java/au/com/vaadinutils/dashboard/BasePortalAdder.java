@@ -8,15 +8,17 @@ import java.util.Set;
 import org.vaadin.alump.gridstack.GridStackCoordinates;
 
 import com.vaadin.server.FontAwesome;
-import com.vaadin.ui.AbstractLayout;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.themes.ValoTheme;
 
 import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.dao.JpaBaseDao;
-import au.com.vaadinutils.fields.ClickableLabel;
 
 public abstract class BasePortalAdder extends VerticalLayout implements PortalConfigDelgate, PortalAdderIfc
 {
@@ -29,14 +31,23 @@ public abstract class BasePortalAdder extends VerticalLayout implements PortalCo
 	}
 
 	@Override
-	public AbstractLayout getVaadinAddLayout(final DashBoardController dashBoard, final DashBoardView view)
+	public Component getVaadinAddLayout(final DashBoardController dashBoard, final DashBoardView view)
 	{
 		final String title = getTitle();
-		ClickableLabel label = new ClickableLabel(FontAwesome.PLUS.getHtml() + " " + title);
-		label.addClickListener(new ClickListener()
+
+		HorizontalLayout layout = new HorizontalLayout();
+		layout.setSpacing(true);
+
+		Label label = new Label(title);
+
+		Button button = new Button(FontAwesome.PLUS.getHtml());
+		button.setCaptionAsHtml(true);
+		button.setStyleName(ValoTheme.BUTTON_TINY);
+		label.setWidth("300");
+		button.addClickListener(new ClickListener()
 		{
 
-			private static final long serialVersionUID = -5740273017618997164L;
+			private static final long serialVersionUID = 1L;
 
 			@Override
 			public void buttonClick(ClickEvent event)
@@ -50,12 +61,13 @@ public abstract class BasePortalAdder extends VerticalLayout implements PortalCo
 
 				addPortal(dashBoard, portal);
 				view.closeToolBar();
-
 			}
-
 		});
 
-		return label;
+		layout.addComponent(button);
+		layout.addComponent(label);
+
+		return layout;
 
 	}
 

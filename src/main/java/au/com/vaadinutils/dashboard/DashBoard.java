@@ -26,8 +26,6 @@ public class DashBoard extends GridStackLayout
 		// One cell height is set to 80 pixels
 		setCellHeight(40);
 
-		setSizeFull();
-
 		addGridStackMoveListener(new GridStackMoveListener()
 		{
 
