@@ -251,6 +251,7 @@ public abstract class DashBoardView extends VerticalLayout implements View
 		Button newDashboard = new Button(FontAwesome.PLUS);
 		newDashboard.setDescription("New");
 		newDashboard.setStyleName(ValoTheme.BUTTON_ICON_ONLY);
+		newDashboard.addStyleName(ValoTheme.BUTTON_FRIENDLY);
 
 		Button rename = createRenameButton();
 
@@ -355,7 +356,9 @@ public abstract class DashBoardView extends VerticalLayout implements View
 
 	private Button createMakeDefaultButton()
 	{
+
 		Button rename = new Button(FontAwesome.STAR);
+
 		rename.setDescription("Make Default Dashboard");
 		rename.setStyleName(ValoTheme.BUTTON_ICON_ONLY);
 
@@ -397,6 +400,7 @@ public abstract class DashBoardView extends VerticalLayout implements View
 		Button delete = new Button(FontAwesome.TRASH);
 		delete.setDescription("Delete");
 		delete.setStyleName(ValoTheme.BUTTON_ICON_ONLY);
+		delete.addStyleName(ValoTheme.BUTTON_DANGER);
 
 		delete.addClickListener(new ClickListener()
 		{

@@ -41,8 +41,11 @@ public abstract class BasePortalAdder extends VerticalLayout implements PortalCo
 		Label label = new Label(title);
 
 		Button button = new Button(FontAwesome.PLUS.getHtml());
+
 		button.setCaptionAsHtml(true);
 		button.setStyleName(ValoTheme.BUTTON_TINY);
+		button.addStyleName(ValoTheme.BUTTON_FRIENDLY);
+
 		label.setWidth("300");
 		button.addClickListener(new ClickListener()
 		{
