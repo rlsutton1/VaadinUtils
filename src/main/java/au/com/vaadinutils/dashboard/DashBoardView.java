@@ -204,7 +204,13 @@ public abstract class DashBoardView extends VerticalLayout implements View
 			dashBoard = new DashBoardNoJQuery();
 		}
 
-		dashBoardHolderPanel.setContent(dashBoard);
+		// this wrapper is necessary so the portals in the dashboard resize
+		// correctly
+		VerticalLayout wrapper = new VerticalLayout();
+		wrapper.setSizeFull();
+		wrapper.addComponent(dashBoard);
+		dashBoard.setSizeFull();
+		dashBoardHolderPanel.setContent(wrapper);
 
 		AbstractLayout dashboardToolBar = createToolBar(new DashBoardController(dashBoard), portalLayout.getGuid());
 		toolbarHolder.removeAllComponents();

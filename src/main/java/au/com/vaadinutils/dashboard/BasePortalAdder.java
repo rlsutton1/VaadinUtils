@@ -174,6 +174,20 @@ public abstract class BasePortalAdder extends VerticalLayout implements PortalCo
 	}
 
 	@Override
+	public double getValueDouble(Tblportal portal, String key)
+	{
+		try
+		{
+			return Double.parseDouble(portal.getConfigValue(key, "0.0"));
+		}
+		catch (Exception e)
+		{
+			return 0.0;
+		}
+
+	}
+
+	@Override
 	public void savePosition(Tblportal portal, GridStackCoordinates event)
 	{
 		setValue(portal, "X", event.getX());
