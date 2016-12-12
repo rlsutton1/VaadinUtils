@@ -2,6 +2,7 @@ package au.com.vaadinutils.crud;
 
 import com.google.common.base.Preconditions;
 import com.vaadin.data.util.PropertyValueGenerator;
+import com.vaadin.data.util.converter.Converter;
 import com.vaadin.ui.Grid.AbstractRenderer;
 
 public class GridHeadingToPropertyId
@@ -14,6 +15,7 @@ public class GridHeadingToPropertyId
 	private boolean lockedState = false;
 
 	private AbstractRenderer<?> renderer = null;
+	private Converter<String, ?> converter;
 
 	/**
 	 * Instantiates a new heading to property id.
@@ -53,6 +55,7 @@ public class GridHeadingToPropertyId
 		private boolean defaultVisibleState = true;
 		private boolean lockedState = false;
 		private AbstractRenderer<?> renderer = null;
+		private Converter<String, ?> converter = null;
 
 		Builder(String heading, String propertyId)
 		{
@@ -65,6 +68,7 @@ public class GridHeadingToPropertyId
 			GridHeadingToPropertyId tmp = new GridHeadingToPropertyId(heading, propertyId, columnGenerator,
 					defaultVisibleState, lockedState, width);
 			tmp.setRenderer(renderer);
+			tmp.setConverter(converter);
 			return tmp;
 		}
 
@@ -99,12 +103,25 @@ public class GridHeadingToPropertyId
 
 		}
 
+		public Builder setConverter(Converter<String, ?> converter)
+		{
+			this.converter = converter;
+			return this;
+
+		}
+
 	}
 
 	public GridHeadingToPropertyId setVisibleByDefault(final boolean defaultVisibleState)
 	{
 		this.defaultVisibleState = defaultVisibleState;
 		return this;
+	}
+
+	public void setConverter(Converter<String, ?> converter)
+	{
+		this.converter = converter;
+
 	}
 
 	public void setRenderer(AbstractRenderer<?> renderer)
@@ -169,5 +186,10 @@ public class GridHeadingToPropertyId
 	public AbstractRenderer<?> getRenderer()
 	{
 		return renderer;
+	}
+
+	public Converter<String, ?> getConverter()
+	{
+		return converter;
 	}
 }

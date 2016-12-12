@@ -19,6 +19,7 @@ import com.google.common.base.Preconditions;
 import com.vaadin.data.Container.Indexed;
 import com.vaadin.data.util.GeneratedPropertyContainer;
 import com.vaadin.data.util.PropertyValueGenerator;
+import com.vaadin.data.util.converter.Converter;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.AbstractRenderer;
@@ -39,7 +40,7 @@ import de.datenhahn.vaadin.componentrenderer.ComponentRenderer;
 public class GridHeadingPropertySet
 {
 	private Logger logger = LogManager.getLogger();
-	private List<GridHeadingToPropertyId> cols = new LinkedList<GridHeadingToPropertyId>();
+	private List<GridHeadingToPropertyId> cols = new LinkedList<>();
 	private boolean eraseSavedConfig = false;
 	private Grid grid;
 	private String uniqueId;
@@ -56,7 +57,7 @@ public class GridHeadingPropertySet
 
 	public static <E> Builder<E> getBuilder(Class<E> Class)
 	{
-		return new Builder<E>();
+		return new Builder<>();
 	}
 
 	interface Start<E>
@@ -83,11 +84,13 @@ public class GridHeadingPropertySet
 
 		public GridHeadingPropertySet build();
 
+		public AddingColumn<E> setConverter(Converter<String, ?> converter);
+
 	}
 
 	public static class Builder<E> implements AddingColumn<E>, Start<E>
 	{
-		private List<GridHeadingToPropertyId> cols = new LinkedList<GridHeadingToPropertyId>();
+		private List<GridHeadingToPropertyId> cols = new LinkedList<>();
 
 		private boolean eraseSavedConfig = false;
 		private boolean dynamicColumnWidth = false;
@@ -107,6 +110,13 @@ public class GridHeadingPropertySet
 		public AddingColumn<E> setRenderer(AbstractRenderer<?> renderer)
 		{
 			columnBuilder.setRenderer(renderer);
+			return this;
+		}
+
+		@Override
+		public AddingColumn<E> setConverter(Converter<String, ?> converter)
+		{
+			columnBuilder.setConverter(converter);
 			return this;
 		}
 
@@ -496,7 +506,7 @@ public class GridHeadingPropertySet
 				}
 			}
 
-			final List<String> colsToShow = new LinkedList<String>();
+			final List<String> colsToShow = new LinkedList<>();
 			for (GridHeadingToPropertyId column : getColumns())
 			{
 				final String propertyId = column.getPropertyId();
@@ -527,7 +537,12 @@ public class GridHeadingPropertySet
 
 				if (column.getRenderer() != null)
 				{
-					gridColumn.setRenderer(column.getRenderer(), null);
+					gridColumn.setRenderer(column.getRenderer());
+				}
+
+				if (column.getConverter() != null)
+				{
+					gridColumn.setConverter(column.getConverter());
 				}
 
 				gridColumn.setHeaderCaption(column.getHeader());

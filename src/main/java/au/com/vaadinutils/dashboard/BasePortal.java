@@ -201,6 +201,7 @@ public abstract class BasePortal extends VerticalLayout implements Portal
 
 	protected TableColumnManager configureSaveColumnWidths(final Grid grid, String tableId)
 	{
+		grid.setData(tableId);
 		final String baseWidthKey = tableId + "_" + COLUMN_WIDTH;
 		final String baseVisableKey = tableId + "_" + COLUMN_VISABLE;
 		final String keyStub = tableId + "_order";
@@ -241,19 +242,27 @@ public abstract class BasePortal extends VerticalLayout implements Portal
 		};
 	}
 
-	private void setupGridSorting(final Grid grid, final String keySorting)
+	public void setupGridSorting(final Grid grid, final String keySorting)
 	{
 
 		String sorts = getConfigDelegate().getValueString(getPortal(), keySorting);
 		if (StringUtils.isNotEmpty(sorts))
 		{
-			List<SortOrder> sortList = new LinkedList<>();
-			String[] sortArray = sorts.split(",");
-			for (String sort : sortArray)
+			try
 			{
-				sortList.add(new SortOrder(sort, SortDirection.ASCENDING));
+				List<SortOrder> sortList = new LinkedList<>();
+				String[] sortArray = sorts.split(",");
+				for (String sort : sortArray)
+				{
+					String[] parts = sort.split("=");
+					sortList.add(new SortOrder(parts[0], SortDirection.valueOf(parts[1])));
+				}
+				grid.setSortOrder(sortList);
 			}
-			grid.setSortOrder(sortList);
+			catch (Exception e)
+			{
+				logger.error(e);
+			}
 
 		}
 
@@ -268,7 +277,7 @@ public abstract class BasePortal extends VerticalLayout implements Portal
 				String sorts = "";
 				for (SortOrder sort : event.getSortOrder())
 				{
-					sorts += sort.getPropertyId() + ",";
+					sorts += sort.getPropertyId() + "=" + sort.getDirection() + ",";
 				}
 
 				getConfigDelegate().setValue(getPortal(), keySorting, sorts);

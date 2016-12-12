@@ -27,4 +27,6 @@ public interface PortalConfigDelgate
 
 	void addCustomHeaderButtons(HorizontalLayout controlLayout);
 
+	double getValueDouble(Tblportal tblportal, String string);
+
 }
