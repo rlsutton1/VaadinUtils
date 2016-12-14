@@ -684,25 +684,29 @@ public class GridHeadingPropertySet
 			{
 				final int newGridWidth = event.getWidth();
 				gridWidth.set(newGridWidth);
-				final List<Column> gridColumns = grid.getColumns();
 
-				double columnsTotalWidth = 0;
-				for (Column column : gridColumns)
+				if (newGridWidth > 1)
 				{
-					columnsTotalWidth += column.getWidth();
-				}
+					final List<Column> gridColumns = grid.getColumns();
 
-				final double widthDiscrepancy = gridWidth.get() - columnsTotalWidth;
-
-				if (widthDiscrepancy != 0)
-				{
-					final double perColumnChange = widthDiscrepancy / gridColumns.size();
-
+					double columnsTotalWidth = 0;
 					for (Column column : gridColumns)
 					{
-						resizing.set(true);
-						column.setWidth(column.getWidth() + perColumnChange);
-						resizing.set(false);
+						columnsTotalWidth += column.getWidth();
+					}
+
+					final double widthDiscrepancy = gridWidth.get() - columnsTotalWidth;
+
+					if (widthDiscrepancy != 0)
+					{
+						final double perColumnChange = widthDiscrepancy / gridColumns.size();
+
+						for (Column column : gridColumns)
+						{
+							resizing.set(true);
+							column.setWidth(column.getWidth() + perColumnChange);
+							resizing.set(false);
+						}
 					}
 				}
 			}
