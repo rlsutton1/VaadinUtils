@@ -75,13 +75,6 @@ public class JoinBuilder<E, K>
 	@SuppressWarnings("rawtypes")
 	List<JoinMetaData> joins = new LinkedList<>();
 
-	@SuppressWarnings(
-	{ "rawtypes", "unchecked" })
-	public JoinBuilder(SingularAttribute<? super E, K> attribute, JoinType type)
-	{
-		joins.add(new JoinMetaDataSingular(attribute, type));
-	}
-
 	private JoinBuilder()
 	{
 		// TODO Auto-generated constructor stub
@@ -96,9 +89,16 @@ public class JoinBuilder<E, K>
 
 	@SuppressWarnings(
 	{ "unchecked", "rawtypes" })
-	public JoinBuilder(ListAttribute<? super E, K> attribute, JoinType type)
+	public JoinBuilder(final SingularAttribute<? super E, K> attribute, final JoinType type, final boolean fetch)
 	{
-		joins.add(new JoinMetaDataList(attribute, type));
+		joins.add(new JoinMetaDataSingular(attribute, type, fetch));
+	}
+
+	@SuppressWarnings(
+	{ "unchecked", "rawtypes" })
+	public JoinBuilder(final ListAttribute<? super E, K> attribute, final JoinType type, final boolean fetch)
+	{
+		joins.add(new JoinMetaDataList(attribute, type, fetch));
 
 	}
 
@@ -187,69 +187,82 @@ public class JoinBuilder<E, K>
 		return jb;
 	}
 
-	@SuppressWarnings(
-	{ "unchecked", "rawtypes" })
 	public <T> JoinBuilder<E, T> join(final SingularAttribute<K, T> attribute)
 	{
-
-		JoinBuilder<E, T> jb = new JoinBuilder<E, T>();
-		jb.joins.addAll(joins);
-		jb.joins.add(new JoinMetaDataSingular(attribute, JoinType.INNER));
-		return jb;
+		return join(attribute, JoinType.INNER, false);
 	}
 
-	@SuppressWarnings(
-	{ "unchecked", "rawtypes" })
 	public <T> JoinBuilder<E, T> join(final ListAttribute<K, T> attribute)
 	{
-
-		JoinBuilder<E, T> jb = new JoinBuilder<E, T>();
-		jb.joins.addAll(joins);
-		jb.joins.add(new JoinMetaDataList(attribute, JoinType.INNER));
-		return jb;
+		return join(attribute, JoinType.INNER, false);
 	}
 
-	@SuppressWarnings(
-	{ "unchecked", "rawtypes" })
 	public <T> JoinBuilder<E, T> join(final SetAttribute<K, T> attribute)
 	{
+		return join(attribute, JoinType.INNER, false);
+	}
 
-		JoinBuilder<E, T> jb = new JoinBuilder<E, T>();
+	public <T> JoinBuilder<E, T> join(final ListAttribute<K, T> attribute, final JoinType type)
+	{
+		return join(attribute, type, false);
+	}
+
+	public <T> JoinBuilder<E, T> join(final SetAttribute<K, T> attribute, final JoinType type)
+	{
+		return join(attribute, type, false);
+	}
+
+	public <T> JoinBuilder<E, T> join(final SingularAttribute<K, T> attribute, final JoinType type)
+	{
+		return join(attribute, type, false);
+	}
+
+	public <T> JoinBuilder<E, T> joinFetch(final ListAttribute<K, T> attribute, final JoinType type)
+	{
+		return join(attribute, type, true);
+	}
+
+	public <T> JoinBuilder<E, T> joinFetch(final SetAttribute<K, T> attribute, final JoinType type)
+	{
+		return join(attribute, type, true);
+	}
+
+	public <T> JoinBuilder<E, T> joinFetch(final SingularAttribute<K, T> attribute, final JoinType type)
+	{
+		return join(attribute, type, true);
+	}
+
+	@SuppressWarnings(
+	{ "unchecked", "rawtypes" })
+	private <T> JoinBuilder<E, T> join(final ListAttribute<K, T> attribute, final JoinType type, final boolean fetch)
+	{
+		final JoinBuilder<E, T> jb = new JoinBuilder<E, T>();
 		jb.joins.addAll(joins);
-		jb.joins.add(new JoinMetaDataSet(attribute, JoinType.INNER, false));
+		jb.joins.add(new JoinMetaDataList(attribute, type, fetch));
+
 		return jb;
 	}
 
 	@SuppressWarnings(
 	{ "unchecked", "rawtypes" })
-	public <T> JoinBuilder<E, T> join(final ListAttribute<K, T> attribute, JoinType type)
+	private <T> JoinBuilder<E, T> join(final SingularAttribute<K, T> attribute, final JoinType type,
+			final boolean fetch)
 	{
-
-		JoinBuilder<E, T> jb = new JoinBuilder<E, T>();
+		final JoinBuilder<E, T> jb = new JoinBuilder<E, T>();
 		jb.joins.addAll(joins);
-		jb.joins.add(new JoinMetaDataList(attribute, type));
+		jb.joins.add(new JoinMetaDataSingular(attribute, type, fetch));
+
 		return jb;
 	}
 
 	@SuppressWarnings(
 	{ "unchecked", "rawtypes" })
-	public <T> JoinBuilder<E, T> join(final SingularAttribute<K, T> attribute, JoinType type)
+	private <T> JoinBuilder<E, T> join(final SetAttribute<K, T> attribute, final JoinType type, final boolean fetch)
 	{
-
-		JoinBuilder<E, T> jb = new JoinBuilder<E, T>();
+		final JoinBuilder<E, T> jb = new JoinBuilder<E, T>();
 		jb.joins.addAll(joins);
-		jb.joins.add(new JoinMetaDataSingular(attribute, type));
-		return jb;
-	}
+		jb.joins.add(new JoinMetaDataSet(attribute, type, fetch));
 
-	@SuppressWarnings(
-	{ "unchecked", "rawtypes" })
-	public <T> JoinBuilder<E, T> join(final SetAttribute<K, T> attribute, JoinType type)
-	{
-
-		JoinBuilder<E, T> jb = new JoinBuilder<E, T>();
-		jb.joins.addAll(joins);
-		jb.joins.add(new JoinMetaDataSet(attribute, type, false));
 		return jb;
 	}
 

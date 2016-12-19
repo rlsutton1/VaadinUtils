@@ -467,6 +467,7 @@ public abstract class JpaDslAbstract<E, R>
 		root.fetch(field, JoinType.LEFT);
 		return this;
 	}
+
 	public <L> JpaDslAbstract<E, R> fetch(SingularAttribute<E, L> field, JoinType type)
 	{
 		root.fetch(field, type);
@@ -908,12 +909,12 @@ public abstract class JpaDslAbstract<E, R>
 
 	public <K> JoinBuilder<E, K> join(final ListAttribute<? super E, K> attribute)
 	{
-		return new JoinBuilder<>(attribute, JoinType.INNER);
+		return new JoinBuilder<>(attribute, JoinType.INNER, false);
 	}
 
 	public <K> JoinBuilder<E, K> join(final ListAttribute<? super E, K> attribute, JoinType type)
 	{
-		return new JoinBuilder<>(attribute, type);
+		return new JoinBuilder<>(attribute, type, false);
 	}
 
 	public <K> JoinBuilder<E, K> join(final SetAttribute<? super E, K> attribute)
@@ -928,15 +929,25 @@ public abstract class JpaDslAbstract<E, R>
 
 	public <K> JoinBuilder<E, K> join(final SingularAttribute<? super E, K> attribute)
 	{
-		return new JoinBuilder<>(attribute, JoinType.INNER);
+		return new JoinBuilder<>(attribute, JoinType.INNER, false);
 	}
 
 	public <K> JoinBuilder<E, K> join(final SingularAttribute<? super E, K> attribute, JoinType type)
 	{
-		return new JoinBuilder<>(attribute, type);
+		return new JoinBuilder<>(attribute, type, false);
+	}
+
+	public <K> JoinBuilder<E, K> joinFetch(final ListAttribute<? super E, K> attribute, JoinType type)
+	{
+		return new JoinBuilder<>(attribute, type, true);
 	}
 
 	public <K> JoinBuilder<E, K> joinFetch(final SetAttribute<? super E, K> attribute, JoinType type)
+	{
+		return new JoinBuilder<>(attribute, type, true);
+	}
+
+	public <K> JoinBuilder<E, K> joinFetch(final SingularAttribute<? super E, K> attribute, JoinType type)
 	{
 		return new JoinBuilder<>(attribute, type, true);
 	}
@@ -958,7 +969,7 @@ public abstract class JpaDslAbstract<E, R>
 
 	public <K> JoinBuilder<E, K> leftJoin(final SingularAttribute<? super E, K> attribute)
 	{
-		return new JoinBuilder<>(attribute, JoinType.LEFT);
+		return new JoinBuilder<>(attribute, JoinType.LEFT, false);
 	}
 
 	public <J, V extends Comparable<? super V>> Condition<E> lessThan(

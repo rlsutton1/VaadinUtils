@@ -30,7 +30,7 @@ public class JoinMetaDataSet<E, K> implements JoinMetaData<E, K>
 	@Override
 	public int hashCode()
 	{
-		return type.hashCode() + attribute.hashCode();
+		return type.hashCode() + attribute.hashCode() + new Boolean(fetch).hashCode();
 	}
 
 	@SuppressWarnings("unchecked")
