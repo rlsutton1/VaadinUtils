@@ -41,6 +41,7 @@ public abstract class BasePortalAdder extends VerticalLayout implements PortalCo
 		Label label = new Label(title);
 
 		Button button = new Button(FontAwesome.PLUS.getHtml());
+		button.setDescription("Click to add '" + title + "' to the current Dashboard");
 
 		button.setCaptionAsHtml(true);
 		button.setStyleName(ValoTheme.BUTTON_TINY);
