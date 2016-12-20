@@ -7,6 +7,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.event.ShortcutAction.KeyCode;
+import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -40,31 +41,47 @@ public class InputFormDialog extends Window
 		this.setResizable(false);
 
 		VerticalLayout layout = new VerticalLayout();
-		// layout.setMargin(new MarginInfo(true, true, true, false));
-		layout.setMargin(true);
+		layout.setMargin(new MarginInfo(false, true, true, true));
 		layout.setSpacing(true);
-		// layout.setSizeFull();
 		layout.addComponent(form);
-		// layout.setComponentAlignment(form, Alignment.TOP_CENTER);
 
 		buttons = new HorizontalLayout();
 		buttons.setSpacing(true);
-		// buttons.setHeight("50");
+		buttons.setHeight("30");
 
-		cancelButton = new Button("Cancel", new Button.ClickListener()
-		{
-			@Override
-			public void buttonClick(ClickEvent event)
-			{
-				if (recipient.onCancel())
-				{
-					close();
-				}
-			}
-		});
+		cancelButton = createCancelButton(recipient);
 		buttons.addComponent(cancelButton);
 
-		ok = new Button("OK", new Button.ClickListener()
+		ok = createOkButton(form, recipient);
+
+		ok.setId("Ok");
+
+		ok.setClickShortcut(KeyCode.ENTER);
+		ok.addStyleName("default");
+		buttons.addComponent(ok);
+
+		layout.addComponent(buttons);
+		layout.setComponentAlignment(buttons, Alignment.MIDDLE_RIGHT);
+		layout.setExpandRatio(form, 1);
+
+		this.setContent(layout);
+		parent.addWindow(this);
+
+		if (primaryFocusField instanceof Field<?>)
+		{
+			((Field<?>) primaryFocusField).focus();
+		}
+
+		if (form instanceof FormLayout)
+		{
+			setWidth("500");
+		}
+
+	}
+
+	private Button createOkButton(final AbstractLayout form, final InputFormDialogRecipient recipient)
+	{
+		return new Button("OK", new Button.ClickListener()
 		{
 			@Override
 			public void buttonClick(ClickEvent event)
@@ -97,31 +114,21 @@ public class InputFormDialog extends Window
 				}
 			}
 		});
+	}
 
-		ok.setId("Ok");
-
-		ok.setClickShortcut(KeyCode.ENTER);
-		ok.addStyleName("default");
-		buttons.addComponent(ok);
-
-		layout.addComponent(buttons);
-		layout.setComponentAlignment(buttons, Alignment.MIDDLE_RIGHT);
-		layout.setExpandRatio(form, 1);
-
-		this.setContent(layout);
-		parent.addWindow(this);
-
-		if (primaryFocusField instanceof Field<?>)
+	private Button createCancelButton(final InputFormDialogRecipient recipient)
+	{
+		return new Button("Cancel", new Button.ClickListener()
 		{
-			((Field<?>) primaryFocusField).focus();
-		}
-
-		if (form instanceof FormLayout)
-		{
-			setWidth("500");
-		}
-		// setHeight("150");
-
+			@Override
+			public void buttonClick(ClickEvent event)
+			{
+				if (recipient.onCancel())
+				{
+					close();
+				}
+			}
+		});
 	}
 
 	public void okOnly()

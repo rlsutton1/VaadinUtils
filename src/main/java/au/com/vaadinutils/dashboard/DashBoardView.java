@@ -325,6 +325,7 @@ public abstract class DashBoardView extends VerticalLayout implements View
 				Tblportallayout portalLayout = (Tblportallayout) dashBoardSelector.getValue();
 				final TextField primaryFocusField = new TextField("New Dashboard Name");
 				AbstractLayout form = new FormLayout();
+				form.setSizeFull();
 				form.addComponent(primaryFocusField);
 
 				InputFormDialogRecipient recipient = new InputFormDialogRecipient()

@@ -24,6 +24,7 @@ public abstract class BasePortalAdder extends VerticalLayout implements PortalCo
 {
 	private static final long serialVersionUID = 1L;
 	private String portalLayoutGuid;
+	private PortalResizeListener resizeListener;
 
 	public BasePortalAdder(String portalLayoutGuid)
 	{
@@ -195,6 +196,17 @@ public abstract class BasePortalAdder extends VerticalLayout implements PortalCo
 		setValue(portal, "Y", event.getY());
 		setValue(portal, "Width", event.getWidth());
 		setValue(portal, "Height", event.getHeight());
+		if (resizeListener != null)
+		{
+			resizeListener.portalResized(event);
+		}
+
+	}
+
+	@Override
+	public void addResizeListener(PortalResizeListener resizeListener)
+	{
+		this.resizeListener = resizeListener;
 
 	}
 
