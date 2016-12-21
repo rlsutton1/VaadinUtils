@@ -118,9 +118,6 @@ public class ExamplePortal extends BasePortalAdder
 
 					}
 
-					dialog.setWidth("700");
-					dialog.setHeight("250");
-
 				}
 			});
 

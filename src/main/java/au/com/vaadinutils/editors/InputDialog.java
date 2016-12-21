@@ -4,14 +4,9 @@ import com.vaadin.data.Validator;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
-import com.vaadin.ui.Window;
 
-public class InputDialog extends Window implements InputFormDialogRecipient
+public class InputDialog implements InputFormDialogRecipient
 {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -8135921877987898679L;
 	final Recipient recipient;
 	final TextField field = new TextField();
 	private InputFormDialog dialog;
@@ -22,26 +17,24 @@ public class InputDialog extends Window implements InputFormDialogRecipient
 
 		FormLayout form = new FormLayout();
 		form.setMargin(true);
+		form.setSizeFull();
 
 		field.setCaption(question);
 		field.setSizeFull();
 		form.addComponent(field);
 		dialog = new InputFormDialog(parent, title, field, form, this);
-		dialog.setWidth("500");
-		dialog.setHeight("150");
 
 	}
 
-	@Override
-	public void setWidth(String width)
+	public void setOkButtonLabel(String label)
 	{
-		dialog.setWidth(width);
+		dialog.setOkButtonLabel(label);
 	}
 
-	@Override
-	public void setHeight(String width)
+	public void setCancelButtonLabel(String label)
 	{
-		dialog.setHeight(width);
+		dialog.setCancelButtonLabel(label);
+
 	}
 
 	public void setFieldWidth(String width)
@@ -84,4 +77,5 @@ public class InputDialog extends Window implements InputFormDialogRecipient
 		return recipient.onCancel();
 
 	}
+
 }

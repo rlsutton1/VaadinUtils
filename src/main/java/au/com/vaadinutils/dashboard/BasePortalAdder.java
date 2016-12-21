@@ -24,6 +24,7 @@ public abstract class BasePortalAdder extends VerticalLayout implements PortalCo
 {
 	private static final long serialVersionUID = 1L;
 	private String portalLayoutGuid;
+	private PortalResizeListener resizeListener;
 
 	public BasePortalAdder(String portalLayoutGuid)
 	{
@@ -41,6 +42,7 @@ public abstract class BasePortalAdder extends VerticalLayout implements PortalCo
 		Label label = new Label(title);
 
 		Button button = new Button(FontAwesome.PLUS.getHtml());
+		button.setDescription("Click to add '" + title + "' to the current Dashboard");
 
 		button.setCaptionAsHtml(true);
 		button.setStyleName(ValoTheme.BUTTON_TINY);
@@ -194,6 +196,17 @@ public abstract class BasePortalAdder extends VerticalLayout implements PortalCo
 		setValue(portal, "Y", event.getY());
 		setValue(portal, "Width", event.getWidth());
 		setValue(portal, "Height", event.getHeight());
+		if (resizeListener != null)
+		{
+			resizeListener.portalResized(event);
+		}
+
+	}
+
+	@Override
+	public void addResizeListener(PortalResizeListener resizeListener)
+	{
+		this.resizeListener = resizeListener;
 
 	}
 

@@ -29,4 +29,6 @@ public interface PortalConfigDelgate
 
 	double getValueDouble(Tblportal tblportal, String string);
 
+	void addResizeListener(PortalResizeListener resizeListener);
+
 }
