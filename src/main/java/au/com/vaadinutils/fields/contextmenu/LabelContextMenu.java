@@ -1,4 +1,4 @@
-package au.com.vaadinutils.fields;
+package au.com.vaadinutils.fields.contextmenu;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,9 +9,9 @@ public class LabelContextMenu extends ContextMenu
 {
 	private static final long serialVersionUID = 1L;
 
-	private List<LabelContextMenuEvents> eventsList = new ArrayList<LabelContextMenuEvents>();
+	private List<ContextMenuEvent> eventsList = new ArrayList<ContextMenuEvent>();
 
-	public void addEvents(final LabelContextMenuEvents events)
+	public void addEvents(final ContextMenuEvent events)
 	{
 		eventsList.add(events);
 	}
