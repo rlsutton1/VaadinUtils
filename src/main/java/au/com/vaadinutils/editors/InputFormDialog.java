@@ -22,6 +22,8 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
+import au.com.vaadinutils.errorHandling.ErrorWindow;
+
 @SuppressWarnings("serial")
 public class InputFormDialog extends Window
 {
@@ -109,8 +111,7 @@ public class InputFormDialog extends Window
 				}
 				catch (Exception e)
 				{
-					Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
-					logger.error(e, e);
+					ErrorWindow.showErrorWindow(e);
 				}
 			}
 		});
