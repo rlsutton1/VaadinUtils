@@ -1,20 +1,18 @@
-package au.com.vaadinutils.fields;
+package au.com.vaadinutils.fields.contextmenu;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.vaadin.peter.contextmenu.ContextMenu;
 
 import com.vaadin.event.ContextClickEvent;
 import com.vaadin.event.ContextClickEvent.ContextClickListener;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.GridContextClickEvent;
 
-public class GridContextMenu extends ContextMenu
+public class GridContextMenu<E> extends EntityContextMenu<E>
 {
 	private static final long serialVersionUID = 1L;
 
-	private List<GridContextMenuEvent> eventsList = new ArrayList<>();
+	private List<ContextMenuEvent> eventsList = new ArrayList<>();
 	private Grid grid;
 
 	/**
@@ -80,14 +78,17 @@ public class GridContextMenu extends ContextMenu
 	{
 		try
 		{
-			final Object itemId = event.getItemId();
+			@SuppressWarnings("unchecked")
+			final E itemId = (E) event.getItemId();
 			if (itemId == null)
 			{
 				return;
 			}
 
+			targetEntity = itemId;
 			grid.select(itemId);
-			for (GridContextMenuEvent events : eventsList)
+
+			for (ContextMenuEvent events : eventsList)
 			{
 				events.preContextMenuOpen();
 			}
@@ -102,7 +103,7 @@ public class GridContextMenu extends ContextMenu
 		}
 	}
 
-	public void addEvents(final GridContextMenuEvent events)
+	public void addEvents(final ContextMenuEvent events)
 	{
 		eventsList.add(events);
 	}
