@@ -86,6 +86,8 @@ public class GridHeadingPropertySet
 
 		public AddingColumn<E> setConverter(Converter<String, ?> converter);
 
+		public Builder<E> addColumn();
+
 	}
 
 	public static class Builder<E> implements AddingColumn<E>, Start<E>
@@ -188,7 +190,8 @@ public class GridHeadingPropertySet
 
 		}
 
-		private Builder<E> addColumn()
+		@Override
+		public Builder<E> addColumn()
 		{
 			if (columnBuilder != null)
 			{
