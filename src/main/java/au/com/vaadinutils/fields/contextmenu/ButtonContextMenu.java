@@ -30,23 +30,29 @@ public class ButtonContextMenu<E> extends EntityContextMenu<E>
 			@Override
 			public void contextClick(ContextClickEvent event)
 			{
-				openContext(event);
+				openContext(event.getClientX(), event.getClientY());
 			}
 		});
 	}
 
-	private void openContext(final ContextClickEvent event)
+	public void openContext(final com.vaadin.ui.Button.ClickEvent event)
+	{
+		openContext(event.getClientX(), event.getClientY());
+	}
+
+	private void openContext(final int clientX, final int clientY)
 	{
 		for (ContextMenuEvent events : eventsList)
 		{
 			events.preContextMenuOpen();
 		}
 
-		open(event.getClientX(), event.getClientY());
+		open(clientX, clientY);
 	}
 
 	public void addEvents(final ContextMenuEvent events)
 	{
 		eventsList.add(events);
 	}
+
 }
