@@ -1,53 +1,62 @@
 package au.com.vaadinutils.crud.events;
 
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import au.com.vaadinutils.audit.AuditFactory;
 import au.com.vaadinutils.crud.BaseCrudView;
 import au.com.vaadinutils.crud.CrudEntity;
+import au.com.vaadinutils.listener.ListenerCallback;
+import au.com.vaadinutils.listener.ListenerManager;
+import au.com.vaadinutils.listener.ListenerManagerFactory;
 
 public enum CrudEventDistributer
 {
 	SELF;
 	// Logger logger = LogManager.getLogger();
 
-	Map<Class<? extends BaseCrudView<?>>, List<CrudEventListener>> listeners = new ConcurrentHashMap<>();
+	Map<Class<? extends BaseCrudView<?>>, ListenerManager<CrudEventListener>> listeners = new ConcurrentHashMap<>();
 
 	public static synchronized void addListener(Class<? extends BaseCrudView<?>> type, CrudEventListener listener)
 	{
-		List<CrudEventListener> list = SELF.listeners.get(type);
+		ListenerManager<CrudEventListener> list = SELF.listeners.get(type);
 		if (list == null)
 		{
-			list = new CopyOnWriteArrayList<CrudEventListener>();
+			list = ListenerManagerFactory.createThreadSafeListenerManager("CrudEventDistributer", 200);
+
 			SELF.listeners.put(type, list);
 		}
-		list.add(listener);
+		list.addListener(listener);
 	}
 
 	public static void removeListener(Class<? extends BaseCrudView<?>> type, CrudEventListener listener)
 	{
-		List<CrudEventListener> list = SELF.listeners.get(type);
+		ListenerManager<CrudEventListener> list = SELF.listeners.get(type);
 		if (list != null)
 		{
-			list.remove(listener);
+			list.removeListener(listener);
 		}
 
 	}
 
-	public static <T extends CrudEntity> void publishEvent(BaseCrudView<T> view, CrudEventType event, T entity)
+	public static <T extends CrudEntity> void publishEvent(BaseCrudView<T> view, final CrudEventType event,
+			final T entity)
 	{
-		List<CrudEventListener> interestedParties = SELF.listeners.get(view.getClass());
+		ListenerManager<CrudEventListener> interestedParties = SELF.listeners.get(view.getClass());
 		if (interestedParties != null)
 		{
-			for (CrudEventListener listener : interestedParties)
+			interestedParties.notifyListeners(new ListenerCallback<CrudEventListener>()
 			{
-				listener.crudEvent(event, entity);
-			}
+
+				@Override
+				public void invoke(CrudEventListener listener)
+				{
+					listener.crudEvent(event, entity);
+				}
+			});
+
 		}
-		
+
 		AuditFactory.getAuditor().audit(event, entity);
 	}
 }

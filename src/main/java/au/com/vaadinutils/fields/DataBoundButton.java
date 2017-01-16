@@ -13,6 +13,9 @@ import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Field;
 
+import au.com.vaadinutils.listener.ListenerManager;
+import au.com.vaadinutils.listener.ListenerManagerFactory;
+
 public class DataBoundButton<T> extends Button implements Field<T>
 {
 
@@ -29,12 +32,13 @@ public class DataBoundButton<T> extends Button implements Field<T>
 	private boolean invalidCommitted = false;
 	private boolean buffered = false;
 
-	Set<Validator> validators = new HashSet<Validator>();
+	Set<Validator> validators = new HashSet<>();
 	private boolean invalidAllowed = true;
-	
-	 transient Logger logger   =  LogManager.getLogger(DataBoundButton.class);
 
-	Set<ValueChangeListener> listeners = new HashSet<ValueChangeListener>();
+	transient Logger logger = LogManager.getLogger(DataBoundButton.class);
+
+	ListenerManager<ValueChangeListener> listeners = ListenerManagerFactory.createListenerManager("DataBoundButton",
+			10);
 
 	DataBoundButton(Class<T> type)
 	{
@@ -71,7 +75,7 @@ public class DataBoundButton<T> extends Button implements Field<T>
 	@Override
 	public void discard() throws SourceException
 	{
-		
+
 		value = dataSource.getValue();
 
 	}
@@ -171,28 +175,28 @@ public class DataBoundButton<T> extends Button implements Field<T>
 	@Override
 	public void addValueChangeListener(ValueChangeListener listener)
 	{
-		listeners.add(listener);
+		listeners.addListener(listener);
 
 	}
 
 	@Override
 	public void addListener(ValueChangeListener listener)
 	{
-		listeners.add(listener);
+		listeners.addListener(listener);
 
 	}
 
 	@Override
 	public void removeValueChangeListener(ValueChangeListener listener)
 	{
-		listeners.remove(listener);
+		listeners.removeListener(listener);
 
 	}
 
 	@Override
 	public void removeListener(ValueChangeListener listener)
 	{
-		listeners.remove(listener);
+		listeners.removeListener(listener);
 
 	}
 
@@ -256,7 +260,7 @@ public class DataBoundButton<T> extends Button implements Field<T>
 	public void clear()
 	{
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }
