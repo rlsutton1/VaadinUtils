@@ -550,4 +550,12 @@ public enum EntityManagerProvider
 		INSTANCE.entityManagerThreadLocal.get().getTransaction().begin();
 	}
 
+	/**
+	 * Evicts all entities in the JPA cache
+	 */
+	public static void evictCache()
+	{
+		INSTANCE.entityManagerThreadLocal.get().getEntityManagerFactory().getCache().evictAll();
+	}
+
 }
