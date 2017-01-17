@@ -15,6 +15,13 @@ class GenericListenerManager<K> implements ListenerManager<K>
 {
 	private Map<K, Date> listeners = createSet();
 
+	/**
+	 * I considered weak references, but if you pass in an anonoumous listener
+	 * it could be GC'd immediately
+	 * 
+	 * @return
+	 */
+
 	protected Map<K, Date> createSet()
 	{
 		return new LinkedHashMap<>();
@@ -56,14 +63,15 @@ class GenericListenerManager<K> implements ListenerManager<K>
 	@Override
 	public void removeListener(K listener)
 	{
-
 		listeners.remove(listener);
-
 	}
 
 	/**
-	 * While thread safe, this method is a bit expensive. If you have a high
-	 * volume application, dont use this.
+	 * This method is a bit expensive. If you have a high volume application,
+	 * dont use this.
+	 * 
+	 * this allows a listener to call back and remove it self without causing a
+	 * co-mod error
 	 * 
 	 * @param callback
 	 */
