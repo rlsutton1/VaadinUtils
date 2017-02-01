@@ -907,6 +907,30 @@ public abstract class JpaDslAbstract<E, R>
 		};
 	}
 
+	public <L> Condition<E> isFalse(final JoinBuilder<E, L> join, final SingularAttribute<L, Boolean> field)
+	{
+		return new AbstractCondition<E>()
+		{
+			@Override
+			public Predicate getPredicates()
+			{
+				return builder.isFalse(getJoin(join).get(field));
+			}
+		};
+	}
+
+	public Condition<E> isFalse(final SingularAttribute<E, Boolean> field)
+	{
+		return new AbstractCondition<E>()
+		{
+			@Override
+			public Predicate getPredicates()
+			{
+				return builder.isFalse(root.get(field));
+			}
+		};
+	}
+
 	public <K> JoinBuilder<E, K> join(final ListAttribute<? super E, K> attribute)
 	{
 		return new JoinBuilder<>(attribute, JoinType.INNER, false);
