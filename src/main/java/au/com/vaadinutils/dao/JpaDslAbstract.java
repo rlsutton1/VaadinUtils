@@ -199,15 +199,6 @@ public abstract class JpaDslAbstract<E, R>
 		return builder.coalesce(root.get(attribute1), root.get(attribute2));
 	}
 
-	public Expression<String> replace(final SingularAttribute<E, String> field, final String match,
-			final String replacement)
-	{
-		// creats sql replace(field,match,replacement)
-		return builder.function("replace", String.class, root.get(field), builder.literal(match),
-				builder.literal(replacement));
-
-	}
-
 	public Expression<String> concat(Expression<String> concat, Expression<String> trim)
 	{
 		return builder.concat(concat, trim);
@@ -464,6 +455,12 @@ public abstract class JpaDslAbstract<E, R>
 		return this;
 	}
 
+	public <L> JpaDslAbstract<E, R> fetch(SetAttribute<E, L> field, JoinType type)
+	{
+		root.fetch(field, type);
+		return this;
+	}
+
 	/**
 	 * specify that JPA should fetch child entities in a single query!
 	 * 
@@ -477,12 +474,6 @@ public abstract class JpaDslAbstract<E, R>
 	}
 
 	public <L> JpaDslAbstract<E, R> fetch(SingularAttribute<E, L> field, JoinType type)
-	{
-		root.fetch(field, type);
-		return this;
-	}
-
-	public <L> JpaDslAbstract<E, R> fetch(SetAttribute<E, L> field, JoinType type)
 	{
 		root.fetch(field, type);
 		return this;
@@ -820,6 +811,30 @@ public abstract class JpaDslAbstract<E, R>
 		};
 	}
 
+	public <L> Condition<E> isFalse(final JoinBuilder<E, L> join, final SingularAttribute<L, Boolean> field)
+	{
+		return new AbstractCondition<E>()
+		{
+			@Override
+			public Predicate getPredicates()
+			{
+				return builder.isFalse(getJoin(join).get(field));
+			}
+		};
+	}
+
+	public Condition<E> isFalse(final SingularAttribute<E, Boolean> field)
+	{
+		return new AbstractCondition<E>()
+		{
+			@Override
+			public Predicate getPredicates()
+			{
+				return builder.isFalse(root.get(field));
+			}
+		};
+	}
+
 	public <L, J> Condition<E> isNotNull(final JoinBuilder<E, L> join, final SingularAttribute<L, J> field)
 	{
 		return new AbstractCondition<E>()
@@ -917,30 +932,6 @@ public abstract class JpaDslAbstract<E, R>
 			public Predicate getPredicates()
 			{
 				return builder.isTrue(root.get(field));
-			}
-		};
-	}
-
-	public <L> Condition<E> isFalse(final JoinBuilder<E, L> join, final SingularAttribute<L, Boolean> field)
-	{
-		return new AbstractCondition<E>()
-		{
-			@Override
-			public Predicate getPredicates()
-			{
-				return builder.isFalse(getJoin(join).get(field));
-			}
-		};
-	}
-
-	public Condition<E> isFalse(final SingularAttribute<E, Boolean> field)
-	{
-		return new AbstractCondition<E>()
-		{
-			@Override
-			public Predicate getPredicates()
-			{
-				return builder.isFalse(root.get(field));
 			}
 		};
 	}
@@ -1404,6 +1395,15 @@ public abstract class JpaDslAbstract<E, R>
 		}
 
 		return query;
+	}
+
+	public Expression<String> replace(final SingularAttribute<E, String> field, final String match,
+			final String replacement)
+	{
+		// creats sql replace(field,match,replacement)
+		return builder.function("replace", String.class, root.get(field), builder.literal(match),
+				builder.literal(replacement));
+
 	}
 
 	public JpaDslAbstract<E, R> startPosition(int startPosition)
