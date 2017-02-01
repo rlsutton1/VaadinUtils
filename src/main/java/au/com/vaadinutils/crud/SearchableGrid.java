@@ -396,6 +396,11 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 		}
 	}
 
+	public void refreshRows(Object... itemIds)
+	{
+		grid.refreshRows(itemIds);
+	}
+
 	@Override
 	public void addContextClickListener(ContextClickListener listener)
 	{
