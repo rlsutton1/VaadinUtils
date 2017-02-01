@@ -170,8 +170,7 @@ public abstract class JpaDslAbstract<E, R>
 		return new AbstractCondition<E>()
 		{
 
-			@SuppressWarnings(
-			{ "unchecked", "rawtypes" })
+			@SuppressWarnings({ "unchecked", "rawtypes" })
 			@Override
 			public Predicate getPredicates()
 			{
@@ -198,6 +197,15 @@ public abstract class JpaDslAbstract<E, R>
 			final SingularAttribute<E, T> attribute2)
 	{
 		return builder.coalesce(root.get(attribute1), root.get(attribute2));
+	}
+
+	public Expression<String> replace(final SingularAttribute<E, String> field, final String match,
+			final String replacement)
+	{
+		// creats sql replace(field,match,replacement)
+		return builder.function("replace", String.class, root.get(field), builder.literal(match),
+				builder.literal(replacement));
+
 	}
 
 	public Expression<String> concat(Expression<String> concat, Expression<String> trim)
@@ -469,6 +477,12 @@ public abstract class JpaDslAbstract<E, R>
 	}
 
 	public <L> JpaDslAbstract<E, R> fetch(SingularAttribute<E, L> field, JoinType type)
+	{
+		root.fetch(field, type);
+		return this;
+	}
+
+	public <L> JpaDslAbstract<E, R> fetch(SetAttribute<E, L> field, JoinType type)
 	{
 		root.fetch(field, type);
 		return this;
