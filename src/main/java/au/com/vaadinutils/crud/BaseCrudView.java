@@ -731,6 +731,18 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 		return clear;
 	}
 
+	/**
+	 * hook to allow cruds to know when advanced mode is selected
+	 * 
+	 * return false to not dispaly the advanced search panel
+	 * 
+	 * @param open
+	 */
+	protected ShowAdvancedSearchLayout advancedSearchOpened(boolean open)
+	{
+		return ShowAdvancedSearchLayout.TRUE;
+	}
+
 	private AbstractLayout buildAdvancedSearch()
 	{
 		advancedSearchLayout = getAdvancedSearchLayout();
@@ -738,6 +750,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 		{
 
 			advancedSearchButton = new Button(getAdvancedCaption());
+			advancedSearchButton.setStyleName(ValoTheme.BUTTON_FRIENDLY);
+			advancedSearchButton.setWidth("100");
+
 			advancedSearchOn = false;
 
 			advancedSearchButton.setImmediate(true);
@@ -751,7 +766,16 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 				{
 					clearAdvancedFilters();
 					advancedSearchOn = !advancedSearchOn;
-					advancedSearchLayout.setVisible(advancedSearchOn);
+
+					if (advancedSearchOpened(advancedSearchOn) == ShowAdvancedSearchLayout.FALSE)
+					{
+						advancedSearchLayout.setVisible(false);
+					}
+					else
+					{
+						advancedSearchLayout.setVisible(advancedSearchOn);
+					}
+
 					if (!advancedSearchOn && dynamicSearch)
 					{
 						triggerFilter();
@@ -759,12 +783,10 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 					if (!advancedSearchOn)
 					{
 						advancedSearchButton.setCaption(getAdvancedCaption());
-						advancedSearchButton.removeStyleName(ValoTheme.BUTTON_FRIENDLY);
 					}
 					else
 					{
 						advancedSearchButton.setCaption(getBasicCaption());
-						advancedSearchButton.setStyleName(ValoTheme.BUTTON_FRIENDLY);
 					}
 
 				}
@@ -802,7 +824,6 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 		advancedSearchOn = false;
 		advancedSearchLayout.setVisible(advancedSearchOn);
 		advancedSearchButton.setCaption(getAdvancedCaption());
-		advancedSearchButton.removeStyleName(ValoTheme.BUTTON_FRIENDLY);
 	}
 
 	protected AbstractLayout getAdvancedSearchLayout()

@@ -170,8 +170,7 @@ public abstract class JpaDslAbstract<E, R>
 		return new AbstractCondition<E>()
 		{
 
-			@SuppressWarnings(
-			{ "unchecked", "rawtypes" })
+			@SuppressWarnings({ "unchecked", "rawtypes" })
 			@Override
 			public Predicate getPredicates()
 			{
@@ -451,6 +450,12 @@ public abstract class JpaDslAbstract<E, R>
 	}
 
 	public <L> JpaDslAbstract<E, R> fetch(ListAttribute<E, L> field, JoinType type)
+	{
+		root.fetch(field, type);
+		return this;
+	}
+
+	public <L> JpaDslAbstract<E, R> fetch(SetAttribute<E, L> field, JoinType type)
 	{
 		root.fetch(field, type);
 		return this;
@@ -806,6 +811,30 @@ public abstract class JpaDslAbstract<E, R>
 		};
 	}
 
+	public <L> Condition<E> isFalse(final JoinBuilder<E, L> join, final SingularAttribute<L, Boolean> field)
+	{
+		return new AbstractCondition<E>()
+		{
+			@Override
+			public Predicate getPredicates()
+			{
+				return builder.isFalse(getJoin(join).get(field));
+			}
+		};
+	}
+
+	public Condition<E> isFalse(final SingularAttribute<E, Boolean> field)
+	{
+		return new AbstractCondition<E>()
+		{
+			@Override
+			public Predicate getPredicates()
+			{
+				return builder.isFalse(root.get(field));
+			}
+		};
+	}
+
 	public <L, J> Condition<E> isNotNull(final JoinBuilder<E, L> join, final SingularAttribute<L, J> field)
 	{
 		return new AbstractCondition<E>()
@@ -903,30 +932,6 @@ public abstract class JpaDslAbstract<E, R>
 			public Predicate getPredicates()
 			{
 				return builder.isTrue(root.get(field));
-			}
-		};
-	}
-
-	public <L> Condition<E> isFalse(final JoinBuilder<E, L> join, final SingularAttribute<L, Boolean> field)
-	{
-		return new AbstractCondition<E>()
-		{
-			@Override
-			public Predicate getPredicates()
-			{
-				return builder.isFalse(getJoin(join).get(field));
-			}
-		};
-	}
-
-	public Condition<E> isFalse(final SingularAttribute<E, Boolean> field)
-	{
-		return new AbstractCondition<E>()
-		{
-			@Override
-			public Predicate getPredicates()
-			{
-				return builder.isFalse(root.get(field));
 			}
 		};
 	}
@@ -1390,6 +1395,15 @@ public abstract class JpaDslAbstract<E, R>
 		}
 
 		return query;
+	}
+
+	public Expression<String> replace(final SingularAttribute<E, String> field, final String match,
+			final String replacement)
+	{
+		// creats sql replace(field,match,replacement)
+		return builder.function("replace", String.class, root.get(field), builder.literal(match),
+				builder.literal(replacement));
+
 	}
 
 	public JpaDslAbstract<E, R> startPosition(int startPosition)
