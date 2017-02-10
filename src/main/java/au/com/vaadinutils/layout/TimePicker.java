@@ -97,10 +97,19 @@ public class TimePicker extends HorizontalLayout implements Field<Date>
 
 			private static final long serialVersionUID = 1L;
 
+			@SuppressWarnings("deprecation")
 			@Override
 			public void valueChange(com.vaadin.data.Property.ValueChangeEvent event)
 			{
-				TimePicker.this.valueChange(event);
+				final Date parsedDate = parseDate((String) event.getProperty().getValue());
+				if (parsedDate != null)
+				{
+					dateTime.set(Calendar.HOUR_OF_DAY, parsedDate.getHours());
+					dateTime.set(Calendar.MINUTE, parsedDate.getMinutes());
+					isSet = true;
+					setNewValue();
+				}
+				// TimePicker.this.valueChange(event);
 			}
 		});
 
@@ -647,7 +656,7 @@ public class TimePicker extends HorizontalLayout implements Field<Date>
 	@Override
 	public Collection<Validator> getValidators()
 	{
-		Collection<Validator> validators = new LinkedList<Validator>();
+		Collection<Validator> validators = new LinkedList<>();
 		validators.add(timeValidator);
 		validators.addAll(this.validators);
 		return validators;
@@ -811,14 +820,12 @@ public class TimePicker extends HorizontalLayout implements Field<Date>
 	@Override
 	public boolean isEmpty()
 	{
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public void clear()
 	{
-		// TODO Auto-generated method stub
 
 	}
 
