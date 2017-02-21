@@ -32,7 +32,7 @@ import au.com.vaadinutils.user.UserSettingsStorageFactory;
 
 public class HeadingPropertySet
 {
-	private List<HeadingToPropertyId> cols = new LinkedList<HeadingToPropertyId>();
+	private List<HeadingToPropertyId> cols = new LinkedList<>();
 
 	private Logger logger = LogManager.getLogger();
 
@@ -47,7 +47,7 @@ public class HeadingPropertySet
 
 	public static <E> Builder<E> getBuilder(Class<E> Class)
 	{
-		return new Builder<E>();
+		return new Builder<>();
 	}
 
 	interface Start<E>
@@ -74,7 +74,7 @@ public class HeadingPropertySet
 
 	public static class Builder<E> implements AddingColumn<E>, Start<E>
 	{
-		private List<HeadingToPropertyId> cols = new LinkedList<HeadingToPropertyId>();
+		private List<HeadingToPropertyId> cols = new LinkedList<>();
 		private boolean autoExpandColumns = false;
 		private boolean eraseSavedConfig = false;
 
@@ -459,19 +459,22 @@ public class HeadingPropertySet
 					Boolean checked = (Boolean) source.getItem(itemId).getItemProperty(attribute.getName()).getValue();
 
 					final Label label = new Label();
-					label.setContentMode(ContentMode.HTML);
-					if (checked)
+					if (checked != null)
 					{
-						if (trueIcon != null)
+						label.setContentMode(ContentMode.HTML);
+						if (checked)
 						{
-							label.setValue(trueIcon.getHtml());
+							if (trueIcon != null)
+							{
+								label.setValue(trueIcon.getHtml());
+							}
 						}
-					}
-					else
-					{
-						if (falseIcon != null)
+						else
 						{
-							label.setValue(falseIcon.getHtml());
+							if (falseIcon != null)
+							{
+								label.setValue(falseIcon.getHtml());
+							}
 						}
 					}
 
@@ -588,7 +591,7 @@ public class HeadingPropertySet
 	{
 		try
 		{
-			final List<String> colsToShow = new LinkedList<String>();
+			final List<String> colsToShow = new LinkedList<>();
 			for (HeadingToPropertyId column : getColumns())
 			{
 				colsToShow.add(column.getPropertyId());

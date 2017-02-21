@@ -245,6 +245,15 @@ public class ReportEmailScheduleEntity implements Serializable, CrudEntity, Repo
 		return (Class<? extends JasperReportProperties>) Class.forName(JasperReportPropertiesClassName);
 	}
 
+	/**
+	 * This is the title for the report, it should not be specific any anyway to
+	 * the parameters.
+	 * 
+	 * This title is compiled into the report template. All subsequent runs of
+	 * this report template will have the same title regardless this parameter.
+	 * 
+	 * @param reportTitle2
+	 */
 	public void setTitle(String reportTitle2)
 	{
 		reportTitle = reportTitle2;

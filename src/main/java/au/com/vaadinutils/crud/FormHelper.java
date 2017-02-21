@@ -495,6 +495,21 @@ public class FormHelper<E> implements Serializable
 		return field;
 	}
 
+	public <L> ComboBox bindComboBox(AbstractLayout form, ValidatingFieldGroup<E> fieldGroup, String fieldName,
+			String fieldLabel, Container options)
+	{
+		ComboBox field = new SplitComboBox(fieldLabel, options);
+		field.setNewItemsAllowed(false);
+		field.setNullSelectionAllowed(false);
+		field.setTextInputAllowed(true);
+		field.setWidth(STANDARD_COMBO_WIDTH);
+		field.setImmediate(true);
+		form.addComponent(field);
+		addValueChangeListeners(field);
+		doBinding(group, fieldName, field);
+		return field;
+	}
+
 	public <L> LegacyComboBox bindLegacyComboBox(AbstractLayout form, ValidatingFieldGroup<E> fieldGroup,
 			String fieldName, String fieldLabel, Collection<?> options)
 	{
@@ -511,7 +526,7 @@ public class FormHelper<E> implements Serializable
 	}
 
 	public <L extends CrudEntity, K> ComboBox bindEntityField(String fieldLabel, SingularAttribute<E, L> fieldName,
-			SingularAttribute<L, K> listFieldName)
+			SingularAttribute<? super L, K> listFieldName)
 	{
 		return new EntityFieldBuilder<L>().setLabel(fieldLabel).setField(fieldName).setListFieldName(listFieldName)
 				.build();
@@ -782,7 +797,7 @@ public class FormHelper<E> implements Serializable
 			return this;
 		}
 
-		public EntityFieldBuilder<L> setListFieldName(SingularAttribute<L, ?> listField)
+		public EntityFieldBuilder<L> setListFieldName(SingularAttribute<? super L, ?> listField)
 		{
 			this.listField = listField.getName();
 			return this;
