@@ -170,7 +170,8 @@ public abstract class JpaDslAbstract<E, R>
 		return new AbstractCondition<E>()
 		{
 
-			@SuppressWarnings({ "unchecked", "rawtypes" })
+			@SuppressWarnings(
+			{ "unchecked", "rawtypes" })
 			@Override
 			public Predicate getPredicates()
 			{
@@ -304,6 +305,19 @@ public abstract class JpaDslAbstract<E, R>
 	}
 
 	public <J, V> Condition<E> eq(final JoinBuilder<E, J> join, final SingularAttribute<J, V> field, final V value)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+				return builder.equal(getJoin(join).get(field), value);
+			}
+		};
+	}
+
+	public <J, V> Condition<E> eq(final JoinBuilder<E, J> join, final ListAttribute<J, V> field, final V value)
 	{
 		return new AbstractCondition<E>()
 		{
