@@ -48,7 +48,7 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 {
 	private static final long serialVersionUID = -4316521010865902678L;
 
-	private boolean initialised;
+	// private boolean initialised;
 	private SingularAttribute<C, ?> itemCaptionProperty;
 	private Class<C> itemClass;
 	private Collection<C> sourceValue;
@@ -93,6 +93,8 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 		createSelectedGrid();
 		createAvailableGrid();
 
+		customizeGrids(selectedGrid, availableGrid);
+
 		addNewButton.setVisible(false);
 	}
 
@@ -117,6 +119,22 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 				}
 			}
 		});
+
+		createSelectedHeadings().applyToGrid(selectedGrid);
+
+		// initialised = true;
+	}
+
+	protected void customizeGrids(Grid selectedGrid, SearchableGrid<C, JPAContainer<C>> availableGrid2)
+	{
+		// Overload this method a do some customization of the grids.
+
+	}
+
+	protected GridHeadingPropertySet createSelectedHeadings()
+	{
+		return new GridHeadingPropertySet.Builder<C>()
+				.addColumn(selectedColumnHeader, itemCaptionProperty.getName(), true, true).build();
 	}
 
 	private BeanContainer<Long, C> createSelectedContainer()
@@ -124,11 +142,17 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 		final Metamodel metaModel = EntityManagerProvider.getEntityManager().getMetamodel();
 		final EntityType<C> type = metaModel.entity(itemClass);
 		beanIdField = type.getDeclaredId(Long.class);
-		selectedBeans = new BeanContainer<Long, C>(itemClass);
+		selectedBeans = new BeanContainer<>(itemClass);
 		selectedBeans.setBeanIdProperty(beanIdField.getName());
 		sortSelectedBeans();
 
 		return selectedBeans;
+	}
+
+	protected GridHeadingPropertySet createAvailableHeadings()
+	{
+		return new GridHeadingPropertySet.Builder<C>()
+				.addColumn(availableColumnHeader, itemCaptionProperty.getName(), true, true).build();
 	}
 
 	protected void createAvailableGrid()
@@ -142,8 +166,7 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 			@Override
 			public GridHeadingPropertySet getHeadingPropertySet()
 			{
-				return new GridHeadingPropertySet.Builder<C>()
-						.addColumn(availableColumnHeader, itemCaptionProperty.getName(), true, true).build();
+				return createAvailableHeadings();
 			}
 
 			@Override
@@ -201,19 +224,20 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 		return availableContainer;
 	}
 
-	@Override
-	public void beforeClientResponse(boolean initial)
-	{
-		super.beforeClientResponse(initial);
-		if (!initialised)
-		{
-			// TODO: Add proper uniqueId
-			new GridHeadingPropertySet.Builder<C>()
-					.addColumn(selectedColumnHeader, itemCaptionProperty.getName(), true, true).build()
-					.applyToGrid(selectedGrid, this.getClass().getSimpleName());
-			initialised = true;
-		}
-	}
+	// @Override
+	// public void beforeClientResponse(boolean initial)
+	// {
+	// super.beforeClientResponse(initial);
+	// if (!initialised)
+	// {
+	// // TODO: Add proper uniqueId
+	// new GridHeadingPropertySet.Builder<C>()
+	// .addColumn(selectedColumnHeader, itemCaptionProperty.getName(), true,
+	// true).build()
+	// .applyToGrid(selectedGrid, this.getClass().getSimpleName());
+	// initialised = true;
+	// }
+	// }
 
 	@Override
 	protected Component initContent()
@@ -334,16 +358,12 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 
 	public void sortAvailableContainer()
 	{
-		availableContainer.sort(new Object[]
-		{ itemCaptionProperty.getName() }, new boolean[]
-		{ sortAscending });
+		availableContainer.sort(new Object[] { itemCaptionProperty.getName() }, new boolean[] { sortAscending });
 	}
 
 	public void sortSelectedBeans()
 	{
-		selectedBeans.sort(new Object[]
-		{ itemCaptionProperty.getName() }, new boolean[]
-		{ sortAscending });
+		selectedBeans.sort(new Object[] { itemCaptionProperty.getName() }, new boolean[] { sortAscending });
 	}
 
 	public interface ValueChangeListener<C>
@@ -355,7 +375,7 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 	{
 		if (valueChangeListeners == null)
 		{
-			valueChangeListeners = new LinkedHashSet<ValueChangeListener<C>>();
+			valueChangeListeners = new LinkedHashSet<>();
 		}
 		valueChangeListeners.add(listener);
 	}
@@ -712,4 +732,5 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 	{
 		availableGrid.triggerFilter();
 	}
+
 }
