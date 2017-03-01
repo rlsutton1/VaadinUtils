@@ -16,6 +16,7 @@ import org.apache.logging.log4j.Logger;
 import com.vaadin.data.Property;
 import com.vaadin.data.Validator;
 import com.vaadin.data.Validator.InvalidValueException;
+import com.vaadin.server.ErrorMessage;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -101,15 +102,39 @@ public class TimePicker extends HorizontalLayout implements Field<Date>
 			@Override
 			public void valueChange(com.vaadin.data.Property.ValueChangeEvent event)
 			{
-				final Date parsedDate = parseDate((String) event.getProperty().getValue());
-				if (parsedDate != null)
+				try
 				{
-					dateTime.set(Calendar.HOUR_OF_DAY, parsedDate.getHours());
-					dateTime.set(Calendar.MINUTE, parsedDate.getMinutes());
-					isSet = true;
-					setNewValue();
+					final Date parsedDate = parseDate((String) event.getProperty().getValue());
+
+					if (parsedDate != null)
+					{
+						dateTime.set(Calendar.HOUR_OF_DAY, parsedDate.getHours());
+						dateTime.set(Calendar.MINUTE, parsedDate.getMinutes());
+						isSet = true;
+						setNewValue();
+					}
+					TimePicker.this.valueChange(event);
+					field.setComponentError(null);
 				}
-				TimePicker.this.valueChange(event);
+				catch (final InvalidValueException e)
+				{
+					field.setComponentError(new ErrorMessage()
+					{
+						private static final long serialVersionUID = 1L;
+
+						@Override
+						public String getFormattedHtmlMessage()
+						{
+							return e.getMessage();
+						}
+
+						@Override
+						public ErrorLevel getErrorLevel()
+						{
+							return ErrorLevel.ERROR;
+						}
+					});
+				}
 			}
 		});
 
@@ -368,8 +393,7 @@ public class TimePicker extends HorizontalLayout implements Field<Date>
 
 	protected void addMinuteButtons(HorizontalLayout minuteButtonPanel, int rows, int cols)
 	{
-		String[] numbers = new String[]
-		{ "00", "10", "15", "20", "30", "40", "45", "50" };
+		String[] numbers = new String[] { "00", "10", "15", "20", "30", "40", "45", "50" };
 		for (int col = 0; col < cols; col++)
 		{
 			VerticalLayout rowsLayout = new VerticalLayout();
@@ -410,8 +434,7 @@ public class TimePicker extends HorizontalLayout implements Field<Date>
 
 	protected void addHourButtons(HorizontalLayout hourButtonPanel, int rows, int cols)
 	{
-		int[] numbers = new int[]
-		{ 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
+		int[] numbers = new int[] { 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
 		for (int col = 0; col < cols; col++)
 		{
 			VerticalLayout rowsLayout = new VerticalLayout();
