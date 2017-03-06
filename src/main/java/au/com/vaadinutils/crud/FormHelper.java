@@ -270,7 +270,7 @@ public class FormHelper<E> implements Serializable
 		return field;
 	}
 
-	public TextArea bindTextAreaField(String fieldLabel, SingularAttribute<E, String> attribute, int rows)
+	public TextArea bindTextAreaField(String fieldLabel, SingularAttribute<? super E, String> attribute, int rows)
 	{
 		TextArea field = bindTextAreaField(form, group, fieldLabel, attribute.getName(), rows);
 		this.fieldList.add(field);
@@ -321,7 +321,7 @@ public class FormHelper<E> implements Serializable
 		return field;
 	}
 
-	public DateField bindDateField(String label, SingularAttribute<E, Date> member, String dateFormat,
+	public DateField bindDateField(String label, SingularAttribute<? super E, Date> member, String dateFormat,
 			Resolution resolution)
 	{
 		DateField field = bindDateField(form, group, label, member.getName(), dateFormat, resolution);
@@ -783,7 +783,7 @@ public class FormHelper<E> implements Serializable
 			return this;
 		}
 
-		public EntityFieldBuilder<L> setField(SingularAttribute<E, L> field)
+		public EntityFieldBuilder<L> setField(SingularAttribute<? super E, L> field)
 		{
 			this.field = field.getName();
 			listClazz = field.getJavaType();
@@ -1402,6 +1402,9 @@ public class FormHelper<E> implements Serializable
 
 	}
 
+	/**
+	 * prefer to use the non static method getEntityFieldBuilder(Class<J> j)
+	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	static public <J extends CrudEntity> FormHelper<?>.EntityFieldBuilder<J> getEntityFieldBuilder(AbstractLayout form,
 			Class<J> j)

@@ -170,8 +170,7 @@ public abstract class JpaDslAbstract<E, R>
 		return new AbstractCondition<E>()
 		{
 
-			@SuppressWarnings(
-			{ "unchecked", "rawtypes" })
+			@SuppressWarnings({ "unchecked", "rawtypes" })
 			@Override
 			public Predicate getPredicates()
 			{
@@ -1381,7 +1380,7 @@ public abstract class JpaDslAbstract<E, R>
 		return this;
 	}
 
-	public <V, J> TypedPath<E, V> path(SingularAttribute<? super E, J> partA, SingularAttribute<J, V> partB)
+	public <V, J> TypedPath<E, V> path(SingularAttribute<? super E, J> partA, SingularAttribute<? super J, V> partB)
 	{
 		return new TypedPath<>(root.get(partA).get(partB));
 
