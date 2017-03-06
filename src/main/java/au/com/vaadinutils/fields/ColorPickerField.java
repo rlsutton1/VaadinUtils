@@ -1,13 +1,13 @@
 package au.com.vaadinutils.fields;
 
-import au.com.vaadinutils.domain.iColor;
-import au.com.vaadinutils.domain.iColorFactory;
-
 import com.vaadin.ui.ColorPicker;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomField;
 import com.vaadin.ui.components.colorpicker.ColorChangeEvent;
 import com.vaadin.ui.components.colorpicker.ColorChangeListener;
+
+import au.com.vaadinutils.domain.iColor;
+import au.com.vaadinutils.domain.iColorFactory;
 
 public class ColorPickerField extends CustomField<iColor>
 {
@@ -29,9 +29,17 @@ public class ColorPickerField extends CustomField<iColor>
 			public void colorChanged(ColorChangeEvent event)
 			{
 				setValue(ColorPickerField.this.colorFactory.createColor(event.getColor()));
+
 			}
 		});
 
+	}
+
+	@Override
+	public void setReadOnly(boolean readOnly)
+	{
+		colorPicker.setReadOnly(readOnly);
+		super.setReadOnly(readOnly);
 	}
 
 	@Override
@@ -56,12 +64,9 @@ public class ColorPickerField extends CustomField<iColor>
 	public void setInternalValue(iColor newFieldValue)
 	{
 		if (newFieldValue != null)
-			this.colorPicker.setColor(new com.vaadin.shared.ui.colorpicker.Color(newFieldValue.getRed(), newFieldValue
-					.getGreen(), newFieldValue.getBlue(), newFieldValue.getAlpha()));
+			this.colorPicker.setColor(new com.vaadin.shared.ui.colorpicker.Color(newFieldValue.getRed(),
+					newFieldValue.getGreen(), newFieldValue.getBlue(), newFieldValue.getAlpha()));
 		super.setInternalValue(newFieldValue);
 	}
 
-	
-
-	
 }

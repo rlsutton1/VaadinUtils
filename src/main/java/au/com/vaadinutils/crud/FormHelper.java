@@ -1402,6 +1402,9 @@ public class FormHelper<E> implements Serializable
 
 	}
 
+	/**
+	 * prefer to use the non static method getEntityFieldBuilder(Class<J> j)
+	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	static public <J extends CrudEntity> FormHelper<?>.EntityFieldBuilder<J> getEntityFieldBuilder(AbstractLayout form,
 			Class<J> j)

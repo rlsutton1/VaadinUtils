@@ -5,12 +5,12 @@ import javax.persistence.metamodel.SingularAttribute;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.vaadin.data.Validator;
+
 import au.com.vaadinutils.crud.CrudEntity;
 import au.com.vaadinutils.dao.JpaBaseDao;
 import au.com.vaadinutils.dao.JpaBaseDao.Condition;
 import au.com.vaadinutils.dao.JpaDslBuilder;
-
-import com.vaadin.data.Validator;
 
 public class UniqueFieldValidatorJPA<E extends CrudEntity, UNIQUE_FIELD_TYPE, FILTER_FIELD_TYPE> implements Validator
 {
@@ -34,19 +34,19 @@ public class UniqueFieldValidatorJPA<E extends CrudEntity, UNIQUE_FIELD_TYPE, FI
 
 		this.warningMessage = warningMessage;
 		this.filterAttribute = filterAttribute;
-		this.filterCallback =callback;
+		this.filterCallback = callback;
 
 	}
 
 	public UniqueFieldValidatorJPA(SingularAttribute<E, UNIQUE_FIELD_TYPE> matchField, String warningMessage,
-			SingularAttribute<E, FILTER_FIELD_TYPE> filterAttribute,final FILTER_FIELD_TYPE filterValue)
+			SingularAttribute<E, FILTER_FIELD_TYPE> filterAttribute, final FILTER_FIELD_TYPE filterValue)
 	{
 		this.table = matchField.getDeclaringType().getJavaType();
 		this.matchField = matchField;
 
 		this.warningMessage = warningMessage;
 		this.filterAttribute = filterAttribute;
-		this.filterCallback =new FilterValueCallback<FILTER_FIELD_TYPE>()
+		this.filterCallback = new FilterValueCallback<FILTER_FIELD_TYPE>()
 		{
 
 			@Override
@@ -58,7 +58,24 @@ public class UniqueFieldValidatorJPA<E extends CrudEntity, UNIQUE_FIELD_TYPE, FI
 
 	}
 
-	
+	public UniqueFieldValidatorJPA(SingularAttribute<E, UNIQUE_FIELD_TYPE> matchField, String warningMessage)
+	{
+		this.table = matchField.getDeclaringType().getJavaType();
+		this.matchField = matchField;
+
+		this.warningMessage = warningMessage;
+		this.filterAttribute = null;
+		this.filterCallback = new FilterValueCallback<FILTER_FIELD_TYPE>()
+		{
+
+			@Override
+			public FILTER_FIELD_TYPE getValue()
+			{
+				return null;
+			}
+		};
+
+	}
 
 	@SuppressWarnings("unchecked")
 	@Override
