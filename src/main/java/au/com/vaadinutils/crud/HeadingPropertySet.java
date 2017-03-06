@@ -178,7 +178,7 @@ public class HeadingPropertySet
 		}
 
 		public <T extends Object> Builder<E> addColumn(final String heading,
-				final SingularAttribute<E, T> headingPropertyId, final boolean defaultVisibleState,
+				final SingularAttribute<? super E, T> headingPropertyId, final boolean defaultVisibleState,
 				final boolean lockedState, int width)
 		{
 			return addColumn(heading, headingPropertyId.getName(), defaultVisibleState, lockedState, width);
@@ -192,7 +192,7 @@ public class HeadingPropertySet
 		}
 
 		public <T extends Object> Builder<E> addColumn(final String heading,
-				final SingularAttribute<E, T> headingPropertyId, final boolean defaultVisibleState,
+				final SingularAttribute<? super E, T> headingPropertyId, final boolean defaultVisibleState,
 				final boolean lockedState)
 		{
 			return addColumn(heading, headingPropertyId.getName(), defaultVisibleState, lockedState);
@@ -273,7 +273,7 @@ public class HeadingPropertySet
 		}
 
 		public <T extends Object> Builder<E> addColumn(final String heading,
-				final SingularAttribute<E, T> headingPropertyId, final int width)
+				final SingularAttribute<? super E, T> headingPropertyId, final int width)
 		{
 			return addColumn(heading, headingPropertyId, true, false, width);
 		}
@@ -284,7 +284,7 @@ public class HeadingPropertySet
 		}
 
 		public <T extends Object> Builder<E> addColumn(final String heading,
-				final SingularAttribute<E, T> headingPropertyId)
+				final SingularAttribute<? super E, T> headingPropertyId)
 		{
 			return addColumn(heading, headingPropertyId, true, false);
 		}
@@ -403,7 +403,7 @@ public class HeadingPropertySet
 		 *            - the format for the Date. format is passed to a
 		 *            SimpleDateFormat
 		 */
-		public Builder<E> addColumn(String headingLabel, SingularAttribute<E, Date> column, String dateFormat,
+		public Builder<E> addColumn(String headingLabel, SingularAttribute<? super E, Date> column, String dateFormat,
 				int width)
 		{
 			return addGeneratedColumn(headingLabel, column.getName(),

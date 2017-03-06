@@ -1347,7 +1347,7 @@ public abstract class JpaDslAbstract<E, R>
 		final Path<V> path;
 	}
 
-	public <V, J> TypedPath<E, V> path(SingularAttribute<? super E, J> partA, SingularAttribute<J, V> partB)
+	public <V, J> TypedPath<E, V> path(SingularAttribute<? super E, J> partA, SingularAttribute<? super J, V> partB)
 	{
 		return new TypedPath<>(root.get(partA).get(partB));
 
