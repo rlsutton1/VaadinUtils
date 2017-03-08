@@ -1,5 +1,6 @@
 package au.com.vaadinutils.dao;
 
+import javax.persistence.criteria.Fetch;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Root;
@@ -7,27 +8,29 @@ import javax.persistence.metamodel.SingularAttribute;
 
 public class JoinMetaDataSingular<E, K> implements JoinMetaData<E, K>
 {
-	public JoinMetaDataSingular(SingularAttribute<E, K> attribute2, JoinType type2)
-	{
-		attribute = attribute2;
-		type = type2;
-	}
-
 	final SingularAttribute<E, K> attribute;
 	final JoinType type;
+	final boolean fetch;
+
+	public JoinMetaDataSingular(final SingularAttribute<E, K> attribute, final JoinType type, final boolean fetch)
+	{
+		this.attribute = attribute;
+		this.type = type;
+		this.fetch = fetch;
+	}
 
 	@SuppressWarnings("rawtypes")
 	@Override
 	public boolean equals(Object obj)
 	{
 		JoinMetaDataSingular other = (JoinMetaDataSingular) obj;
-		return type == other.type && attribute == other.attribute;
+		return type == other.type && attribute == other.attribute && fetch == other.fetch;
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return type.hashCode() + attribute.hashCode();
+		return type.hashCode() + attribute.hashCode() + new Boolean(fetch).hashCode();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -41,8 +44,22 @@ public class JoinMetaDataSingular<E, K> implements JoinMetaData<E, K>
 				return (Join<E, K>) join;
 			}
 		}
+		for (Fetch<E, ?> join : root.getFetches())
+		{
+			if (join.getAttribute().equals(attribute) && join.getJoinType().equals(type))
+			{
+				return (Join<E, K>) join;
+			}
+		}
 
-		return root.join(attribute, type);
+		if (fetch)
+		{
+			return (Join<E, K>) root.fetch(attribute, type);
+		}
+		else
+		{
+			return root.join(attribute, type);
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -56,8 +73,22 @@ public class JoinMetaDataSingular<E, K> implements JoinMetaData<E, K>
 				return (Join<E, K>) existingJoin;
 			}
 		}
+		for (Fetch<E, ?> existingJoin : join.getFetches())
+		{
+			if (existingJoin.getAttribute().equals(attribute) && existingJoin.getJoinType().equals(type))
+			{
+				return (Join<E, K>) existingJoin;
+			}
+		}
 
-		return join.join(attribute, type);
+		if (fetch)
+		{
+			return (Join<E, K>) join.fetch(attribute, type);
+		}
+		else
+		{
+			return join.join(attribute, type);
+		}
 	}
 
 	@Override
