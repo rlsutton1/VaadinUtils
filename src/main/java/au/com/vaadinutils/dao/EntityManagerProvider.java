@@ -546,7 +546,23 @@ public enum EntityManagerProvider
 	 */
 	public static void commitAndContinue()
 	{
+		commit();
+		begin();
+	}
+
+	/**
+	 * Commits the current active transaction
+	 */
+	public static void commit()
+	{
 		INSTANCE.entityManagerThreadLocal.get().getTransaction().commit();
+	}
+
+	/**
+	 * Starts a new transaction
+	 */
+	public static void begin()
+	{
 		INSTANCE.entityManagerThreadLocal.get().getTransaction().begin();
 	}
 
