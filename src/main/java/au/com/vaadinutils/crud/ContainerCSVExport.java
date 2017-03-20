@@ -194,7 +194,11 @@ public class ContainerCSVExport<E>
 			if (itemProperty != null && itemProperty.getValue() != null)
 			{
 				ColumnGenerator generator = table.getColumnGenerator(propertyId);
-				if (generator != null)
+
+				// added handling for generated Boolean columns, - just using
+				// the default property toString()
+
+				if (generator != null && itemProperty.getType() != Boolean.class)
 				{
 					Object value = generator.generateCell(table, id, propertyId);
 					if (value instanceof Label)
