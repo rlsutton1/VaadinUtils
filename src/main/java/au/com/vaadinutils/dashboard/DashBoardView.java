@@ -133,25 +133,26 @@ public abstract class DashBoardView extends VerticalLayout implements View
 						{
 							logger.error(e1);
 						}
-						try (AutoCloseable closer = EntityManagerProvider.setThreadLocalEntityManagerTryWithResources())
+
+						ui.access(new Runnable()
 						{
 
-							ui.access(new Runnable()
+							@Override
+							public void run()
 							{
-
-								@Override
-								public void run()
+								try (AutoCloseable closer = EntityManagerProvider
+										.setThreadLocalEntityManagerTryWithResources())
 								{
 									removeComponent(preparing);
 									postLoad();
 								}
-							});
+								catch (Exception e)
+								{
+									logger.error(e, e);
+								}
+							}
+						});
 
-						}
-						catch (Exception e)
-						{
-							logger.error(e, e);
-						}
 					}
 				};
 			}
