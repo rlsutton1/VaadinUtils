@@ -135,8 +135,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 	protected HeadingPropertySet headings;
 	private boolean dragAndDropOrderingEnabled = false;
 	private SingularAttribute<E, Long> ordinalField;
-
 	private boolean isMainView = true;
+	private boolean rowChanging;
 
 	protected BaseCrudView()
 	{
@@ -248,7 +248,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 		dragAndDropOrderingEnabled = true;
 		this.ordinalField = ordinalField;
 
-		container.sort(new Object[] { ordinalField.getName() }, new boolean[] { true });
+		container.sort(new Object[]
+		{ ordinalField.getName() }, new boolean[]
+		{ true });
 
 		this.entityTable.setDragMode(TableDragMode.ROW);
 		this.entityTable.setDropHandler(new DropHandler()
@@ -317,7 +319,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 
 				container.commit();
 				container.refresh();
-				container.sort(new Object[] { ordinalField.getName() }, new boolean[] { true });
+				container.sort(new Object[]
+				{ ordinalField.getName() }, new boolean[]
+				{ true });
 
 				// cause this crud to save, or if its a child cause the parent
 				// to save.
@@ -1765,6 +1769,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 	 */
 	public void rowChanged(EntityItem<E> item)
 	{
+		rowChanging = true;
 
 		splitPanel.showSecondComponent();
 		fieldGroup.setItemDataSource(item);
@@ -1842,8 +1847,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 			{
 				this.actionApplyButton.setEnabled(false);
 			}
-
 		}
+
+		rowChanging = false;
 	}
 
 	/**
@@ -2450,5 +2456,18 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 	public VerticalLayout getRightLayout()
 	{
 		return rightLayout;
+	}
+
+	/**
+	 * Value change events get fired when a row changes and a FormGroup is
+	 * re-bound. This method can be used to check whether a value change was
+	 * user initiated, or occurred programatically. Vaadin 8 fixes this with
+	 * .isUserInitiated().
+	 *
+	 * @return whether row is changing
+	 */
+	public boolean isRowChanging()
+	{
+		return rowChanging;
 	}
 }
