@@ -574,4 +574,11 @@ public enum EntityManagerProvider
 		INSTANCE.entityManagerThreadLocal.get().getEntityManagerFactory().getCache().evictAll();
 	}
 
+	/**
+	 * Evicts all entities of the specified class in the JPA cache
+	 */
+	public static void evictCache(final Class<?> entityClass)
+	{
+		INSTANCE.entityManagerThreadLocal.get().getEntityManagerFactory().getCache().evict(entityClass);
+	}
 }
