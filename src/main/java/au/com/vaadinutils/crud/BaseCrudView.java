@@ -137,6 +137,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 	private SingularAttribute<E, Long> ordinalField;
 
 	private boolean isMainView = true;
+	private DragAndDropListener dragAndDropListener;
 
 	protected BaseCrudView()
 	{
@@ -316,8 +317,14 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 				}
 
 				container.commit();
-				container.refresh();
-				container.sort(new Object[] { ordinalField.getName() }, new boolean[] { true });
+
+				if (dragAndDropListener != null)
+				{
+					dragAndDropListener.dropped();
+				}
+				// container.refresh();
+				// container.sort(new Object[] { ordinalField.getName() }, new
+				// boolean[] { true });
 
 				// cause this crud to save, or if its a child cause the parent
 				// to save.
@@ -333,6 +340,11 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 			}
 		});
 
+	}
+
+	public void setDragAndDropListener(DragAndDropListener listener)
+	{
+		dragAndDropListener = listener;
 	}
 
 	/**
