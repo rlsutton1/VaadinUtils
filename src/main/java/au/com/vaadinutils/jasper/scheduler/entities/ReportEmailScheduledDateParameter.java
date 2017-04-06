@@ -20,6 +20,11 @@ import au.com.vaadinutils.jasper.scheduler.ScheduledDateParameter;
 public class ReportEmailScheduledDateParameter implements ScheduledDateParameter,ChildCrudEntity
 {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8959271035969758404L;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long iID;

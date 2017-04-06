@@ -11,6 +11,11 @@ import au.com.vaadinutils.crud.CrudEntity;
 @Table(name = "tblreportemailsender")
 public class ReportEmailSender implements CrudEntity
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5079828648797583451L;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long iID;
