@@ -68,11 +68,20 @@ public class JSCallWithReturnValue
 	{
 		call(new JavaScriptCallback<JsonArray>()
 		{
+			boolean done = false;
 
 			@Override
 			public void callback(JsonArray arguments)
 			{
-				callback.callback(arguments.getBoolean(0));
+				if (!done)
+				{
+					done = true;
+					callback.callback(arguments.getBoolean(0));
+				}
+				else
+				{
+					logger.warn("This appears to have been a duplicate callback, ignoring it!");
+				}
 			}
 		});
 
@@ -82,11 +91,20 @@ public class JSCallWithReturnValue
 	{
 		call(new JavaScriptCallback<JsonArray>()
 		{
+			boolean done = false;
 
 			@Override
 			public void callback(JsonArray arguments)
 			{
-				callback.callback(arguments.getString(0));
+				if (!done)
+				{
+					done = true;
+					callback.callback(arguments.getString(0));
+				}
+				else
+				{
+					logger.warn("This appears to have been a duplicate callback, ignoring it!");
+				}
 			}
 		});
 
@@ -96,11 +114,20 @@ public class JSCallWithReturnValue
 	{
 		call(new JavaScriptCallback<JsonArray>()
 		{
+			boolean done = false;
 
 			@Override
 			public void callback(JsonArray value)
 			{
-				callback.callback(null);
+				if (!done)
+				{
+					done = true;
+					callback.callback(null);
+				}
+				else
+				{
+					logger.warn("This appears to have been a duplicate callback, ignoring it!");
+				}
 			}
 		});
 	}
@@ -115,6 +142,7 @@ public class JSCallWithReturnValue
 		{
 
 			private static final long serialVersionUID = 1L;
+			boolean done = false;
 
 			@Override
 			public void call(JsonArray arguments)
@@ -126,7 +154,15 @@ public class JSCallWithReturnValue
 						logger.warn("Responded after {}ms", timer.elapsed(TimeUnit.MILLISECONDS));
 					}
 					logger.debug("Handling response for " + hookName);
-					callback.callback(arguments);
+					if (!done)
+					{
+						done = true;
+						callback.callback(arguments);
+					}
+					else
+					{
+						logger.warn("This appears to have been a duplicate callback, ignoring it!");
+					}
 
 				}
 				catch (Exception e)
@@ -155,6 +191,7 @@ public class JSCallWithReturnValue
 
 		JavaScript.getCurrent().addFunction(hookName, new JavaScriptFunction()
 		{
+			boolean done = false;
 
 			private static final long serialVersionUID = 1L;
 
@@ -162,7 +199,15 @@ public class JSCallWithReturnValue
 			public void call(JsonArray arguments)
 			{
 				logger.debug("Handling response for " + hookName);
-				javaScriptCallback.callback(null);
+				if (!done)
+				{
+					done = true;
+					javaScriptCallback.callback(null);
+				}
+				else
+				{
+					logger.warn("This appears to have been a duplicate callback, ignoring it!");
+				}
 				future.cancel(false);
 				removeHooks(hookName, errorHookName);
 				if (timer.elapsed(TimeUnit.MILLISECONDS) > EXPECTED_RESPONSE_TIME_MS)
