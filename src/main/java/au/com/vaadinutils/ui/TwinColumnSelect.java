@@ -268,17 +268,17 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 		removeAllButton.addClickListener(removeAllClickListener());
 		addNewButton.addClickListener(addNewClickListener());
 
-		layout.addComponent(addButton);
-		layout.addComponent(removeButton);
-		layout.addComponent(addAllButton);
-		layout.addComponent(removeAllButton);
-		layout.addComponent(addNewButton);
+		VerticalLayout buttonHolder = new VerticalLayout();
 
-		layout.setComponentAlignment(addButton, Alignment.MIDDLE_CENTER);
-		layout.setComponentAlignment(removeButton, Alignment.MIDDLE_CENTER);
-		layout.setComponentAlignment(addAllButton, Alignment.MIDDLE_CENTER);
-		layout.setComponentAlignment(removeAllButton, Alignment.MIDDLE_CENTER);
-		layout.setComponentAlignment(addNewButton, Alignment.MIDDLE_CENTER);
+		buttonHolder.addComponent(addButton);
+		buttonHolder.addComponent(removeButton);
+		buttonHolder.addComponent(addAllButton);
+		buttonHolder.addComponent(removeAllButton);
+		buttonHolder.addComponent(addNewButton);
+
+		layout.addComponent(buttonHolder);
+		layout.setSizeFull();
+		layout.setComponentAlignment(buttonHolder, Alignment.MIDDLE_CENTER);
 
 		return layout;
 	}

@@ -143,7 +143,6 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 
 		final HorizontalLayout basicSearchLayout = new HorizontalLayout();
 		basicSearchLayout.setWidth(100, Unit.PERCENTAGE);
-		basicSearchLayout.setSpacing(true);
 		layout.addComponent(basicSearchLayout);
 
 		final AbstractLayout advancedSearch = buildAdvancedSearch();
@@ -156,6 +155,7 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 		searchField.setId("searchField");
 		searchField.setTextChangeEventMode(TextChangeEventMode.LAZY);
 		searchField.setImmediate(true);
+		searchField.setStyleName(ValoTheme.TEXTFIELD_SMALL);
 		searchField.addTextChangeListener(new TextChangeListener()
 		{
 			private static final long serialVersionUID = 1L;
@@ -171,11 +171,11 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 
 		// clear button
 		final Button clear = createClearButton();
+
 		basicSearchLayout.addComponent(clear);
-		basicSearchLayout.setComponentAlignment(clear, Alignment.MIDDLE_CENTER);
+		basicSearchLayout.setComponentAlignment(clear, Alignment.MIDDLE_LEFT);
 		basicSearchLayout.addComponent(searchField);
 		basicSearchLayout.setExpandRatio(searchField, 1.0f);
-		basicSearchLayout.setSpacing(true);
 
 		searchField.focus();
 
@@ -304,6 +304,7 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 
 	}
 
+	@Override
 	public void addStyleName(String style)
 	{
 		grid.addStyleName(style);
