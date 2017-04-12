@@ -49,6 +49,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.PasswordField;
+import com.vaadin.ui.Slider;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 
@@ -1423,6 +1424,19 @@ public class FormHelper<E> implements Serializable
 	{
 		form.addComponent(component);
 
+	}
+
+	public Slider bindSliderField(String fieldLabel, SingularAttribute<E, ? extends Number> fieldName, int min, int max)
+	{
+		Slider field = new Slider(fieldLabel, min, max);
+		field.setWidth("100%");
+		field.setImmediate(true);
+
+		field.setId(fieldLabel.replace(" ", ""));
+		addValueChangeListeners(field);
+		doBinding(group, fieldName.getName(), field);
+		form.addComponent(field);
+		return field;
 	}
 
 }
