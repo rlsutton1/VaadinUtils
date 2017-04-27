@@ -581,4 +581,13 @@ public enum EntityManagerProvider
 	{
 		INSTANCE.entityManagerThreadLocal.get().getEntityManagerFactory().getCache().evict(entityClass);
 	}
+
+	/**
+	 * Evicts the entity of the specified class with the specified key in the
+	 * JPA cache
+	 */
+	public static void evictCache(final Class<?> entityClass, final Object key)
+	{
+		INSTANCE.entityManagerThreadLocal.get().getEntityManagerFactory().getCache().evict(entityClass, key);
+	}
 }
