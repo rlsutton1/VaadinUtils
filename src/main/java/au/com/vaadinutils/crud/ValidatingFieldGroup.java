@@ -3,6 +3,7 @@ package au.com.vaadinutils.crud;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -64,7 +65,7 @@ public class ValidatingFieldGroup<E> extends FieldGroup
 		this.groupIsDirty = groupIsDirty;
 	}
 
-	private Set<Field<?>> knownFields = new HashSet<Field<?>>();
+	private Set<Field<?>> knownFields = new HashSet<>();
 
 	/*
 	 * Override configureField to add a bean validator to each field.
@@ -124,6 +125,7 @@ public class ValidatingFieldGroup<E> extends FieldGroup
 
 	}
 
+	@Override
 	public void discard()
 	{
 		groupIsDirty = false;
@@ -135,6 +137,7 @@ public class ValidatingFieldGroup<E> extends FieldGroup
 
 	}
 
+	@Override
 	public void setItemDataSource(Item itemDataSource)
 	{
 		groupIsDirty = false;
@@ -160,7 +163,12 @@ public class ValidatingFieldGroup<E> extends FieldGroup
 			if (field.isModified())
 			{
 				logger.warn("Dirty: {} {}", field.getCaption(), field.getClass().getSimpleName());
-				logger.warn("Dirty value: " + field.getValue());
+				String value = null;
+				if (field.getValue() != null)
+				{
+					value = field.getValue().toString();
+				}
+				logger.warn("Dirty value: " + StringUtils.abbreviate(value, 40));
 
 				return true;
 			}
@@ -168,6 +176,7 @@ public class ValidatingFieldGroup<E> extends FieldGroup
 		return false;
 	}
 
+	@Override
 	public void bind(Field<?> field, Object propertyId) throws BindException
 	{
 
