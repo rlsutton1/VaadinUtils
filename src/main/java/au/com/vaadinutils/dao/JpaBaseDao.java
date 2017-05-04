@@ -23,6 +23,8 @@ import javax.persistence.metamodel.EntityType;
 import javax.persistence.metamodel.Metamodel;
 import javax.persistence.metamodel.SingularAttribute;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.vaadin.addons.lazyquerycontainer.EntityContainer;
 
 import com.google.common.base.Preconditions;
@@ -34,6 +36,8 @@ import au.com.vaadinutils.entity.BaseCrudEntity_;
 public class JpaBaseDao<E, K> implements Dao<E, K>
 {
 	protected Class<E> entityClass;
+
+	Logger logger = LogManager.getLogger();
 
 	public interface Condition<E>
 	{
@@ -48,7 +52,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 	static public <E> JpaBaseDao<E, Long> getGenericDao(Class<E> class1)
 	{
-		return new JpaBaseDao<E, Long>(class1);
+		return new JpaBaseDao<>(class1);
 
 	}
 
@@ -124,6 +128,17 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 	@Override
 	public E findById(K id)
 	{
+		if (id == null)
+		{
+
+			logger.warn("Null key provided for findById on entity " + entityClass);
+			if (logger.isDebugEnabled())
+			{
+				Exception e = new Exception("Null Key Provided for entity " + entityClass);
+				logger.debug(e, e);
+			}
+			return null;
+		}
 		return getEntityManager().find(entityClass, id);
 	}
 
@@ -203,7 +218,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		criteria.select(root);
 		if (order != null)
 		{
-			List<Order> ordering = new LinkedList<Order>();
+			List<Order> ordering = new LinkedList<>();
 			for (SingularAttribute<E, ?> field : order)
 			{
 				ordering.add(builder.asc(root.get(field)));
@@ -242,7 +257,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		Root<E> root = criteria.from(entityClass);
 		criteria.select(root);
 
-		List<Order> ordering = new LinkedList<Order>();
+		List<Order> ordering = new LinkedList<>();
 		for (SingularAttribute<E, ?> field : order)
 		{
 			if (sortAscending[ordering.size()] == true)
@@ -453,8 +468,8 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 	public JPAContainer<E> createVaadinContainer()
 	{
-		JPAContainer<E> container = new JPAContainer<E>(entityClass);
-		container.setEntityProvider(new BatchingPerRequestEntityProvider<E>(entityClass));
+		JPAContainer<E> container = new JPAContainer<>(entityClass);
+		container.setEntityProvider(new BatchingPerRequestEntityProvider<>(entityClass));
 		return container;
 
 	}
@@ -467,7 +482,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		boolean detachedEntities = true;
 		String propertyId = getIdField().getName();
 		boolean applicationManagedTransactions = true;
-		EntityContainer<E> entityContainer = new EntityContainer<E>(em, entityClass, propertyId, Integer.MAX_VALUE,
+		EntityContainer<E> entityContainer = new EntityContainer<>(em, entityClass, propertyId, Integer.MAX_VALUE,
 				applicationManagedTransactions, detachedEntities, compositeItmes);
 
 		for (Attribute<? super E, ?> attrib : getIdField().getDeclaringType().getAttributes())
@@ -505,7 +520,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 				return Math.min(sizeLimit, size);
 			}
 		};
-		container.setEntityProvider(new BatchingPerRequestEntityProvider<E>(entityClass));
+		container.setEntityProvider(new BatchingPerRequestEntityProvider<>(entityClass));
 		return container;
 
 	}
@@ -644,17 +659,17 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 	public JpaDslBuilder<E> find()
 	{
-		return new JpaDslBuilder<E>(entityClass);
+		return new JpaDslBuilder<>(entityClass);
 	}
 
 	public JpaDslTupleBuilder<E> findTuple()
 	{
-		return new JpaDslTupleBuilder<E>(entityClass);
+		return new JpaDslTupleBuilder<>(entityClass);
 	}
 
 	public JpaDslBuilder<E> jpaContainerDelegate(CriteriaQuery<E> criteria)
 	{
-		return new JpaDslBuilder<E>(criteria, entityClass);
+		return new JpaDslBuilder<>(criteria, entityClass);
 	}
 
 	@SuppressWarnings("unchecked")
