@@ -243,7 +243,9 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 	protected Component initContent()
 	{
 		mainLayout.addComponent(availableGrid);
-		mainLayout.addComponent(buildButtons());
+		final VerticalLayout buttonLayout = buildButtons();
+		mainLayout.addComponent(buttonLayout);
+		mainLayout.setComponentAlignment(buttonLayout, Alignment.MIDDLE_CENTER);
 		mainLayout.addComponent(selectedGrid);
 		mainLayout.setExpandRatio(availableGrid, 1);
 		mainLayout.setExpandRatio(selectedGrid, 1);
@@ -251,11 +253,8 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 		return mainLayout;
 	}
 
-	private Component buildButtons()
+	private VerticalLayout buildButtons()
 	{
-		final VerticalLayout layout = new VerticalLayout();
-		layout.setWidth(BUTTON_LAYOUT_WIDTH, Unit.PIXELS);
-
 		addButton.setWidth(BUTTON_WIDTH, Unit.PIXELS);
 		removeButton.setWidth(BUTTON_WIDTH, Unit.PIXELS);
 		addAllButton.setWidth(BUTTON_WIDTH, Unit.PIXELS);
@@ -268,19 +267,11 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 		removeAllButton.addClickListener(removeAllClickListener());
 		addNewButton.addClickListener(addNewClickListener());
 
-		VerticalLayout buttonHolder = new VerticalLayout();
+		final VerticalLayout buttonLayout = new VerticalLayout();
+		buttonLayout.setWidth(BUTTON_WIDTH, Unit.PIXELS);
+		buttonLayout.addComponents(addButton, removeButton, addAllButton, removeAllButton, addNewButton);
 
-		buttonHolder.addComponent(addButton);
-		buttonHolder.addComponent(removeButton);
-		buttonHolder.addComponent(addAllButton);
-		buttonHolder.addComponent(removeAllButton);
-		buttonHolder.addComponent(addNewButton);
-
-		layout.addComponent(buttonHolder);
-		layout.setSizeFull();
-		layout.setComponentAlignment(buttonHolder, Alignment.MIDDLE_CENTER);
-
-		return layout;
+		return buttonLayout;
 	}
 
 	public void setEnabledAddAllButton(boolean enabled)
@@ -358,12 +349,16 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 
 	public void sortAvailableContainer()
 	{
-		availableContainer.sort(new Object[] { itemCaptionProperty.getName() }, new boolean[] { sortAscending });
+		availableContainer.sort(new Object[]
+		{ itemCaptionProperty.getName() }, new boolean[]
+		{ sortAscending });
 	}
 
 	public void sortSelectedBeans()
 	{
-		selectedBeans.sort(new Object[] { itemCaptionProperty.getName() }, new boolean[] { sortAscending });
+		selectedBeans.sort(new Object[]
+		{ itemCaptionProperty.getName() }, new boolean[]
+		{ sortAscending });
 	}
 
 	public interface ValueChangeListener<C>
