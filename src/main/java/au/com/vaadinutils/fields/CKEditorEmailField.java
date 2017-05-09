@@ -43,38 +43,48 @@ public class CKEditorEmailField extends CKEditorTextField
 
 	static public Map<String, String> getDefaultConfig()
 	{
-		Map<String, String> configMap = new HashMap<String, String>();
+		Map<String, String> configMap = new HashMap<>();
 
 		// configMap
 		// .put("source",
-		// "{ name: 'document', items : [ 'Source','-','Save','NewPage','DocProps','Preview','Print','-','Templates' ] }");
+		// "{ name: 'document', items : [
+		// 'Source','-','Save','NewPage','DocProps','Preview','Print','-','Templates'
+		// ] }");
 		//
 		// configMap
 		// .put("paragraph",
-		// "{ name: 'paragraph', items : [ 'NumberedList','BulletedList','-','Outdent','Indent','-','Blockquote','CreateDiv','-','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','-','BidiLtr','BidiRtl' ] }");
+		// "{ name: 'paragraph', items : [
+		// 'NumberedList','BulletedList','-','Outdent','Indent','-','Blockquote','CreateDiv','-','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','-','BidiLtr','BidiRtl'
+		// ] }");
 		// configMap
 		// .put("clipboard",
-		// "{ name: 'clipboard', items : [ 'Cut','Copy','Paste','PasteText','PasteFromWord','-','Undo','Redo' ] }");
+		// "{ name: 'clipboard', items : [
+		// 'Cut','Copy','Paste','PasteText','PasteFromWord','-','Undo','Redo' ]
+		// }");
 		// configMap.put("editing",
-		// "{ name: 'editing', items : [ 'Find','Replace','-','SelectAll','-','SpellChecker', 'Scayt' ] }");
+		// "{ name: 'editing', items : [
+		// 'Find','Replace','-','SelectAll','-','SpellChecker', 'Scayt' ] }");
 		// configMap.put("document",
 		// "{ name: 'links', items : [ 'Link','Unlink','Anchor' ] }");
 		//
 		// configMap
 		// .put("basicstyles",
-		// "{ name: 'basicstyles', items : [ 'Bold','Italic','Underline','Strike','Subscript','Superscript','-','RemoveFormat' ] }");
+		// "{ name: 'basicstyles', items : [
+		// 'Bold','Italic','Underline','Strike','Subscript','Superscript','-','RemoveFormat'
+		// ] }");
 		// configMap.put("colors",
 		// "{ name: 'colors', items : [ 'TextColor','BGColor' ] }");
 		//
 		// configMap.put("styles",
-		// "{ name: 'styles', items : [ 'Styles','Format','Font','FontSize' ] }");
+		// "{ name: 'styles', items : [ 'Styles','Format','Font','FontSize' ]
+		// }");
 		//
 		// configMap.put("tools",
-		// "{ name: 'tools', items : [ 'Maximize', 'ShowBlocks','-','About' ] }");
+		// "{ name: 'tools', items : [ 'Maximize', 'ShowBlocks','-','About' ]
+		// }");
 
-		configMap
-				.put("style",
-						"{ items: ['Styles','Format','Bold','Italic','Underline','Strike','Subscript','Superscript','-','RemoveFormat'] }");
+		configMap.put("style",
+				"{ items: ['Styles','Format','Bold','Italic','Underline','Strike','Subscript','Superscript','-','RemoveFormat'] }");
 		configMap.put("colour", "{ items: ['TextColor','BGColor'] }");
 		configMap.put("size", "{ items: ['Font','FontSize'] }");
 		configMap.put("justify", "{ items: ['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'] }");

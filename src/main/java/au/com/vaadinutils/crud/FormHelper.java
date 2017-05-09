@@ -684,7 +684,6 @@ public class FormHelper<E> implements Serializable
 
 		public ComboBox build()
 		{
-			Preconditions.checkNotNull(label, "Label may not be null");
 			Preconditions.checkNotNull(listField, "ListField may not be null");
 			Preconditions.checkArgument(group == null || field != null, "Field may not be null");
 			if (builderForm == null)
@@ -697,9 +696,12 @@ public class FormHelper<E> implements Serializable
 			{
 				component = new SplitComboBox(label);
 			}
-			component.setCaption(label);
 			component.setItemCaptionMode(ItemCaptionMode.PROPERTY);
-			component.setId(label.replace(" ", ""));
+			if (label != null)
+			{
+				component.setCaption(label);
+				component.setId(label.replace(" ", ""));
+			}
 
 			if (container == null)
 			{
@@ -1382,7 +1384,7 @@ public class FormHelper<E> implements Serializable
 		return field;
 	}
 
-	public <EN> ComboBox bindEnumField(String fieldLabel, SingularAttribute<E, EN> fieldName)
+	public <EN extends Enum<EN>> ComboBox bindEnumField(String fieldLabel, SingularAttribute<E, EN> fieldName)
 	{
 		return bindEnumField(fieldLabel, fieldName.getName(), fieldName.getBindableJavaType());
 
