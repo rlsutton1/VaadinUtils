@@ -47,7 +47,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 	static public <E> JpaBaseDao<E, Long> getGenericDao(Class<E> class1)
 	{
-		return new JpaBaseDao<E, Long>(class1);
+		return new JpaBaseDao<>(class1);
 
 	}
 
@@ -202,7 +202,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		criteria.select(root);
 		if (order != null)
 		{
-			List<Order> ordering = new LinkedList<Order>();
+			List<Order> ordering = new LinkedList<>();
 			for (SingularAttribute<E, ?> field : order)
 			{
 				ordering.add(builder.asc(root.get(field)));
@@ -241,7 +241,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		Root<E> root = criteria.from(entityClass);
 		criteria.select(root);
 
-		List<Order> ordering = new LinkedList<Order>();
+		List<Order> ordering = new LinkedList<>();
 		for (SingularAttribute<E, ?> field : order)
 		{
 			if (sortAscending[ordering.size()] == true)
@@ -452,8 +452,8 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 	public JPAContainer<E> createVaadinContainer()
 	{
-		JPAContainer<E> container = new JPAContainer<E>(entityClass);
-		container.setEntityProvider(new BatchingPerRequestEntityProvider<E>(entityClass));
+		JPAContainer<E> container = new JPAContainer<>(entityClass);
+		container.setEntityProvider(new BatchingPerRequestEntityProvider<>(entityClass));
 		return container;
 
 	}
@@ -466,7 +466,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		boolean detachedEntities = true;
 		String propertyId = getIdField().getName();
 		boolean applicationManagedTransactions = true;
-		EntityContainer<E> entityContainer = new EntityContainer<E>(em, entityClass, propertyId, Integer.MAX_VALUE,
+		EntityContainer<E> entityContainer = new EntityContainer<>(em, entityClass, propertyId, Integer.MAX_VALUE,
 				applicationManagedTransactions, detachedEntities, compositeItmes);
 
 		for (Attribute<? super E, ?> attrib : getIdField().getDeclaringType().getAttributes())
@@ -504,7 +504,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 				return Math.min(sizeLimit, size);
 			}
 		};
-		container.setEntityProvider(new BatchingPerRequestEntityProvider<E>(entityClass));
+		container.setEntityProvider(new BatchingPerRequestEntityProvider<>(entityClass));
 		return container;
 
 	}
@@ -643,17 +643,17 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 	public JpaDslBuilder<E> select()
 	{
-		return new JpaDslBuilder<E>(entityClass);
+		return new JpaDslBuilder<>(entityClass);
 	}
 
 	public JpaDslTupleBuilder<E> selectTuple()
 	{
-		return new JpaDslTupleBuilder<E>(entityClass);
+		return new JpaDslTupleBuilder<>(entityClass);
 	}
 
 	public JpaDslBuilder<E> jpaContainerDelegate(CriteriaQuery<E> criteria)
 	{
-		return new JpaDslBuilder<E>(criteria, entityClass);
+		return new JpaDslBuilder<>(criteria, entityClass);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -903,6 +903,11 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 			return builder.isNull(root.get(field));
 
 		}
+	}
+
+	public List<E> getEntities(final int startIndex)
+	{
+		return getGenericDao(entityClass).select().startPosition(startIndex).getResultList();
 	}
 
 	public int getEntityCount()
