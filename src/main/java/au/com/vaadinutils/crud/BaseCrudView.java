@@ -1158,6 +1158,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 					restoreDelete = false;
 				}
 				newEntity = null;
+				searchField.setReadOnly(false);
 
 				// set the selection to the first item on the page.
 				// We need to set it to null first as if the first item was
@@ -1225,6 +1226,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 		previousItemId = entityTable.prevVisibleItemId(entityId);
 
 		newEntity = null;
+		searchField.setReadOnly(false);
 
 		preDelete(deltedEntity);
 		// set the selection to the first item
@@ -1317,6 +1319,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 					activateEditMode(false);
 					restoreDelete = false;
 				}
+				searchField.setReadOnly(false);
 			}
 			else
 			{
@@ -1371,6 +1374,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 				container.discard();
 			}
 			this.newEntity = null;
+			searchField.setReadOnly(false);
 
 			// select has been moved to here because when it happens earlier,
 			// child cruds are caused to discard their data before saving it for
@@ -1738,6 +1742,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 								}
 
 								newEntity = null;
+								searchField.setReadOnly(false);
 
 								callback.allowRowChange();
 
@@ -2048,6 +2053,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 					selectFirstFieldAndShowTab();
 
 					postNew(newEntity);
+
+					searchField.setReadOnly(true);
 
 					buttonLayout.startNewPhase();
 				}

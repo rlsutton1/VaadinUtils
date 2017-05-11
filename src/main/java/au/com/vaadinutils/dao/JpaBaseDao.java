@@ -22,6 +22,8 @@ import javax.persistence.metamodel.EntityType;
 import javax.persistence.metamodel.Metamodel;
 import javax.persistence.metamodel.SingularAttribute;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.vaadin.addons.lazyquerycontainer.EntityContainer;
 
 import com.google.common.base.Preconditions;
@@ -33,6 +35,8 @@ import au.com.vaadinutils.entity.BaseCrudEntity_;
 public class JpaBaseDao<E, K> implements Dao<E, K>
 {
 	protected Class<E> entityClass;
+
+	Logger logger = LogManager.getLogger();
 
 	public interface Condition<E>
 	{
@@ -123,6 +127,17 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 	@Override
 	public E findById(K id)
 	{
+		if (id == null)
+		{
+
+			logger.warn("Null key provided for findById on entity " + entityClass);
+			if (logger.isDebugEnabled())
+			{
+				Exception e = new Exception("Null Key Provided for entity " + entityClass);
+				logger.debug(e, e);
+			}
+			return null;
+		}
 		return getEntityManager().find(entityClass, id);
 	}
 

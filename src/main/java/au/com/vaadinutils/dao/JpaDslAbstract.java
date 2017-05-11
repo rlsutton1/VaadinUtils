@@ -28,6 +28,9 @@ import javax.persistence.metamodel.ListAttribute;
 import javax.persistence.metamodel.SetAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.google.common.base.Preconditions;
 
 import au.com.vaadinutils.dao.JpaBaseDao.Condition;
@@ -44,6 +47,8 @@ import au.com.vaadinutils.dao.JpaBaseDao.Condition;
  */
 public abstract class JpaDslAbstract<E, R>
 {
+
+	Logger logger = LogManager.getLogger();
 
 	public abstract class AbstractCondition<Z> implements Condition<Z>
 	{
@@ -157,6 +162,26 @@ public abstract class JpaDslAbstract<E, R>
 	public <K> Expression<String> asString(final JoinBuilder<E, K> join, SingularAttribute<K, ?> field)
 	{
 		return getJoin(join).get(field).as(String.class);
+	}
+
+	public <T> Expression<T> asExpression(SingularAttribute<E, T> field)
+	{
+		return root.get(field).as(field.getJavaType());
+	}
+
+	public <T> Expression<?> date(SingularAttribute<E, T> callbackdate)
+	{
+		return builder.function("date", Integer.class, asExpression(callbackdate));
+	}
+
+	public <T> Expression<Integer> hour(SingularAttribute<E, T> callbackdate)
+	{
+		return builder.function("hour", Integer.class, asExpression(callbackdate));
+	}
+
+	public <T> Expression<Integer> minute(SingularAttribute<E, T> callbackdate)
+	{
+		return builder.function("minute", Integer.class, asExpression(callbackdate));
 	}
 
 	public Expression<String> asString(SingularAttribute<E, ?> field)
@@ -280,6 +305,21 @@ public abstract class JpaDslAbstract<E, R>
 	}
 
 	public Expression<Number> divide(final Path<? extends Number> path1, final Path<? extends Number> path2)
+	{
+		return builder.quot(path1, path2);
+	}
+
+	public Expression<Number> divide(final Expression<? extends Number> path1, int number)
+	{
+		return builder.quot(path1, number);
+	}
+
+	public Expression<?> toInteger(Expression<Number> expression)
+	{
+		return builder.toInteger(expression);
+	}
+
+	public Expression<Number> divide(final Expression<? extends Number> path1, final Path<? extends Number> path2)
 	{
 		return builder.quot(path1, path2);
 	}
@@ -790,7 +830,9 @@ public abstract class JpaDslAbstract<E, R>
 			{
 				if (values.isEmpty())
 				{
-					throw new RuntimeException("Empty set supplied for IN clause");
+					logger.warn("Empty set supplied for IN clause on attribute " + attribute.getJavaType() + " "
+							+ attribute.getName());
+					return builder.isFalse(builder.literal(true));
 				}
 				return root.get(attribute).in(values);
 			}
@@ -1225,6 +1267,16 @@ public abstract class JpaDslAbstract<E, R>
 	public <T extends Number> Expression<T> max(final SingularAttribute<E, T> attribute)
 	{
 		return builder.max(root.get(attribute));
+	}
+
+	public <T extends Comparable<T>> Expression<T> greatest(final SingularAttribute<E, T> attribute)
+	{
+		return builder.greatest(root.get(attribute));
+	}
+
+	public <T extends Comparable<T>> Expression<T> least(final SingularAttribute<E, T> attribute)
+	{
+		return builder.least(root.get(attribute));
 	}
 
 	public <J> AbstractCondition<E> not(final Condition<E> condition)

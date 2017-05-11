@@ -241,7 +241,7 @@ public class ContainerCSVExport<E>
 
 						if (value instanceof AbstractLayout)
 						{
-							value = new HtmlToPlainText().getPlainText(Jsoup.parse(value.toString()));
+							value = "";
 						}
 					}
 					if (value == null)

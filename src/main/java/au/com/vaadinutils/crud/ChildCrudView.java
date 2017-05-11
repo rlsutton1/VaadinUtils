@@ -454,6 +454,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 
 		entityTable.removeItem(entityId);
 		newEntity = null;
+		searchField.setReadOnly(false);
 
 		entityTable.select(null);
 		entityTable.select(previousItemId);
@@ -594,6 +595,8 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 			selectFirstFieldAndShowTab();
 
 			postNew(newEntity);
+
+			searchField.setReadOnly(true);
 
 			rightLayout.setVisible(true);
 		}
@@ -742,6 +745,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 						activateEditMode(false);
 						restoreDelete = false;
 					}
+					searchField.setReadOnly(false);
 				}
 				splitPanel.showFirstComponent();
 				saving = false;
@@ -1009,6 +1013,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 			{
 				showNoSelectionMessage();
 			}
+			searchField.setReadOnly(false);
 		}
 
 	}
