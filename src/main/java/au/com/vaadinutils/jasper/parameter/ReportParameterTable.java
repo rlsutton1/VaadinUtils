@@ -11,7 +11,6 @@ import org.apache.logging.log4j.Logger;
 
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.QueryModifierDelegate;
-import com.vaadin.data.Container;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
@@ -32,11 +31,14 @@ import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
 import au.com.vaadinutils.crud.CrudEntity;
 import au.com.vaadinutils.crud.GridHeadingPropertySet;
+import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.dao.JpaBaseDao;
+import au.com.vaadinutils.errorHandling.ErrorWindow;
 import au.com.vaadinutils.jasper.scheduler.entities.DateParameterType;
 
 public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<String>
@@ -46,7 +48,7 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 	protected Grid grid;
 	private Long defaultValue = null;
 	JPAContainer<T> container = null;
-	protected VerticalLayout layout;
+	protected VerticalLayout layout = new VerticalLayout();
 	protected String caption;
 	Logger logger = LogManager.getLogger();
 	protected SingularAttribute<T, String> displayField;
@@ -74,108 +76,155 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 		layout.addComponent(comp);
 	}
 
-	void setSelectionMode(SelectionMode mode)
+	void setSelectionMode(final SelectionMode mode)
 	{
-		if (mode == SelectionMode.MULTI)
+		UI ui = UI.getCurrent();
+		if (ui != null)
 		{
-			grid.setSelectionMode(SelectionMode.MULTI);
+			Runnable runner = new Runnable()
+			{
 
-			grid.setSelectionModel(new Grid.MultiSelectionModel());
-		}
-		else if (mode == SelectionMode.SINGLE)
-		{
-			grid.setSelectionMode(SelectionMode.SINGLE);
+				@Override
+				public void run()
+				{
+					if (mode == SelectionMode.MULTI)
+					{
+						grid.setSelectionMode(SelectionMode.MULTI);
 
-			grid.setSelectionModel(new Grid.SingleSelectionModel());
+						grid.setSelectionModel(new Grid.MultiSelectionModel());
+					}
+					else if (mode == SelectionMode.SINGLE)
+					{
+						grid.setSelectionMode(SelectionMode.SINGLE);
 
+						grid.setSelectionModel(new Grid.SingleSelectionModel());
+
+					}
+					else
+					{
+						throw new RuntimeException("SelectionMode none not supported");
+					}
+				}
+			};
+			UI.getCurrent().accessSynchronously(runner);
 		}
 		else
 		{
-			throw new RuntimeException("SelectionMode none not supported");
+			logger.warn("No vaadin session available, not setting up UI");
 		}
 
 	}
 
-	protected void init(String caption, Class<T> tableClass, final SingularAttribute<T, String> displayField)
+	protected void init(final String caption, final Class<T> tableClass,
+			final SingularAttribute<T, String> displayField)
 	{
 		JpaBaseDao.getGenericDao(tableClass).flushCache();
 		container = createContainer(tableClass, displayField);
-		this.displayField = displayField;
-		layout = new VerticalLayout();
-		layout.setSizeFull();
-		this.caption = caption;
 
-		TextField searchText = new TextField();
-		searchText.setInputPrompt("Search");
-		searchText.setWidth("100%");
-		searchText.setImmediate(true);
-		searchText.setHeight("20");
-		searchText.addTextChangeListener(new TextChangeListener()
+		UI ui = UI.getCurrent();
+		if (ui != null)
 		{
-
-			private static final long serialVersionUID = 1315710313315289836L;
-
-			@Override
-			public void textChange(TextChangeEvent event)
+			Runnable runner = new Runnable()
 			{
-				String value = event.getText();
-				removeAllContainerFilters();
-				if (value.length() > 0)
+
+				@Override
+				public void run()
 				{
-					container.addContainerFilter(new SimpleStringFilter(displayField.getName(), value, true, false));
+
+					try (AutoCloseable closer = EntityManagerProvider.setThreadLocalEntityManagerTryWithResources())
+					{
+						ReportParameterTable.this.displayField = displayField;
+						layout.setSizeFull();
+						ReportParameterTable.this.caption = caption;
+
+						TextField searchText = new TextField();
+						searchText.setInputPrompt("Search");
+						searchText.setWidth("100%");
+						searchText.setImmediate(true);
+						searchText.setHeight("20");
+						searchText.addTextChangeListener(new TextChangeListener()
+						{
+
+							private static final long serialVersionUID = 1315710313315289836L;
+
+							@Override
+							public void textChange(TextChangeEvent event)
+							{
+								String value = event.getText();
+								removeAllContainerFilters();
+								if (value.length() > 0)
+								{
+									container.addContainerFilter(
+											new SimpleStringFilter(displayField.getName(), value, true, false));
+								}
+
+							}
+						});
+
+						grid = new Grid();
+						grid.setImmediate(true);
+
+						grid.setSizeFull();
+						// table.setHeight("150");
+
+						grid.setContainerDataSource(container);
+
+						new GridHeadingPropertySet.Builder<T>().createColumn(caption, displayField.getName()).build()
+								.applyToGrid(grid);
+
+						List<SortOrder> orders = new LinkedList<>();
+						orders.add(new SortOrder(displayField.getName(), SortDirection.ASCENDING));
+						grid.setSortOrder(orders);
+
+						final Label selectionCount = new Label("0 selected");
+
+						// removed for concertina
+						// layout.addComponent(new Label(caption));
+						layout.addComponent(searchText);
+						layout.addComponent(grid);
+
+						HorizontalLayout selectionLayout = new HorizontalLayout();
+						selectionLayout.setHeight("30");
+						selectionLayout.setWidth("100%");
+						selectionLayout.addComponent(selectionCount);
+						selectionLayout.setComponentAlignment(selectionCount, Alignment.MIDDLE_RIGHT);
+						layout.addComponent(selectionLayout);
+						grid.addSelectionListener(new SelectionListener()
+						{
+
+							/**
+							 * 
+							 */
+							private static final long serialVersionUID = 1L;
+
+							@Override
+							public void select(SelectionEvent event)
+							{
+								validate();
+
+								selectionCount.setValue("" + event.getSelected().size() + " selected");
+
+							}
+						});
+
+						layout.setExpandRatio(grid, 1);
+						// layout.setComponentAlignment(selectAll,
+						// Alignment.BOTTOM_RIGHT);
+					}
+					catch (Exception e)
+					{
+						ErrorWindow.showErrorWindow(e);
+					}
+
 				}
+			};
+			UI.getCurrent().accessSynchronously(runner);
 
-			}
-		});
-
-		grid = new Grid();
-		grid.setImmediate(true);
-
-		grid.setSizeFull();
-		// table.setHeight("150");
-
-		grid.setContainerDataSource(container);
-
-		new GridHeadingPropertySet.Builder<T>().createColumn(caption, displayField.getName()).build().applyToGrid(grid);
-
-		List<SortOrder> orders = new LinkedList<>();
-		orders.add(new SortOrder(displayField.getName(), SortDirection.ASCENDING));
-		grid.setSortOrder(orders);
-
-		final Label selectionCount = new Label("0 selected");
-
-		// removed for concertina
-		// layout.addComponent(new Label(caption));
-		layout.addComponent(searchText);
-		layout.addComponent(grid);
-
-		HorizontalLayout selectionLayout = new HorizontalLayout();
-		selectionLayout.setHeight("30");
-		selectionLayout.setWidth("100%");
-		selectionLayout.addComponent(selectionCount);
-		selectionLayout.setComponentAlignment(selectionCount, Alignment.MIDDLE_RIGHT);
-		layout.addComponent(selectionLayout);
-		grid.addSelectionListener(new SelectionListener()
+		}
+		else
 		{
-
-			/**
-			 * 
-			 */
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void select(SelectionEvent event)
-			{
-				validate();
-
-				selectionCount.setValue("" + event.getSelected().size() + " selected");
-
-			}
-		});
-
-		layout.setExpandRatio(grid, 1);
-		// layout.setComponentAlignment(selectAll, Alignment.BOTTOM_RIGHT);
-
+			logger.warn("No vaadin session available, not setting up UI");
+		}
 	}
 
 	/**
@@ -208,73 +257,91 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 	@Override
 	public void addSelectionListener(final ValueChangeListener listener)
 	{
-		grid.addSelectionListener(new SelectionListener()
+		UI ui = UI.getCurrent();
+		if (ui != null)
 		{
-
-			/**
-			 * 
-			 */
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void select(SelectionEvent event)
+			Runnable runner = new Runnable()
 			{
 
-				listener.valueChange(new ValueChangeEvent()
+				@Override
+				public void run()
 				{
 
-					/**
-					 * 
-					 */
-					private static final long serialVersionUID = 1L;
-
-					@Override
-					public Property<Collection<Long>> getProperty()
+					grid.addSelectionListener(new SelectionListener()
 					{
-						return new Property<Collection<Long>>()
+
+						/**
+						 * 
+						 */
+						private static final long serialVersionUID = 1L;
+
+						@Override
+						public void select(SelectionEvent event)
 						{
 
-							/**
-							 * 
-							 */
-							private static final long serialVersionUID = 1L;
-
-							@Override
-							public Collection<Long> getValue()
-							{
-								return getSelectedIds();
-							}
-
-							@Override
-							public void setValue(Collection<Long> newValue)
-									throws com.vaadin.data.Property.ReadOnlyException
+							listener.valueChange(new ValueChangeEvent()
 							{
 
-							}
+								/**
+								 * 
+								 */
+								private static final long serialVersionUID = 1L;
 
-							@Override
-							public Class<? extends Collection<Long>> getType()
-							{
-								return null;
-							}
+								@Override
+								public Property<Collection<Long>> getProperty()
+								{
+									return new Property<Collection<Long>>()
+									{
 
-							@Override
-							public boolean isReadOnly()
-							{
-								return false;
-							}
+										/**
+										 * 
+										 */
+										private static final long serialVersionUID = 1L;
 
-							@Override
-							public void setReadOnly(boolean newStatus)
-							{
+										@Override
+										public Collection<Long> getValue()
+										{
+											return getSelectedIds();
+										}
 
-							}
-						};
-					}
-				});
+										@Override
+										public void setValue(Collection<Long> newValue)
+												throws com.vaadin.data.Property.ReadOnlyException
+										{
 
-			}
-		});
+										}
+
+										@Override
+										public Class<? extends Collection<Long>> getType()
+										{
+											return null;
+										}
+
+										@Override
+										public boolean isReadOnly()
+										{
+											return false;
+										}
+
+										@Override
+										public void setReadOnly(boolean newStatus)
+										{
+
+										}
+									};
+								}
+							});
+
+						}
+					});
+				}
+			};
+			UI.getCurrent().accessSynchronously(runner);
+		}
+		else
+		{
+			logger.warn("No vaadin session available, not setting up UI");
+		}
 
 	}
 
@@ -290,12 +357,12 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 
 	public void removeAllContainerFilters()
 	{
-		((Container.Filterable) grid.getContainerDataSource()).removeAllContainerFilters();
+		container.removeAllContainerFilters();
 	}
 
 	public void addContainerFilter(Filter filter)
 	{
-		((Container.Filterable) grid.getContainerDataSource()).addContainerFilter(filter);
+		container.addContainerFilter(filter);
 	}
 
 	@Override
