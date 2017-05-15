@@ -920,6 +920,11 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		}
 	}
 
+	public List<E> getEntities(final int startIndex)
+	{
+		return getGenericDao(entityClass).select().startPosition(startIndex).getResultList();
+	}
+
 	public int getEntityCount()
 	{
 		return getGenericDao(entityClass).select().count().intValue();
