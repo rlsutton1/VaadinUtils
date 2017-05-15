@@ -8,10 +8,12 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<vaadin.version>7.7.8</vaadin.version>
+		<vaadin.version>7.7.9</vaadin.version>
 		<vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
 		<jasperreports.version>6.3.0</jasperreports.version>
 	</properties>
+
+
 
 	<repositories>
 		<repository>
@@ -44,6 +46,9 @@
 		</pluginRepository>
 	</pluginRepositories>
 	<build>
+	
+		
+	
 		<plugins>
 
 			<!-- <plugin> <groupId>org.zeroturnaround</groupId> <artifactId>jrebel-maven-plugin</artifactId> 
@@ -395,7 +400,7 @@
 		<dependency>
 		   <groupId>org.vaadin</groupId>
 		   <artifactId>viritin</artifactId>
-		   <version>1.58</version>
+		   <version>1.61</version>
 		</dependency>
 		<dependency>
 			<groupId>org.vaadin.addons</groupId>
