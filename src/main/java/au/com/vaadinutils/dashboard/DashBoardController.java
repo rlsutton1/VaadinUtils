@@ -1,5 +1,6 @@
 package au.com.vaadinutils.dashboard;
 
+import org.vaadin.alump.gridstack.GridStackCoordinates;
 import org.vaadin.alump.gridstack.GridStackLayoutNoJQuery;
 import org.vaadin.alump.gridstack.GridStackMoveEvent.GridStackMoveListener;
 
@@ -54,6 +55,17 @@ public class DashBoardController
 	{
 		actualDashBoard.removeComponent(basePortal);
 
+	}
+
+	public Integer getCellHeight()
+	{
+		return actualDashBoard.getCellHeight();
+
+	}
+
+	public GridStackCoordinates getCoordinates(Component child)
+	{
+		return actualDashBoard.getCoordinates(child);
 	}
 
 }
