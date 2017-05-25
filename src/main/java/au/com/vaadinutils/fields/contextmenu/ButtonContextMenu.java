@@ -1,8 +1,5 @@
 package au.com.vaadinutils.fields.contextmenu;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.vaadin.event.ContextClickEvent;
 import com.vaadin.event.ContextClickEvent.ContextClickListener;
 import com.vaadin.ui.Button;
@@ -10,8 +7,6 @@ import com.vaadin.ui.Button;
 public class ButtonContextMenu<E> extends EntityContextMenu<E>
 {
 	private static final long serialVersionUID = 1L;
-
-	private List<ContextMenuEvent> eventsList = new ArrayList<>();
 
 	/**
 	 * Assigns this as the context menu of a button.
@@ -42,17 +37,7 @@ public class ButtonContextMenu<E> extends EntityContextMenu<E>
 
 	private void openContext(final int clientX, final int clientY)
 	{
-		for (ContextMenuEvent events : eventsList)
-		{
-			events.preContextMenuOpen();
-		}
-
+		fireEvents();
 		open(clientX, clientY);
 	}
-
-	public void addEvents(final ContextMenuEvent events)
-	{
-		eventsList.add(events);
-	}
-
 }

@@ -1,8 +1,5 @@
 package au.com.vaadinutils.fields.contextmenu;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.vaadin.event.ContextClickEvent;
 import com.vaadin.event.ContextClickEvent.ContextClickListener;
 import com.vaadin.ui.Grid;
@@ -12,7 +9,6 @@ public class GridContextMenu<E> extends EntityContextMenu<E>
 {
 	private static final long serialVersionUID = 1L;
 
-	private List<ContextMenuEvent> eventsList = new ArrayList<>();
 	private Grid grid;
 
 	/**
@@ -88,10 +84,7 @@ public class GridContextMenu<E> extends EntityContextMenu<E>
 			targetEntity = itemId;
 			grid.select(itemId);
 
-			for (ContextMenuEvent events : eventsList)
-			{
-				events.preContextMenuOpen();
-			}
+			fireEvents();
 			open(event.getClientX(), event.getClientY());
 		}
 		catch (IllegalArgumentException e)
@@ -101,10 +94,5 @@ public class GridContextMenu<E> extends EntityContextMenu<E>
 			// menu on old items while the grid is still refreshing with new
 			// items.
 		}
-	}
-
-	public void addEvents(final ContextMenuEvent events)
-	{
-		eventsList.add(events);
 	}
 }

@@ -9,11 +9,11 @@ public class LabelContextMenu extends ContextMenu
 {
 	private static final long serialVersionUID = 1L;
 
-	private List<ContextMenuEvent> eventsList = new ArrayList<ContextMenuEvent>();
+	private List<ContextMenuEvent> events = new ArrayList<>();
 
-	public void addEvents(final ContextMenuEvent events)
+	public void addEvent(final ContextMenuEvent event)
 	{
-		eventsList.add(events);
+		events.add(event);
 	}
 
 }
