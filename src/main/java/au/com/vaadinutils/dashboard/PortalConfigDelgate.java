@@ -1,5 +1,6 @@
 package au.com.vaadinutils.dashboard;
 
+import java.util.Collection;
 import java.util.Map;
 
 import org.vaadin.alump.gridstack.GridStackCoordinates;
@@ -30,5 +31,7 @@ public interface PortalConfigDelgate
 	double getValueDouble(Tblportal tblportal, String string);
 
 	void addResizeListener(PortalResizeListener resizeListener);
+
+	Collection<String> getKeys(Tblportal portal);
 
 }

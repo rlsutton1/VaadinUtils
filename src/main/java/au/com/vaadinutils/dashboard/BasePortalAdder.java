@@ -1,5 +1,6 @@
 package au.com.vaadinutils.dashboard;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -214,6 +215,17 @@ public abstract class BasePortalAdder extends VerticalLayout implements PortalCo
 	public void addCustomHeaderButtons(HorizontalLayout controlLayout)
 	{
 
+	}
+
+	@Override
+	public Collection<String> getKeys(Tblportal portal)
+	{
+		Set<String> keys = new HashSet<>();
+		for (Tblportalconfig config : portal.getConfigs())
+		{
+			keys.add(config.getKey());
+		}
+		return keys;
 	}
 
 }
