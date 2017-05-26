@@ -241,7 +241,17 @@ public class ContainerCSVExport<E>
 
 						if (value instanceof AbstractLayout)
 						{
-							value = "";
+
+							// if you want your generated field to be exported,
+							// set a string using setData() on the layout.
+							if (((AbstractLayout) value).getData() instanceof ContainerCSVExportData)
+							{
+								value = ((AbstractLayout) value).getData().toString();
+							}
+							else
+							{
+								value = "";
+							}
 						}
 					}
 					if (value == null)
