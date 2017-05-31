@@ -22,6 +22,7 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.CellDescriptionGenerator;
@@ -34,7 +35,6 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Table.ColumnGenerator;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.Reindeer;
 import com.vaadin.ui.themes.ValoTheme;
 
 import au.com.vaadinutils.crud.security.SecurityManagerFactoryProxy;
@@ -57,7 +57,19 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 	private String filterString = "";
 	private GridHeadingPropertySet headingPropertySet;
 
-	public SearchableGrid(String uniqueId)
+	private VerticalLayout mainLayout;
+
+	private HorizontalLayout basicSearchLayout;
+
+	/**
+	 * don't forget to call init
+	 */
+	public SearchableGrid()
+	{
+
+	}
+
+	public void init(String uniqueId)
 	{
 		if (!getSecurityManager().canUserView())
 		{
@@ -70,16 +82,39 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 		grid = new Grid(new GeneratedPropertyContainer(container));
 		grid.setSizeFull();
 		searchBar = buildSearchBar();
-		final VerticalLayout layout = new VerticalLayout();
-		layout.setSizeFull();
-		addTitle(layout);
-		layout.addComponent(searchBar);
-		layout.addComponent(grid);
-		layout.setExpandRatio(grid, 1);
-		this.setCompositionRoot(layout);
+		mainLayout = new VerticalLayout();
+		mainLayout.setSizeFull();
+		addTitle(mainLayout);
+		mainLayout.addComponent(searchBar);
+		mainLayout.addComponent(grid);
+		mainLayout.setExpandRatio(grid, 1);
+		this.setCompositionRoot(mainLayout);
 		headingPropertySet = getHeadingPropertySet();
 		headingPropertySet.setDeferLoadSettings(true);
 		headingPropertySet.applyToGrid(grid, uniqueId);
+
+	}
+
+	public void addComponentAsFirst(Component component)
+	{
+		mainLayout.addComponentAsFirst(component);
+
+	}
+
+	public void addComponent(Component component)
+	{
+		mainLayout.addComponent(component);
+	}
+
+	/**
+	 * dont use this constructor, it will hurt you -trust me.
+	 * 
+	 * @param uniqueId
+	 */
+	@Deprecated
+	public SearchableGrid(String uniqueId)
+	{
+		init(uniqueId);
 	}
 
 	private void addTitle(final VerticalLayout layout)
@@ -141,7 +176,7 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 		searchField.setWidth(100, Unit.PERCENTAGE);
 		searchBar = layout;
 
-		final HorizontalLayout basicSearchLayout = new HorizontalLayout();
+		basicSearchLayout = new HorizontalLayout();
 		basicSearchLayout.setWidth(100, Unit.PERCENTAGE);
 		layout.addComponent(basicSearchLayout);
 
@@ -182,11 +217,16 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 		return layout;
 	}
 
+	public void addComponentToBasicSearchBar(Component component)
+	{
+		basicSearchLayout.addComponent(component);
+	}
+
 	private Button createClearButton()
 	{
 
 		final Button clear = new Button("X");
-		clear.setStyleName(Reindeer.BUTTON_SMALL);
+		clear.setStyleName(ValoTheme.BUTTON_SMALL);
 		clear.setImmediate(true);
 		clear.addClickListener(new ClickEventLogged.ClickListener()
 		{
@@ -209,6 +249,8 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 		if (advancedSearchLayout != null)
 		{
 			advancedSearchButton = new Button(getAdvancedCaption());
+			advancedSearchButton.setStyleName(ValoTheme.BUTTON_SMALL);
+			advancedSearchButton.setWidth("85");
 			advancedSearchOn = false;
 
 			advancedSearchButton.setImmediate(true);
@@ -234,7 +276,7 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 					else
 					{
 						advancedSearchButton.setCaption(getBasicCaption());
-						advancedSearchButton.setStyleName(ValoTheme.BUTTON_FRIENDLY);
+						advancedSearchButton.addStyleName(ValoTheme.BUTTON_FRIENDLY);
 					}
 				}
 			});
