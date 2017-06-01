@@ -250,6 +250,7 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 		{
 			advancedSearchButton = new Button(getAdvancedCaption());
 			advancedSearchButton.setStyleName(ValoTheme.BUTTON_SMALL);
+			advancedSearchButton.addStyleName(ValoTheme.BUTTON_FRIENDLY);
 			advancedSearchButton.setWidth("85");
 			advancedSearchOn = false;
 
@@ -271,12 +272,10 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 					if (!advancedSearchOn)
 					{
 						advancedSearchButton.setCaption(getAdvancedCaption());
-						advancedSearchButton.removeStyleName(ValoTheme.BUTTON_FRIENDLY);
 					}
 					else
 					{
 						advancedSearchButton.setCaption(getBasicCaption());
-						advancedSearchButton.addStyleName(ValoTheme.BUTTON_FRIENDLY);
 					}
 				}
 			});
