@@ -368,6 +368,19 @@ public abstract class JpaDslAbstract<E, R>
 			}
 		};
 	}
+	
+	public <J, V> Condition<E> eq(final JoinBuilder<E, J> join, final SetAttribute<J, V> field, final V value)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+				return builder.equal(getJoin(join).get(field), value);
+			}
+		};
+	}
 
 	public <J, V> Condition<E> eq(final ListAttribute<? super E, J> joinAttribute, final JoinType joinType,
 			final SingularAttribute<J, V> field, final V value)
