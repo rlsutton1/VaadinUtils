@@ -40,11 +40,11 @@ public class GridContainerCSVExport<E>
 {
 	PipedOutputStreamWrapper stream = new PipedOutputStreamWrapper();
 	Logger logger = LogManager.getLogger();
-	private GridHeadingPropertySet headingsSet;
+	private GridHeadingPropertySet<E> headingsSet;
 	private Grid grid;
 	private LinkedHashMap<String, Object> extraColumnHeadersAndPropertyIds;
 
-	public GridContainerCSVExport(final String fileName, final Grid grid, final GridHeadingPropertySet headingsSet)
+	public GridContainerCSVExport(final String fileName, final Grid grid, final GridHeadingPropertySet<E> headingsSet)
 	{
 
 		this.grid = grid;
@@ -143,7 +143,7 @@ public class GridContainerCSVExport<E>
 		return downloadButton;
 	}
 
-	public void export(Grid grid, Writer stream, GridHeadingPropertySet headingsSet) throws IOException
+	public void export(Grid grid, Writer stream, GridHeadingPropertySet<E> headingsSet) throws IOException
 	{
 
 		CSVWriter writer = new CSVWriter(stream);
@@ -247,8 +247,7 @@ public class GridContainerCSVExport<E>
 
 	private void writeHeaders(CSVWriter writer, List<String> headers)
 	{
-		writer.writeNext(headers.toArray(new String[]
-		{}));
+		writer.writeNext(headers.toArray(new String[] {}));
 	}
 
 	/**

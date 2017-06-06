@@ -30,6 +30,7 @@ import javax.persistence.metamodel.SingularAttribute;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.persistence.jpa.JpaQuery;
 
 import com.google.common.base.Preconditions;
 
@@ -627,16 +628,32 @@ public abstract class JpaDslAbstract<E, R>
 		return prepareQuery().getSingleResult();
 	}
 
-	public R getSingleResultOrNull()
+	public R getSingleResultOrNull(boolean dump)
 	{
 		limit(1);
-		List<R> resultList = prepareQuery().getResultList();
+		TypedQuery<R> prepareQuery = prepareQuery();
+		List<R> resultList = prepareQuery.getResultList();
+		if (dump)
+		{
+			logger.warn(prepareQuery.unwrap(JpaQuery.class).getDatabaseQuery().getSQLString());
+		}
 		if (resultList.size() == 0)
 		{
 			return null;
 		}
 
 		return resultList.get(0);
+	}
+
+	/**
+	 * there is also a method to dump the query out at warning level see
+	 * getSingleResultOrNull(boolean dump);
+	 * 
+	 * @return the first matching entity;
+	 */
+	public R getSingleResultOrNull()
+	{
+		return getSingleResultOrNull(false);
 	}
 
 	public <V extends Comparable<? super V>> Condition<E> greaterThan(final SingularAttribute<E, V> field,

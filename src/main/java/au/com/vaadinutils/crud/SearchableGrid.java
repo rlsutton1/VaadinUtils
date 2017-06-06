@@ -55,7 +55,7 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 	private Grid grid;
 	private T container;
 	private String filterString = "";
-	private GridHeadingPropertySet headingPropertySet;
+	private GridHeadingPropertySetIfc<E> headingPropertySet;
 
 	private VerticalLayout mainLayout;
 
@@ -69,7 +69,7 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 
 	}
 
-	public void init(String uniqueId)
+	public void init(String uniqueId, Class<E> entityClazz)
 	{
 		if (!getSecurityManager().canUserView())
 		{
@@ -91,7 +91,7 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 		this.setCompositionRoot(mainLayout);
 		headingPropertySet = getHeadingPropertySet();
 		headingPropertySet.setDeferLoadSettings(true);
-		headingPropertySet.applyToGrid(grid, uniqueId);
+		headingPropertySet.applyToGrid(entityClazz, grid, uniqueId);
 
 	}
 
@@ -112,9 +112,9 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 	 * @param uniqueId
 	 */
 	@Deprecated
-	public SearchableGrid(String uniqueId)
+	public SearchableGrid(String uniqueId, Class<E> entityClazz)
 	{
-		init(uniqueId);
+		init(uniqueId, entityClazz);
 	}
 
 	private void addTitle(final VerticalLayout layout)
@@ -139,7 +139,7 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 		}
 	}
 
-	abstract public GridHeadingPropertySet getHeadingPropertySet();
+	abstract public GridHeadingPropertySetIfc<E> getHeadingPropertySet();
 
 	abstract public T getContainer();
 

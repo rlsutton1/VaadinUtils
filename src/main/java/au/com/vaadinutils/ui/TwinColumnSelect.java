@@ -131,7 +131,7 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 
 	}
 
-	protected GridHeadingPropertySet createSelectedHeadings()
+	protected GridHeadingPropertySet<C> createSelectedHeadings()
 	{
 		return new GridHeadingPropertySet.Builder<C>()
 				.addColumn(selectedColumnHeader, itemCaptionProperty.getName(), true, true).build();
@@ -149,22 +149,23 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 		return selectedBeans;
 	}
 
-	protected GridHeadingPropertySet createAvailableHeadings()
+	protected GridHeadingPropertySet<C> createAvailableHeadings()
 	{
 		return new GridHeadingPropertySet.Builder<C>()
 				.addColumn(availableColumnHeader, itemCaptionProperty.getName(), true, true).build();
 	}
 
+	@SuppressWarnings("deprecation")
 	protected void createAvailableGrid()
 	{
 		createAvailableContainer();
 		// TODO: Add proper uniqueId
-		availableGrid = new SearchableGrid<C, JPAContainer<C>>(this.getClass().getSimpleName())
+		availableGrid = new SearchableGrid<C, JPAContainer<C>>(this.getClass().getSimpleName(), itemClass)
 		{
 			private static final long serialVersionUID = 1L;
 
 			@Override
-			public GridHeadingPropertySet getHeadingPropertySet()
+			public GridHeadingPropertySet<C> getHeadingPropertySet()
 			{
 				return createAvailableHeadings();
 			}
@@ -349,16 +350,12 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 
 	public void sortAvailableContainer()
 	{
-		availableContainer.sort(new Object[]
-		{ itemCaptionProperty.getName() }, new boolean[]
-		{ sortAscending });
+		availableContainer.sort(new Object[] { itemCaptionProperty.getName() }, new boolean[] { sortAscending });
 	}
 
 	public void sortSelectedBeans()
 	{
-		selectedBeans.sort(new Object[]
-		{ itemCaptionProperty.getName() }, new boolean[]
-		{ sortAscending });
+		selectedBeans.sort(new Object[] { itemCaptionProperty.getName() }, new boolean[] { sortAscending });
 	}
 
 	public interface ValueChangeListener<C>

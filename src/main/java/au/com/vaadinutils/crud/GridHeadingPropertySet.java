@@ -37,7 +37,7 @@ import au.com.vaadinutils.dao.Path;
 import au.com.vaadinutils.user.UserSettingsStorageFactory;
 import de.datenhahn.vaadin.componentrenderer.ComponentRenderer;
 
-public class GridHeadingPropertySet
+public class GridHeadingPropertySet<E> implements GridHeadingPropertySetIfc<E>
 {
 	private Logger logger = LogManager.getLogger();
 	private List<GridHeadingToPropertyId> cols = new LinkedList<>();
@@ -66,7 +66,7 @@ public class GridHeadingPropertySet
 
 		public <T> AddingColumn<E> createColumn(String heading, SingularAttribute<E, T> headingPropertyId);
 
-		public GridHeadingPropertySet build();
+		public GridHeadingPropertySet<E> build();
 	}
 
 	public interface AddingColumn<E>
@@ -82,7 +82,7 @@ public class GridHeadingPropertySet
 
 		public AddingColumn<E> setRenderer(AbstractRenderer<?> renderer);
 
-		public GridHeadingPropertySet build();
+		public GridHeadingPropertySet<E> build();
 
 		public AddingColumn<E> setConverter(Converter<String, ?> converter);
 
@@ -98,10 +98,10 @@ public class GridHeadingPropertySet
 		private boolean dynamicColumnWidth = false;
 
 		@Override
-		public GridHeadingPropertySet build()
+		public GridHeadingPropertySet<E> build()
 		{
 			addColumn();
-			final GridHeadingPropertySet propertySet = new GridHeadingPropertySet(this.cols);
+			final GridHeadingPropertySet<E> propertySet = new GridHeadingPropertySet<>(this.cols);
 			propertySet.eraseSavedConfig = eraseSavedConfig;
 			propertySet.dynamicColumnWidth = dynamicColumnWidth;
 
@@ -490,6 +490,7 @@ public class GridHeadingPropertySet
 	 *            - an id for this layout/grid combination, it is used to
 	 *            identify stored column widths in a key value map
 	 */
+
 	public void applyToGrid(final Grid grid, final String uniqueId)
 	{
 		this.grid = grid;
@@ -612,11 +613,13 @@ public class GridHeadingPropertySet
 		return (GeneratedPropertyContainer) gridContainer;
 	}
 
+	@Override
 	public void setDeferLoadSettings(final boolean deferLoadSettings)
 	{
 		this.deferLoadSettings = deferLoadSettings;
 	}
 
+	@Override
 	public void applySettingsToColumns()
 	{
 		Preconditions.checkState(grid != null, "You must call applytoGrid first");
@@ -862,5 +865,11 @@ public class GridHeadingPropertySet
 	public String toString()
 	{
 		return Arrays.toString(cols.toArray());
+	}
+
+	@Override
+	public void applyToGrid(Class<E> entityClazz, Grid grid, String uniqueId)
+	{
+		applyToGrid(grid, uniqueId);
 	}
 }
