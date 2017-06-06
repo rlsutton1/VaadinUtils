@@ -37,6 +37,9 @@ public class ButtonContextMenu<E> extends EntityContextMenu<E>
 
 	private void openContext(final int clientX, final int clientY)
 	{
+		// Make sure we have an up to date copy of the entity from the db
+		targetEntity = loadEntity(targetEntity);
+
 		fireEvents();
 		open(clientX, clientY);
 	}

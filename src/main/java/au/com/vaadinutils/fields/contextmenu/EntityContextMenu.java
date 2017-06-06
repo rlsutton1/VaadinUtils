@@ -5,6 +5,9 @@ import java.util.List;
 
 import org.vaadin.peter.contextmenu.ContextMenu;
 
+import au.com.vaadinutils.crud.CrudEntity;
+import au.com.vaadinutils.dao.JpaBaseDao;
+
 public abstract class EntityContextMenu<E> extends ContextMenu
 {
 	private static final long serialVersionUID = 1L;
@@ -15,6 +18,27 @@ public abstract class EntityContextMenu<E> extends ContextMenu
 	public E getTargetEntity()
 	{
 		return targetEntity;
+	}
+
+	/**
+	 * Loads the entity from the db (or cache) if possible to ensure that an up
+	 * to date copy is used
+	 *
+	 * @param item
+	 *            the item
+	 * @return the e
+	 */
+	@SuppressWarnings("unchecked")
+	protected E loadEntity(final E item)
+	{
+		if (item instanceof CrudEntity)
+		{
+			return (E) JpaBaseDao.getGenericDao(item.getClass()).findById(((CrudEntity) item).getId());
+		}
+		else
+		{
+			return item;
+		}
 	}
 
 	protected void fireEvents()
