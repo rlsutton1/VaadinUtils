@@ -204,6 +204,21 @@ public abstract class JpaDslAbstract<E, R>
 			}
 		};
 	}
+	
+	public <V extends Comparable<? super V>> Condition<E> between(final JoinBuilder<E, ? super V> joinBuilder,
+			final SingularAttribute<? super V, Long> field, final Long start, final Long end)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@SuppressWarnings({ "unchecked", "rawtypes" })
+			@Override
+			public Predicate getPredicates()
+			{
+				return builder.between(getJoin(joinBuilder).get((SingularAttribute) field), start, end);
+			}
+		};
+	}
 
 	public <J, V extends Comparable<? super V>> Condition<E> between(final SingularAttribute<? super E, V> field,
 			final V start, final V end)
@@ -811,6 +826,20 @@ public abstract class JpaDslAbstract<E, R>
 	}
 
 	public <V, K> Condition<E> in(final JoinBuilder<E, V> join, final SingularAttribute<V, K> attribute,
+			final Collection<K> values)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+				return getJoin(join).get(attribute).in(values);
+			}
+		};
+	}
+	
+	public <V, K> Condition<E> in(final JoinBuilder<E, V> join, final ListAttribute<V, K> attribute,
 			final Collection<K> values)
 	{
 		return new AbstractCondition<E>()
