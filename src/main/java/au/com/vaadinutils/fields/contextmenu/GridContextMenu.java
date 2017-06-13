@@ -5,9 +5,6 @@ import com.vaadin.event.ContextClickEvent.ContextClickListener;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.GridContextClickEvent;
 
-import au.com.vaadinutils.crud.CrudEntity;
-import au.com.vaadinutils.dao.JpaBaseDao;
-
 public class GridContextMenu<E> extends EntityContextMenu<E>
 {
 	private static final long serialVersionUID = 1L;
@@ -97,19 +94,6 @@ public class GridContextMenu<E> extends EntityContextMenu<E>
 			// exist in the grid. This can happen when trying to open a context
 			// menu on old items while the grid is still refreshing with new
 			// items.
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	protected E loadEntity(final E item)
-	{
-		if (item instanceof CrudEntity)
-		{
-			return (E) JpaBaseDao.getGenericDao(item.getClass()).findById(((CrudEntity) item).getId());
-		}
-		else
-		{
-			return item;
 		}
 	}
 }
