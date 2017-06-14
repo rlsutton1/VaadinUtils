@@ -364,7 +364,7 @@ public abstract class JpaDslAbstract<E, R>
 		};
 	}
 
-	public<K> Condition<E> eq(final Expression<K> expression, final K value)
+	public <K> Condition<E> eq(final Expression<K> expression, final K value)
 	{
 		return new AbstractCondition<E>()
 		{
@@ -373,6 +373,19 @@ public abstract class JpaDslAbstract<E, R>
 			public Predicate getPredicates()
 			{
 				return builder.equal(expression, value);
+			}
+		};
+	}
+
+	public <K> Condition<E> notEqual(final Expression<K> expression, final int value)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+				return builder.notEqual(expression, value);
 			}
 		};
 	}
