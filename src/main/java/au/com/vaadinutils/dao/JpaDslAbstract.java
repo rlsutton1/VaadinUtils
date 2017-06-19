@@ -204,7 +204,7 @@ public abstract class JpaDslAbstract<E, R>
 			}
 		};
 	}
-	
+
 	public <V extends Comparable<? super V>> Condition<E> between(final JoinBuilder<E, ? super V> joinBuilder,
 			final SingularAttribute<? super V, Long> field, final Long start, final Long end)
 	{
@@ -330,6 +330,11 @@ public abstract class JpaDslAbstract<E, R>
 		return builder.quot(path1, number);
 	}
 
+	public Expression<Integer> mod(final Expression<Integer> path1, int i)
+	{
+		return builder.mod(path1, i);
+	}
+
 	public Expression<?> toInteger(Expression<Number> expression)
 	{
 		return builder.toInteger(expression);
@@ -359,6 +364,32 @@ public abstract class JpaDslAbstract<E, R>
 		};
 	}
 
+	public <K> Condition<E> eq(final Expression<K> expression, final K value)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+				return builder.equal(expression, value);
+			}
+		};
+	}
+
+	public <K> Condition<E> notEqual(final Expression<K> expression, final int value)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+				return builder.notEqual(expression, value);
+			}
+		};
+	}
+
 	public <J, V> Condition<E> eq(final JoinBuilder<E, J> join, final SingularAttribute<J, V> field, final V value)
 	{
 		return new AbstractCondition<E>()
@@ -384,7 +415,7 @@ public abstract class JpaDslAbstract<E, R>
 			}
 		};
 	}
-	
+
 	public <J, V> Condition<E> eq(final JoinBuilder<E, J> join, final SetAttribute<J, V> field, final V value)
 	{
 		return new AbstractCondition<E>()
@@ -838,7 +869,7 @@ public abstract class JpaDslAbstract<E, R>
 			}
 		};
 	}
-	
+
 	public <V, K> Condition<E> in(final JoinBuilder<E, V> join, final ListAttribute<V, K> attribute,
 			final Collection<K> values)
 	{
