@@ -1,84 +1,30 @@
 package au.com.vaadinutils.fields;
 
-import com.vaadin.addon.jpacontainer.EntityItemProperty;
-import com.vaadin.data.Property.ValueChangeListener;
-import com.vaadin.server.Resource;
+import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickListener;
-import com.vaadin.ui.CustomComponent;
-import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.TextField;
 
 @SuppressWarnings("serial")
-public class TextFieldWithButton extends CustomComponent
+public class TextFieldWithButton extends FieldWithButton<String>
 {
-	private TextField textField;
-	private Button button;
-
-	public TextFieldWithButton(String caption)
+	public TextFieldWithButton(final String caption)
 	{
-		final HorizontalLayout layout = new HorizontalLayout();
-		layout.setSizeFull();
-		layout.setSpacing(true);
-		textField = new TextField();
-		textField.setSizeFull();
-		layout.addComponent(textField);
-		layout.setExpandRatio(textField, 1);
-		button = new Button();
-		layout.addComponent(button);
-
-		setCompositionRoot(layout);
-		setCaption(caption);
+		super(caption, null);
 	}
 
-	public void setPropertyDataSource(EntityItemProperty newDataSource)
+	public TextFieldWithButton(final String caption, final Button button)
 	{
-		textField.setPropertyDataSource(newDataSource);
+		super(caption, button);
+	}
+
+	@Override
+	protected AbstractField<String> createField()
+	{
+		return new TextField();
 	}
 
 	public void setNullRepresentation(String nullRepresentation)
 	{
-		textField.setNullRepresentation(nullRepresentation);
+		((TextField) field).setNullRepresentation(nullRepresentation);
 	}
-
-	public void setButtonCaption(String caption)
-	{
-		button.setCaption(caption);
-	}
-
-	public void setButtonIcon(Resource icon)
-	{
-		button.setIcon(icon);
-	}
-
-	public String getValue()
-	{
-		return textField.getValue();
-	}
-
-	public void addButtonClickListener(ClickListener listener)
-	{
-		button.addClickListener(listener);
-	}
-
-	public void addTextFieldValueChangeListener(ValueChangeListener listener)
-	{
-		textField.addValueChangeListener(listener);
-	}
-
-	public void setButtonDescription(String description)
-	{
-		button.setDescription(description);
-	}
-
-	public void setReadOnly(boolean readOnly)
-	{
-		textField.setReadOnly(readOnly);
-	}
-
-	public void setButtonEnabled(boolean enabled)
-	{
-		button.setEnabled(enabled);
-	}
-
 }
