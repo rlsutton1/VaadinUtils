@@ -34,7 +34,7 @@ public class UniqueFieldValidator<E extends CrudEntity, F> implements Validator
 	 * @param matchField
 	 * @param crud
 	 */
-	public UniqueFieldValidator(SingularAttribute<E, F> matchField, BaseCrudView<E> crud)
+	public UniqueFieldValidator(SingularAttribute<? super E, F> matchField, BaseCrudView<E> crud)
 	{
 		this(matchField, crud, "'" + matchField.getName() + "' must be unique");
 	}
@@ -47,10 +47,11 @@ public class UniqueFieldValidator<E extends CrudEntity, F> implements Validator
 	 * @param crud
 	 * @param warningMessage
 	 */
-	public UniqueFieldValidator(SingularAttribute<E, F> matchField, BaseCrudView<E> crud, String warningMessage)
+	@SuppressWarnings("unchecked")
+	public UniqueFieldValidator(SingularAttribute<? super E, F> matchField, BaseCrudView<E> crud, String warningMessage)
 	{
-		this.table = matchField.getDeclaringType().getJavaType();
-		this.matchField = matchField;
+		this.table = (Class<E>) matchField.getDeclaringType().getJavaType();
+		this.matchField = (SingularAttribute<E, F>) matchField;
 		this.crud = crud;
 		this.warningMessage = warningMessage;
 
