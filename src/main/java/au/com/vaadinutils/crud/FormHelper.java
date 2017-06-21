@@ -415,6 +415,8 @@ public class FormHelper<E> implements Serializable
 		field.setNullSelectionAllowed(false);
 		field.setTextInputAllowed(true);
 		field.setWidth(STANDARD_COMBO_WIDTH);
+		field.setPopupWidth("100%");
+
 		field.setImmediate(true);
 		field.setId(fieldLabel.replace(" ", ""));
 		addValueChangeListeners(field);
@@ -489,6 +491,7 @@ public class FormHelper<E> implements Serializable
 		field.setNullSelectionAllowed(false);
 		field.setTextInputAllowed(true);
 		field.setWidth(STANDARD_COMBO_WIDTH);
+		field.setPopupWidth("100%");
 		field.setImmediate(true);
 		form.addComponent(field);
 		addValueChangeListeners(field);
@@ -504,6 +507,7 @@ public class FormHelper<E> implements Serializable
 		field.setNullSelectionAllowed(false);
 		field.setTextInputAllowed(true);
 		field.setWidth(STANDARD_COMBO_WIDTH);
+		field.setPopupWidth("100%");
 		field.setImmediate(true);
 		form.addComponent(field);
 		addValueChangeListeners(field);
@@ -727,6 +731,7 @@ public class FormHelper<E> implements Serializable
 			component.setNullSelectionAllowed(false);
 			component.setTextInputAllowed(true);
 			component.setWidth(STANDARD_COMBO_WIDTH);
+			component.setPopupWidth("100%");
 			component.setImmediate(true);
 			addValueChangeListeners(component);
 			if (group != null)
