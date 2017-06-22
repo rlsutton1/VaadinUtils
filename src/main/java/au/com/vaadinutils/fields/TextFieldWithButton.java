@@ -23,8 +23,13 @@ public class TextFieldWithButton extends FieldWithButton<String>
 		return new TextField();
 	}
 
-	public void setNullRepresentation(String nullRepresentation)
+	public void setNullRepresentation(final String nullRepresentation)
 	{
 		((TextField) field).setNullRepresentation(nullRepresentation);
+	}
+
+	public void setNullSettingAllowed(final boolean nullSettingAllowed)
+	{
+		((TextField) field).setNullSettingAllowed(nullSettingAllowed);
 	}
 }

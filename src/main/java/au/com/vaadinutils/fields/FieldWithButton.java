@@ -2,6 +2,7 @@ package au.com.vaadinutils.fields;
 
 import com.vaadin.addon.jpacontainer.EntityItemProperty;
 import com.vaadin.data.Property.ValueChangeListener;
+import com.vaadin.data.Validator;
 import com.vaadin.server.Resource;
 import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.Button;
@@ -38,7 +39,7 @@ public abstract class FieldWithButton<T> extends CustomComponent
 		field.setSizeFull();
 		layout.addComponent(field);
 		layout.setExpandRatio(field, 1);
-		layout.addComponent(button);
+		layout.addComponent(this.button);
 
 		setCompositionRoot(layout);
 		setCaption(caption);
@@ -100,5 +101,15 @@ public abstract class FieldWithButton<T> extends CustomComponent
 	public Button getButton()
 	{
 		return button;
+	}
+
+	public AbstractField<T> getField()
+	{
+		return field;
+	}
+
+	public void addValidator(final Validator validator)
+	{
+		field.addValidator(validator);
 	}
 }
