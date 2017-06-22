@@ -29,8 +29,6 @@ import com.vaadin.ui.Grid.ColumnVisibilityChangeListener;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
-import com.vaadin.ui.Table.ColumnCollapseEvent;
-import com.vaadin.ui.Table.ColumnCollapseListener;
 import com.vaadin.ui.Table.ColumnResizeEvent;
 import com.vaadin.ui.Table.ColumnResizeListener;
 import com.vaadin.ui.VerticalLayout;
@@ -157,21 +155,6 @@ public abstract class BasePortal extends VerticalLayout implements Portal
 				final String property = (String) event.getPropertyId();
 				final int width = event.getCurrentWidth();
 				getConfigDelegate().setValue(portal, baseKey + property, width);
-			}
-		});
-
-		table.addColumnCollapseListener(new ColumnCollapseListener()
-		{
-
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void columnCollapseStateChange(ColumnCollapseEvent event)
-			{
-				final Tblportal portal = getPortal();
-				final String property = (String) event.getPropertyId();
-				final boolean isVisible = !table.isColumnCollapsed(property);
-
 			}
 		});
 
@@ -354,8 +337,6 @@ public abstract class BasePortal extends VerticalLayout implements Portal
 			{
 				final Column column = event.getColumn();
 				final boolean isVisible = !column.isHidden();
-				final Tblportal portal = getPortal();
-				final String property = (String) column.getPropertyId();
 
 				int value = 0;
 				if (isVisible)

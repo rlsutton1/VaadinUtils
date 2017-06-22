@@ -353,8 +353,8 @@ public abstract class DashBoardView extends VerticalLayout implements View
 						return true;
 					}
 				};
-				InputFormDialog dialog = new InputFormDialog(UI.getCurrent(),
-						"Rename " + portalLayout.getName() + " to:", primaryFocusField, form, recipient);
+				new InputFormDialog(UI.getCurrent(), "Rename " + portalLayout.getName() + " to:", primaryFocusField,
+						form, recipient);
 
 			}
 		});

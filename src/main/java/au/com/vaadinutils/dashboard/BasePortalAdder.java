@@ -124,7 +124,6 @@ public abstract class BasePortalAdder extends VerticalLayout implements PortalCo
 	public void deleteValuesLike(Tblportal portal, String baseKey)
 	{
 		Set<Tblportalconfig> removeList = new HashSet<>();
-		Map<String, Integer> values = new HashMap<>();
 		for (Tblportalconfig config : portal.getConfigs())
 		{
 			if (config.getKey().startsWith(baseKey))
