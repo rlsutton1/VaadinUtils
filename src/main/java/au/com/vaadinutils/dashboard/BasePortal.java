@@ -129,7 +129,10 @@ public abstract class BasePortal extends VerticalLayout implements Portal
 	public void savePosition(GridStackMoveEvent event)
 	{
 		Tblportal portal = JpaBaseDao.getGenericDao(Tblportal.class).findOneByAttribute(Tblportal_.guid, guid);
-		configDelegate.savePosition(portal, event.getNew());
+		if (portal != null)
+		{
+			configDelegate.savePosition(portal, event.getNew());
+		}
 	}
 
 	protected TableColumnManager configureSaveColumnWidths(final Table table, String tableId)
