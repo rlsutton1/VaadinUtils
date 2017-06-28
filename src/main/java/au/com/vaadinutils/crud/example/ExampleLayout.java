@@ -1,5 +1,12 @@
 package au.com.vaadinutils.crud.example;
 
+import com.vaadin.addon.jpacontainer.JPAContainer;
+import com.vaadin.data.Container.Filter;
+import com.vaadin.data.util.filter.Or;
+import com.vaadin.data.util.filter.SimpleStringFilter;
+import com.vaadin.ui.AbstractLayout;
+import com.vaadin.ui.VerticalLayout;
+
 import au.com.vaadinutils.crud.BaseCrudView;
 import au.com.vaadinutils.crud.HeadingPropertySet;
 import au.com.vaadinutils.crud.MultiColumnFormLayout;
@@ -7,13 +14,6 @@ import au.com.vaadinutils.crud.ValidatingFieldGroup;
 import au.com.vaadinutils.crud.example.entities.TblExample;
 import au.com.vaadinutils.dao.BatchingPerRequestEntityProvider;
 import au.com.vaadinutils.layout.TopVerticalLayout;
-
-import com.vaadin.addon.jpacontainer.JPAContainer;
-import com.vaadin.data.Container.Filter;
-import com.vaadin.data.util.filter.Or;
-import com.vaadin.data.util.filter.SimpleStringFilter;
-import com.vaadin.ui.AbstractLayout;
-import com.vaadin.ui.VerticalLayout;
 
 /** A start view for navigating to the main view */
 public class ExampleLayout extends BaseCrudView<TblExample>

@@ -12,7 +12,7 @@ import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailScheduleEntity;
 
 public enum JasperReportScheudulerService implements ReportEmailScheduleProvider
 {
-	// Logger logger = LogManager.getLogger();
+	// Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 	SELF;
 
 	private Scheduler scheduler;

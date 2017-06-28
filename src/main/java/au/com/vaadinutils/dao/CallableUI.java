@@ -2,7 +2,6 @@ package au.com.vaadinutils.dao;
 
 import java.util.concurrent.Callable;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.vaadin.ui.UI;
@@ -20,7 +19,7 @@ public abstract class CallableUI<T> implements Callable<T>
 {
 
 	final private UI ui;
-	Logger logger = LogManager.getLogger();
+	Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 
 	public CallableUI(UI ui)
 	{

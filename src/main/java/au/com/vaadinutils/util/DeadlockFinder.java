@@ -4,8 +4,9 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import org.apache.logging.log4j.LogManager;
 
 /**
  * This class implements a daemon thread which periodically checks to see if

@@ -10,7 +10,6 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Set;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.vaadin.data.Property;
@@ -623,7 +622,7 @@ public class TimePicker extends HorizontalLayout implements Field<Date>
 		return isBuffered;
 	}
 
-	Logger logger = LogManager.getLogger();
+	Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 
 	@Override
 	public boolean isModified()

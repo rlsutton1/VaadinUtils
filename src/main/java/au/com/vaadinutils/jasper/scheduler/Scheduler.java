@@ -10,7 +10,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.joda.time.DateTime;
 
@@ -26,7 +25,7 @@ public class Scheduler implements Runnable
 {
 	public static final String REPORT_SUCCESSFULLY_RUN = "Report successfully run";
 
-	Logger logger = LogManager.getLogger();
+	Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 
 	final private ReportEmailScheduleProvider scheduleProvider;
 	final private ScheduledExecutorService schedulerpool = Executors.newScheduledThreadPool(1);

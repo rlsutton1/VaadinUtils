@@ -23,7 +23,6 @@ import java.util.concurrent.TimeUnit;
 import javax.activation.DataSource;
 import javax.mail.util.ByteArrayDataSource;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.google.common.base.Preconditions;
@@ -31,6 +30,8 @@ import com.vaadin.server.Page;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.server.WrappedSession;
 import com.vaadin.ui.UI;
+
+import org.apache.logging.log4j.LogManager;
 
 import au.com.vaadinutils.jasper.parameter.ReportChooser;
 import au.com.vaadinutils.jasper.parameter.ReportParameter;

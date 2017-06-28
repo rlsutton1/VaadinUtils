@@ -1,13 +1,12 @@
 package au.com.vaadinutils.js;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class JSCallWithErrorLogging
 {
-	// Logger logger = LogManager.getLogger();
+	// Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 
-	Logger logger = LogManager.getLogger();
+	Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 
 	/**
 	 * 

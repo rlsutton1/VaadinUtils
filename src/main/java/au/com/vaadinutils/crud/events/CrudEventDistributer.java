@@ -13,7 +13,7 @@ import au.com.vaadinutils.listener.ListenerManagerFactory;
 public enum CrudEventDistributer
 {
 	SELF;
-	// Logger logger = LogManager.getLogger();
+	// Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 
 	Map<Class<? extends BaseCrudView<?>>, ListenerManager<CrudEventListener>> listeners = new ConcurrentHashMap<>();
 

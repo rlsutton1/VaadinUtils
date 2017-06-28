@@ -2,7 +2,6 @@ package au.com.vaadinutils.editors;
 
 import java.util.Iterator;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.vaadin.data.Validator.InvalidValueException;
@@ -28,7 +27,7 @@ import au.com.vaadinutils.errorHandling.ErrorWindow;
 public class InputFormDialog extends Window
 {
 
-	Logger logger = LogManager.getLogger();
+	Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 	private HorizontalLayout buttons;
 	private Button cancelButton;
 	private Button ok;

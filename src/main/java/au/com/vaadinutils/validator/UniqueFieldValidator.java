@@ -4,10 +4,11 @@ import java.util.List;
 
 import javax.persistence.metamodel.SingularAttribute;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.vaadin.data.Validator;
+
+import org.apache.logging.log4j.LogManager;
 
 import au.com.vaadinutils.crud.BaseCrudView;
 import au.com.vaadinutils.crud.ChildCrudEntity;

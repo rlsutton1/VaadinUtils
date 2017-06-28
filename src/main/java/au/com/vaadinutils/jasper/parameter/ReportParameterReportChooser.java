@@ -1,14 +1,13 @@
 package au.com.vaadinutils.jasper.parameter;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.Component;
 
 import au.com.vaadinutils.crud.FormHelper;
 import au.com.vaadinutils.jasper.scheduler.entities.DateParameterType;
 import au.com.vaadinutils.jasper.ui.JasperReportProperties;
-
-import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.Component;
 
 public class ReportParameterReportChooser<T extends Enum<T> & ReportChooser> extends ReportParameter<Enum<T>> implements
 		ReportChooser
@@ -16,7 +15,7 @@ public class ReportParameterReportChooser<T extends Enum<T> & ReportChooser> ext
 
 	private ComboBox field;
 	private Class<T> enumClass;
-	Logger logger = LogManager.getLogger();
+	Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 
 	/**
 	 * 

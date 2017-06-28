@@ -7,7 +7,6 @@ import java.util.Iterator;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.vaadin.server.Constants;
@@ -22,7 +21,7 @@ public class PartialDownloadStream extends DownloadStream
 
 	private long contentLength;
 
-	Logger logger = LogManager.getLogger();
+	Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 
 	public PartialDownloadStream(InputStream stream, String contentType, String fileName)
 	{

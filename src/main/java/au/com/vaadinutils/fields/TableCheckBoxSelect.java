@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.vaadin.data.Property;
@@ -32,7 +31,7 @@ public class TableCheckBoxSelect extends Table
 	private Set<ValueChangeListener> valueChangeListeners = new HashSet<ValueChangeListener>();
 	protected int containerSize = 0;
 
-	Logger logger = LogManager.getLogger();
+	Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 
 	public TableCheckBoxSelect()
 	{

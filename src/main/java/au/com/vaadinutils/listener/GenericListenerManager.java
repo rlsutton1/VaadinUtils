@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 class GenericListenerManager<K> implements ListenerManager<K>
@@ -29,7 +28,7 @@ class GenericListenerManager<K> implements ListenerManager<K>
 
 	private long maxSize;
 	private long highWaterMark = 0;
-	Logger logger = LogManager.getLogger();
+	Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 	private String name;
 
 	public GenericListenerManager(String name, long maxSize)

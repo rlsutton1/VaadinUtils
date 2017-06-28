@@ -28,7 +28,6 @@ import javax.persistence.metamodel.ListAttribute;
 import javax.persistence.metamodel.SetAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.persistence.jpa.JpaQuery;
 
@@ -49,7 +48,7 @@ import au.com.vaadinutils.dao.JpaBaseDao.Condition;
 public abstract class JpaDslAbstract<E, R>
 {
 
-	Logger logger = LogManager.getLogger();
+	Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 
 	public abstract class AbstractCondition<Z> implements Condition<Z>
 	{

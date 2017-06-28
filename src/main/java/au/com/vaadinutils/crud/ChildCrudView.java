@@ -8,7 +8,6 @@ import javax.persistence.PersistenceException;
 import javax.persistence.metamodel.SingularAttribute;
 import javax.validation.ConstraintViolationException;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.google.common.base.Preconditions;
@@ -31,6 +30,8 @@ import com.vaadin.data.util.filter.UnsupportedFilterException;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
+
+import org.apache.logging.log4j.LogManager;
 
 import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.dao.JpaBaseDao;

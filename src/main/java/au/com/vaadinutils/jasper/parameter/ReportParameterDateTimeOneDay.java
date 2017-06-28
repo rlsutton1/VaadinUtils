@@ -4,7 +4,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.joda.time.DateTime;
 
@@ -17,7 +16,7 @@ import com.vaadin.ui.VerticalLayout;
 public class ReportParameterDateTimeOneDay extends ReportParameterDateTimeRange
 {
 
-	Logger logger = LogManager.getLogger();
+	Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 
 	public ReportParameterDateTimeOneDay(String caption, String startParameterName, String endParameterName)
 	{

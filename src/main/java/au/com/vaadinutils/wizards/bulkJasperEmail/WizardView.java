@@ -5,17 +5,12 @@ import java.util.List;
 
 import javax.persistence.metamodel.SingularAttribute;
 
-import net.sf.jasperreports.engine.JRException;
-
 import org.vaadin.teemu.wizards.Wizard;
 import org.vaadin.teemu.wizards.event.WizardCancelledEvent;
 import org.vaadin.teemu.wizards.event.WizardCompletedEvent;
 import org.vaadin.teemu.wizards.event.WizardProgressListener;
 import org.vaadin.teemu.wizards.event.WizardStepActivationEvent;
 import org.vaadin.teemu.wizards.event.WizardStepSetChangedEvent;
-
-import au.com.vaadinutils.crud.CrudEntity;
-import au.com.vaadinutils.crud.HeadingPropertySet;
 
 import com.vaadin.addon.jpacontainer.EntityContainer;
 import com.vaadin.addon.jpacontainer.JPAContainer;
@@ -25,6 +20,10 @@ import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.VerticalLayout;
+
+import au.com.vaadinutils.crud.CrudEntity;
+import au.com.vaadinutils.crud.HeadingPropertySet;
+import net.sf.jasperreports.engine.JRException;
 
 abstract public class WizardView<Parent extends CrudEntity, Child extends CrudEntity, R extends Recipient> extends VerticalLayout implements WizardProgressListener
 {

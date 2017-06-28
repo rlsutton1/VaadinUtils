@@ -12,7 +12,7 @@ public class JasperReportPopUp extends Window
 	public static final String NAME = "ReportView";
 	private static final long serialVersionUID = 1L;
 
-	// static private final transient Logger logger = LogManager.getLogger();
+	// static private final transient Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 
 	final JasperReportLayout report;
 

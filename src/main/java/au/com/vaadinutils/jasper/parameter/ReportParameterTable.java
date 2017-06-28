@@ -6,7 +6,6 @@ import java.util.List;
 
 import javax.persistence.metamodel.SingularAttribute;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.vaadin.addon.jpacontainer.JPAContainer;
@@ -50,7 +49,7 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 	JPAContainer<T> container = null;
 	protected VerticalLayout layout = new VerticalLayout();
 	protected String caption;
-	Logger logger = LogManager.getLogger();
+	Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 	protected SingularAttribute<T, String> displayField;
 
 	public ReportParameterTable(String caption, String parameterName, Class<T> tableClass,

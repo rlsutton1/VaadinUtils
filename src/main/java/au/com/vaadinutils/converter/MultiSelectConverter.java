@@ -26,10 +26,7 @@ import java.util.Set;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import au.com.vaadinutils.crud.CrudEntity;
 
 import com.google.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.EntityItem;
@@ -42,6 +39,8 @@ import com.vaadin.data.util.TransactionalPropertyWrapper;
 import com.vaadin.data.util.converter.Converter;
 import com.vaadin.ui.AbstractSelect;
 
+import au.com.vaadinutils.crud.CrudEntity;
+
 public class MultiSelectConverter<T extends CrudEntity> implements Converter<Collection<Object>, Collection<T>>
 {
 
@@ -51,7 +50,7 @@ public class MultiSelectConverter<T extends CrudEntity> implements Converter<Col
 	private String mappedBy;
 	@SuppressWarnings("rawtypes")
 	private Class type;
-	Logger logger = LogManager.getLogger();
+	Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 
 	public MultiSelectConverter(AbstractSelect select, @SuppressWarnings("rawtypes") Class type)
 	{

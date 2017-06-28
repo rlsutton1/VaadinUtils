@@ -8,7 +8,7 @@ import org.vaadin.alump.gridstack.GridStackMoveEvent.GridStackMoveListener;
 
 public class DashBoardNoJQuery extends GridStackLayoutNoJQuery
 {
-	// Logger logger = LogManager.getLogger();
+	// Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 
 	private static final long serialVersionUID = 1L;
 

@@ -24,7 +24,6 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.metamodel.Metamodel;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import au.com.vaadinutils.errorHandling.ErrorWindow;
@@ -37,7 +36,7 @@ public class EntityManagerTrackerWrapper implements EntityManager
 
 	private static ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
-	Logger logger = LogManager.getLogger();
+	Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 
 	private ScheduledFuture<?> future;
 

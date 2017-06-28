@@ -13,6 +13,8 @@ import javax.mail.internet.AddressException;
 
 import org.apache.commons.mail.EmailException;
 
+import com.google.common.base.Preconditions;
+
 import au.com.vaadinutils.jasper.AttachmentType;
 import au.com.vaadinutils.jasper.JasperEmailBuilder;
 import au.com.vaadinutils.jasper.JasperEmailSettings;
@@ -27,14 +29,12 @@ import au.com.vaadinutils.jasper.ui.CleanupCallback;
 import au.com.vaadinutils.jasper.ui.JasperReportProperties;
 import au.com.vaadinutils.jasper.ui.JasperReportPropertiesAlternateFile;
 
-import com.google.common.base.Preconditions;
-
 public class ReportEmailRunnerImpl implements ReportEmailRunner, JasperReportProperties
 {
 	private JasperReportProperties jasperReportProperties;
 	private ReportEmailSchedule schedule;
 
-	// Logger logger = LogManager.getLogger();
+	// Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 
 	@Override
 	public boolean runReport(ReportEmailSchedule schedule, Date scheduledTime, JasperEmailSettings emailSettings)

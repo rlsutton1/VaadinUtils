@@ -12,7 +12,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.persistence.metamodel.SingularAttribute;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.vaadin.viritin.grid.GeneratedPropertyListContainer;
 
@@ -52,7 +51,7 @@ import de.datenhahn.vaadin.componentrenderer.ComponentRenderer;
 
 public class GridHeadingV2PropertySet<E> implements GridHeadingPropertySetIfc<E>
 {
-	private Logger logger = LogManager.getLogger();
+	private Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 	private List<GridHeadingV2ToPropertyId> cols = new LinkedList<>();
 	private boolean eraseSavedConfig = false;
 	private Grid grid;

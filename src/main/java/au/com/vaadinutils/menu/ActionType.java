@@ -1,6 +1,5 @@
 package au.com.vaadinutils.menu;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.vaadin.shared.ui.BorderStyle;
@@ -91,7 +90,7 @@ public enum ActionType
 		}
 	};
 
-	Logger logger = LogManager.getLogger();
+	Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 
 	abstract public void createLeafItem(MenuWrapper menuItem, Menu menu, final String displayName,
 			final ViewMapping viewmap, boolean addAtTop);

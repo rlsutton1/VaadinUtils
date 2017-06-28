@@ -4,10 +4,10 @@ import java.util.Collection;
 
 import org.vaadin.ui.LegacyComboBox;
 
-import au.com.vaadinutils.crud.splitFields.SplitField;
-
 import com.vaadin.data.Container;
 import com.vaadin.ui.Label;
+
+import au.com.vaadinutils.crud.splitFields.SplitField;
 
 public class LegacySplitComboBox extends LegacyComboBox implements SplitField
 {

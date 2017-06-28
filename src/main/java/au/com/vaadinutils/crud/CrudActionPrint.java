@@ -1,12 +1,12 @@
 package au.com.vaadinutils.crud;
 
-import net.sf.jasperreports.engine.JRException;
-import au.com.vaadinutils.jasper.ui.JasperReportPopUp;
-import au.com.vaadinutils.jasper.ui.JasperReportProperties;
-
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
+
+import au.com.vaadinutils.jasper.ui.JasperReportPopUp;
+import au.com.vaadinutils.jasper.ui.JasperReportProperties;
+import net.sf.jasperreports.engine.JRException;
 
 public abstract class CrudActionPrint<E extends CrudEntity> implements CrudAction<E>
 {

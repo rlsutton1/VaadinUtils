@@ -49,7 +49,7 @@ public abstract class BasePortalAdder extends VerticalLayout implements PortalCo
 		button.setStyleName(ValoTheme.BUTTON_TINY);
 		button.addStyleName(ValoTheme.BUTTON_FRIENDLY);
 
-		label.setWidth("300");
+		label.setWidth("200");
 		button.addClickListener(new ClickListener()
 		{
 

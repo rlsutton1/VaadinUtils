@@ -20,7 +20,6 @@ import javax.persistence.metamodel.SingularAttribute;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.vaadin.addons.lazyquerycontainer.EntityContainer;
 import org.vaadin.ui.LegacyComboBox;
@@ -52,6 +51,8 @@ import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.Slider;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
+
+import org.apache.logging.log4j.LogManager;
 
 import au.com.vaadinutils.converter.ContainerAdaptor;
 import au.com.vaadinutils.converter.ContainerAdaptorFactory;

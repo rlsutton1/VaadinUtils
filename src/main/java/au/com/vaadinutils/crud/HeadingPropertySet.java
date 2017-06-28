@@ -10,7 +10,6 @@ import java.util.List;
 
 import javax.persistence.metamodel.SingularAttribute;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.google.common.base.Preconditions;
@@ -34,7 +33,7 @@ public class HeadingPropertySet
 {
 	private List<HeadingToPropertyId> cols = new LinkedList<>();
 
-	private Logger logger = LogManager.getLogger();
+	private Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 
 	public boolean autoExpandColumns = false;
 
@@ -502,7 +501,7 @@ public class HeadingPropertySet
 	static class DateColumnGenerator<E> implements ColumnGenerator
 	{
 		private static final long serialVersionUID = 1;
-		private Logger logger = LogManager.getLogger();
+		private Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 
 		final private SimpleDateFormat sdf;
 		final private SimpleDateFormat sdfParse = new SimpleDateFormat("yyyy-MM-dd");

@@ -16,5 +16,5 @@ public class DBmanagerprovider implements DBmanager
 		// TODO Auto-generated method stub
 		
 	}
-	// Logger logger = LogManager.getLogger();
+	// Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 }

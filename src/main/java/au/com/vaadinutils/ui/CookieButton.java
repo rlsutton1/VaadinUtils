@@ -1,13 +1,13 @@
 package au.com.vaadinutils.ui;
 
+import com.vaadin.ui.Button;
+
 import au.com.vaadinutils.user.UserSettingsStorage;
 import au.com.vaadinutils.user.UserSettingsStorageFactory;
 
-import com.vaadin.ui.Button;
-
 public class CookieButton extends Button
 {
-	// Logger logger = LogManager.getLogger();
+	// Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 
 	private static final String OFF_STATE = "CookieButton-Off";
 	private static final String ON_STATE = "CookieButton-On";

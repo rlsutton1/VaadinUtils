@@ -1,8 +1,8 @@
 package au.com.vaadinutils.crud.splitFields;
 
-import au.com.vaadinutils.fields.OrderingListSelect;
-
 import com.vaadin.ui.Label;
+
+import au.com.vaadinutils.fields.OrderingListSelect;
 
 public class SplitOrderingListSelect<T> extends OrderingListSelect<T> implements SplitField
 {

@@ -6,7 +6,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.google.common.base.Stopwatch;
@@ -19,7 +18,7 @@ import elemental.json.JsonArray;
 
 public class JSCallWithReturnValue
 {
-	// Logger logger = LogManager.getLogger();
+	// Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 
 	private static final int EXPECTED_RESPONSE_TIME_MS = 1500;
 
@@ -30,7 +29,7 @@ public class JSCallWithReturnValue
 	private String jsToExecute;
 	private String errorHookName;
 
-	Logger logger = LogManager.getLogger();
+	Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 	private Exception trace;
 
 	// setting the pool size to 1, we will hopefully never execute any events

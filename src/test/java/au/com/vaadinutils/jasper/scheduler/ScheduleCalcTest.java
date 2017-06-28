@@ -15,7 +15,7 @@ import au.com.vaadinutils.jasper.scheduler.entities.ScheduleMode;
 
 public class ScheduleCalcTest
 {
-	// Logger logger = LogManager.getLogger();
+	// Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 
 	@Test
 	public void testDaysOfWeek() throws ParseException

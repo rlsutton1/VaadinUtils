@@ -2,13 +2,14 @@ package au.com.vaadinutils.validator;
 
 import javax.persistence.metamodel.SingularAttribute;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import com.vaadin.data.Validator;
+
+import org.apache.logging.log4j.LogManager;
 
 import au.com.vaadinutils.crud.BaseCrudView;
 import au.com.vaadinutils.crud.CrudEntity;
-
-import com.vaadin.data.Validator;
 
 public class UniqueFieldValidatorWithContainerFilters<E extends CrudEntity, F> implements Validator
 {

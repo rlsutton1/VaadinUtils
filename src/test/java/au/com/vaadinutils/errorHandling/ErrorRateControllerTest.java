@@ -93,7 +93,7 @@ public class ErrorRateControllerTest
 
 	}
 
-	// Logger logger = LogManager.getLogger();
+	// Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 
 	private long expected(Stopwatch timer)
 	{

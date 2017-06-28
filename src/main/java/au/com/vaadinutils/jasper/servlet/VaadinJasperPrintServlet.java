@@ -18,7 +18,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
@@ -30,7 +29,7 @@ public class VaadinJasperPrintServlet extends HttpServlet
 
     public static final String IMAGES_MAP = "IMAGES_MAP";
     private static final long serialVersionUID = -4735461255420730963L;
-    static Logger logger = LogManager.getLogger();
+    static Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 
     /**
      * Called to show an image that has been loaded into the session be a prior

@@ -15,7 +15,7 @@ import au.com.vaadinutils.jasper.ui.JasperReportProperties;
 
 public interface ReportEmailSchedule 
 {
-	// Logger logger = LogManager.getLogger();
+	// Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 	
 
 	// report title, will appear on the report

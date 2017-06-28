@@ -8,7 +8,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.google.common.base.Preconditions;
@@ -25,7 +24,7 @@ public class MenuBuilder implements Serializable
 	private static final long serialVersionUID = 1L;
 	private List<ViewMapping> viewMap;
 
-	Logger logger = LogManager.getLogger();
+	Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 
 	public MenuBuilder(Navigator navigator, List<ViewMapping> viewMap)
 	{

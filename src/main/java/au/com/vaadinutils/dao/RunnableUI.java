@@ -1,6 +1,5 @@
 package au.com.vaadinutils.dao;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.vaadin.ui.UI;
@@ -18,7 +17,7 @@ public abstract class RunnableUI implements Runnable
 {
 
 	final private UI ui;
-	Logger logger = LogManager.getLogger();
+	Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 
 	public RunnableUI(UI ui)
 	{

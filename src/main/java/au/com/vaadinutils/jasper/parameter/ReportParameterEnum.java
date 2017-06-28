@@ -1,10 +1,10 @@
 package au.com.vaadinutils.jasper.parameter;
 
-import au.com.vaadinutils.crud.FormHelper;
-import au.com.vaadinutils.jasper.scheduler.entities.DateParameterType;
-
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
+
+import au.com.vaadinutils.crud.FormHelper;
+import au.com.vaadinutils.jasper.scheduler.entities.DateParameterType;
 
 public class ReportParameterEnum<T extends Enum<T>> extends ReportParameter<Enum<T>>
 {

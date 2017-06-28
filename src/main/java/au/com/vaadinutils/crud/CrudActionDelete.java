@@ -1,6 +1,5 @@
 package au.com.vaadinutils.crud;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.vaadin.dialogs.ConfirmDialog;
 
@@ -16,7 +15,7 @@ public class CrudActionDelete<E extends CrudEntity> implements CrudAction<E>
 	private DeleteAction<E> action;
 	private String message;
 
-	Logger logger = LogManager.getLogger();
+	Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 
 	public CrudActionDelete()
 	{

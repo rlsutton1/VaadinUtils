@@ -2,11 +2,11 @@ package au.com.vaadinutils.converter;
 
 import java.util.Collection;
 
-import au.com.vaadinutils.crud.CrudEntity;
-
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
+
+import au.com.vaadinutils.crud.CrudEntity;
 
 public interface ContainerAdaptor<T extends CrudEntity>
 {

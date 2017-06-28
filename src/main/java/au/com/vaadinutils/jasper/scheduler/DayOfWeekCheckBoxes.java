@@ -13,7 +13,7 @@ import com.vaadin.ui.HorizontalLayout;
 
 public class DayOfWeekCheckBoxes extends HorizontalLayout implements Field<String>
 {
-	// Logger logger = LogManager.getLogger();
+	// Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 
 	private static final long serialVersionUID = -3339061540299550077L;
 

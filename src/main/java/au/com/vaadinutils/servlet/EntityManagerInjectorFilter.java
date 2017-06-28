@@ -9,15 +9,13 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
-import org.apache.logging.log4j.LogManager;
-
 import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.dao.EntityWorker;
 
 public class EntityManagerInjectorFilter implements Filter
 {
 	// private static transient Logger logger =
-	org.apache.logging.log4j.Logger logger = LogManager.getLogger();
+	org.apache.logging.log4j.Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException

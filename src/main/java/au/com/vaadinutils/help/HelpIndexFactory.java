@@ -19,5 +19,5 @@ public class HelpIndexFactory
 		Preconditions.checkNotNull(index, "Call registerHelpIndex first");
 		return index.get();
 	}
-	// Logger logger = LogManager.getLogger();
+	// Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 }

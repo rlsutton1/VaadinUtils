@@ -6,14 +6,7 @@ import java.util.Date;
 
 import javax.persistence.metamodel.SingularAttribute;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import au.com.vaadinutils.crud.splitFields.SplitField;
-import au.com.vaadinutils.crud.splitFields.SplitLabel;
-import au.com.vaadinutils.domain.iColorFactory;
-import au.com.vaadinutils.fields.CKEditorEmailField;
-import au.com.vaadinutils.fields.ColorPickerField;
 
 import com.vaadin.shared.ui.datefield.Resolution;
 import com.vaadin.ui.AbstractComponent;
@@ -27,6 +20,14 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
+
+import org.apache.logging.log4j.LogManager;
+
+import au.com.vaadinutils.crud.splitFields.SplitField;
+import au.com.vaadinutils.crud.splitFields.SplitLabel;
+import au.com.vaadinutils.domain.iColorFactory;
+import au.com.vaadinutils.fields.CKEditorEmailField;
+import au.com.vaadinutils.fields.ColorPickerField;
 
 public class MultiColumnFormLayout<E extends CrudEntity> extends GridLayout
 {

@@ -8,7 +8,6 @@ import java.util.concurrent.Callable;
 import javax.persistence.EntityManager;
 import javax.validation.ConstraintViolationException;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.google.common.base.Preconditions;
@@ -69,7 +68,7 @@ public enum EntityManagerProvider
 {
 	INSTANCE;
 
-	private static final Logger logger = LogManager.getLogger();
+	private static final Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 
 	/**
 	 * provides a mechanism to register actions that should happen should happen

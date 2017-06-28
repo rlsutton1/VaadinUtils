@@ -5,13 +5,12 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.joda.time.DateTime;
 
-import au.com.vaadinutils.jasper.scheduler.ReportEmailSchedule;
-
 import com.google.common.base.Preconditions;
+
+import au.com.vaadinutils.jasper.scheduler.ReportEmailSchedule;
 
 public enum ScheduleMode
 {
@@ -90,7 +89,7 @@ public enum ScheduleMode
 		}
 	};
 
-	Logger logger = LogManager.getLogger();
+	Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 
 	String name;
 

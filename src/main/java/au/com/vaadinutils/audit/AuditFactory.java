@@ -11,7 +11,7 @@ public enum AuditFactory
 	this.auditor.set(auditor);
     }
 
-    // Logger logger = LogManager.getLogger();
+    // Logger logger = org.apache.logging.log4j.LogManager.getLogger();
     AtomicReference<Auditor> auditor = new AtomicReference<Auditor>();
 
     public static Auditor getAuditor()

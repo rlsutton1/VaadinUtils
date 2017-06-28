@@ -8,11 +8,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.mail.EmailException;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.UI;
+
+import org.apache.logging.log4j.LogManager;
 
 import au.com.vaadinutils.dao.CallableUI;
 import au.com.vaadinutils.dao.EntityManagerThread;

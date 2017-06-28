@@ -4,19 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
-import net.sf.jasperreports.engine.JRException;
-
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.vaadin.teemu.wizards.WizardStep;
-
-import au.com.vaadinutils.crud.CrudEntity;
-import au.com.vaadinutils.fields.PoJoTable;
-import au.com.vaadinutils.ui.WorkingDialog;
-import au.com.vaadinutils.util.MutableInteger;
-import au.com.vaadinutils.util.ProgressBarWorker;
-import au.com.vaadinutils.util.ProgressTaskListener;
-import au.com.vaadinutils.util.VUNotification;
 
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.ui.Component;
@@ -26,6 +15,17 @@ import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+
+import org.apache.logging.log4j.LogManager;
+
+import au.com.vaadinutils.crud.CrudEntity;
+import au.com.vaadinutils.fields.PoJoTable;
+import au.com.vaadinutils.ui.WorkingDialog;
+import au.com.vaadinutils.util.MutableInteger;
+import au.com.vaadinutils.util.ProgressBarWorker;
+import au.com.vaadinutils.util.ProgressTaskListener;
+import au.com.vaadinutils.util.VUNotification;
+import net.sf.jasperreports.engine.JRException;
 
 public class ShowProgressStep<C extends CrudEntity> implements WizardStep, ProgressTaskListener<JasperTransmission>
 {

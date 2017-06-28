@@ -3,7 +3,6 @@ package au.com.vaadinutils.crud;
 import java.lang.annotation.Annotation;
 import java.util.Collection;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.vaadin.data.Container;
@@ -42,7 +41,7 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 	private static final long serialVersionUID = 1L;
 
 	@SuppressWarnings("unused")
-	private static Logger logger = LogManager.getLogger();
+	private static Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 
 	protected TextField searchField = new TextField();
 	private AbstractLayout advancedSearchLayout;

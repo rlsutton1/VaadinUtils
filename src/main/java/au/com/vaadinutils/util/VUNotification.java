@@ -1,6 +1,5 @@
 package au.com.vaadinutils.util;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.vaadin.server.Page;
@@ -11,7 +10,7 @@ import com.vaadin.ui.UI;
 public class VUNotification extends Notification
 {
 	private static final long serialVersionUID = 1L;
-	static Logger logger = LogManager.getLogger();
+	static Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 
 	public VUNotification(final String caption)
 	{

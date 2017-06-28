@@ -4,7 +4,6 @@ import javax.persistence.PersistenceException;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.persistence.exceptions.DatabaseException;
 import org.eclipse.persistence.exceptions.DescriptorException;
@@ -14,7 +13,7 @@ import com.vaadin.data.Buffered.SourceException;
 
 public class ViolationConstraintHandler
 {
-    static Logger logger = LogManager.getLogger();
+    static Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 
     /**
      * logs the initial error and calls the recusive version of it'self. always

@@ -3,7 +3,6 @@ package au.com.vaadinutils.dashboard;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.vaadin.alump.gridstack.GridStackLayoutNoJQuery;
 import org.vaadin.sliderpanel.SliderPanel;
@@ -51,7 +50,7 @@ public abstract class DashBoardView extends VerticalLayout implements View
 
 	private static final long serialVersionUID = 1L;
 
-	Logger logger = LogManager.getLogger();
+	Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 
 	private GridStackLayoutNoJQuery dashBoard;
 

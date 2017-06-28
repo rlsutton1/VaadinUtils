@@ -5,7 +5,6 @@ import java.io.Closeable;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import au.com.vaadinutils.errorHandling.ErrorWindow;
@@ -14,7 +13,7 @@ public class Transaction implements Closeable
 {
 	private EntityTransaction transaction;
 	private boolean nested = false;
-	Logger logger = LogManager.getLogger();
+	Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 
 	public Transaction(EntityManager em)
 	{

@@ -4,11 +4,11 @@ import java.util.Collection;
 
 import org.vaadin.addons.lazyquerycontainer.EntityContainer;
 
-import au.com.vaadinutils.crud.CrudEntity;
-
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
+
+import au.com.vaadinutils.crud.CrudEntity;
 
 public class ContainerAdaptorEntity<E extends CrudEntity> implements ContainerAdaptor<E>
 {

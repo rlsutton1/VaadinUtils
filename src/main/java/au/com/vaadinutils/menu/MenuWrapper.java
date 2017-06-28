@@ -1,6 +1,5 @@
 package au.com.vaadinutils.menu;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.vaadin.ui.MenuBar;
@@ -15,7 +14,7 @@ import com.vaadin.ui.MenuBar.MenuItem;
  */
 public class MenuWrapper
 {
-	Logger logger = LogManager.getLogger();
+	Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 	Object innerMenuObject;
 
 	MenuWrapper(MenuBar bar)

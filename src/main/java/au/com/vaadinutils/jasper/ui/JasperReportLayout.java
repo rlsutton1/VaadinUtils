@@ -8,7 +8,6 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.google.common.base.Preconditions;
@@ -75,7 +74,7 @@ class JasperReportLayout extends VerticalLayout
 
 	public static final String NAME = "ReportView";
 
-	static private final transient Logger logger = LogManager.getLogger();
+	static private final transient Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 
 	private static final String PRINT_PANEL_ID = "nj-print-panel-id-for-pdf";
 

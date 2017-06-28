@@ -15,5 +15,5 @@ public class WindowSizerNull implements WindowSizer
 		throw new RuntimeException("Not implemented");
 
 	}
-	// Logger logger = LogManager.getLogger();
+	// Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 }

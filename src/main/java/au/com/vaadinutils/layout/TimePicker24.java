@@ -7,7 +7,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.vaadin.data.Property;
@@ -33,7 +32,7 @@ import com.vaadin.ui.themes.Reindeer;
 @SuppressWarnings("rawtypes")
 public class TimePicker24 extends HorizontalLayout implements Field
 {
-	Logger logger = LogManager.getLogger();
+	Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 
 	protected static final String TIME_FORMAT = "HH:mm a";
 	protected static final String TIME_FORMAT2 = "HH:mma";

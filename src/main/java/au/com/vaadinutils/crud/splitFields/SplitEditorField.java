@@ -1,8 +1,8 @@
 package au.com.vaadinutils.crud.splitFields;
 
-import au.com.vaadinutils.fields.CKEditorEmailField;
-
 import com.vaadin.ui.Label;
+
+import au.com.vaadinutils.fields.CKEditorEmailField;
 
 public class SplitEditorField extends CKEditorEmailField implements SplitField
 {

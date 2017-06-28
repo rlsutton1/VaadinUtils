@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.vaadin.data.Property;
@@ -12,6 +11,8 @@ import com.vaadin.data.Validator;
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Field;
+
+import org.apache.logging.log4j.LogManager;
 
 import au.com.vaadinutils.listener.ListenerManager;
 import au.com.vaadinutils.listener.ListenerManagerFactory;

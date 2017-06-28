@@ -12,15 +12,7 @@ import javax.persistence.metamodel.EntityType;
 import javax.persistence.metamodel.Metamodel;
 import javax.persistence.metamodel.SingularAttribute;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import au.com.vaadinutils.crud.CrudEntity;
-import au.com.vaadinutils.crud.HeadingPropertySet;
-import au.com.vaadinutils.crud.SearchableSelectableEntityTable;
-import au.com.vaadinutils.dao.EntityManagerProvider;
-import au.com.vaadinutils.dao.JpaBaseDao;
-import au.com.vaadinutils.dao.NullFilter;
 
 import com.google.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.JPAContainer;
@@ -49,6 +41,13 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.ColumnGenerator;
 import com.vaadin.ui.VerticalLayout;
 
+import au.com.vaadinutils.crud.CrudEntity;
+import au.com.vaadinutils.crud.HeadingPropertySet;
+import au.com.vaadinutils.crud.SearchableSelectableEntityTable;
+import au.com.vaadinutils.dao.EntityManagerProvider;
+import au.com.vaadinutils.dao.JpaBaseDao;
+import au.com.vaadinutils.dao.NullFilter;
+
 /**
  * @deprecated Replaced by {@link TwinColumnSelect}
  */
@@ -57,7 +56,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 {
 
 	private static final long serialVersionUID = -4316521010865902678L;
-	private Logger logger = LogManager.getLogger();
+	private Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 
 	private SingularAttribute<C, ?> listField;
 	protected Collection<C> sourceValue;

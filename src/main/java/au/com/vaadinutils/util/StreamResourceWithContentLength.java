@@ -1,6 +1,5 @@
 package au.com.vaadinutils.util;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.vaadin.server.DownloadStream;
@@ -17,7 +16,7 @@ public class StreamResourceWithContentLength extends StreamResource
 	private ContentLengthProviderStreamSource contentLengthProvider;
 	UI ui = UI.getCurrent();
 
-	Logger logger = LogManager.getLogger();
+	Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 
 	public StreamResourceWithContentLength(ContentLengthProviderStreamSource streamSource, String filename)
 	{

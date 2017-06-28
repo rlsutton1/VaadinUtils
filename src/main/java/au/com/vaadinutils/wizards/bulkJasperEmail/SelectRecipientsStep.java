@@ -5,14 +5,14 @@ import java.util.Collection;
 
 import org.vaadin.teemu.wizards.WizardStep;
 
-import au.com.vaadinutils.crud.CrudEntity;
-import au.com.vaadinutils.crud.HeadingPropertySet;
-import au.com.vaadinutils.crud.SelectableEntityTable;
-
 import com.vaadin.addon.jpacontainer.EntityContainer;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.VerticalLayout;
+
+import au.com.vaadinutils.crud.CrudEntity;
+import au.com.vaadinutils.crud.HeadingPropertySet;
+import au.com.vaadinutils.crud.SelectableEntityTable;
 
 public class SelectRecipientsStep<C extends CrudEntity> implements WizardStep
 {

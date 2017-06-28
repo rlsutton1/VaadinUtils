@@ -2,10 +2,10 @@ package au.com.vaadinutils.converter;
 
 import org.vaadin.addons.lazyquerycontainer.EntityContainer;
 
-import au.com.vaadinutils.crud.CrudEntity;
-
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.data.Container;
+
+import au.com.vaadinutils.crud.CrudEntity;
 
 public class ContainerAdaptorFactory<T extends CrudEntity>
 {

@@ -2,9 +2,9 @@ package au.com.vaadinutils.wizards.bulkJasperEmail;
 
 import org.vaadin.teemu.wizards.WizardStep;
 
-import au.com.vaadinutils.crud.CrudEntity;
-
 import com.vaadin.ui.Component;
+
+import au.com.vaadinutils.crud.CrudEntity;
 
 public class SelectFilterStep<Parent extends CrudEntity, Child extends CrudEntity> implements WizardStep
 {

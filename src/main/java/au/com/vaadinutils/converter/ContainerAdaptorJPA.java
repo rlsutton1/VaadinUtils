@@ -3,12 +3,12 @@ package au.com.vaadinutils.converter;
 import java.util.Collection;
 import java.util.HashSet;
 
-import au.com.vaadinutils.crud.CrudEntity;
-
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
+
+import au.com.vaadinutils.crud.CrudEntity;
 
 public class ContainerAdaptorJPA<E extends CrudEntity> implements ContainerAdaptor<E>
 {

@@ -34,5 +34,5 @@ public class ExampleDashboard extends DashBoardView
 	{
 		return ExampleDashboardEnum.valueOf(type);
 	}
-	// Logger logger = LogManager.getLogger();
+	// Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 }

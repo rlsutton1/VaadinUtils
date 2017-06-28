@@ -7,7 +7,7 @@ import au.com.vaadinutils.dashboard.DashBoardView;
 
 public class ExampleToolBar extends VerticalLayout
 {
-	// Logger logger = LogManager.getLogger();
+	// Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 
 	private static final long serialVersionUID = 1L;
 

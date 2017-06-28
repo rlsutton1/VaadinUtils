@@ -2,11 +2,11 @@ package au.com.vaadinutils.fields;
 
 import javax.persistence.metamodel.SingularAttribute;
 
-import au.com.vaadinutils.crud.CrudEntity;
-
 import com.vaadin.addon.jpacontainer.EntityContainer;
 import com.vaadin.data.util.filter.Compare;
 import com.vaadin.ui.ComboBox;
+
+import au.com.vaadinutils.crud.CrudEntity;
 
 /**
  * A combobox which is dependent on a parent combo box.

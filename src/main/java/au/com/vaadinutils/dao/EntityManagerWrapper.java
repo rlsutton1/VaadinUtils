@@ -23,7 +23,6 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.metamodel.Metamodel;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class EntityManagerWrapper implements EntityManager
@@ -32,7 +31,7 @@ public class EntityManagerWrapper implements EntityManager
 
 	final static AtomicLong seen = new AtomicLong();
 
-	Logger logger = LogManager.getLogger();
+	Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 
 	private long emid;
 

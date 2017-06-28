@@ -80,7 +80,7 @@ public class MarkedIds
 		return markedIds;
 	}
 
-	// Logger logger = LogManager.getLogger();
+	// Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 	
 	public boolean isTrackingSelected()
 	{

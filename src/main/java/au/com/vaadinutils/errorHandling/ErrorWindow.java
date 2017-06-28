@@ -9,7 +9,6 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.vaadin.addons.screenshot.Screenshot;
 import org.vaadin.addons.screenshot.ScreenshotImage;
@@ -36,7 +35,7 @@ public class ErrorWindow
 	private Button close = new Button("OK");
 	private Label uploadStatus = new Label("&nbsp;", ContentMode.HTML);
 
-	static Logger logger = LogManager.getLogger();
+	static Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 
 	/**
 	 * throttle for sending emails about errors the user hasn't seen. Allow

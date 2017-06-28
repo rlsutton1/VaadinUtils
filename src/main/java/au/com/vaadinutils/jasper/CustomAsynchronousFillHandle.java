@@ -4,14 +4,14 @@ import java.sql.Connection;
 import java.util.Map;
 import java.util.concurrent.Executor;
 
+import au.com.vaadinutils.jasper.JasperManager.OutputFormat;
+import au.com.vaadinutils.jasper.ui.JasperReportProperties;
 import net.sf.jasperreports.engine.DefaultJasperReportsContext;
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.JasperReportsContext;
 import net.sf.jasperreports.engine.fill.AsynchronousFillHandle;
-import au.com.vaadinutils.jasper.JasperManager.OutputFormat;
-import au.com.vaadinutils.jasper.ui.JasperReportProperties;
 
 public class CustomAsynchronousFillHandle extends AsynchronousFillHandle
 {
