@@ -582,6 +582,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 
 			// if we call the overridden version we loop indefinitely
 
+			entityTable.select(null);
 			ChildCrudView.super.rowChanged(newEntity);
 
 			// Can't delete when you are adding a new record.

@@ -1384,7 +1384,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 			entityTable.select(newEntity.getId());
 
 			splitPanel.showFirstComponent();
-			Notification.show("Changes Saved", "Any changes you have made have been saved.", Type.TRAY_NOTIFICATION);
+			Notification.show("Changes Saved", "Any changes you have made have been saved.", Type.HUMANIZED_MESSAGE);
 
 			// return save/edit buttons to default settings
 			buttonLayout.setDefaultState();
