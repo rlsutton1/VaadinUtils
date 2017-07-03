@@ -50,6 +50,8 @@ public abstract class BasePortal extends VerticalLayout implements Portal
 	private Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 	private PortalConfigDelgate configDelegate;
 
+	private Label titleLabel;
+
 	protected BasePortal(Tblportal portal, DashBoardController dashBoard, PortalConfigDelgate configDelegate)
 	{
 		guid = portal.getGuid();
@@ -62,6 +64,14 @@ public abstract class BasePortal extends VerticalLayout implements Portal
 
 		addComponent(header);
 
+	}
+
+	public void setPortalTitle(String titleText)
+	{
+		if (StringUtils.isNotBlank(titleText))
+		{
+			titleLabel.setValue(titleText);
+		}
 	}
 
 	public String getGuid()
@@ -85,7 +95,7 @@ public abstract class BasePortal extends VerticalLayout implements Portal
 		HorizontalLayout header = new HorizontalLayout();
 		header.setWidth("100%");
 		header.setHeight("25");
-		Label titleLabel = new Label(title);
+		titleLabel = new Label(title);
 		titleLabel.setStyleName(ValoTheme.LABEL_COLORED);
 		header.addComponent(titleLabel);
 
