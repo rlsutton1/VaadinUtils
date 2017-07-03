@@ -40,52 +40,60 @@ public class TextFieldWithLabel extends CustomComponent
 	{
 		textField.setNullRepresentation(nullRepresentation);
 	}
-	
+
 	public void setLabelCaption(String caption)
 	{
 		label.setCaption(caption);
 	}
-	
+
 	public void setLabelIcon(Resource icon)
 	{
 		label.setIcon(icon);
+	}
+
+	public void setValue(final String newValue)
+	{
+		textField.setValue(newValue);
 	}
 
 	public String getValue()
 	{
 		return textField.getValue();
 	}
-	
+
 	public void setButtonDescription(String description)
 	{
 		label.setDescription(description);
 	}
-	
+
+	@Override
 	public void setReadOnly(boolean readOnly)
 	{
 		textField.setReadOnly(readOnly);
 	}
-	
+
 	public void setLabelReadOnly(boolean readOnly)
 	{
 		label.setReadOnly(readOnly);
 	}
-	
+
 	public void addValueChangeListener(ValueChangeListener listener)
 	{
 		textField.addValueChangeListener(listener);
 	}
 
-    public void setConverter(Class<?> datamodelType) {
-    	textField.setConverter(datamodelType);
-    }
+	public void setConverter(Class<?> datamodelType)
+	{
+		textField.setConverter(datamodelType);
+	}
 
-    public void setConverter(Converter<String, ?> converter) {
-    	textField.setConverter(converter);
-    }
-    
-    public TextField getTextField()
-    {
-    	return textField;
-    }
+	public void setConverter(Converter<String, ?> converter)
+	{
+		textField.setConverter(converter);
+	}
+
+	public TextField getTextField()
+	{
+		return textField;
+	}
 }
