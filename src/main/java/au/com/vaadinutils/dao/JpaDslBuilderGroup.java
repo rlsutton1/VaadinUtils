@@ -1,6 +1,8 @@
 package au.com.vaadinutils.dao;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -48,7 +50,7 @@ public class JpaDslBuilderGroup<E>
 	private List<JpaDslBuilderGroupItem<E>> builders = new ArrayList<>();
 	private JpaDslBuilderGroupCommon<E> common;
 	private Class<E> entityClass;
-	private List<E> results = new ArrayList<>();
+	private List<E> results;
 	private boolean distinct = false;
 	private List<JpaDslOrder> orders = new ArrayList<>();
 
@@ -79,6 +81,16 @@ public class JpaDslBuilderGroup<E>
 
 	public List<E> getResults()
 	{
+		final Collection<E> results;
+		if (distinct)
+		{
+			results = new HashSet<>();
+		}
+		else
+		{
+			results = new ArrayList<>();
+		}
+
 		if (builders.size() > 0)
 		{
 			for (JpaDslBuilderGroupItem<E> builder : builders)
@@ -91,12 +103,21 @@ public class JpaDslBuilderGroup<E>
 			results.addAll(makeQuery(null));
 		}
 
-		return results;
+		if (distinct)
+		{
+			this.results = new ArrayList<>(results);
+		}
+		else
+		{
+			this.results = (List<E>) results;
+		}
+
+		return this.results;
 	}
 
 	private List<E> makeQuery(final JpaDslBuilderGroupItem<E> builder)
 	{
-		final JpaDslBuilder<E> q = new JpaDslBuilder<E>(entityClass);
+		final JpaDslBuilder<E> q = new JpaDslBuilder<>(entityClass);
 		final List<Condition<E>> conditions = new LinkedList<>();
 
 		if (common != null)
