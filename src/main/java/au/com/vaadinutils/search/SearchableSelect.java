@@ -74,6 +74,7 @@ public class SearchableSelect<T> extends MVerticalLayout
 			{
 				provider.setFilterText(event.getText());
 				selector.lazyLoadFrom(provider, provider);
+				selector.select(selector.getCurrentPageFirstItemId());
 			}
 		});
 
@@ -89,6 +90,7 @@ public class SearchableSelect<T> extends MVerticalLayout
 				provider.setFilterText("");
 
 				selector.lazyLoadFrom(provider, provider);
+				selector.select(selector.getCurrentPageFirstItemId());
 
 			}
 		});
