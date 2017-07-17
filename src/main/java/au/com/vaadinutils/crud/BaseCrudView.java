@@ -763,6 +763,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 		{
 
 			advancedSearchButton = new Button(getAdvancedCaption());
+			advancedSearchButton.setDescription("Switch to " + getAdvancedCaption());
 			advancedSearchButton.setStyleName(ValoTheme.BUTTON_FRIENDLY);
 			advancedSearchButton.setWidth("100");
 
@@ -796,10 +797,14 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 					if (!advancedSearchOn)
 					{
 						advancedSearchButton.setCaption(getAdvancedCaption());
+						advancedSearchButton.setDescription("Switch to " + getAdvancedCaption());
+
 					}
 					else
 					{
 						advancedSearchButton.setCaption(getBasicCaption());
+						advancedSearchButton.setDescription("Switch to " + getBasicCaption());
+
 					}
 
 				}
