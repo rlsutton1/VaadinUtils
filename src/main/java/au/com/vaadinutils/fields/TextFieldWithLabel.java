@@ -41,6 +41,11 @@ public class TextFieldWithLabel extends CustomComponent
 		textField.setNullRepresentation(nullRepresentation);
 	}
 
+	public void setNullSettingAllowed(final boolean nullSettingAllowed)
+	{
+		textField.setNullSettingAllowed(nullSettingAllowed);
+	}
+
 	public void setLabelCaption(String caption)
 	{
 		label.setCaption(caption);
@@ -90,6 +95,16 @@ public class TextFieldWithLabel extends CustomComponent
 	public void setConverter(Converter<String, ?> converter)
 	{
 		textField.setConverter(converter);
+	}
+
+	public Object getConvertedValue()
+	{
+		return textField.getConvertedValue();
+	}
+
+	public void setConvertedValue(Object value)
+	{
+		textField.setConvertedValue(value);
 	}
 
 	public TextField getTextField()
