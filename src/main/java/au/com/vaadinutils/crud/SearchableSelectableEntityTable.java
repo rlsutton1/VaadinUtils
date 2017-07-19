@@ -128,7 +128,7 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 		return "Override getTitle() to set a custom title.";
 	}
 
-	private CrudSecurityManager getSecurityManager()
+	protected CrudSecurityManager getSecurityManager()
 	{
 		return SecurityManagerFactoryProxy.getSecurityManager(this.getClass());
 	}

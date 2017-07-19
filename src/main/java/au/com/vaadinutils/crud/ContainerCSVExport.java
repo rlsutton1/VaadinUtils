@@ -172,9 +172,16 @@ public class ContainerCSVExport<E>
 		Set<Object> properties = new LinkedHashSet<>();
 		properties.addAll(headerPropertyMap.values());
 
+		int ctr = 0;
 		for (Object id : table.getContainerDataSource().getItemIds())
 		{
 			writeRow(writer, table, id, properties);
+			ctr++;
+			if (ctr > 100000)
+			{
+				writer.writeNext(new String[] { "Export stopped at 100,000 lines." });
+				break;
+			}
 		}
 
 		writer.flush();
