@@ -549,7 +549,12 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 			try
 			{
 				preventRowChangeCascade = true;
-				saveEditsToTemp();
+				if (isInitialised)
+				{
+					// without this conditional, we try to save fields which
+					// don't have a datasource set and it will blowup
+					saveEditsToTemp();
+				}
 				super.rowChanged(item);
 				activateEditMode(false);
 			}
@@ -832,11 +837,12 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 			if (!isInitialised)
 			{
 				entityTable.init(this.getClass().getSimpleName());
-				isInitialised = true;
 
 				// entityTable doesn't generate a row change event on this path,
 				// so we'll simulate one!
 				rowChanged(entityTable.getCurrent());
+
+				isInitialised = true;
 			}
 			loggerChildCrud.debug("Child crud load {} took {}", this.getClass().getSimpleName(),
 					timer.elapsed(TimeUnit.MILLISECONDS));
