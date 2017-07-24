@@ -139,6 +139,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 	private boolean isMainView = true;
 	private DragAndDropListener dragAndDropListener;
 	private boolean rowChanging;
+	private Button clearButton;
 
 	protected BaseCrudView()
 	{
@@ -738,9 +739,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 	private Button createClearButton()
 	{
 
-		Button clear = new Button("X");
-		clear.setImmediate(true);
-		clear.addClickListener(new ClickEventLogged.ClickListener()
+		clearButton = new Button("X");
+		clearButton.setImmediate(true);
+		clearButton.addClickListener(new ClickEventLogged.ClickListener()
 		{
 			private static final long serialVersionUID = 1L;
 
@@ -757,7 +758,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 			}
 
 		});
-		return clear;
+		return clearButton;
 	}
 
 	/**
@@ -1181,6 +1182,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 				}
 				newEntity = null;
 				searchField.setReadOnly(false);
+				clearButton.setEnabled(true);
 
 				// set the selection to the first item on the page.
 				// We need to set it to null first as if the first item was
@@ -1249,6 +1251,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 
 		newEntity = null;
 		searchField.setReadOnly(false);
+		clearButton.setEnabled(true);
 
 		preDelete(deltedEntity);
 		// set the selection to the first item
@@ -1342,6 +1345,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 					restoreDelete = false;
 				}
 				searchField.setReadOnly(false);
+				clearButton.setEnabled(true);
 			}
 			else
 			{
@@ -1397,6 +1401,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 			}
 			this.newEntity = null;
 			searchField.setReadOnly(false);
+			clearButton.setEnabled(true);
 
 			// select has been moved to here because when it happens earlier,
 			// child cruds are caused to discard their data before saving it for
@@ -1765,6 +1770,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 
 								newEntity = null;
 								searchField.setReadOnly(false);
+								clearButton.setEnabled(true);
 
 								callback.allowRowChange();
 
@@ -2077,6 +2083,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 					postNew(newEntity);
 
 					searchField.setReadOnly(true);
+					clearButton.setEnabled(false);
 
 					buttonLayout.startNewPhase();
 				}
