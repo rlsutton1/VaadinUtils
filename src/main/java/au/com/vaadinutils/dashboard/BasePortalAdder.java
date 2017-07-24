@@ -157,6 +157,10 @@ public abstract class BasePortalAdder extends VerticalLayout implements PortalCo
 	@Override
 	public String getValueString(Tblportal portal, String key)
 	{
+		if (portal == null)
+		{
+			return "";
+		}
 		return portal.getConfigValue(key, "");
 
 	}

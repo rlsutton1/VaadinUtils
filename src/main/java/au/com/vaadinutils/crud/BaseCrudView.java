@@ -275,69 +275,85 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 				}
 				Object draggedItemId = event.getTransferable().getData("itemId");
 
-				AbstractSelectTargetDetails td = (AbstractSelectTargetDetails) event.getTargetDetails();
-				VerticalDropLocation dl = td.getDropLocation();
-
-				Object targetId = ((AbstractSelectTargetDetails) event.getTargetDetails()).getItemIdOver();
-				int idx = container.indexOfId(targetId);
-				if (dl == VerticalDropLocation.BOTTOM)
-				{
-					// drop below so move the idx down one
-					idx++;
-				}
-
-				if (idx > -1)
-				{
-					targetId = container.getIdByIndex(idx);
-				}
-
 				EntityItem<E> dragged = container.getItem(draggedItemId);
 
-				EntityItemProperty draggedOrdinalProp = dragged.getItemProperty(ordinalField.getName());
-
-				boolean added = false;
-				Long ctr = 1l;
-
-				for (Object id : container.getItemIds())
+				if (dragged != null)
 				{
-					if (id.equals(targetId))
+					EntityItemProperty draggedOrdinalProp = dragged.getItemProperty(ordinalField.getName());
+
+					if (dragged != null && draggedOrdinalProp != null)
 					{
-						draggedOrdinalProp.setValue(ctr++);
-						added = true;
+						AbstractSelectTargetDetails td = (AbstractSelectTargetDetails) event.getTargetDetails();
+						VerticalDropLocation dl = td.getDropLocation();
 
+						Object targetId = ((AbstractSelectTargetDetails) event.getTargetDetails()).getItemIdOver();
+						int idx = container.indexOfId(targetId);
+						if (dl == VerticalDropLocation.BOTTOM)
+						{
+							// drop below so move the idx down one
+							idx++;
+						}
+
+						if (idx > -1)
+						{
+							targetId = container.getIdByIndex(idx);
+						}
+
+						boolean added = false;
+						Long ctr = 1l;
+
+						for (Object id : container.getItemIds())
+						{
+							if (id.equals(targetId))
+							{
+								draggedOrdinalProp.setValue(ctr++);
+								added = true;
+
+							}
+							if (!id.equals(draggedItemId))
+							{
+								container.getItem(id).getItemProperty(ordinalField.getName()).setValue(ctr++);
+							}
+						}
+						if (!added)
+						{
+							draggedOrdinalProp.setValue(ctr++);
+
+						}
+
+						container.commit();
+
+						if (dragAndDropListener != null)
+						{
+							dragAndDropListener.dropped();
+						}
+						// container.refresh();
+						// container.sort(new Object[] { ordinalField.getName()
+						// },
+						// new
+						// boolean[] { true });
+
+						// cause this crud to save, or if its a child cause the
+						// parent
+						// to save.
+						try
+						{
+							invokeTopLevelCrudSave();
+						}
+						catch (Exception e)
+						{
+							ErrorWindow.showErrorWindow(e);
+						}
 					}
-					if (!id.equals(draggedItemId))
+					else
 					{
-						container.getItem(id).getItemProperty(ordinalField.getName()).setValue(ctr++);
+						logger.error("draggedOrdinalProp is null");
 					}
 				}
-				if (!added)
+				else
 				{
-					draggedOrdinalProp.setValue(ctr++);
-
+					logger.error("dragged is null");
 				}
-
-				container.commit();
-
-				if (dragAndDropListener != null)
-				{
-					dragAndDropListener.dropped();
-				}
-				// container.refresh();
-				// container.sort(new Object[] { ordinalField.getName() }, new
-				// boolean[] { true });
-
-				// cause this crud to save, or if its a child cause the parent
-				// to save.
-				try
-				{
-					invokeTopLevelCrudSave();
-				}
-				catch (Exception e)
-				{
-					ErrorWindow.showErrorWindow(e);
-				}
-
 			}
 		});
 
