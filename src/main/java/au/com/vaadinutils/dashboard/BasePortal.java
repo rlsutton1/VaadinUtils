@@ -101,8 +101,6 @@ public abstract class BasePortal extends VerticalLayout implements Portal
 
 		HorizontalLayout controlLayout = new HorizontalLayout();
 
-		addCustomHeaderButtons(controlLayout);
-
 		Button removeButton = new Button(FontAwesome.CLOSE);
 		removeButton.setStyleName(ValoTheme.BUTTON_LINK);
 		removeButton.addClickListener(new ClickListener()
@@ -126,11 +124,17 @@ public abstract class BasePortal extends VerticalLayout implements Portal
 			}
 		});
 
-		controlLayout.addComponent(removeButton);
+		if (canUserConfigurePortal())
+		{
+			addCustomHeaderButtons(controlLayout);
+			controlLayout.addComponent(removeButton);
+		}
 		header.addComponent(controlLayout);
 		header.setComponentAlignment(controlLayout, Alignment.MIDDLE_RIGHT);
 		return header;
 	}
+
+	protected abstract boolean canUserConfigurePortal();
 
 	protected abstract void addCustomHeaderButtons(HorizontalLayout controlLayout);
 

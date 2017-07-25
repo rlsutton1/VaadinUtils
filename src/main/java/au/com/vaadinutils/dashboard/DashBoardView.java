@@ -1,8 +1,11 @@
 package au.com.vaadinutils.dashboard;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.vaadin.alump.gridstack.GridStackLayoutNoJQuery;
 import org.vaadin.sliderpanel.SliderPanel;
@@ -295,6 +298,11 @@ public abstract class DashBoardView extends VerticalLayout implements View
 
 		buttonLayout.addComponent(createDeleteButton());
 
+		if (canUserShareDashboards())
+		{
+			buttonLayout.addComponent(createShareButton());
+		}
+
 		TabSheet selectorHolder = new TabSheet();
 		selectorHolder.addTab(layout, "Dashboards");
 
@@ -305,6 +313,11 @@ public abstract class DashBoardView extends VerticalLayout implements View
 
 		// layout.setSizeFull();
 		return selectorHolder;
+	}
+
+	protected boolean canUserShareDashboards()
+	{
+		return true;
 	}
 
 	private Button createRenameButton()
@@ -437,6 +450,78 @@ public abstract class DashBoardView extends VerticalLayout implements View
 		});
 		return delete;
 	}
+
+	private Button createShareButton()
+	{
+		Button share = new Button(FontAwesome.SHARE);
+		share.setDescription("Share Dashboard");
+		share.setStyleName(ValoTheme.BUTTON_ICON_ONLY);
+		// share.addStyleName(ValoTheme.BUTTON_DANGER);
+
+		share.addClickListener(new ClickListener()
+		{
+
+			private static final long serialVersionUID = 4136469280694751393L;
+
+			@Override
+			public void buttonClick(ClickEvent event)
+			{
+				CopyDashboardCallback callback = new CopyDashboardCallback()
+				{
+
+					@Override
+					public void copy(long accountId)
+					{
+						SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
+
+						Tblportallayout portalLayout = (Tblportallayout) dashBoardSelector.getValue();
+						Tblportallayout copyLayout = new Tblportallayout();
+						copyLayout.setAccount(accountId);
+						copyLayout.setName(
+								StringUtils.abbreviate(portalLayout.getName() + " " + sdf.format(new Date()), 80));
+						EntityManagerProvider.getEntityManager().persist(copyLayout);
+
+						for (Tblportal portal : portalLayout.getPortals())
+						{
+							Tblportal copyPortal = new Tblportal();
+							copyPortal.setType(portal.getType());
+							EntityManagerProvider.getEntityManager().persist(copyPortal);
+
+							for (Tblportalconfig config : portal.getConfigs())
+							{
+								Tblportalconfig copyConfig = new Tblportalconfig();
+								copyConfig.setKey(config.getKey());
+								copyConfig.setValue(config.getValue());
+								copyPortal.addConfig(copyConfig);
+								EntityManagerProvider.getEntityManager().persist(copyConfig);
+
+							}
+
+							if (portal.getData() != null && portal.getData().getData() != null)
+							{
+								TblPortalData data = new TblPortalData();
+								data.setData(portal.getData().getData());
+								data.setPortal(copyPortal);
+								EntityManagerProvider.getEntityManager().persist(data);
+							}
+
+							copyLayout.addPortal(copyPortal);
+
+						}
+
+					}
+
+				};
+
+				getAccountIdToShareDashboardWith(callback);
+
+			}
+
+		});
+		return share;
+	}
+
+	protected abstract void getAccountIdToShareDashboardWith(CopyDashboardCallback callback);
 
 	private void createDashboardSelector()
 	{

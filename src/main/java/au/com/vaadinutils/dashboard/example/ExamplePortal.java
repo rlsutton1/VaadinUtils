@@ -125,5 +125,17 @@ public class ExamplePortal extends BasePortalAdder
 
 		}
 
+		@Override
+		protected boolean canUserConfigurePortal()
+		{
+			return true;
+		}
+
+	}
+
+	@Override
+	public boolean canUserAddPortal()
+	{
+		return true;
 	}
 }

@@ -11,4 +11,6 @@ public interface PortalAdderIfc
 
 	void addPortal(DashBoardController dashBoard2, Tblportal portal);
 
+	boolean canUserAddPortal();
+
 }

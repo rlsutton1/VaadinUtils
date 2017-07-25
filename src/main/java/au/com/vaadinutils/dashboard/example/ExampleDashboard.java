@@ -2,6 +2,7 @@ package au.com.vaadinutils.dashboard.example;
 
 import com.vaadin.ui.AbstractLayout;
 
+import au.com.vaadinutils.dashboard.CopyDashboardCallback;
 import au.com.vaadinutils.dashboard.DashBoardController;
 import au.com.vaadinutils.dashboard.DashBoardView;
 import au.com.vaadinutils.dashboard.PortalEnumIfc;
@@ -35,4 +36,11 @@ public class ExampleDashboard extends DashBoardView
 		return ExampleDashboardEnum.valueOf(type);
 	}
 	// Logger logger = org.apache.logging.log4j.LogManager.getLogger();
+
+	@Override
+	protected void getAccountIdToShareDashboardWith(CopyDashboardCallback callback)
+	{
+		// TODO Auto-generated method stub
+
+	}
 }
