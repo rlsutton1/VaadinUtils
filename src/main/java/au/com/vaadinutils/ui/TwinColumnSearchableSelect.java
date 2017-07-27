@@ -100,32 +100,47 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 
 	public TwinColumnSearchableSelect(String fieldName, SingularAttribute<C, ?> listField)
 	{
-		this(fieldName, listField, null, true);
+		this(fieldName, listField, null, null, true);
 	}
 
 	public TwinColumnSearchableSelect(String fieldName, SingularAttribute<C, ?> listField, boolean isAscending)
 	{
-		this(fieldName, listField, null, isAscending);
+		this(fieldName, listField, null, null, isAscending);
 	}
 
 	public TwinColumnSearchableSelect(final String fieldName, final SingularAttribute<C, ?> listField,
 			final String itemLabel)
 	{
-		this(fieldName, listField, itemLabel, true);
+		this(fieldName, listField, null, itemLabel, true);
 	}
 
 	public TwinColumnSearchableSelect(final String fieldName, final SingularAttribute<C, ?> listField,
-			String itemLabel, final boolean isAscending)
+			final SingularAttribute<C, Long> beanIdField, final String itemLabel)
+	{
+		this(fieldName, listField, beanIdField, itemLabel, true);
+	}
+
+	public TwinColumnSearchableSelect(final String fieldName, final SingularAttribute<C, ?> listField,
+			final SingularAttribute<C, Long> beanIdField, String itemLabel, final boolean isAscending)
 	{
 		this.setCaption(fieldName);
 		mainLayout = new HorizontalLayout();
 
 		this.isAscending = isAscending;
 		this.listField = listField;
-		beans = new BeanContainer<Long, C>(listField.getDeclaringType().getJavaType());
-		Metamodel metaModel = EntityManagerProvider.getEntityManager().getMetamodel();
-		EntityType<C> type = metaModel.entity(listField.getDeclaringType().getJavaType());
-		beanIdField = type.getDeclaredId(Long.class);
+		beans = new BeanContainer<>(listField.getDeclaringType().getJavaType());
+
+		if (beanIdField == null)
+		{
+			Metamodel metaModel = EntityManagerProvider.getEntityManager().getMetamodel();
+			EntityType<C> type = metaModel.entity(listField.getDeclaringType().getJavaType());
+			this.beanIdField = type.getDeclaredId(Long.class);
+		}
+		else
+		{
+			this.beanIdField = beanIdField;
+		}
+
 		availableContainer = JpaBaseDao.getGenericDao(listField.getDeclaringType().getJavaType())
 				.createVaadinContainer();
 		availableContainer.sort(new Object[]
@@ -155,7 +170,9 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 			public void itemClick(ItemClickEvent event)
 			{
 				if (event.isDoubleClick())
+				{
 					removeButton.click();
+				}
 			}
 		});
 
@@ -251,7 +268,9 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 				Filter searchFilter = null;
 
 				if (filterString != null && filterString.length() > 0)
+				{
 					searchFilter = getSearchFilter(filterString);
+				}
 
 				return NullFilter.and(baselineFilter, selectedFilter, searchFilter);
 			}
@@ -271,7 +290,9 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 			public void itemClick(ItemClickEvent event)
 			{
 				if (event.isDoubleClick())
+				{
 					addButton.click();
+				}
 			}
 		});
 
@@ -364,9 +385,13 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 				"If you look at getConvertedValue, you'll see convertedValue can never be null");
 
 		if ((sourceValue == null || sourceValue.size() == 0) && (convertedValue.size() > 0))
+		{
 			return true;
+		}
 		if ((sourceValue == null || sourceValue.size() == 0) && (convertedValue.size() == 0))
+		{
 			return false;
+		}
 		boolean equal = convertedValue.containsAll(sourceValue) && sourceValue.containsAll(convertedValue);
 		return !equal;
 	}
@@ -675,9 +700,13 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 						if (id != null)
 						{
 							if (isPreAddActionRequired())
+							{
 								handlePreAddAction(id);
+							}
 							else
+							{
 								handleAddAction(id);
+							}
 
 							postAddAction();
 						}
@@ -797,6 +826,7 @@ public class TwinColumnSearchableSelect<C extends CrudEntity> extends CustomFiel
 		addButton.setVisible(visible);
 	}
 
+	@Override
 	public void setSizeFull()
 	{
 		super.setSizeFull();
