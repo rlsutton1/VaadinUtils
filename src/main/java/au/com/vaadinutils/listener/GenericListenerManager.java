@@ -91,4 +91,9 @@ class GenericListenerManager<K> implements ListenerManager<K>
 	{
 		return !listeners.isEmpty();
 	}
+
+	public void destroy()
+	{
+		listeners.clear();
+	}
 }

@@ -9,4 +9,6 @@ public interface ListenerManager<K>
 	public void notifyListeners(ListenerCallback<K> callback);
 
 	public boolean hasListeners();
+
+	public void destroy();
 }
