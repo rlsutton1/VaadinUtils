@@ -20,6 +20,7 @@ import javax.persistence.metamodel.SingularAttribute;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.vaadin.addons.lazyquerycontainer.EntityContainer;
 import org.vaadin.ui.LegacyComboBox;
@@ -1279,7 +1280,8 @@ public class FormHelper<E> implements Serializable
 		LinkedHashMap<Enum<?>, String> enumMap = new LinkedHashMap<>();
 		for (Object enumConstant : clazz.getEnumConstants())
 		{
-			enumMap.put((Enum<?>) enumConstant, enumConstant.toString());
+			String label = StringUtils.capitalize(enumConstant.toString().toLowerCase().replace("_", " "));
+			enumMap.put((Enum<?>) enumConstant, label);
 		}
 
 		return createContainerFromMap(fieldName, enumMap);
