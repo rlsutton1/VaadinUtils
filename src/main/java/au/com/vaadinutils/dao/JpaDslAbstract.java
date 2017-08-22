@@ -146,6 +146,24 @@ public abstract class JpaDslAbstract<E, R>
 		};
 	}
 
+	public Condition<E> and(final List<Condition<E>> conditions)
+	{
+		return new AbstractCondition<E>()
+		{
+			@Override
+			public Predicate getPredicates()
+			{
+				final List<Predicate> predicates = new ArrayList<>(conditions.size());
+				for (Condition<E> condition : conditions)
+				{
+					predicates.add(condition.getPredicates());
+				}
+
+				return builder.and(predicates.toArray(new Predicate[predicates.size()]));
+			}
+		};
+	}
+
 	public Condition<E> and(final Condition<E> c1, final Condition<E> c2)
 	{
 		return new AbstractCondition<E>()
@@ -195,7 +213,8 @@ public abstract class JpaDslAbstract<E, R>
 		return new AbstractCondition<E>()
 		{
 
-			@SuppressWarnings({ "unchecked", "rawtypes" })
+			@SuppressWarnings(
+			{ "unchecked", "rawtypes" })
 			@Override
 			public Predicate getPredicates()
 			{
@@ -210,7 +229,8 @@ public abstract class JpaDslAbstract<E, R>
 		return new AbstractCondition<E>()
 		{
 
-			@SuppressWarnings({ "unchecked", "rawtypes" })
+			@SuppressWarnings(
+			{ "unchecked", "rawtypes" })
 			@Override
 			public Predicate getPredicates()
 			{
