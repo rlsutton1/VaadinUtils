@@ -21,6 +21,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.vaadin.addons.lazyquerycontainer.EntityContainer;
 import org.vaadin.ui.LegacyComboBox;
@@ -52,8 +53,6 @@ import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.Slider;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
-
-import org.apache.logging.log4j.LogManager;
 
 import au.com.vaadinutils.converter.ContainerAdaptor;
 import au.com.vaadinutils.converter.ContainerAdaptorFactory;
@@ -228,7 +227,9 @@ public class FormHelper<E> implements Serializable
 	public void doBinding(FieldGroup group, String fieldName, @SuppressWarnings("rawtypes") Field field)
 	{
 		if (group != null)
+		{
 			group.bind(field, fieldName);
+		}
 		else
 
 		{
@@ -723,7 +724,11 @@ public class FormHelper<E> implements Serializable
 
 			ContainerAdaptor<L> adaptor = ContainerAdaptorFactory.getAdaptor(container);
 			if (adaptor.getSortableContainerPropertyIds().contains(listField))
-				adaptor.sort(new String[] { listField }, new boolean[] { true });
+			{
+				adaptor.sort(new String[]
+				{ listField }, new boolean[]
+				{ true });
+			}
 
 			component.setItemCaptionPropertyId(listField);
 			component.setContainerDataSource(container);
@@ -740,10 +745,13 @@ public class FormHelper<E> implements Serializable
 			{
 				Collection<? extends Object> ids = null;
 				if (group.getContainer() != null)
-
+				{
 					ids = group.getContainer().getContainerPropertyIds();
+				}
 				else if (group.getItemDataSource() != null)
+				{
 					ids = group.getItemDataSource().getItemPropertyIds();
+				}
 
 				Preconditions.checkNotNull(ids,
 						"The group must have either a Container or an ItemDataSource attached.");
@@ -853,7 +861,7 @@ public class FormHelper<E> implements Serializable
 	 * <br>
 	 * ListSelect sections = helper.new ListSelectBuilder<TblSection>()<br>
 	 * .setLabel("Sections")<br>
-	 * .setField(TblAdvertisementSize_.tblSections)<br>
+	 * .setField(TblAdvertisementSize_.sections)<br>
 	 * .setListFieldName("name")<br>
 	 * .setMultiSelect(true)<br>
 	 * .build(); <br>
@@ -874,7 +882,8 @@ public class FormHelper<E> implements Serializable
 		private AbstractLayout builderForm;
 		private boolean multiSelect = false;
 
-		@SuppressWarnings({ "unchecked", "rawtypes" })
+		@SuppressWarnings(
+		{ "unchecked", "rawtypes" })
 		public SplitListSelect build()
 		{
 			Preconditions.checkNotNull(label, "label may not be null");
@@ -904,7 +913,11 @@ public class FormHelper<E> implements Serializable
 					+ " is not valid, valid listFields are " + container.getContainerPropertyIds().toString());
 
 			if (container.getSortableContainerPropertyIds().contains(listField))
-				container.sort(new String[] { listField }, new boolean[] { true });
+			{
+				container.sort(new String[]
+				{ listField }, new boolean[]
+				{ true });
+			}
 
 			component.setContainerDataSource(container);
 
@@ -1029,7 +1042,7 @@ public class FormHelper<E> implements Serializable
 	 * TwinColSelect sections = helper.new
 	 * TwinColSelectBuilder<TblSection>()<br>
 	 * .setLabel("Sections")<br>
-	 * .setField(TblAdvertisementSize_.tblSections)<br>
+	 * .setField(TblAdvertisementSize_.sections)<br>
 	 * .setListFieldName("name")<br>
 	 * .setLeftColumnCaption("Available") .setRightColumnCaption("Selected")
 	 * .build(); <br>
@@ -1051,7 +1064,8 @@ public class FormHelper<E> implements Serializable
 		private String leftColumnCaption = "Available";
 		private String rightColumnCaption = "Selected";
 
-		@SuppressWarnings({ "unchecked", "rawtypes" })
+		@SuppressWarnings(
+		{ "unchecked", "rawtypes" })
 		public SplitTwinColSelect build()
 		{
 			Preconditions.checkNotNull(label, "label may not be null");
@@ -1085,7 +1099,11 @@ public class FormHelper<E> implements Serializable
 
 			ContainerAdaptor<L> adaptor = ContainerAdaptorFactory.getAdaptor(container);
 			if (adaptor.getSortableContainerPropertyIds().contains(listField))
-				adaptor.sort(new String[] { listField }, new boolean[] { true });
+			{
+				adaptor.sort(new String[]
+				{ listField }, new boolean[]
+				{ true });
+			}
 
 			component.setContainerDataSource(container);
 			component.setConverter(new MultiSelectConverter(component, Set.class));
@@ -1141,6 +1159,13 @@ public class FormHelper<E> implements Serializable
 		 * @return
 		 */
 		public TwinColSelectBuilder<L> setField(SetAttribute<E, L> field)
+		{
+			this.field = field.getName();
+			listClazz = field.getBindableJavaType();
+			return this;
+		}
+
+		public TwinColSelectBuilder<L> setField(ListAttribute<E, L> field)
 		{
 			this.field = field.getName();
 			listClazz = field.getBindableJavaType();
@@ -1404,7 +1429,8 @@ public class FormHelper<E> implements Serializable
 
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings(
+	{ "rawtypes", "unchecked" })
 	static public <J extends CrudEntity> FormHelper<?>.ListSelectBuilder<J> getListSelectBuilder(AbstractLayout form,
 			Class<J> j)
 	{
@@ -1416,7 +1442,8 @@ public class FormHelper<E> implements Serializable
 	/**
 	 * prefer to use the non static method getEntityFieldBuilder(Class<J> j)
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings(
+	{ "rawtypes", "unchecked" })
 	static public <J extends CrudEntity> FormHelper<?>.EntityFieldBuilder<J> getEntityFieldBuilder(AbstractLayout form,
 			Class<J> j)
 	{

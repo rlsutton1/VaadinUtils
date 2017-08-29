@@ -541,6 +541,14 @@ public enum EntityManagerProvider
 	}
 
 	/**
+	 * Executes outstanding queries but does not commit the transaction
+	 */
+	public static void flush()
+	{
+		INSTANCE.entityManagerThreadLocal.get().flush();
+	}
+
+	/**
 	 * Commits the current active transaction and starts a new one
 	 */
 	public static void commitAndContinue()

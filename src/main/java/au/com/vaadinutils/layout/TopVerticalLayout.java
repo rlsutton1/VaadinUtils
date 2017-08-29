@@ -1,5 +1,6 @@
 package au.com.vaadinutils.layout;
 
+import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.VerticalLayout;
@@ -53,5 +54,10 @@ public class TopVerticalLayout extends CustomComponent
 	public void setMargin(boolean b)
 	{
 		container.setMargin(b);
+	}
+
+	public void setMargin(MarginInfo marginInfo)
+	{
+		container.setMargin(marginInfo);
 	}
 }
