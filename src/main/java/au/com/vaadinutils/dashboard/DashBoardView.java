@@ -31,6 +31,8 @@ import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.ListSelect;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TextField;
@@ -336,6 +338,11 @@ public abstract class DashBoardView extends VerticalLayout implements View
 			{
 
 				Tblportallayout portalLayout = (Tblportallayout) dashBoardSelector.getValue();
+				if (portalLayout == null)
+				{
+					Notification.show("You must select a dashboard first", Type.ERROR_MESSAGE);
+					return;
+				}
 				final TextField primaryFocusField = new TextField("New Dashboard Name");
 				AbstractLayout form = new FormLayout();
 				form.setSizeFull();
