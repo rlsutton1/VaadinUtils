@@ -33,4 +33,14 @@ public class ComboBoxWithButton extends FieldWithButton<Object>
 	{
 		((ComboBox) field).setContainerDataSource(newDataSource);
 	}
+
+	public void setItemCaptionPropertyId(final Object propertyId)
+	{
+		((ComboBox) field).setItemCaptionPropertyId(propertyId);
+	}
+
+	public void select(final Object itemId)
+	{
+		((ComboBox) field).select(itemId);
+	}
 }
