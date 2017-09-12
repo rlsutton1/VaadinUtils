@@ -175,7 +175,7 @@ public class JSCallWithReturnValue
 				{
 					if (timer.elapsed(TimeUnit.MILLISECONDS) > EXPECTED_RESPONSE_TIME_MS)
 					{
-						logger.warn("Responded after {}ms", timer.elapsed(TimeUnit.MILLISECONDS));
+						logger.warn(jsToExecute + "\n\nResponded after {}ms", timer.elapsed(TimeUnit.MILLISECONDS));
 					}
 					logger.debug("Handling response for " + hookName);
 					if (!done)
@@ -236,7 +236,7 @@ public class JSCallWithReturnValue
 				removeHooks(hookName, errorHookName);
 				if (timer.elapsed(TimeUnit.MILLISECONDS) > EXPECTED_RESPONSE_TIME_MS)
 				{
-					logger.warn("Responded after {}ms", timer.elapsed(TimeUnit.MILLISECONDS));
+					logger.warn(jsToExecute + "\n\nResponded after {}ms", timer.elapsed(TimeUnit.MILLISECONDS));
 				}
 
 			}
