@@ -94,13 +94,23 @@ public class JSCallWithReturnValue
 		{
 			boolean done = false;
 
+			@SuppressWarnings("unused")
 			@Override
 			public void callback(JsonArray arguments)
 			{
 				if (!done)
 				{
 					done = true;
-					callback.callback(arguments.getBoolean(0));
+
+					// beware arguments.getBoolean(...) can return null or any
+					// type for that matter
+					Boolean result = arguments.getBoolean(0);
+					if (result == null)
+					{
+						logger.warn("Method returned null, changing to false :\n" + jsToExecute);
+						result = false;
+					}
+					callback.callback(result);
 				}
 				else
 				{

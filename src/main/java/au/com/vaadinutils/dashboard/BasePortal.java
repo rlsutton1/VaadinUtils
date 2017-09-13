@@ -52,6 +52,14 @@ public abstract class BasePortal extends VerticalLayout implements Portal
 
 	private Label titleLabel;
 
+	private SortListener sortListener;
+
+	private Grid.ColumnResizeListener columnResizeListener;
+
+	private ColumnVisibilityChangeListener columnVisibilityListener;
+
+	private ColumnReorderListener columnReorderListener;
+
 	protected BasePortal(Tblportal portal, DashBoardController dashBoard, PortalConfigDelgate configDelegate)
 	{
 		guid = portal.getGuid();
@@ -265,7 +273,11 @@ public abstract class BasePortal extends VerticalLayout implements Portal
 
 		}
 
-		grid.addSortListener(new SortListener()
+		if (sortListener != null)
+		{
+			grid.removeSortListener(sortListener);
+		}
+		sortListener = new SortListener()
 		{
 
 			private static final long serialVersionUID = 1L;
@@ -282,7 +294,8 @@ public abstract class BasePortal extends VerticalLayout implements Portal
 				getConfigDelegate().setValue(getPortal(), keySorting, sorts);
 
 			}
-		});
+		};
+		grid.addSortListener(sortListener);
 
 	}
 
@@ -308,7 +321,11 @@ public abstract class BasePortal extends VerticalLayout implements Portal
 
 		}
 
-		grid.addColumnResizeListener(new Grid.ColumnResizeListener()
+		if (columnResizeListener != null)
+		{
+			grid.removeColumnResizeListener(columnResizeListener);
+		}
+		columnResizeListener = new Grid.ColumnResizeListener()
 		{
 			private static final long serialVersionUID = 4034036880290943146L;
 
@@ -320,7 +337,8 @@ public abstract class BasePortal extends VerticalLayout implements Portal
 				getConfigDelegate().setValue(getPortal(), baseWidthKey + propertyId, "" + (int) width);
 
 			}
-		});
+		};
+		grid.addColumnResizeListener(columnResizeListener);
 	}
 
 	private void setupGridColumnVisibility(final Grid grid, final String baseVisableKey)
@@ -343,7 +361,12 @@ public abstract class BasePortal extends VerticalLayout implements Portal
 
 		}
 
-		grid.addColumnVisibilityChangeListener(new ColumnVisibilityChangeListener()
+		if (columnVisibilityListener != null)
+		{
+			grid.removeColumnVisibilityChangeListener(columnVisibilityListener);
+
+		}
+		columnVisibilityListener = new ColumnVisibilityChangeListener()
 		{
 
 			private static final long serialVersionUID = -9082974567948595049L;
@@ -363,7 +386,8 @@ public abstract class BasePortal extends VerticalLayout implements Portal
 				getConfigDelegate().setValue(getPortal(), baseVisableKey + column.getPropertyId(), value);
 
 			}
-		});
+		};
+		grid.addColumnVisibilityChangeListener(columnVisibilityListener);
 	}
 
 	private void setupGridColumnReordering(final Grid grid, final String keyStub)
@@ -379,7 +403,12 @@ public abstract class BasePortal extends VerticalLayout implements Portal
 			}
 		}
 
-		grid.addColumnReorderListener(new ColumnReorderListener()
+		if (columnReorderListener != null)
+		{
+			grid.removeColumnReorderListener(columnReorderListener);
+		}
+
+		columnReorderListener = new ColumnReorderListener()
 		{
 			private static final long serialVersionUID = -2810298692555333890L;
 
@@ -399,7 +428,8 @@ public abstract class BasePortal extends VerticalLayout implements Portal
 					getConfigDelegate().setValue(getPortal(), keyStub, "" + parsedColumns);
 				}
 			}
-		});
+		};
+		grid.addColumnReorderListener(columnReorderListener);
 	}
 
 	/**
