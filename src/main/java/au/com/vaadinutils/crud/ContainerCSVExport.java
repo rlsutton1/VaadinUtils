@@ -28,6 +28,7 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Link;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.ColumnGenerator;
@@ -215,6 +216,10 @@ public class ContainerCSVExport<E>
 					{
 						value = new HtmlToPlainText().getPlainText(Jsoup.parse(itemProperty.getValue().toString()));
 					}
+					if(value instanceof Link)
+					{
+					    value = new HtmlToPlainText().getPlainText(Jsoup.parse(itemProperty.getValue().toString()));
+					}
 					if (value != null)
 					{
 						values[i++] = value.toString();
@@ -258,6 +263,10 @@ public class ContainerCSVExport<E>
 							{
 								value = "";
 							}
+						}
+						if(value instanceof Link)
+						{
+						    value = new HtmlToPlainText().getPlainText(Jsoup.parse(((Link) value).getCaption()));
 						}
 					}
 					if (value == null)
