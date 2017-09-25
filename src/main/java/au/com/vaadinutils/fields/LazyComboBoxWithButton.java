@@ -4,6 +4,7 @@ import org.vaadin.viritin.LazyList;
 import org.vaadin.viritin.fields.LazyComboBox;
 import org.vaadin.viritin.fields.LazyComboBox.FilterableCountProvider;
 import org.vaadin.viritin.fields.LazyComboBox.FilterablePagingProvider;
+import org.vaadin.viritin.fields.MValueChangeListener;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CustomComponent;
@@ -62,5 +63,20 @@ public class LazyComboBoxWithButton<E> extends CustomComponent
 	public Button getButton()
 	{
 		return button;
+	}
+
+	public E getValue()
+	{
+		return field.getValue();
+	}
+
+	public void setValue(final E newFieldValue)
+	{
+		field.setValue(newFieldValue);
+	}
+
+	public void addMValueChangeListener(final MValueChangeListener<E> listener)
+	{
+		field.addMValueChangeListener(listener);
 	}
 }
