@@ -213,8 +213,7 @@ public abstract class JpaDslAbstract<E, R>
 		return new AbstractCondition<E>()
 		{
 
-			@SuppressWarnings(
-			{ "unchecked", "rawtypes" })
+			@SuppressWarnings({ "unchecked", "rawtypes" })
 			@Override
 			public Predicate getPredicates()
 			{
@@ -229,8 +228,7 @@ public abstract class JpaDslAbstract<E, R>
 		return new AbstractCondition<E>()
 		{
 
-			@SuppressWarnings(
-			{ "unchecked", "rawtypes" })
+			@SuppressWarnings({ "unchecked", "rawtypes" })
 			@Override
 			public Predicate getPredicates()
 			{
@@ -748,8 +746,8 @@ public abstract class JpaDslAbstract<E, R>
 		};
 	}
 
-	public <J> Condition<E> greaterThanOrEqualTo(final JoinBuilder<E, J> join, final SingularAttribute<J, Date> field,
-			final Date value)
+	public <J, V extends Comparable<? super V>> Condition<E> greaterThanOrEqualTo(final JoinBuilder<E, J> join,
+			final SingularAttribute<J, V> field, final V value)
 	{
 		return new AbstractCondition<E>()
 		{
@@ -758,6 +756,48 @@ public abstract class JpaDslAbstract<E, R>
 			public Predicate getPredicates()
 			{
 				return builder.greaterThanOrEqualTo(getJoin(join).get(field), value);
+			}
+		};
+	}
+
+	public <J, V extends Comparable<? super V>> Condition<E> greaterThanOrEqualTo(final JoinBuilder<E, J> join,
+			final SingularAttribute<J, V> field, final SingularAttribute<E, V> value)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+				return builder.greaterThanOrEqualTo(getJoin(join).get(field), root.get(value));
+			}
+		};
+	}
+
+	public <J, V extends Comparable<? super V>> Condition<E> lessThan(final JoinBuilder<E, J> join,
+			final SingularAttribute<J, V> field, final SingularAttribute<E, V> value)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+				return builder.lessThan(getJoin(join).get(field), root.get(value));
+			}
+		};
+	}
+
+	public <J, V extends Comparable<? super V>> Condition<E> lessThanOrEqualTo(final JoinBuilder<E, J> join,
+			final SingularAttribute<J, V> field, final SingularAttribute<E, V> value)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+				return builder.lessThanOrEqualTo(getJoin(join).get(field), root.get(value));
 			}
 		};
 	}
@@ -774,6 +814,38 @@ public abstract class JpaDslAbstract<E, R>
 			{
 				Join<E, J> join = getJoin(joinAttribute, joinType);
 				return builder.greaterThanOrEqualTo(join.get(field), value);
+			}
+		};
+	}
+
+	public <J, V extends Comparable<? super V>> Condition<E> greaterThan(
+			final ListAttribute<? super E, J> joinAttribute, final JoinType joinType,
+			final SingularAttribute<J, V> field, final SingularAttribute<E, V> value)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+				Join<E, J> join = getJoin(joinAttribute, joinType);
+				return builder.greaterThan(join.get(field), root.get(value));
+			}
+		};
+	}
+
+	public <J, V extends Comparable<? super V>> Condition<E> greaterThanOrEqualTo(
+			final ListAttribute<? super E, J> joinAttribute, final JoinType joinType,
+			final SingularAttribute<J, V> field, final SingularAttribute<E, V> value)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+				Join<E, J> join = getJoin(joinAttribute, joinType);
+				return builder.greaterThanOrEqualTo(join.get(field), root.get(value));
 			}
 		};
 	}
