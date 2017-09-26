@@ -35,10 +35,7 @@ public abstract class EntityContextMenu<E> extends ContextMenu
 		{
 			return (E) JpaBaseDao.getGenericDao(item.getClass()).findById(((CrudEntity) item).getId());
 		}
-		else
-		{
-			return item;
-		}
+		return item;
 	}
 
 	protected void fireEvents()

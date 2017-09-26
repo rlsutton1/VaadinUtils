@@ -94,7 +94,7 @@ public class JSCallWithReturnValue
 		{
 			boolean done = false;
 
-			@SuppressWarnings("unused")
+			@SuppressWarnings({ "unused", "null" })
 			@Override
 			public void callback(JsonArray arguments)
 			{

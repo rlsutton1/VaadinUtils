@@ -57,10 +57,7 @@ public class JoinMetaDataList<E, K> implements JoinMetaData<E, K>
 		{
 			return (Join<E, K>) root.fetch(attribute, type);
 		}
-		else
-		{
-			return root.join(attribute, type);
-		}
+		return root.join(attribute, type);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -86,10 +83,7 @@ public class JoinMetaDataList<E, K> implements JoinMetaData<E, K>
 		{
 			return (Join<E, K>) join.fetch(attribute, type);
 		}
-		else
-		{
-			return join.join(attribute, type);
-		}
+		return join.join(attribute, type);
 	}
 
 	@Override

@@ -19,6 +19,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import javax.persistence.metamodel.SingularAttribute;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.vaadin.dialogs.ConfirmDialog;
 
@@ -68,8 +69,6 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
-
-import org.apache.logging.log4j.LogManager;
 
 import au.com.vaadinutils.crud.events.CrudEventDistributer;
 import au.com.vaadinutils.crud.events.CrudEventType;
@@ -282,7 +281,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 				{
 					EntityItemProperty draggedOrdinalProp = dragged.getItemProperty(ordinalField.getName());
 
-					if (dragged != null && draggedOrdinalProp != null)
+					if (draggedOrdinalProp != null)
 					{
 						AbstractSelectTargetDetails td = (AbstractSelectTargetDetails) event.getTargetDetails();
 						VerticalDropLocation dl = td.getDropLocation();
