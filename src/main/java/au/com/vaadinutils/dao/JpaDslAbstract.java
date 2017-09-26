@@ -802,6 +802,20 @@ public abstract class JpaDslAbstract<E, R>
 		};
 	}
 
+	public <J, K, V extends Comparable<? super V>> Condition<E> lessThanOrEqualTo(final JoinBuilder<E, J> join,
+			final SingularAttribute<J, V> field, final JoinBuilder<E, K> join2, final SingularAttribute<K, V> field2)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+				return builder.lessThanOrEqualTo(getJoin(join).get(field), getJoin(join2).get(field2));
+			}
+		};
+	}
+
 	public <J, V extends Comparable<? super V>> Condition<E> greaterThanOrEqualTo(
 			final ListAttribute<? super E, J> joinAttribute, final JoinType joinType,
 			final SingularAttribute<J, V> field, final V value)
