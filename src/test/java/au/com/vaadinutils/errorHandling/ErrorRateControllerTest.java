@@ -44,7 +44,7 @@ public class ErrorRateControllerTest
 	{
 
 		int counter = 0;
-		for (int i = 0; i < 60; i++)
+		for (int i = 0; i < 30; i++)
 		{
 			if (errorRateController.acquire())
 			{
