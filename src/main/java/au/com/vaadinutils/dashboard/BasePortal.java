@@ -252,6 +252,32 @@ public abstract class BasePortal extends VerticalLayout implements Portal
 	public void setupGridSorting(final Grid grid, final String keySorting)
 	{
 
+		if (sortListener != null)
+		{
+			grid.removeSortListener(sortListener);
+		}
+		else
+		{
+			sortListener = new SortListener()
+			{
+
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public void sort(SortEvent event)
+				{
+					String sorts = "";
+					for (SortOrder sort : event.getSortOrder())
+					{
+						sorts += sort.getPropertyId() + "=" + sort.getDirection() + ",";
+					}
+
+					getConfigDelegate().setValue(getPortal(), keySorting, sorts);
+
+				}
+			};
+		}
+
 		String sorts = getConfigDelegate().getValueString(getPortal(), keySorting);
 		if (StringUtils.isNotEmpty(sorts))
 		{
@@ -273,34 +299,33 @@ public abstract class BasePortal extends VerticalLayout implements Portal
 
 		}
 
-		if (sortListener != null)
-		{
-			grid.removeSortListener(sortListener);
-		}
-		sortListener = new SortListener()
-		{
-
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void sort(SortEvent event)
-			{
-				String sorts = "";
-				for (SortOrder sort : event.getSortOrder())
-				{
-					sorts += sort.getPropertyId() + "=" + sort.getDirection() + ",";
-				}
-
-				getConfigDelegate().setValue(getPortal(), keySorting, sorts);
-
-			}
-		};
 		grid.addSortListener(sortListener);
 
 	}
 
 	private void setupGridColumnSizing(final Grid grid, final String baseWidthKey)
 	{
+		if (columnResizeListener != null)
+		{
+			grid.removeColumnResizeListener(columnResizeListener);
+		}
+		else
+		{
+			columnResizeListener = new Grid.ColumnResizeListener()
+			{
+				private static final long serialVersionUID = 4034036880290943146L;
+
+				@Override
+				public void columnResize(com.vaadin.ui.Grid.ColumnResizeEvent event)
+				{
+					final String propertyId = (String) event.getColumn().getPropertyId();
+					final double width = event.getColumn().getWidth();
+					getConfigDelegate().setValue(getPortal(), baseWidthKey + propertyId, "" + (int) width);
+
+				}
+			};
+		}
+
 		for (Entry<String, Integer> value : getConfigDelegate().getValuesLikeInt(getPortal(), baseWidthKey).entrySet())
 		{
 			try
@@ -321,28 +346,41 @@ public abstract class BasePortal extends VerticalLayout implements Portal
 
 		}
 
-		if (columnResizeListener != null)
-		{
-			grid.removeColumnResizeListener(columnResizeListener);
-		}
-		columnResizeListener = new Grid.ColumnResizeListener()
-		{
-			private static final long serialVersionUID = 4034036880290943146L;
-
-			@Override
-			public void columnResize(com.vaadin.ui.Grid.ColumnResizeEvent event)
-			{
-				final String propertyId = (String) event.getColumn().getPropertyId();
-				final double width = event.getColumn().getWidth();
-				getConfigDelegate().setValue(getPortal(), baseWidthKey + propertyId, "" + (int) width);
-
-			}
-		};
 		grid.addColumnResizeListener(columnResizeListener);
 	}
 
 	private void setupGridColumnVisibility(final Grid grid, final String baseVisableKey)
 	{
+		if (columnVisibilityListener != null)
+		{
+			grid.removeColumnVisibilityChangeListener(columnVisibilityListener);
+
+		}
+		else
+		{
+			columnVisibilityListener = new ColumnVisibilityChangeListener()
+			{
+
+				private static final long serialVersionUID = -9082974567948595049L;
+
+				@Override
+				public void columnVisibilityChanged(ColumnVisibilityChangeEvent event)
+				{
+					final Column column = event.getColumn();
+					final boolean isVisible = !column.isHidden();
+
+					int value = 0;
+					if (isVisible)
+					{
+						value = 1;
+					}
+
+					getConfigDelegate().setValue(getPortal(), baseVisableKey + column.getPropertyId(), value);
+
+				}
+			};
+		}
+
 		for (Entry<String, Integer> value : getConfigDelegate().getValuesLikeInt(getPortal(), baseVisableKey)
 				.entrySet())
 		{
@@ -361,37 +399,41 @@ public abstract class BasePortal extends VerticalLayout implements Portal
 
 		}
 
-		if (columnVisibilityListener != null)
-		{
-			grid.removeColumnVisibilityChangeListener(columnVisibilityListener);
-
-		}
-		columnVisibilityListener = new ColumnVisibilityChangeListener()
-		{
-
-			private static final long serialVersionUID = -9082974567948595049L;
-
-			@Override
-			public void columnVisibilityChanged(ColumnVisibilityChangeEvent event)
-			{
-				final Column column = event.getColumn();
-				final boolean isVisible = !column.isHidden();
-
-				int value = 0;
-				if (isVisible)
-				{
-					value = 1;
-				}
-
-				getConfigDelegate().setValue(getPortal(), baseVisableKey + column.getPropertyId(), value);
-
-			}
-		};
 		grid.addColumnVisibilityChangeListener(columnVisibilityListener);
 	}
 
 	private void setupGridColumnReordering(final Grid grid, final String keyStub)
 	{
+		if (columnReorderListener != null)
+		{
+			grid.removeColumnReorderListener(columnReorderListener);
+		}
+		else
+		{
+
+			columnReorderListener = new ColumnReorderListener()
+			{
+				private static final long serialVersionUID = -2810298692555333890L;
+
+				@Override
+				public void columnReorder(ColumnReorderEvent event)
+				{
+					final List<Column> columns = ((Grid) event.getSource()).getColumns();
+					if (columns.size() > 0)
+					{
+						String parsedColumns = "";
+						for (Column column : columns)
+						{
+							parsedColumns += column.getPropertyId() + ", ";
+						}
+
+						parsedColumns = parsedColumns.substring(0, parsedColumns.length() - 2);
+						getConfigDelegate().setValue(getPortal(), keyStub, "" + parsedColumns);
+					}
+				}
+			};
+		}
+
 		final List<Column> availableColumns = grid.getColumns();
 		final String columns = getConfigDelegate().getValueString(getPortal(), keyStub);
 		if (availableColumns.size() > 0 && columns != null && !columns.isEmpty())
@@ -403,32 +445,6 @@ public abstract class BasePortal extends VerticalLayout implements Portal
 			}
 		}
 
-		if (columnReorderListener != null)
-		{
-			grid.removeColumnReorderListener(columnReorderListener);
-		}
-
-		columnReorderListener = new ColumnReorderListener()
-		{
-			private static final long serialVersionUID = -2810298692555333890L;
-
-			@Override
-			public void columnReorder(ColumnReorderEvent event)
-			{
-				final List<Column> columns = ((Grid) event.getSource()).getColumns();
-				if (columns.size() > 0)
-				{
-					String parsedColumns = "";
-					for (Column column : columns)
-					{
-						parsedColumns += column.getPropertyId() + ", ";
-					}
-
-					parsedColumns = parsedColumns.substring(0, parsedColumns.length() - 2);
-					getConfigDelegate().setValue(getPortal(), keyStub, "" + parsedColumns);
-				}
-			}
-		};
 		grid.addColumnReorderListener(columnReorderListener);
 	}
 
