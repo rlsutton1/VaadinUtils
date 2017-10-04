@@ -75,6 +75,11 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 		layout.addComponent(comp);
 	}
 
+	protected void addComponentToLayout(Component comp, int position)
+	{
+		layout.addComponent(comp, position);
+	}
+
 	void setSelectionMode(final SelectionMode mode)
 	{
 		UI ui = UI.getCurrent();
