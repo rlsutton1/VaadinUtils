@@ -26,6 +26,7 @@ import com.vaadin.shared.data.sort.SortDirection;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Grid;
+import com.vaadin.ui.Grid.MultiSelectionModel;
 import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -68,6 +69,16 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 		this.defaultValue = defaultValue;
 		setSelectionMode(SelectionMode.MULTI);
 
+	}
+
+	public void deselectAll()
+	{
+		grid.deselectAll();
+	}
+
+	public void selectAll()
+	{
+		((MultiSelectionModel) grid.getSelectionModel()).selectAll();
 	}
 
 	protected void addComponentToLayout(Component comp)
