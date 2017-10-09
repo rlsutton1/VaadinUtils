@@ -2,8 +2,10 @@ package au.com.vaadinutils.dashboard;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
@@ -51,14 +53,6 @@ public abstract class BasePortal extends VerticalLayout implements Portal
 	private PortalConfigDelgate configDelegate;
 
 	private Label titleLabel;
-
-	private SortListener sortListener;
-
-	private Grid.ColumnResizeListener columnResizeListener;
-
-	private ColumnVisibilityChangeListener columnVisibilityListener;
-
-	private ColumnReorderListener columnReorderListener;
 
 	protected BasePortal(Tblportal portal, DashBoardController dashBoard, PortalConfigDelgate configDelegate)
 	{
@@ -249,16 +243,18 @@ public abstract class BasePortal extends VerticalLayout implements Portal
 		};
 	}
 
+	Map<Grid, SortListener> sortListeners = new HashMap<>();
+
 	public void setupGridSorting(final Grid grid, final String keySorting)
 	{
 
-		if (sortListener != null)
+		if (sortListeners.get(grid) != null)
 		{
-			grid.removeSortListener(sortListener);
+			grid.removeSortListener(sortListeners.get(grid));
 		}
 		else
 		{
-			sortListener = new SortListener()
+			SortListener sortListener = new SortListener()
 			{
 
 				private static final long serialVersionUID = 1L;
@@ -276,6 +272,7 @@ public abstract class BasePortal extends VerticalLayout implements Portal
 
 				}
 			};
+			sortListeners.put(grid, sortListener);
 		}
 
 		String sorts = getConfigDelegate().getValueString(getPortal(), keySorting);
@@ -299,19 +296,21 @@ public abstract class BasePortal extends VerticalLayout implements Portal
 
 		}
 
-		grid.addSortListener(sortListener);
+		grid.addSortListener(sortListeners.get(grid));
 
 	}
 
+	Map<Grid, Grid.ColumnResizeListener> columnResizeListeners = new HashMap<>();
+
 	private void setupGridColumnSizing(final Grid grid, final String baseWidthKey)
 	{
-		if (columnResizeListener != null)
+		if (columnResizeListeners.get(grid) != null)
 		{
-			grid.removeColumnResizeListener(columnResizeListener);
+			grid.removeColumnResizeListener(columnResizeListeners.get(grid));
 		}
 		else
 		{
-			columnResizeListener = new Grid.ColumnResizeListener()
+			Grid.ColumnResizeListener columnResizeListener = new Grid.ColumnResizeListener()
 			{
 				private static final long serialVersionUID = 4034036880290943146L;
 
@@ -324,6 +323,7 @@ public abstract class BasePortal extends VerticalLayout implements Portal
 
 				}
 			};
+			columnResizeListeners.put(grid, columnResizeListener);
 		}
 
 		for (Entry<String, Integer> value : getConfigDelegate().getValuesLikeInt(getPortal(), baseWidthKey).entrySet())
@@ -346,19 +346,21 @@ public abstract class BasePortal extends VerticalLayout implements Portal
 
 		}
 
-		grid.addColumnResizeListener(columnResizeListener);
+		grid.addColumnResizeListener(columnResizeListeners.get(grid));
 	}
+
+	Map<Grid, ColumnVisibilityChangeListener> columnVisibilityListeners = new HashMap<>();
 
 	private void setupGridColumnVisibility(final Grid grid, final String baseVisableKey)
 	{
-		if (columnVisibilityListener != null)
+		if (columnVisibilityListeners.get(grid) != null)
 		{
-			grid.removeColumnVisibilityChangeListener(columnVisibilityListener);
+			grid.removeColumnVisibilityChangeListener(columnVisibilityListeners.get(grid));
 
 		}
 		else
 		{
-			columnVisibilityListener = new ColumnVisibilityChangeListener()
+			ColumnVisibilityChangeListener columnVisibilityListener = new ColumnVisibilityChangeListener()
 			{
 
 				private static final long serialVersionUID = -9082974567948595049L;
@@ -379,6 +381,7 @@ public abstract class BasePortal extends VerticalLayout implements Portal
 
 				}
 			};
+			columnVisibilityListeners.put(grid, columnVisibilityListener);
 		}
 
 		for (Entry<String, Integer> value : getConfigDelegate().getValuesLikeInt(getPortal(), baseVisableKey)
@@ -399,19 +402,21 @@ public abstract class BasePortal extends VerticalLayout implements Portal
 
 		}
 
-		grid.addColumnVisibilityChangeListener(columnVisibilityListener);
+		grid.addColumnVisibilityChangeListener(columnVisibilityListeners.get(grid));
 	}
+
+	Map<Grid, ColumnReorderListener> columnReorderListeners = new HashMap<>();
 
 	private void setupGridColumnReordering(final Grid grid, final String keyStub)
 	{
-		if (columnReorderListener != null)
+		if (columnReorderListeners.get(grid) != null)
 		{
-			grid.removeColumnReorderListener(columnReorderListener);
+			grid.removeColumnReorderListener(columnReorderListeners.get(grid));
 		}
 		else
 		{
 
-			columnReorderListener = new ColumnReorderListener()
+			ColumnReorderListener columnReorderListener = new ColumnReorderListener()
 			{
 				private static final long serialVersionUID = -2810298692555333890L;
 
@@ -432,6 +437,8 @@ public abstract class BasePortal extends VerticalLayout implements Portal
 					}
 				}
 			};
+
+			columnReorderListeners.put(grid, columnReorderListener);
 		}
 
 		final List<Column> availableColumns = grid.getColumns();
@@ -445,7 +452,7 @@ public abstract class BasePortal extends VerticalLayout implements Portal
 			}
 		}
 
-		grid.addColumnReorderListener(columnReorderListener);
+		grid.addColumnReorderListener(columnReorderListeners.get(grid));
 	}
 
 	/**
