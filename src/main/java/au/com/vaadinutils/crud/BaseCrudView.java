@@ -42,6 +42,7 @@ import com.vaadin.event.dd.DragAndDropEvent;
 import com.vaadin.event.dd.DropHandler;
 import com.vaadin.event.dd.acceptcriteria.AcceptCriterion;
 import com.vaadin.event.dd.acceptcriteria.SourceIsTarget;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.dd.VerticalDropLocation;
 import com.vaadin.shared.ui.label.ContentMode;
@@ -701,6 +702,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 
 		group.addComponent(clear);
 
+		group.addComponent(createRefreshButton());
+
 		// searchField.setWidth("80%");
 		searchField.setId("CrudSearchField");
 		group.addComponent(searchField);
@@ -758,6 +761,27 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 
 		});
 		return clearButton;
+	}
+
+	private Button createRefreshButton()
+	{
+
+		Button refreshButton = new Button(FontAwesome.REFRESH);
+		refreshButton.setImmediate(true);
+		refreshButton.addClickListener(new ClickEventLogged.ClickListener()
+		{
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void clicked(ClickEvent event)
+			{
+				EntityManagerProvider.getEntityManager().getEntityManagerFactory().getCache().evict(entityClass);
+				triggerFilter();
+
+			}
+
+		});
+		return refreshButton;
 	}
 
 	/**
