@@ -1585,7 +1585,7 @@ public abstract class JpaDslAbstract<E, R>
 		return this;
 	}
 
-	public JpaDslAbstract<E, R> orderBy(SingularAttribute<E, ?> field, boolean asc)
+	public JpaDslAbstract<E, R> orderBy(SingularAttribute<? super E, ?> field, boolean asc)
 	{
 		if (asc)
 		{
