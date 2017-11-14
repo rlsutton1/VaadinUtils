@@ -23,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 import javax.activation.DataSource;
 import javax.mail.util.ByteArrayDataSource;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.google.common.base.Preconditions;
@@ -30,8 +31,6 @@ import com.vaadin.server.Page;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.server.WrappedSession;
 import com.vaadin.ui.UI;
-
-import org.apache.logging.log4j.LogManager;
 
 import au.com.vaadinutils.jasper.parameter.ReportChooser;
 import au.com.vaadinutils.jasper.parameter.ReportParameter;
@@ -416,7 +415,9 @@ public class JasperManager implements Runnable
 					JRTextField st = (JRTextField) element;
 
 					JRDesignExpression expr = (JRDesignExpression) st.getExpression();
-					expr.setText("\"" + reportProperties.getReportTitle() + "\"+" + expr.getText());
+					expr.setText("\"                       " + reportProperties.getReportTitle() + "\"+"
+							+ expr.getText()
+							+ "+\"                        Generated: \"+    new java.text.SimpleDateFormat(\"yyyy/MM/dd hh:mm:ss a\").format(new Date())");
 					st.setWidth((designFile.getPageWidth() - st.getX()) - (margin * 2));
 
 				}
