@@ -112,10 +112,20 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 	}
 
-	@SuppressWarnings("unchecked")
 	public E findById(Integer id)
 	{
-		return findById((K) new Long(id));
+		if (id == null)
+		{
+
+			logger.warn("Null key provided for findById on entity " + entityClass);
+			if (logger.isDebugEnabled())
+			{
+				Exception e = new Exception("Null Key Provided for entity " + entityClass);
+				logger.debug(e, e);
+			}
+			return null;
+		}
+		return getEntityManager().find(entityClass, new Long(id));
 	}
 
 	public <T> JpaDslSelectAttributeBuilder<E, T> select(SingularAttribute<E, T> attribute)
