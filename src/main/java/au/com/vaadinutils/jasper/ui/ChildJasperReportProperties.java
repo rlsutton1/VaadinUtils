@@ -6,6 +6,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import com.vaadin.server.Resource;
+
 import au.com.vaadinutils.jasper.JasperManager.OutputFormat;
 import au.com.vaadinutils.jasper.filter.ReportFilterUIBuilder;
 import au.com.vaadinutils.jasper.parameter.ReportParameter;
@@ -47,7 +49,7 @@ public class ChildJasperReportProperties implements JasperReportProperties
 	{
 		return this.reportFilename;
 	}
-	
+
 	@Override
 	public Map<String, Object> getCustomReportParameterMap()
 	{
@@ -86,10 +88,10 @@ public class ChildJasperReportProperties implements JasperReportProperties
 	}
 
 	@Override
-	public List<ReportParameter<?>> prepareData(Collection<ReportParameter<?>> params,String reportFilename, CleanupCallback cleanupCallback)
-			throws Exception
+	public List<ReportParameter<?>> prepareData(Collection<ReportParameter<?>> params, String reportFilename,
+			CleanupCallback cleanupCallback) throws Exception
 	{
-		return parentReportProperties.prepareData(params,reportFilename, cleanupCallback);
+		return parentReportProperties.prepareData(params, reportFilename, cleanupCallback);
 	}
 
 	@Override
@@ -131,9 +133,9 @@ public class ChildJasperReportProperties implements JasperReportProperties
 	}
 
 	@Override
-	public String generateDynamicHeaderImage(int pageWidth,int height, String reportTitle)
+	public String generateDynamicHeaderImage(int pageWidth, int height, String reportTitle)
 	{
-		return this.parentReportProperties.generateDynamicHeaderImage(pageWidth,height, reportTitle);
+		return this.parentReportProperties.generateDynamicHeaderImage(pageWidth, height, reportTitle);
 	}
 
 	@Override
@@ -161,10 +163,39 @@ public class ChildJasperReportProperties implements JasperReportProperties
 		return this.parentReportProperties.getReportIdentifier();
 	}
 
-
 	@Override
 	public String getDynamicJrxmlFileName()
 	{
 		return null;
+	}
+
+	@Override
+	public Resource getExportButtonIconResource()
+	{
+		return this.parentReportProperties.getExportButtonIconResource();
+	}
+
+	@Override
+	public Resource getScheduleButtonIconResource()
+	{
+		return this.parentReportProperties.getScheduleButtonIconResource();
+	}
+
+	@Override
+	public Resource getEmailButtonIconResource()
+	{
+		return this.parentReportProperties.getEmailButtonIconResource();
+	}
+
+	@Override
+	public Resource getPdfButtonIconResource()
+	{
+		return this.parentReportProperties.getPdfButtonIconResource();
+	}
+
+	@Override
+	public Resource getPreviewButtonIconResource()
+	{
+		return this.parentReportProperties.getPreviewButtonIconResource();
 	}
 }

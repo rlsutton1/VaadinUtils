@@ -42,12 +42,7 @@ public abstract class BasePortalAdder extends VerticalLayout implements PortalCo
 
 		Label label = new Label(title);
 
-		Button button = new Button(FontAwesome.PLUS.getHtml());
-		button.setDescription("Click to add '" + title + "' to the current Dashboard");
-
-		button.setCaptionAsHtml(true);
-		button.setStyleName(ValoTheme.BUTTON_TINY);
-		button.addStyleName(ValoTheme.BUTTON_FRIENDLY);
+		Button button = createAddButton(title);
 
 		label.setWidth("200");
 		button.addClickListener(new ClickListener()
@@ -75,6 +70,17 @@ public abstract class BasePortalAdder extends VerticalLayout implements PortalCo
 
 		return layout;
 
+	}
+
+	protected Button createAddButton(final String title)
+	{
+		Button button = new Button(FontAwesome.PLUS.getHtml());
+		button.setDescription("Click to add '" + title + "' to the current Dashboard");
+
+		button.setCaptionAsHtml(true);
+		button.setStyleName(ValoTheme.BUTTON_TINY);
+		button.addStyleName(ValoTheme.BUTTON_FRIENDLY);
+		return button;
 	}
 
 	protected abstract Enum<?> getPortalEnum();

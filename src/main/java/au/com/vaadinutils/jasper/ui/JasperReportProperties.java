@@ -6,16 +6,18 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import com.vaadin.server.Resource;
+
 import au.com.vaadinutils.jasper.JasperManager.OutputFormat;
 import au.com.vaadinutils.jasper.filter.ReportFilterUIBuilder;
 import au.com.vaadinutils.jasper.parameter.ReportParameter;
 
 /**
- * Provides an interface between Jasper Reports and you application specific settings
- * and the settings of a particular report.
+ * Provides an interface between Jasper Reports and you application specific
+ * settings and the settings of a particular report.
  * 
- * Normally you would implement a base abstract class that implemented each of the method with the 
- * exception of:
+ * Normally you would implement a base abstract class that implemented each of
+ * the method with the exception of:
  * 
  * public abstract String getReportTitle();
  * 
@@ -23,7 +25,8 @@ import au.com.vaadinutils.jasper.parameter.ReportParameter;
  * 
  * public abstract ReportFilterUIBuilder getFilterBuilder();
  * 
- * Each of the above methods are then implemented in a concrete class for each report.
+ * Each of the above methods are then implemented in a concrete class for each
+ * report.
  * 
  * @author bsutton
  *
@@ -45,23 +48,22 @@ public interface JasperReportProperties
 	public abstract String getReportFileName();
 
 	/**
-	 * the folder where the jasper report (.jrxml) can be found and the .jasper 
+	 * the folder where the jasper report (.jrxml) can be found and the .jasper
 	 * file will be written (if the jrxml needs to be compiled).
+	 * 
 	 * @return
 	 */
 	public abstract File getReportFolder();
 
 	/**
-	 * The library supports the concept of a standardized header and footer which is dynamically 
-	 * added to each report. This provides a nice means of ensuring that every report has a consistent
-	 * header and footer.
-	 * The template is just a standard jasper report which contains just three bands:
-	 * Page Header
-	 * Page Footer
-	 * No Details section.
+	 * The library supports the concept of a standardized header and footer
+	 * which is dynamically added to each report. This provides a nice means of
+	 * ensuring that every report has a consistent header and footer. The
+	 * template is just a standard jasper report which contains just three
+	 * bands: Page Header Page Footer No Details section.
 	 * 
-	 * When creating a report you should leave each of the above bands empty so they can be dynamically
-	 * rendered.
+	 * When creating a report you should leave each of the above bands empty so
+	 * they can be dynamically rendered.
 	 * 
 	 * The band may contain parameters such as the report name.
 	 * 
@@ -71,9 +73,9 @@ public interface JasperReportProperties
 	public abstract String getHeaderFooterTemplateName();
 
 	/**
-	 * This should return the current logged in users name.
-	 * It is displayed in the list of queued reports so that other users can know who is
-	 * holding the queue up.
+	 * This should return the current logged in users name. It is displayed in
+	 * the list of queued reports so that other users can know who is holding
+	 * the queue up.
 	 * 
 	 * @return
 	 */
@@ -84,27 +86,33 @@ public interface JasperReportProperties
 	/**
 	 * ***MUST BE THREAD SAFE***
 	 * <p>
-	 * Some more complex reports may need some preprocessing of data before the 
-	 * report is run. A classic example is using java code to create a temporary table
-	 * which is then passed to the report as its primary data source (via a parameter).
-	 * The prepareData method is called before the jasper report is rendered.
+	 * Some more complex reports may need some preprocessing of data before the
+	 * report is run. A classic example is using java code to create a temporary
+	 * table which is then passed to the report as its primary data source (via
+	 * a parameter). The prepareData method is called before the jasper report
+	 * is rendered.
 	 * 
 	 * Create any temporary data that may be needed for the jasper report and
 	 * return any extra params, typically the temporary table
 	 * <p>
 	 * Because report parameters live through multiple runs of a report and the
-	 * agent may cancel a report, which leaves the report still running in a background thread.
+	 * agent may cancel a report, which leaves the report still running in a
+	 * background thread.
 	 * 
 	 * prepareData must be thread safe.
 	 * <p>
-	 * if cleanup is required it should be done via the CleanupCallback
-	 * Object which will be invoked after the report is finished rendering.
+	 * if cleanup is required it should be done via the CleanupCallback Object
+	 * which will be invoked after the report is finished rendering.
 	 * 
-	 * @param params the collection of parameters that will be sent to the report.
-	 * @param cleanupCallback - a interface to an object that will be called once the report has completed.
+	 * @param params
+	 *            the collection of parameters that will be sent to the report.
+	 * @param cleanupCallback
+	 *            - a interface to an object that will be called once the report
+	 *            has completed.
 	 * 
-	 * @return The list or parameters that are to be passed to the report. This is normally 'params' with any 
-	 * additional parameters added to the collection.
+	 * @return The list or parameters that are to be passed to the report. This
+	 *         is normally 'params' with any additional parameters added to the
+	 *         collection.
 	 * @throws Exception
 	 */
 	public abstract List<ReportParameter<?>> prepareData(Collection<ReportParameter<?>> params, String reportFileName,
@@ -176,7 +184,7 @@ public interface JasperReportProperties
 	 * 
 	 * 
 	 * @param pageWidth
-	 * @param height 
+	 * @param height
 	 * @param reportTitle
 	 *            TODO
 	 * @return
@@ -200,16 +208,19 @@ public interface JasperReportProperties
 
 	/**
 	 * Email address to use in the 'From' field when sending reports via emails
+	 * 
 	 * @return
 	 */
 	public abstract String getUserEmailAddress();
 
 	/**
-	 * Multiple reports can be accessed from a single ReportView via the ReportChooserReportParameter, so it is 
-	 * necessary to be able to identify a report as belonging to a ReportView
+	 * Multiple reports can be accessed from a single ReportView via the
+	 * ReportChooserReportParameter, so it is necessary to be able to identify a
+	 * report as belonging to a ReportView
 	 * 
-	 * An enum that identifies a report based on the vaadin view that is used to configure it.
-	 * this will be used to group the report in the schedules view.
+	 * An enum that identifies a report based on the vaadin view that is used to
+	 * configure it. this will be used to group the report in the schedules
+	 * view.
 	 * 
 	 * @return
 	 */
@@ -218,5 +229,15 @@ public interface JasperReportProperties
 	public abstract Map<String, Object> getCustomReportParameterMap();
 
 	public abstract String getDynamicJrxmlFileName();
+
+	public abstract Resource getExportButtonIconResource();
+
+	public abstract Resource getScheduleButtonIconResource();
+
+	public abstract Resource getEmailButtonIconResource();
+
+	public abstract Resource getPdfButtonIconResource();
+
+	public abstract Resource getPreviewButtonIconResource();
 
 }

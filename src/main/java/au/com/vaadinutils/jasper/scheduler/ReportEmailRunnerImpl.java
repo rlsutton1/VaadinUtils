@@ -14,6 +14,7 @@ import javax.mail.internet.AddressException;
 import org.apache.commons.mail.EmailException;
 
 import com.google.common.base.Preconditions;
+import com.vaadin.server.Resource;
 
 import au.com.vaadinutils.jasper.AttachmentType;
 import au.com.vaadinutils.jasper.JasperEmailBuilder;
@@ -41,16 +42,17 @@ public class ReportEmailRunnerImpl implements ReportEmailRunner, JasperReportPro
 			throws InterruptedException, IOException, EmailException, InstantiationException, IllegalAccessException,
 			AddressException, ClassNotFoundException
 	{
-		Preconditions.checkNotNull(schedule.getSendersEmailAddress(),"Missing senders email address.");
-		Preconditions.checkNotNull(schedule.getRecipients(),"Missing recipient email address");
-		Preconditions.checkArgument(schedule.getRecipients().size()>0,"Missing recipient email address");
-		
+		Preconditions.checkNotNull(schedule.getSendersEmailAddress(), "Missing senders email address.");
+		Preconditions.checkNotNull(schedule.getRecipients(), "Missing recipient email address");
+		Preconditions.checkArgument(schedule.getRecipients().size() > 0, "Missing recipient email address");
+
 		Class<? extends JasperReportProperties> jrpClass = schedule.getJasperReportPropertiesClass();
 
 		jasperReportProperties = jrpClass.newInstance();
 		this.schedule = schedule;
 
-		jasperReportProperties = new JasperReportPropertiesAlternateFile(schedule.getReportTitle(),schedule.getReportFileName(), jasperReportProperties);
+		jasperReportProperties = new JasperReportPropertiesAlternateFile(schedule.getReportTitle(),
+				schedule.getReportFileName(), jasperReportProperties);
 		Collection<ReportParameter<?>> params = buildParams(schedule, scheduledTime, this);
 
 		JasperManager manager = new JasperManager(this);
@@ -67,8 +69,8 @@ public class ReportEmailRunnerImpl implements ReportEmailRunner, JasperReportPro
 			AttachmentType attachementType = outputFormat.getAttachementType();
 			builder.setFrom(schedule.getSendersEmailAddress().toString()).setSubject(schedule.subject())
 
-			.setHtmlBody(schedule.message())
-					.addAttachement(export.getBodyAsDataSource(schedule.getReportTitle()+attachementType.getFileExtension(), attachementType));
+					.setHtmlBody(schedule.message()).addAttachement(export.getBodyAsDataSource(
+							schedule.getReportTitle() + attachementType.getFileExtension(), attachementType));
 
 			for (ReportEmailRecipient address : schedule.getRecipients())
 			{
@@ -116,22 +118,22 @@ public class ReportEmailRunnerImpl implements ReportEmailRunner, JasperReportPro
 		for (ScheduledDateParameter param : schedule.getDateParameters())
 		{
 			String start = param.getOffsetType().convertStartDate(param.getStartDate(), scheduledTime, param.getType());
-			params.add(new ReportParameterConstant<String>(param.getStartName(), start, param.getLabel()+" From", start));
-			
+			params.add(new ReportParameterConstant<String>(param.getStartName(), start, param.getLabel() + " From",
+					start));
+
 			String end = param.getOffsetType().convertEndDate(param.getEndDate(), scheduledTime, param.getType());
-			params.add(new ReportParameterConstant<String>(param.getEndName(), end,param.getLabel()+" To",end));
+			params.add(new ReportParameterConstant<String>(param.getEndName(), end, param.getLabel() + " To", end));
 
 		}
 
 		return params;
 	}
-	
+
 	@Override
 	public Map<String, Object> getCustomReportParameterMap()
 	{
 		return jasperReportProperties.getCustomReportParameterMap();
 	}
-
 
 	@Override
 	public String getReportTitle()
@@ -216,9 +218,9 @@ public class ReportEmailRunnerImpl implements ReportEmailRunner, JasperReportPro
 	}
 
 	@Override
-	public String generateDynamicHeaderImage(int pageWidth,int height, String reportTitle)
+	public String generateDynamicHeaderImage(int pageWidth, int height, String reportTitle)
 	{
-		return jasperReportProperties.generateDynamicHeaderImage(pageWidth,height, reportTitle);
+		return jasperReportProperties.generateDynamicHeaderImage(pageWidth, height, reportTitle);
 	}
 
 	@Override
@@ -251,11 +253,40 @@ public class ReportEmailRunnerImpl implements ReportEmailRunner, JasperReportPro
 	{
 		return jasperReportProperties.getReportIdentifier();
 	}
-	
 
 	@Override
 	public String getDynamicJrxmlFileName()
 	{
 		return null;
+	}
+
+	@Override
+	public Resource getExportButtonIconResource()
+	{
+		return jasperReportProperties.getExportButtonIconResource();
+	}
+
+	@Override
+	public Resource getScheduleButtonIconResource()
+	{
+		return jasperReportProperties.getScheduleButtonIconResource();
+	}
+
+	@Override
+	public Resource getEmailButtonIconResource()
+	{
+		return jasperReportProperties.getEmailButtonIconResource();
+	}
+
+	@Override
+	public Resource getPdfButtonIconResource()
+	{
+		return jasperReportProperties.getPdfButtonIconResource();
+	}
+
+	@Override
+	public Resource getPreviewButtonIconResource()
+	{
+		return jasperReportProperties.getPreviewButtonIconResource();
 	}
 }

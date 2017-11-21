@@ -6,6 +6,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import com.vaadin.server.Resource;
+
 import au.com.vaadinutils.jasper.JasperManager.OutputFormat;
 import au.com.vaadinutils.jasper.filter.ReportFilterUIBuilder;
 import au.com.vaadinutils.jasper.parameter.ReportParameter;
@@ -27,11 +29,12 @@ public class JasperReportPropertiesAlternateFile implements JasperReportProperti
 	@Override
 	public String getReportFileName()
 	{
-		if (reportPropertiesTemplate.getDynamicJrxmlFileName() !=null){
+		if (reportPropertiesTemplate.getDynamicJrxmlFileName() != null)
+		{
 			return reportPropertiesTemplate.getDynamicJrxmlFileName();
 		}
 		return reportFileName;
-		
+
 	}
 
 	@Override
@@ -40,7 +43,7 @@ public class JasperReportPropertiesAlternateFile implements JasperReportProperti
 
 		return title;
 	}
-	
+
 	@Override
 	public Map<String, Object> getCustomReportParameterMap()
 	{
@@ -51,7 +54,7 @@ public class JasperReportPropertiesAlternateFile implements JasperReportProperti
 	public List<ReportParameter<?>> prepareData(Collection<ReportParameter<?>> params, String reportFileName,
 			CleanupCallback cleanupCallback) throws Exception
 	{
-		return reportPropertiesTemplate.prepareData(params,  reportFileName, cleanupCallback);
+		return reportPropertiesTemplate.prepareData(params, reportFileName, cleanupCallback);
 	}
 
 	@Override
@@ -88,9 +91,9 @@ public class JasperReportPropertiesAlternateFile implements JasperReportProperti
 	}
 
 	@Override
-	public String generateDynamicHeaderImage(int pageWidth,int height, String reportTitle)
+	public String generateDynamicHeaderImage(int pageWidth, int height, String reportTitle)
 	{
-		return reportPropertiesTemplate.generateDynamicHeaderImage(pageWidth, height,reportTitle);
+		return reportPropertiesTemplate.generateDynamicHeaderImage(pageWidth, height, reportTitle);
 	}
 
 	@Override
@@ -151,5 +154,35 @@ public class JasperReportPropertiesAlternateFile implements JasperReportProperti
 	public String getDynamicJrxmlFileName()
 	{
 		return null;
+	}
+
+	@Override
+	public Resource getExportButtonIconResource()
+	{
+		return reportPropertiesTemplate.getExportButtonIconResource();
+	}
+
+	@Override
+	public Resource getScheduleButtonIconResource()
+	{
+		return reportPropertiesTemplate.getScheduleButtonIconResource();
+	}
+
+	@Override
+	public Resource getEmailButtonIconResource()
+	{
+		return reportPropertiesTemplate.getEmailButtonIconResource();
+	}
+
+	@Override
+	public Resource getPdfButtonIconResource()
+	{
+		return reportPropertiesTemplate.getPdfButtonIconResource();
+	}
+
+	@Override
+	public Resource getPreviewButtonIconResource()
+	{
+		return reportPropertiesTemplate.getPreviewButtonIconResource();
 	}
 }
