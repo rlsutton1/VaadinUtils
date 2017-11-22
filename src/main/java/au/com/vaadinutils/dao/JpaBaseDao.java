@@ -1,9 +1,12 @@
 package au.com.vaadinutils.dao;
 
 import java.lang.reflect.ParameterizedType;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -28,6 +31,7 @@ import org.vaadin.addons.lazyquerycontainer.EntityContainer;
 import com.google.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 
+import au.com.vaadinutils.crud.CrudEntity;
 import au.com.vaadinutils.entity.BaseCrudEntity;
 import au.com.vaadinutils.entity.BaseCrudEntity_;
 
@@ -938,4 +942,16 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 	{
 		return getGenericDao(entityClass).select().count().intValue();
 	}
+
+	public Collection<Long> getIds(Collection<? extends CrudEntity> entities)
+	{
+		Set<Long> ids = new HashSet<>();
+		for (CrudEntity entity : entities)
+		{
+			ids.add(entity.getId());
+		}
+
+		return ids;
+	}
+
 }
