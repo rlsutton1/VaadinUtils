@@ -325,7 +325,7 @@ public class HelpSplitPanel extends HorizontalLayout implements View, HelpPageLi
 					helpFooter.setComponentAlignment(closeButton, Alignment.BOTTOM_LEFT);
 
 					helpFooter.addComponent(hideButton);
-					helpFooter.addComponent(new Label("Help id is " + helpId));
+					helpFooter.addComponent(new Label("Help id is HELP_" + helpId));
 
 					helpFooter.setComponentAlignment(hideButton, Alignment.BOTTOM_RIGHT);
 
