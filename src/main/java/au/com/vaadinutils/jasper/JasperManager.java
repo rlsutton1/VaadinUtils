@@ -414,8 +414,10 @@ public class JasperManager implements Runnable
 				{
 					JRTextField st = (JRTextField) element;
 
+					String company = reportProperties.getCompanyName();
+
 					JRDesignExpression expr = (JRDesignExpression) st.getExpression();
-					expr.setText("\"                       " + reportProperties.getReportTitle() + "\"+"
+					expr.setText("\"" + company + "                       " + reportProperties.getReportTitle() + "\"+"
 							+ expr.getText()
 							+ "+\"                        Generated: \"+    new java.text.SimpleDateFormat(\"yyyy/MM/dd hh:mm:ss a\").format(new Date())");
 					st.setWidth((designFile.getPageWidth() - st.getX()) - (margin * 2));
