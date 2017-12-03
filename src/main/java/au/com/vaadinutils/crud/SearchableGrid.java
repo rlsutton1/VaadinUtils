@@ -5,6 +5,7 @@ import java.util.Collection;
 
 import org.vaadin.teemusa.gridextensions.refresher.GridRefresher;
 
+import com.vaadin.data.Container;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Container.Filterable;
 import com.vaadin.data.Container.Indexed;
@@ -482,6 +483,11 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 	public void sort(final Sort sort)
 	{
 		grid.sort(sort);
+	}
+
+	public Container.Indexed getContainerDataSource()
+	{
+		return grid.getContainerDataSource();
 	}
 
 }
