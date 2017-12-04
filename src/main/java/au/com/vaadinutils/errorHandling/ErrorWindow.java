@@ -4,11 +4,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.vaadin.addons.screenshot.Screenshot;
 import org.vaadin.addons.screenshot.ScreenshotImage;
@@ -214,20 +215,33 @@ public class ErrorWindow
 
 	boolean isExempted(Throwable cause)
 	{
-		Map<String, String> exemptedExceptions = new HashMap<>();
-		exemptedExceptions.put("ClientAbortException", "");
-		exemptedExceptions.put("SocketException", "");
-		exemptedExceptions.put("UIDetachedException", "");
-		exemptedExceptions.put("IOException", "Pipe closed");
+		Map<String, Set<String>> exemptedExceptions = new HashMap<>();
+		exemptedExceptions.put("ClientAbortException", new HashSet<String>());
+		exemptedExceptions.put("SocketException", new HashSet<String>());
+		exemptedExceptions.put("UIDetachedException", new HashSet<String>());
 
-		String expectedMessage = exemptedExceptions.get(cause.getClass().getSimpleName());
+		HashSet<String> ioSet = new HashSet<String>();
+		ioSet.add("Pipe closed");
+		ioSet.add("Pipe not connected");
+		exemptedExceptions.put("IOException", ioSet);
+
+		Set<String> expectedMessage = exemptedExceptions.get(cause.getClass().getSimpleName());
 		if (expectedMessage != null)
 		{
-			if (StringUtils.isNotEmpty(expectedMessage))
+			if (!expectedMessage.isEmpty())
 			{
-				return cause.getMessage().equalsIgnoreCase(expectedMessage);
+				for (String message : expectedMessage)
+				{
+					if (cause.getMessage().equalsIgnoreCase(message))
+					{
+						return true;
+					}
+				}
 			}
-			return true;
+			else
+			{
+				return true;
+			}
 		}
 		return false;
 	}

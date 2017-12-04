@@ -47,7 +47,7 @@ public class ChildJasperReportProperties implements JasperReportProperties
 	{
 		return this.reportFilename;
 	}
-	
+
 	@Override
 	public Map<String, Object> getCustomReportParameterMap()
 	{
@@ -86,10 +86,10 @@ public class ChildJasperReportProperties implements JasperReportProperties
 	}
 
 	@Override
-	public List<ReportParameter<?>> prepareData(Collection<ReportParameter<?>> params,String reportFilename, CleanupCallback cleanupCallback)
-			throws Exception
+	public List<ReportParameter<?>> prepareData(Collection<ReportParameter<?>> params, String reportFilename,
+			CleanupCallback cleanupCallback) throws Exception
 	{
-		return parentReportProperties.prepareData(params,reportFilename, cleanupCallback);
+		return parentReportProperties.prepareData(params, reportFilename, cleanupCallback);
 	}
 
 	@Override
@@ -131,9 +131,9 @@ public class ChildJasperReportProperties implements JasperReportProperties
 	}
 
 	@Override
-	public String generateDynamicHeaderImage(int pageWidth,int height, String reportTitle)
+	public String generateDynamicHeaderImage(int pageWidth, int height, String reportTitle)
 	{
-		return this.parentReportProperties.generateDynamicHeaderImage(pageWidth,height, reportTitle);
+		return this.parentReportProperties.generateDynamicHeaderImage(pageWidth, height, reportTitle);
 	}
 
 	@Override
@@ -161,10 +161,15 @@ public class ChildJasperReportProperties implements JasperReportProperties
 		return this.parentReportProperties.getReportIdentifier();
 	}
 
-
 	@Override
 	public String getDynamicJrxmlFileName()
 	{
 		return null;
+	}
+
+	@Override
+	public String getCompanyName()
+	{
+		return this.parentReportProperties.getCompanyName();
 	}
 }
