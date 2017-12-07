@@ -115,6 +115,11 @@ public class ErrorWindow
 				id += "at " + trace.getClassName() + "." + trace.getMethodName() + "(" + trace.getFileName() + ":"
 						+ trace.getLineNumber() + ")\n";
 			}
+
+			// include the build version in the hash to make hashes unique
+			// between builds
+			id += getBuildVersion();
+
 			// prevent hashcode being negative
 			Long hashId = new Long(id.hashCode()) + new Long(Integer.MAX_VALUE);
 			id = "" + hashId;
