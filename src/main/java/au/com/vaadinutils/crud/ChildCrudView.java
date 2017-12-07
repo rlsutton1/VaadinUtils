@@ -281,9 +281,22 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 			// above TODO.
 			// Another example is when resetFilter has been overridden and the
 			// resulting filters eliminate the new child
-			throw new IllegalStateException(changeInItems
-					+ ", The number of items in the container is not the same as it was before the refresh. "
-					+ this.getClass().getSimpleName());
+
+			// it is also possible for the number of items to change if there
+			// are multiple users editing simultaneously
+
+			if (ignoreIncorrectNumberOfItems())
+			{
+				loggerChildCrud.warn(changeInItems
+						+ ", The number of items in the container is not the same as it was before the refresh. ");
+			}
+			else
+			{
+
+				throw new IllegalStateException(changeInItems
+						+ ", The number of items in the container is not the same as it was before the refresh. "
+						+ this.getClass().getSimpleName());
+			}
 		}
 		associateChildren(newParentId);
 		dirty = false;
@@ -310,6 +323,18 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 			}
 		}
 
+	}
+
+	/**
+	 * override this method and return ture if this crud is for a highly
+	 * contended table.
+	 * 
+	 * @return
+	 */
+	protected boolean ignoreIncorrectNumberOfItems()
+	{
+
+		return false;
 	}
 
 	/**
