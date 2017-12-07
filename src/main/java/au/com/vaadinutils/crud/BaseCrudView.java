@@ -17,6 +17,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javax.persistence.EntityNotFoundException;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.apache.logging.log4j.LogManager;
@@ -43,6 +44,7 @@ import com.vaadin.event.dd.DropHandler;
 import com.vaadin.event.dd.acceptcriteria.AcceptCriterion;
 import com.vaadin.event.dd.acceptcriteria.SourceIsTarget;
 import com.vaadin.server.FontAwesome;
+import com.vaadin.server.Page;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.dd.VerticalDropLocation;
 import com.vaadin.shared.ui.label.ContentMode;
@@ -2269,23 +2271,33 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 		EntityManagerProvider.getEntityManager().getTransaction().commit();
 		EntityManagerProvider.getEntityManager().getTransaction().begin();
 
-		if (itemId != null)
+		try
 		{
-			container.refreshItem(itemId);
-		}
-		else
-		{
-			container.refresh();
-		}
+			if (itemId != null)
+			{
+				container.refreshItem(itemId);
+			}
+			else
+			{
+				container.refresh();
+			}
 
-		if (selectedId == null)
-		{
-			entityTable.select(null);
-			entityTable.select(entityTable.firstItemId());
+			if (selectedId == null)
+			{
+				entityTable.select(null);
+				entityTable.select(entityTable.firstItemId());
+			}
+			else
+			{
+				entityTable.select(selectedId);
+			}
 		}
-		else
+		catch (EntityNotFoundException e)
 		{
-			entityTable.select(selectedId);
+			Page.getCurrent().reload();
+			Notification.show("The record seems to have been deleted by another user, reloading...",
+					Type.ERROR_MESSAGE);
+
 		}
 	}
 
