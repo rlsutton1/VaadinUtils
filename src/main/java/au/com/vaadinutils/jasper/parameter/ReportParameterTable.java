@@ -184,8 +184,8 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 
 						grid.setContainerDataSource(container);
 
-						new GridHeadingPropertySet.Builder<T>().createColumn(caption, displayField.getName()).build()
-								.applyToGrid(grid);
+						new GridHeadingPropertySet.Builder<T>().createColumn(caption, displayField.getName())
+								.setLockedState(true).build().applyToGrid(grid);
 
 						List<SortOrder> orders = new LinkedList<>();
 						orders.add(new SortOrder(displayField.getName(), SortDirection.ASCENDING));

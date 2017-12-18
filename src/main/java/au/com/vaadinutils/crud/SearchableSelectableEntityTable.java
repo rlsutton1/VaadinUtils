@@ -147,7 +147,6 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 
 		HorizontalLayout basicSearchLayout = new HorizontalLayout();
 		basicSearchLayout.setWidth(100, Unit.PERCENTAGE);
-		basicSearchLayout.setSpacing(true);
 		layout.addComponent(basicSearchLayout);
 
 		AbstractLayout advancedSearch = buildAdvancedSearch();
@@ -180,7 +179,6 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 
 		basicSearchLayout.addComponent(searchField);
 		basicSearchLayout.setExpandRatio(searchField, 1.0f);
-		basicSearchLayout.setSpacing(true);
 
 		searchField.focus();
 
@@ -202,7 +200,7 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 	{
 
 		Button clear = new Button("X");
-		clear.setStyleName(Reindeer.BUTTON_SMALL);
+		// clear.setStyleName(ValoTheme.BUTTON_SMALL);
 		clear.setImmediate(true);
 		clear.addClickListener(new ClickEventLogged.ClickListener()
 		{
