@@ -96,25 +96,20 @@ public class ErrorWindow
 		for (Throwable t = error; t != null; t = t.getCause())
 		{
 			if (t.getCause() == null) // We're at final cause
-				cause = t;
-			fullTrace += t.getClass().getCanonicalName() + " " + t.getMessage() + "\n";
-			for (StackTraceElement trace : t.getStackTrace())
 			{
-				fullTrace += "at " + trace.getClassName() + "." + trace.getMethodName() + "(" + trace.getFileName()
-						+ ":" + trace.getLineNumber() + ")\n";
+				cause = t;
+				fullTrace = extractTrace(t);
 			}
-			fullTrace += "\n\n";
+			else
+			{
+				logger.error(extractTrace(t));
+			}
 		}
 		if (cause != null)
 		{
 			causeClass = cause.getClass().getSimpleName();
 
-			id = cause.getClass().getCanonicalName() + "\n";
-			for (StackTraceElement trace : cause.getStackTrace())
-			{
-				id += "at " + trace.getClassName() + "." + trace.getMethodName() + "(" + trace.getFileName() + ":"
-						+ trace.getLineNumber() + ")\n";
-			}
+			id = fullTrace;
 
 			// include the build version in the hash to make hashes unique
 			// between builds
@@ -136,7 +131,6 @@ public class ErrorWindow
 
 		final String finalId = id;
 		final String finalTrace = fullTrace;
-		// final Throwable finalCause = cause;
 		final String reference = UUID.randomUUID().toString();
 
 		logger.error("Reference: " + reference + " Version: " + getBuildVersion() + " System: " + getSystemName() + " "
@@ -186,6 +180,19 @@ public class ErrorWindow
 		{
 			logger.error("Not Sending email or displaying error as cause is exempted.");
 		}
+	}
+
+	private String extractTrace(Throwable t)
+	{
+		String fullTrace1 = t.getClass().getCanonicalName() + " " + t.getMessage() + "\n";
+		String fullTrace = fullTrace1;
+		for (StackTraceElement trace : t.getStackTrace())
+		{
+			fullTrace += "at " + trace.getClassName() + "." + trace.getMethodName() + "(" + trace.getFileName() + ":"
+					+ trace.getLineNumber() + ")\n";
+		}
+		fullTrace += "\n\n";
+		return fullTrace;
 	}
 
 	private void emailErrorWithoutShowing(final Date time, final String finalId, final String finalTrace,
