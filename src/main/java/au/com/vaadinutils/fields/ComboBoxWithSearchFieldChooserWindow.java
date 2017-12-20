@@ -208,8 +208,6 @@ public class ComboBoxWithSearchFieldChooserWindow<T extends CrudEntity, C extend
 
 	public void setNullSelectionAllowed(boolean b, String prompt)
 	{
-
-		logger.error("Set null selection Allowed, not implemented");
 		Button noneButton = new Button(StringUtils.defaultString(prompt, "Select None"));
 		noneButton.setWidth("100%");
 		noneButton.setStyleName(ValoTheme.BUTTON_FRIENDLY);
