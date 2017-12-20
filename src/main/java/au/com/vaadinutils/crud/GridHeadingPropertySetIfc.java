@@ -9,6 +9,6 @@ public interface GridHeadingPropertySetIfc<E>
 
 	void setDeferLoadSettings(boolean b);
 
-	void applyToGrid(Class<E> entityClazz, Grid grid, String uniqueId);
+	void applyToGrid(Class<E> type, Grid grid, String uniqueId);
 
 }

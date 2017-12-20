@@ -46,9 +46,9 @@
 		</pluginRepository>
 	</pluginRepositories>
 	<build>
-	
-		
-	
+
+
+
 		<plugins>
 
 			<!-- <plugin> <groupId>org.zeroturnaround</groupId> <artifactId>jrebel-maven-plugin</artifactId> 
@@ -398,15 +398,23 @@
 			<version>0.3.1-nj</version>
 		</dependency>
 		<dependency>
-		   <groupId>org.vaadin</groupId>
-		   <artifactId>viritin</artifactId>
-		   <version>1.61</version>
+			<groupId>org.vaadin</groupId>
+			<artifactId>viritin</artifactId>
+			<version>1.61</version>
 		</dependency>
 		<dependency>
 			<groupId>org.vaadin.addons</groupId>
 			<artifactId>sizereporter</artifactId>
 			<version>0.1.4</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.vaadin.addons</groupId>
+			<artifactId>popupbutton</artifactId>
+			<version>2.6.0</version>
+		</dependency>
+
+
 	</dependencies>
 
 	<profiles>

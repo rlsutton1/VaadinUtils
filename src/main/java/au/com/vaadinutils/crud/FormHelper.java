@@ -30,6 +30,8 @@ import com.google.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.fieldfactory.SingleSelectConverter;
 import com.vaadin.data.Container;
+import com.vaadin.data.Container.Filterable;
+import com.vaadin.data.Container.Indexed;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.IndexedContainer;
@@ -57,6 +59,7 @@ import com.vaadin.ui.TextField;
 import au.com.vaadinutils.converter.ContainerAdaptor;
 import au.com.vaadinutils.converter.ContainerAdaptorFactory;
 import au.com.vaadinutils.converter.MultiSelectConverter;
+import au.com.vaadinutils.crud.GridHeadingPropertySet.Builder;
 import au.com.vaadinutils.crud.splitFields.SplitCheckBox;
 import au.com.vaadinutils.crud.splitFields.SplitColorPicker;
 import au.com.vaadinutils.crud.splitFields.SplitComboBox;
@@ -70,11 +73,13 @@ import au.com.vaadinutils.crud.splitFields.SplitTextField;
 import au.com.vaadinutils.crud.splitFields.SplitTwinColSelect;
 import au.com.vaadinutils.crud.splitFields.legacy.LegacySplitComboBox;
 import au.com.vaadinutils.dao.JpaBaseDao;
+import au.com.vaadinutils.dao.Path;
 import au.com.vaadinutils.domain.iColor;
 import au.com.vaadinutils.domain.iColorFactory;
 import au.com.vaadinutils.fields.CKEditorEmailField;
 import au.com.vaadinutils.fields.CKEditorEmailField.ConfigModifier;
 import au.com.vaadinutils.fields.ColorPickerField;
+import au.com.vaadinutils.fields.ComboBoxWithSearchField;
 import au.com.vaadinutils.fields.DataBoundButton;
 
 public class FormHelper<E> implements Serializable
@@ -677,6 +682,181 @@ public class FormHelper<E> implements Serializable
 	 * @param <L>
 	 *            the type of the list class
 	 */
+	public class EntityFieldBuilderV2<L extends CrudEntity, C extends Indexed & Filterable>
+	{
+
+		private ComboBoxWithSearchField<L, C> component = null;
+		private String label = null;
+		private C container = null;
+		private Class<? extends L> listClazz;
+		private String field;
+		private AbstractLayout builderForm;
+		private Builder<L> headingBuilder = new GridHeadingPropertySet.Builder<>();
+		private List<String> sortColumns = new LinkedList<>();
+
+		public ComboBoxWithSearchField<L, C> build()
+		{
+			Preconditions.checkArgument(group == null || field != null, "Field may not be null");
+			if (builderForm == null)
+			{
+				builderForm = form;
+			}
+			Preconditions.checkNotNull(builderForm, "Form may not be null");
+			component = new ComboBoxWithSearchField<L, C>(label, listClazz, container, headingBuilder,
+					sortColumns.toArray(new String[] {}));
+
+			if (label != null)
+			{
+				component.setId(label.replace(" ", ""));
+			}
+
+			component.setImmediate(true);
+			addValueChangeListeners(component);
+			if (group != null)
+			{
+				Collection<? extends Object> ids = null;
+				if (group.getContainer() != null)
+				{
+					ids = group.getContainer().getContainerPropertyIds();
+				}
+				else if (group.getItemDataSource() != null)
+				{
+					ids = group.getItemDataSource().getItemPropertyIds();
+				}
+
+				Preconditions.checkNotNull(ids,
+						"The group must have either a Container or an ItemDataSource attached.");
+
+				Preconditions.checkState(ids.contains(field),
+						field + " is not valid, valid listFieldNames are " + ids.toString());
+
+				doBinding(group, field, component);
+			}
+			builderForm.addComponent(component);
+			return component;
+		}
+
+		public EntityFieldBuilderV2<L, C> setContainer(C container)
+		{
+			this.container = container;
+			return this;
+		}
+
+		public EntityFieldBuilderV2<L, C> setForm(AbstractLayout form)
+		{
+			this.builderForm = form;
+			return this;
+		}
+
+		public EntityFieldBuilderV2<L, C> setLabel(String label)
+		{
+			this.label = label;
+			return this;
+		}
+
+		public EntityFieldBuilderV2<L, C> setField(SingularAttribute<? super E, ? extends L> field)
+		{
+			this.field = field.getName();
+			listClazz = field.getJavaType();
+			return this;
+		}
+
+		public <K> EntityFieldBuilderV2<L, C> addDisplayField(SingularAttribute<? super L, K> listField, String caption)
+		{
+
+			headingBuilder.createColumn(StringUtils.defaultString(caption, listField.getName()), listField.getName())
+					.setLockedState(true).addColumn();
+
+			sortColumns.add(listField.getName());
+
+			return this;
+		}
+
+		public <K> EntityFieldBuilderV2<L, C> addDisplayFieldExtends(SingularAttribute<? extends L, K> listField,
+				String caption)
+		{
+
+			headingBuilder.createColumn(StringUtils.defaultString(caption, listField.getName()), listField.getName())
+					.setLockedState(true).addColumn();
+
+			sortColumns.add(listField.getName());
+
+			return this;
+		}
+
+		@SuppressWarnings("unchecked")
+		public EntityFieldBuilderV2<L, C> addDisplayField(Path listField, String caption)
+		{
+
+			if (container instanceof JPAContainer)
+			{
+				((JPAContainer<L>) container).addNestedContainerProperty(listField.getName());
+			}
+			headingBuilder.createColumn(caption, listField.getName()).setLockedState(true).addColumn();
+
+			sortColumns.add(listField.getName());
+
+			return this;
+		}
+
+		public EntityFieldBuilderV2<L, C> setField(String field)
+		{
+			this.field = field;
+			return this;
+		}
+
+		public EntityFieldBuilderV2<L, C> setListClass(Class<L> listClazz)
+		{
+			Preconditions.checkState(this.listClazz == null,
+					"As you have set the field as a singularAttribute, the listClass is set automatically so there is no need to call setListClass.");
+			this.listClazz = listClazz;
+			return this;
+		}
+
+		public C getContainer()
+		{
+			return container;
+		}
+
+	}
+
+	public <L extends CrudEntity> ComboBoxWithSearchField<L, JPAContainer<L>> bindEntityFieldV2(String fieldLabel,
+			SingularAttribute<? super E, L> fieldName)
+	{
+
+		return new EntityFieldBuilderV2<L, JPAContainer<L>>().setLabel(fieldLabel).setField(fieldName).build();
+	}
+
+	public <L extends CrudEntity, K> ComboBoxWithSearchField<L, JPAContainer<L>> bindEntityFieldV2(String fieldLabel,
+			SingularAttribute<E, L> fieldName, SingularAttribute<? super L, K> listField)
+	{
+
+		return new EntityFieldBuilderV2<L, JPAContainer<L>>().setLabel(fieldLabel).setField(fieldName)
+				.addDisplayField(listField, null).build();
+	}
+
+	/**
+	 * use this syntax to instance the builder:<br>
+	 * formHelper.new EntityFieldBuilder<{name of list class}>(); <br>
+	 * <br>
+	 * for example<br>
+	 * <br>
+	 * 
+	 * FormHelper&lt;RaffleBook&gt; helper = new
+	 * FormHelper&lt;RaffleBook&gt;(...);<br>
+	 * <br>
+	 * ComboBox field = helper.new
+	 * EntityFieldBuilder&lt;RaffleAllocation&gt;()<br>
+	 * .setLabel("Action")<br>
+	 * .setField(RaffleBook.allocation)<br>
+	 * .setListFieldName(RaffleAllocation_.name)<br>
+	 * .build();<br>
+	 * 
+	 * @author rsutton
+	 * 
+	 * @param <L>
+	 *            the type of the list class
+	 */
 	public class EntityFieldBuilder<L extends CrudEntity>
 	{
 
@@ -725,9 +905,7 @@ public class FormHelper<E> implements Serializable
 			ContainerAdaptor<L> adaptor = ContainerAdaptorFactory.getAdaptor(container);
 			if (adaptor.getSortableContainerPropertyIds().contains(listField))
 			{
-				adaptor.sort(new String[]
-				{ listField }, new boolean[]
-				{ true });
+				adaptor.sort(new String[] { listField }, new boolean[] { true });
 			}
 
 			component.setItemCaptionPropertyId(listField);
@@ -882,8 +1060,7 @@ public class FormHelper<E> implements Serializable
 		private AbstractLayout builderForm;
 		private boolean multiSelect = false;
 
-		@SuppressWarnings(
-		{ "unchecked", "rawtypes" })
+		@SuppressWarnings({ "unchecked", "rawtypes" })
 		public SplitListSelect build()
 		{
 			Preconditions.checkNotNull(label, "label may not be null");
@@ -914,9 +1091,7 @@ public class FormHelper<E> implements Serializable
 
 			if (container.getSortableContainerPropertyIds().contains(listField))
 			{
-				container.sort(new String[]
-				{ listField }, new boolean[]
-				{ true });
+				container.sort(new String[] { listField }, new boolean[] { true });
 			}
 
 			component.setContainerDataSource(container);
@@ -1064,8 +1239,7 @@ public class FormHelper<E> implements Serializable
 		private String leftColumnCaption = "Available";
 		private String rightColumnCaption = "Selected";
 
-		@SuppressWarnings(
-		{ "unchecked", "rawtypes" })
+		@SuppressWarnings({ "unchecked", "rawtypes" })
 		public SplitTwinColSelect build()
 		{
 			Preconditions.checkNotNull(label, "label may not be null");
@@ -1100,9 +1274,7 @@ public class FormHelper<E> implements Serializable
 			ContainerAdaptor<L> adaptor = ContainerAdaptorFactory.getAdaptor(container);
 			if (adaptor.getSortableContainerPropertyIds().contains(listField))
 			{
-				adaptor.sort(new String[]
-				{ listField }, new boolean[]
-				{ true });
+				adaptor.sort(new String[] { listField }, new boolean[] { true });
 			}
 
 			component.setContainerDataSource(container);
@@ -1429,8 +1601,7 @@ public class FormHelper<E> implements Serializable
 
 	}
 
-	@SuppressWarnings(
-	{ "rawtypes", "unchecked" })
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	static public <J extends CrudEntity> FormHelper<?>.ListSelectBuilder<J> getListSelectBuilder(AbstractLayout form,
 			Class<J> j)
 	{
@@ -1442,8 +1613,7 @@ public class FormHelper<E> implements Serializable
 	/**
 	 * prefer to use the non static method getEntityFieldBuilder(Class<J> j)
 	 */
-	@SuppressWarnings(
-	{ "rawtypes", "unchecked" })
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	static public <J extends CrudEntity> FormHelper<?>.EntityFieldBuilder<J> getEntityFieldBuilder(AbstractLayout form,
 			Class<J> j)
 	{
