@@ -293,4 +293,9 @@ public class ComboBoxWithSearchField<T extends CrudEntity, C extends Indexed & F
 
 	}
 
+	public boolean containerContains(Object id)
+	{
+		return popup.containerContains(id);
+	}
+
 }

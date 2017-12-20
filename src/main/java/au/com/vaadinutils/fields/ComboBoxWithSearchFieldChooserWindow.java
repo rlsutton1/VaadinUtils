@@ -228,4 +228,10 @@ public class ComboBoxWithSearchFieldChooserWindow<T extends CrudEntity, C extend
 		grid.addComponent(noneButton);
 	}
 
+	public boolean containerContains(Object id)
+	{
+
+		return grid.getContainerDataSource().containsId(id);
+	}
+
 }
