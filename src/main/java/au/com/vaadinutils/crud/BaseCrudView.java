@@ -1049,7 +1049,11 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 			@Override
 			public void clicked(ClickEvent event)
 			{
-
+				if (isDirty())
+				{
+					Notification.show("You must Save or Discard your changes first", Type.ERROR_MESSAGE);
+					return;
+				}
 				newClicked();
 
 			}
