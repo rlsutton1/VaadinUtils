@@ -11,6 +11,7 @@ import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Container.Filterable;
 import com.vaadin.data.Container.Indexed;
 import com.vaadin.data.sort.Sort;
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.filter.And;
 import com.vaadin.data.util.filter.SimpleStringFilter;
 import com.vaadin.event.ItemClickEvent;
@@ -45,6 +46,7 @@ public class ComboBoxWithSearchFieldChooserWindow<T extends CrudEntity, C extend
 	private String[] sortColumns;
 
 	Logger logger = LogManager.getLogger();
+	private Filter baseFilters;
 
 	public interface IndexedAndFilterable extends Indexed, Filterable
 	{
@@ -110,6 +112,11 @@ public class ComboBoxWithSearchFieldChooserWindow<T extends CrudEntity, C extend
 			protected Filter getContainerFilter(String filterString, boolean advancedSearchActive)
 			{
 				List<Filter> filters = new ArrayList<>();
+
+				if (baseFilters != null)
+				{
+					filters.add(baseFilters);
+				}
 
 				if (filterString.length() > 0)
 				{
@@ -185,22 +192,28 @@ public class ComboBoxWithSearchFieldChooserWindow<T extends CrudEntity, C extend
 	{
 		if (currentValue != null)
 		{
-			Object id = currentValue.getId();
-			if (!grid.getContainerDataSource().containsId(id))
+			Object id = currentValue;
+			// BeanItemContainer uses the entity as the ID, JPAContainer uses
+			// the ID
+			if (!(grid.getContainerDataSource() instanceof BeanItemContainer))
 			{
-				id = currentValue;
+				id = currentValue.getId();
 			}
 			if (grid.getContainerDataSource().containsId(id))
 			{
+
 				grid.select(id);
 				grid.getGrid().scrollTo(id);
 			}
+
 		}
 
 	}
 
 	public void setContainerFilters(Filter filter)
 	{
+		baseFilters = filter;
+
 		localContainer.removeAllContainerFilters();
 		localContainer.addContainerFilter(filter);
 
