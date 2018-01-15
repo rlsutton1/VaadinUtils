@@ -217,46 +217,57 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 		int numberOfChildren = 0;
 		for (Object id : container.getItemIds())
 		{
+
 			numberOfChildren++;
 			EntityItem<E> item = container.getItem(id);
-			EntityItemProperty reference = item.getItemProperty(childKey);
-			if (reference == null)
+			if (item != null)
 			{
-				loggerChildCrud.error(
-						"Child key " + childKey + " doesn't exist in the container " + container.getEntityClass());
-			}
-			if (reference == null || reference.getValue() == null)
-			{
-				try
-				{
 
-					// TODO: this looks like the spot to allow a ManyToMany
-					// relationship to be updated,
-					// need to add a hook for that here (I think, may be
-					// problems with the parent when it's also a new parent)
-					if (item.getItemProperty(childKey).getType() == newParentId.getClass())
+				EntityItemProperty reference = item.getItemProperty(childKey);
+
+				if (reference == null)
+				{
+					loggerChildCrud.error(
+							"Child key " + childKey + " doesn't exist in the container " + container.getEntityClass());
+				}
+				if (reference == null || reference.getValue() == null)
+				{
+					try
 					{
-						item.getItemProperty(childKey).setValue(newParentId);
+
+						// TODO: this looks like the spot to allow a ManyToMany
+						// relationship to be updated,
+						// need to add a hook for that here (I think, may be
+						// problems with the parent when it's also a new parent)
+						if (item.getItemProperty(childKey).getType().isAssignableFrom(newParentId.getClass()))
+						{
+							item.getItemProperty(childKey).setValue(newParentId);
+						}
+						else
+						{
+							loggerChildCrud.warn(
+									"Child key type is not the same as the Parent type, if it's an ID thats probably ok?");
+							// special handling when the child key is an
+							// id(Long)
+							// rather than an entity.
+							item.getItemProperty(childKey).setValue(translateParentId(newParentId.getId()));
+						}
+						// item.getItemProperty(childKey).setValue(newParentId);
+
 					}
-					else
+					catch (Exception e)
 					{
-						loggerChildCrud.warn(
-								"Child key type is not the same as the Parent type, if it's an ID thats probably ok?");
-						// special handling when the child key is an id(Long)
-						// rather than an entity.
-						item.getItemProperty(childKey).setValue(translateParentId(newParentId.getId()));
+						loggerChildCrud.error(e, e);
 					}
-					// item.getItemProperty(childKey).setValue(newParentId);
 
 				}
-				catch (Exception e)
-				{
-					loggerChildCrud.error(e, e);
-				}
+				extendedChildCommitProcessing(newParentId, item);
 
 			}
-
-			extendedChildCommitProcessing(newParentId, item);
+			else
+			{
+				loggerChildCrud.error("Missing item {} from container", id);
+			}
 
 		}
 		// container.commit();
