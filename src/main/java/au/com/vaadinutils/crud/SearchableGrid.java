@@ -223,6 +223,11 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 		basicSearchLayout.addComponent(component);
 	}
 
+	public void addComponentToBasicSearchBar(Component component, int position)
+	{
+		basicSearchLayout.addComponent(component, position);
+	}
+
 	private Button createClearButton()
 	{
 
