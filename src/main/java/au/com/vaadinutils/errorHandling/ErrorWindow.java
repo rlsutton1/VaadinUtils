@@ -184,8 +184,7 @@ public class ErrorWindow
 
 	private String extractTrace(Throwable t)
 	{
-		String fullTrace1 = t.getClass().getCanonicalName() + " " + t.getMessage() + "\n";
-		String fullTrace = fullTrace1;
+		String fullTrace = t.getClass().getCanonicalName() + " " + t.getMessage() + "\n";
 		for (StackTraceElement trace : t.getStackTrace())
 		{
 			fullTrace += "at " + trace.getClassName() + "." + trace.getMethodName() + "(" + trace.getFileName() + ":"
@@ -226,6 +225,10 @@ public class ErrorWindow
 		exemptedExceptions.put("ClientAbortException", new HashSet<String>());
 		exemptedExceptions.put("SocketException", new HashSet<String>());
 		exemptedExceptions.put("UIDetachedException", new HashSet<String>());
+
+		HashSet<String> suppressedRuntimeExceptions = new HashSet<String>();
+		suppressedRuntimeExceptions.add("Couldn't attach to writer stream");
+		exemptedExceptions.put("RuntimeException", suppressedRuntimeExceptions);
 
 		HashSet<String> ioSet = new HashSet<String>();
 		ioSet.add("Pipe closed");
