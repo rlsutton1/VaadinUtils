@@ -99,26 +99,27 @@ public class ErrorWindow
 			{
 				cause = t;
 				fullTrace = extractTrace(t);
+
+				causeClass = cause.getClass().getSimpleName();
+
+				id = getCustomHashString(fullTrace);
+
+				// include the build version in the hash to make hashes unique
+				// between builds
+				id += getBuildVersion();
+
+				// prevent hashcode being negative
+				Long hashId = new Long(id.hashCode()) + new Long(Integer.MAX_VALUE);
+				id = "" + hashId;
+
+				// add the message after the hash id is calculated
+				fullTrace = "Cause: " + cause.getMessage() + "\n" + fullTrace;
+
 			}
 			else
 			{
 				logger.error(extractTrace(t));
 			}
-		}
-		if (cause != null)
-		{
-			causeClass = cause.getClass().getSimpleName();
-
-			id = fullTrace;
-
-			// include the build version in the hash to make hashes unique
-			// between builds
-			id += getBuildVersion();
-
-			// prevent hashcode being negative
-			Long hashId = new Long(id.hashCode()) + new Long(Integer.MAX_VALUE);
-			id = "" + hashId;
-
 		}
 
 		if (lastSeenError.get() != null && lastSeenError.get().equals(id))
@@ -182,9 +183,23 @@ public class ErrorWindow
 		}
 	}
 
+	private String getCustomHashString(String fullTrace)
+	{
+		try
+		{
+			return ErrorSettingsFactory.getErrorSettings().getCustomHashString(fullTrace);
+		}
+		catch (Exception e)
+		{
+			logger.error(e, e);
+			return fullTrace;
+		}
+
+	}
+
 	private String extractTrace(Throwable t)
 	{
-		String fullTrace = t.getClass().getCanonicalName() + " " + t.getMessage() + "\n";
+		String fullTrace = t.getClass().getCanonicalName() + "\n";
 		for (StackTraceElement trace : t.getStackTrace())
 		{
 			fullTrace += "at " + trace.getClassName() + "." + trace.getMethodName() + "(" + trace.getFileName() + ":"
