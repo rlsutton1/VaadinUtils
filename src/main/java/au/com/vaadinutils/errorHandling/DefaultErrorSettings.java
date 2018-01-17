@@ -2,16 +2,15 @@ package au.com.vaadinutils.errorHandling;
 
 import java.io.ByteArrayOutputStream;
 
-
 public class DefaultErrorSettings implements ErrorSettings
 {
-	
+
 	@Override
 	public String getSupportCompanyName()
 	{
 		return "Support company name not set, call ErrorSettingsFactory.setErrorSettings and implement appropriate settings";
 	}
-	
+
 	@Override
 	public String getSystemName()
 	{
@@ -37,10 +36,11 @@ public class DefaultErrorSettings implements ErrorSettings
 	}
 
 	@Override
-	public void sendEmail(String emailAddress, String subject, String bodyText, ByteArrayOutputStream attachment, String filename, String MIMEType)
+	public void sendEmail(String emailAddress, String subject, String bodyText, ByteArrayOutputStream attachment,
+			String filename, String MIMEType)
 	{
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -56,5 +56,10 @@ public class DefaultErrorSettings implements ErrorSettings
 
 	}
 
-	
+	@Override
+	public String getCustomHashString(String stackTraceAsString)
+	{
+		return stackTraceAsString;
+	}
+
 }

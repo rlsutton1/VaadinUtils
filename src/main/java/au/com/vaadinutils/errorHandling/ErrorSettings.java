@@ -6,7 +6,7 @@ public interface ErrorSettings
 {
 
 	String getSupportCompanyName();
-	
+
 	String getSystemName();
 
 	String getViewName();
@@ -15,10 +15,13 @@ public interface ErrorSettings
 
 	String getTargetEmailAddress();
 
-	public void sendEmail(String emailAddress, String subject, String bodyText, ByteArrayOutputStream attachment, String filename, String MIMEType);
+	public void sendEmail(String emailAddress, String subject, String bodyText, ByteArrayOutputStream attachment,
+			String filename, String MIMEType);
 
 	String getBuildVersion();
 
 	String getUserEmail();
+
+	String getCustomHashString(String stackTraceAsString);
 
 }
