@@ -303,10 +303,14 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 			}
 			else
 			{
-
-				throw new IllegalStateException(changeInItems
+				Notification.show(
+						"Some of the items may not have been saved, or another user may have been editing the same record at the same time.\n\n"
+								+ "You should refresh the browser page (press F5) and check that your changes were correctly saved.",
+						Type.ERROR_MESSAGE);
+				loggerChildCrud.error(changeInItems
 						+ ", The number of items in the container is not the same as it was before the refresh. "
-						+ this.getClass().getSimpleName());
+						+ this.getClass().getSimpleName() + " " + numberOfChildren + " != "
+						+ container.getItemIds().size());
 			}
 		}
 		associateChildren(newParentId);
