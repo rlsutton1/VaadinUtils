@@ -5,6 +5,8 @@ import java.util.Date;
 
 import javax.persistence.metamodel.SingularAttribute;
 
+import com.vaadin.data.Item;
+import com.vaadin.data.Property;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.ColumnGenerator;
@@ -27,14 +29,26 @@ public class DateColumnGenerator implements ColumnGenerator
 
 	public DateColumnGenerator(String format, SingularAttribute<? extends Object, Date> field)
 	{
-		this(format,field.getName());
+		this(format, field.getName());
 	}
 
 	@Override
 	public Object generateCell(Table source, Object itemId, Object columnId)
 	{
-		Object value = source.getItem(itemId).getItemProperty(propertyId).getValue();
-		return new Label(sdf.format(value));
+		Item item = source.getItem(itemId);
+		if (item != null)
+		{
+			Property<?> itemProperty = item.getItemProperty(propertyId);
+			if (itemProperty != null)
+			{
+				Object value = itemProperty.getValue();
+				if (value != null)
+				{
+					return new Label(sdf.format(value));
+				}
+			}
+		}
+		return new Label("");
 	}
 
 }
