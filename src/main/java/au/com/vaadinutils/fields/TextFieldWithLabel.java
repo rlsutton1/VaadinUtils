@@ -1,5 +1,7 @@
 package au.com.vaadinutils.fields;
 
+import java.util.Collection;
+
 import com.vaadin.addon.jpacontainer.EntityItemProperty;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.converter.Converter;
@@ -85,6 +87,17 @@ public class TextFieldWithLabel extends CustomComponent
 	public void addValueChangeListener(ValueChangeListener listener)
 	{
 		textField.addValueChangeListener(listener);
+	}
+
+	public void removeValueChangeListener(ValueChangeListener listener)
+	{
+		textField.removeValueChangeListener(listener);
+	}
+
+	@Override
+	public Collection<?> getListeners(Class<?> eventType)
+	{
+		return textField.getListeners(eventType);
 	}
 
 	public void setConverter(Class<?> datamodelType)
