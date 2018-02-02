@@ -1,5 +1,7 @@
 package au.com.vaadinutils.fields;
 
+import java.util.Collection;
+
 import org.vaadin.viritin.LazyList;
 import org.vaadin.viritin.fields.LazyComboBox;
 import org.vaadin.viritin.fields.LazyComboBox.FilterableCountProvider;
@@ -78,5 +80,16 @@ public class LazyComboBoxWithButton<E> extends CustomComponent
 	public void addMValueChangeListener(final MValueChangeListener<E> listener)
 	{
 		field.addMValueChangeListener(listener);
+	}
+
+	public void removeMValueChangeListener(final MValueChangeListener<E> listener)
+	{
+		field.removeMValueChangeListener(listener);
+	}
+
+	@Override
+	public Collection<?> getListeners(Class<?> eventType)
+	{
+		return field.getListeners(eventType);
 	}
 }
