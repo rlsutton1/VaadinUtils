@@ -191,7 +191,6 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 		searchField.setId("searchField");
 		searchField.setTextChangeEventMode(TextChangeEventMode.LAZY);
 		searchField.setImmediate(true);
-		searchField.setStyleName(ValoTheme.TEXTFIELD_SMALL);
 		searchField.addTextChangeListener(new TextChangeListener()
 		{
 			private static final long serialVersionUID = 1L;
@@ -232,7 +231,6 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 	{
 
 		final Button clear = new Button("X");
-		clear.setStyleName(ValoTheme.BUTTON_SMALL);
 		clear.setImmediate(true);
 		clear.addClickListener(new ClickEventLogged.ClickListener()
 		{
@@ -255,7 +253,6 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 		if (advancedSearchLayout != null)
 		{
 			advancedSearchButton = new Button(getAdvancedCaption());
-			advancedSearchButton.setStyleName(ValoTheme.BUTTON_SMALL);
 			advancedSearchButton.addStyleName(ValoTheme.BUTTON_FRIENDLY);
 			advancedSearchButton.setWidth("85");
 			advancedSearchOn = false;
