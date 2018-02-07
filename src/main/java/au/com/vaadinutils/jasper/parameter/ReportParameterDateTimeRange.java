@@ -27,6 +27,8 @@ public class ReportParameterDateTimeRange extends ReportParameter<String>
 	protected String endParameterName;
 	protected final String startParameterName;
 
+	int endAdjustment = 0;
+
 	/**
 	 * 
 	 * @param caption
@@ -41,7 +43,7 @@ public class ReportParameterDateTimeRange extends ReportParameter<String>
 	 *            - format of the value passed to ireport
 	 */
 	public ReportParameterDateTimeRange(String caption, String startParameterName, String endParameterName,
-			Resolution resolution, String displayFormat, String parameterFormat)
+			Resolution resolution, String displayFormat, String parameterFormat, int endAdjustment)
 	{
 		super(caption, new String[] { startParameterName, endParameterName });
 		Preconditions.checkNotNull(startParameterName);
@@ -64,6 +66,7 @@ public class ReportParameterDateTimeRange extends ReportParameter<String>
 
 		endfield.setValidationVisible(true);
 		createValidators();
+		this.endAdjustment = endAdjustment;
 	}
 
 	public void addValueChangeListener(ValueChangeListener listener)
@@ -92,6 +95,8 @@ public class ReportParameterDateTimeRange extends ReportParameter<String>
 
 		endfield.setValidationVisible(true);
 		createValidators();
+
+		endAdjustment = -1;
 
 	}
 
@@ -154,7 +159,7 @@ public class ReportParameterDateTimeRange extends ReportParameter<String>
 		}
 		else if (parameterName.equalsIgnoreCase(endParameterName))
 		{
-			value = new DateTime(endfield.getValue()).plusDays(1).toDate();
+			value = new DateTime(endfield.getValue()).plusDays(endAdjustment).toDate();
 		}
 		else
 		{
@@ -195,7 +200,17 @@ public class ReportParameterDateTimeRange extends ReportParameter<String>
 	@Override
 	public String getDisplayValue(String parameterName)
 	{
+		if ("ReportParameterEndDate".equalsIgnoreCase(parameterName))
+		{
+			// actual end date will be 25/10/2017 00:00:00.0 but we want to
+			// display 24/10/2017
+			SimpleDateFormat format = new SimpleDateFormat(parameterFormat);
 
+			String tmp = format.format(new DateTime(getDate(parameterName)).minusDays(endAdjustment).toDate());
+
+			return tmp;
+
+		}
 		return new SimpleDateFormat(startfield.getDateFormat()).format(getDate(parameterName));
 	}
 
