@@ -50,7 +50,7 @@ public class ReportParameterDateTimeRange extends ReportParameter<String>
 		Preconditions.checkNotNull(endParameterName);
 		this.startParameterName = startParameterName;
 		this.endParameterName = endParameterName;
-		startfield = new DateField(caption, new DateTime().toDate());
+		startfield = new DateField(caption, new DateTime().withTimeAtStartOfDay().toDate());
 		startfield.setResolution(resolution);
 		startfield.setDateFormat(displayFormat);
 		this.parameterFormat = parameterFormat;
