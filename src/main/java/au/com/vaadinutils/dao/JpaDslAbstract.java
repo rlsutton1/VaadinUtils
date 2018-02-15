@@ -213,7 +213,8 @@ public abstract class JpaDslAbstract<E, R>
 		return new AbstractCondition<E>()
 		{
 
-			@SuppressWarnings({ "unchecked", "rawtypes" })
+			@SuppressWarnings(
+			{ "unchecked", "rawtypes" })
 			@Override
 			public Predicate getPredicates()
 			{
@@ -228,7 +229,8 @@ public abstract class JpaDslAbstract<E, R>
 		return new AbstractCondition<E>()
 		{
 
-			@SuppressWarnings({ "unchecked", "rawtypes" })
+			@SuppressWarnings(
+			{ "unchecked", "rawtypes" })
 			@Override
 			public Predicate getPredicates()
 			{
@@ -1057,6 +1059,20 @@ public abstract class JpaDslAbstract<E, R>
 			{
 				return builder.or(builder.isNull(root.get(attribute)),
 						builder.equal(builder.length(root.get(attribute)), 0));
+			}
+		};
+	}
+
+	public Condition<E> isNotEmptyString(final SingularAttribute<E, String> attribute)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+				return builder.and(builder.isNotNull(root.get(attribute)),
+						builder.notEqual(builder.length(root.get(attribute)), 0));
 			}
 		};
 	}
