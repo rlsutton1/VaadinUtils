@@ -997,7 +997,9 @@ public class JasperManager implements Runnable
 				return;
 			}
 
+			logger.warn("Output stream is ready");
 			progressListener.outputStreamReady();
+			logger.warn("Waiting for reader stream");
 			if (readerReady.await(10, TimeUnit.SECONDS))
 			{
 
