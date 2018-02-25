@@ -350,12 +350,16 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 
 	public void sortAvailableContainer()
 	{
-		availableContainer.sort(new Object[] { itemCaptionProperty.getName() }, new boolean[] { sortAscending });
+		availableContainer.sort(new Object[]
+		{ itemCaptionProperty.getName() }, new boolean[]
+		{ sortAscending });
 	}
 
 	public void sortSelectedBeans()
 	{
-		selectedBeans.sort(new Object[] { itemCaptionProperty.getName() }, new boolean[] { sortAscending });
+		selectedBeans.sort(new Object[]
+		{ itemCaptionProperty.getName() }, new boolean[]
+		{ sortAscending });
 	}
 
 	public interface ValueChangeListener<C>
@@ -725,4 +729,9 @@ public class TwinColumnSelect<C extends CrudEntity> extends CustomField<Collecti
 		availableGrid.triggerFilter();
 	}
 
+	@Override
+	public void focus()
+	{
+		availableGrid.focus();
+	}
 }

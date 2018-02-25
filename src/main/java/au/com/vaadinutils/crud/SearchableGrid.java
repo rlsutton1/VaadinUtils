@@ -212,8 +212,6 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 		basicSearchLayout.addComponent(searchField);
 		basicSearchLayout.setExpandRatio(searchField, 1.0f);
 
-		searchField.focus();
-
 		return layout;
 	}
 
@@ -492,4 +490,9 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 		return grid.getContainerDataSource();
 	}
 
+	@Override
+	public void focus()
+	{
+		searchField.focus();
+	}
 }
