@@ -190,6 +190,7 @@ public class ComboBoxWithSearchFieldChooserWindow<T extends CrudEntity, C extend
 
 	void select(T currentValue)
 	{
+		grid.setSearchFilterText("");
 		if (currentValue != null)
 		{
 			Object id = currentValue;
