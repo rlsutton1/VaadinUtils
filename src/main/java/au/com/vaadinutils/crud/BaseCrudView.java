@@ -778,8 +778,18 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 			public void clicked(ClickEvent event)
 			{
 				EntityManagerProvider.getEntityManager().getEntityManagerFactory().getCache().evict(entityClass);
-				triggerFilter();
 
+				// this is ugly
+				UI.getCurrent().getPage().reload();
+
+				// reloadDataFromDB is really slow and you still need to call
+				// triggerFilter
+
+				// reloadDataFromDB();
+
+				// this by it's self doesn't get the job done
+
+				// triggerFilter();
 			}
 
 		});
