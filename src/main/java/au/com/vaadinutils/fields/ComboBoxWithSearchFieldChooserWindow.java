@@ -208,6 +208,7 @@ public class ComboBoxWithSearchFieldChooserWindow<T extends CrudEntity, C extend
 			}
 
 		}
+		grid.focus();
 
 	}
 
