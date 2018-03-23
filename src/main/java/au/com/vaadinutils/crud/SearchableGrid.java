@@ -278,7 +278,15 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 					{
 						advancedSearchButton.setCaption(getBasicCaption());
 					}
+
+					AdvancedSearchListener advancedSearchListener = getAdvancedSearchListener();
+					if (advancedSearchListener != null)
+					{
+						advancedSearchListener.advancedSearchIsOpen(advancedSearchOn);
+					}
+
 				}
+
 			});
 
 			searchBar.addComponent(advancedSearchLayout);
@@ -286,6 +294,11 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 		}
 
 		return advancedSearchLayout;
+	}
+
+	protected AdvancedSearchListener getAdvancedSearchListener()
+	{
+		return null;
 	}
 
 	protected AbstractLayout getAdvancedSearchLayout()
@@ -494,5 +507,30 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 	public void focus()
 	{
 		searchField.focus();
+	}
+
+	public void showAdvancedSearch(boolean show)
+	{
+		clearAdvancedFilters();
+		advancedSearchOn = show;
+		advancedSearchLayout.setVisible(advancedSearchOn);
+		if (!advancedSearchOn)
+		{
+			triggerFilter();
+		}
+		if (!advancedSearchOn)
+		{
+			advancedSearchButton.setCaption(getAdvancedCaption());
+		}
+		else
+		{
+			advancedSearchButton.setCaption(getBasicCaption());
+		}
+
+		AdvancedSearchListener advancedSearchListener = getAdvancedSearchListener();
+		if (advancedSearchListener != null)
+		{
+			advancedSearchListener.advancedSearchIsOpen(advancedSearchOn);
+		}
 	}
 }

@@ -18,6 +18,7 @@ import com.vaadin.ui.CustomField;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.themes.ValoTheme;
 
+import au.com.vaadinutils.crud.AdvancedSearchListener;
 import au.com.vaadinutils.crud.CrudEntity;
 import au.com.vaadinutils.crud.FormHelper;
 import au.com.vaadinutils.crud.GridHeadingPropertySet.Builder;
@@ -47,6 +48,13 @@ public class ComboBoxWithSearchField<T extends CrudEntity, C extends Indexed & F
 	public ComboBoxWithSearchField(String caption, Class<? extends T> type, C container, Builder<T> headingBuilder,
 			String[] sortColumns)
 	{
+		this(caption, type, container, headingBuilder, sortColumns, null, null);
+	}
+
+	public ComboBoxWithSearchField(String caption, Class<? extends T> type, C container, Builder<T> headingBuilder,
+			String[] sortColumns, AdvancedSearchContentProvider advancedSearchProvider,
+			AdvancedSearchListener advancedSearchListener)
+	{
 		this.type = type;
 		setImmediate(true);
 		setCaption(caption);
@@ -58,7 +66,7 @@ public class ComboBoxWithSearchField<T extends CrudEntity, C extends Indexed & F
 		select = new PopupButtonCustom("", holder);
 
 		popup = new ComboBoxWithSearchFieldChooserWindow<T, C>(getSelectionListener(), type, caption, container,
-				headingBuilder, sortColumns);
+				headingBuilder, sortColumns, advancedSearchProvider, advancedSearchListener);
 
 		select.setContent(popup.getPopupContent2());
 
@@ -296,6 +304,12 @@ public class ComboBoxWithSearchField<T extends CrudEntity, C extends Indexed & F
 	public boolean containerContains(Object id)
 	{
 		return popup.containerContains(id);
+	}
+
+	public void showAdvancedSearch(boolean show)
+	{
+		popup.showAdvancedSearch(show);
+
 	}
 
 }
