@@ -76,6 +76,7 @@ import au.com.vaadinutils.dao.JpaBaseDao;
 import au.com.vaadinutils.dao.Path;
 import au.com.vaadinutils.domain.iColor;
 import au.com.vaadinutils.domain.iColorFactory;
+import au.com.vaadinutils.fields.AdvancedSearchContentProvider;
 import au.com.vaadinutils.fields.CKEditorEmailField;
 import au.com.vaadinutils.fields.CKEditorEmailField.ConfigModifier;
 import au.com.vaadinutils.fields.ColorPickerField;
@@ -693,6 +694,9 @@ public class FormHelper<E> implements Serializable
 		private AbstractLayout builderForm;
 		private Builder<L> headingBuilder = new GridHeadingPropertySet.Builder<>();
 		private List<String> sortColumns = new LinkedList<>();
+		private AdvancedSearchContentProvider advancedSearchProvider = null;
+
+		private AdvancedSearchListener advancedSearchListener = null;
 
 		public ComboBoxWithSearchField<L, C> build()
 		{
@@ -703,7 +707,7 @@ public class FormHelper<E> implements Serializable
 			}
 			Preconditions.checkNotNull(builderForm, "Form may not be null");
 			component = new ComboBoxWithSearchField<L, C>(label, listClazz, container, headingBuilder,
-					sortColumns.toArray(new String[] {}));
+					sortColumns.toArray(new String[] {}), advancedSearchProvider, advancedSearchListener);
 
 			if (label != null)
 			{
@@ -734,6 +738,13 @@ public class FormHelper<E> implements Serializable
 			}
 			builderForm.addComponent(component);
 			return component;
+		}
+
+		public EntityFieldBuilderV2<L, C> setAdvancedSearchProvider(
+				AdvancedSearchContentProvider advancedSearchProvider)
+		{
+			this.advancedSearchProvider = advancedSearchProvider;
+			return this;
 		}
 
 		public EntityFieldBuilderV2<L, C> setContainer(C container)
@@ -816,6 +827,12 @@ public class FormHelper<E> implements Serializable
 		public C getContainer()
 		{
 			return container;
+		}
+
+		public EntityFieldBuilderV2<L, C> setAdvancedSearchListener(AdvancedSearchListener advancedSearchListener)
+		{
+			this.advancedSearchListener = advancedSearchListener;
+			return this;
 		}
 
 	}

@@ -16,6 +16,7 @@ import com.vaadin.data.util.filter.And;
 import com.vaadin.data.util.filter.SimpleStringFilter;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ItemClickEvent.ItemClickListener;
+import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
@@ -24,6 +25,7 @@ import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
+import au.com.vaadinutils.crud.AdvancedSearchListener;
 import au.com.vaadinutils.crud.CrudEntity;
 import au.com.vaadinutils.crud.GridHeadingPropertySet;
 import au.com.vaadinutils.crud.GridHeadingPropertySet.Builder;
@@ -47,15 +49,25 @@ public class ComboBoxWithSearchFieldChooserWindow<T extends CrudEntity, C extend
 
 	Logger logger = LogManager.getLogger();
 	private Filter baseFilters;
+	protected AdvancedSearchContentProvider advancedSearchProvider;
+	private AdvancedSearchListener advancedSearchListener;
 
 	public interface IndexedAndFilterable extends Indexed, Filterable
 	{
 
 	}
 
-	@SuppressWarnings("unchecked")
+	
 	public ComboBoxWithSearchFieldChooserWindow(final ChooserListener listener, Class<? extends T> type,
 			final String caption, C container, Builder<T> headingBuilder, String[] sortColumns)
+	{
+		this(listener,type,caption,container,headingBuilder,sortColumns,null,null);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public ComboBoxWithSearchFieldChooserWindow(final ChooserListener listener, Class<? extends T> type,
+			final String caption, C container, Builder<T> headingBuilder, String[] sortColumns,
+			AdvancedSearchContentProvider advancedSearchProvider, AdvancedSearchListener advancedSearchListener)
 	{
 
 		this.caption = caption;
@@ -86,6 +98,9 @@ public class ComboBoxWithSearchFieldChooserWindow<T extends CrudEntity, C extend
 
 		}
 		headingProps = builder.build();
+
+		this.advancedSearchProvider = advancedSearchProvider;
+		this.advancedSearchListener = advancedSearchListener;
 
 	}
 
@@ -145,6 +160,22 @@ public class ComboBoxWithSearchFieldChooserWindow<T extends CrudEntity, C extend
 
 				return localContainer;
 
+			}
+
+			@Override
+			protected AbstractLayout getAdvancedSearchLayout()
+			{
+				if (advancedSearchProvider == null)
+				{
+					return null;
+				}
+				return advancedSearchProvider.getAdvancedSearchLayout();
+			}
+
+			@Override
+			protected AdvancedSearchListener getAdvancedSearchListener()
+			{
+				return advancedSearchListener;
 			}
 
 		};
@@ -245,6 +276,12 @@ public class ComboBoxWithSearchFieldChooserWindow<T extends CrudEntity, C extend
 	{
 
 		return grid.getContainerDataSource().containsId(id);
+	}
+
+	public void showAdvancedSearch(boolean show)
+	{
+		grid.showAdvancedSearch(show);
+
 	}
 
 }
