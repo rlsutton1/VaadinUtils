@@ -92,7 +92,7 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 		this.setCompositionRoot(mainLayout);
 		headingPropertySet = getHeadingPropertySet();
 		headingPropertySet.setDeferLoadSettings(true);
-		headingPropertySet.applyToGrid(entityClazz, grid, uniqueId);
+		headingPropertySet.applyToGrid(entityClazz, grid, uniqueId + entityClazz.getSimpleName());
 
 	}
 
