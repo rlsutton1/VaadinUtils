@@ -51,6 +51,11 @@ public class CrudActionDelete<E extends CrudEntity> implements CrudAction<E>
 	@Override
 	public void exec(final BaseCrudView<E> crud, final EntityItem<E> entity)
 	{
+		if (entity == null || entity.getEntity() == null)
+		{
+			Notification.show("No record selected to delete.", Type.ERROR_MESSAGE);
+			return;
+		}
 		DeleteVetoResponseData response = crud.canDelete(entity.getEntity());
 		if (response.canDelete)
 		{
