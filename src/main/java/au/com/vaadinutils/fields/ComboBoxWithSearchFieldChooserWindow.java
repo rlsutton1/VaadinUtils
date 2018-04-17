@@ -57,13 +57,12 @@ public class ComboBoxWithSearchFieldChooserWindow<T extends CrudEntity, C extend
 
 	}
 
-	
 	public ComboBoxWithSearchFieldChooserWindow(final ChooserListener listener, Class<? extends T> type,
 			final String caption, C container, Builder<T> headingBuilder, String[] sortColumns)
 	{
-		this(listener,type,caption,container,headingBuilder,sortColumns,null,null);
+		this(listener, type, caption, container, headingBuilder, sortColumns, null, null);
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public ComboBoxWithSearchFieldChooserWindow(final ChooserListener listener, Class<? extends T> type,
 			final String caption, C container, Builder<T> headingBuilder, String[] sortColumns,
@@ -94,7 +93,7 @@ public class ComboBoxWithSearchFieldChooserWindow<T extends CrudEntity, C extend
 		}
 		else
 		{
-			builder.createColumn("Action", "name").setLockedState(true).setWidth(100).addColumn().build();
+			builder.createColumn("Action", "name").setLockedState(true).addColumn().build();
 
 		}
 		headingProps = builder.build();
@@ -212,7 +211,7 @@ public class ComboBoxWithSearchFieldChooserWindow<T extends CrudEntity, C extend
 		grid.setSizeFull();
 
 		holder = new VerticalLayout();
-		holder.setWidth("380");
+		holder.setWidth("100%");
 		holder.setHeight("300");
 		holder.addComponent(grid);
 
