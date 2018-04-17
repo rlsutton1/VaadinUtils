@@ -611,6 +611,12 @@ public abstract class JpaDslAbstract<E, R>
 		return this;
 	}
 
+	public <K, T> JpaDslAbstract<E, R> fetch(final JoinBuilder<E, K> join, SingularAttribute<K, T> field, JoinType type)
+	{
+		getJoin(join).fetch(field, type);
+		return this;
+	}
+
 	/**
 	 * for use with vaadin JPAContainer queryDelegate
 	 * 
