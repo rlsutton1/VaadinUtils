@@ -51,6 +51,7 @@ public class ComboBoxWithSearchFieldChooserWindow<T extends CrudEntity, C extend
 	private Filter baseFilters;
 	protected AdvancedSearchContentProvider advancedSearchProvider;
 	private AdvancedSearchListener advancedSearchListener;
+	private Button noneButton;
 
 	public interface IndexedAndFilterable extends Indexed, Filterable
 	{
@@ -253,22 +254,25 @@ public class ComboBoxWithSearchFieldChooserWindow<T extends CrudEntity, C extend
 
 	public void setNullSelectionAllowed(boolean b, String prompt)
 	{
-		Button noneButton = new Button(StringUtils.defaultString(prompt, "Select None"));
-		noneButton.setWidth("100%");
-		noneButton.setStyleName(ValoTheme.BUTTON_FRIENDLY);
-		noneButton.addClickListener(new ClickListener()
+		if (noneButton == null)
 		{
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void buttonClick(ClickEvent event)
+			noneButton = new Button(StringUtils.defaultString(prompt, "Select None"));
+			noneButton.setWidth("100%");
+			noneButton.setStyleName(ValoTheme.BUTTON_FRIENDLY);
+			noneButton.addClickListener(new ClickListener()
 			{
-				listener.selected(null);
-				grid.select(null);
+				private static final long serialVersionUID = 1L;
 
-			}
-		});
-		grid.addComponent(noneButton);
+				@Override
+				public void buttonClick(ClickEvent event)
+				{
+					listener.selected(null);
+					grid.select(null);
+
+				}
+			});
+			grid.addComponent(noneButton);
+		}
 	}
 
 	public boolean containerContains(Object id)
