@@ -13,6 +13,7 @@ import com.vaadin.data.Container.Indexed;
 import com.vaadin.data.sort.Sort;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.filter.And;
+import com.vaadin.data.util.filter.Or;
 import com.vaadin.data.util.filter.SimpleStringFilter;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ItemClickEvent.ItemClickListener;
@@ -58,12 +59,34 @@ public class ComboBoxWithSearchFieldChooserWindow<T extends CrudEntity, C extend
 
 	}
 
+	/**
+	 * 
+	 * @param listener
+	 * @param type
+	 * @param caption
+	 * @param container
+	 * @param headingBuilder
+	 * @param sortColumns
+	 *            - also used as the search columns
+	 */
 	public ComboBoxWithSearchFieldChooserWindow(final ChooserListener listener, Class<? extends T> type,
 			final String caption, C container, Builder<T> headingBuilder, String[] sortColumns)
 	{
 		this(listener, type, caption, container, headingBuilder, sortColumns, null, null);
 	}
 
+	/**
+	 * 
+	 * @param listener
+	 * @param type
+	 * @param caption
+	 * @param container
+	 * @param headingBuilder
+	 * @param sortColumns
+	 *            -also used as the search columns
+	 * @param advancedSearchProvider
+	 * @param advancedSearchListener
+	 */
 	@SuppressWarnings("unchecked")
 	public ComboBoxWithSearchFieldChooserWindow(final ChooserListener listener, Class<? extends T> type,
 			final String caption, C container, Builder<T> headingBuilder, String[] sortColumns,
@@ -135,8 +158,13 @@ public class ComboBoxWithSearchFieldChooserWindow<T extends CrudEntity, C extend
 
 				if (filterString.length() > 0)
 				{
-
-					filters.add(new SimpleStringFilter(sortColumns[0], filterString, true, false));
+					Filter[] filterList = new Filter[sortColumns.length];
+					int i = 0;
+					for (String search : sortColumns)
+					{
+						filterList[i++] = new SimpleStringFilter(search, filterString, true, false);
+					}
+					filters.add(new Or(filterList));
 
 				}
 
