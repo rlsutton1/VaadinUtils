@@ -700,7 +700,7 @@ public class JasperManager implements Runnable
 	// }
 	// }
 
-	private JasperPrint fillReport(OutputFormat outputFormat) throws JRException
+	private JasperPrint fillReport(OutputFormat outputFormat) throws JRException, InterruptedException
 	{
 		Connection connection = reportProperties.getConnection();
 
@@ -736,14 +736,7 @@ public class JasperManager implements Runnable
 		// boundParams, connection);
 		while (asyncAccessor.getReportStatus().getStatus() == ReportExecutionStatus.Status.RUNNING)
 		{
-			try
-			{
-				Thread.sleep(100);
-			}
-			catch (InterruptedException e)
-			{
-				logger.error(e, e);
-			}
+			Thread.sleep(100);
 		}
 
 		return asyncAccessor.getFinalJasperPrint();
