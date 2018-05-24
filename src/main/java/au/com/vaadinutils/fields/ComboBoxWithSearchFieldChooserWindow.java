@@ -13,6 +13,7 @@ import com.vaadin.data.Container.Indexed;
 import com.vaadin.data.sort.Sort;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.filter.And;
+import com.vaadin.data.util.filter.Or;
 import com.vaadin.data.util.filter.SimpleStringFilter;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ItemClickEvent.ItemClickListener;
@@ -51,18 +52,41 @@ public class ComboBoxWithSearchFieldChooserWindow<T extends CrudEntity, C extend
 	private Filter baseFilters;
 	protected AdvancedSearchContentProvider advancedSearchProvider;
 	private AdvancedSearchListener advancedSearchListener;
+	private Button noneButton;
 
 	public interface IndexedAndFilterable extends Indexed, Filterable
 	{
 
 	}
 
+	/**
+	 * 
+	 * @param listener
+	 * @param type
+	 * @param caption
+	 * @param container
+	 * @param headingBuilder
+	 * @param sortColumns
+	 *            - also used as the search columns
+	 */
 	public ComboBoxWithSearchFieldChooserWindow(final ChooserListener listener, Class<? extends T> type,
 			final String caption, C container, Builder<T> headingBuilder, String[] sortColumns)
 	{
 		this(listener, type, caption, container, headingBuilder, sortColumns, null, null);
 	}
 
+	/**
+	 * 
+	 * @param listener
+	 * @param type
+	 * @param caption
+	 * @param container
+	 * @param headingBuilder
+	 * @param sortColumns
+	 *            -also used as the search columns
+	 * @param advancedSearchProvider
+	 * @param advancedSearchListener
+	 */
 	@SuppressWarnings("unchecked")
 	public ComboBoxWithSearchFieldChooserWindow(final ChooserListener listener, Class<? extends T> type,
 			final String caption, C container, Builder<T> headingBuilder, String[] sortColumns,
@@ -134,8 +158,13 @@ public class ComboBoxWithSearchFieldChooserWindow<T extends CrudEntity, C extend
 
 				if (filterString.length() > 0)
 				{
-
-					filters.add(new SimpleStringFilter(sortColumns[0], filterString, true, false));
+					Filter[] filterList = new Filter[sortColumns.length];
+					int i = 0;
+					for (String search : sortColumns)
+					{
+						filterList[i++] = new SimpleStringFilter(search, filterString, true, false);
+					}
+					filters.add(new Or(filterList));
 
 				}
 
@@ -253,22 +282,28 @@ public class ComboBoxWithSearchFieldChooserWindow<T extends CrudEntity, C extend
 
 	public void setNullSelectionAllowed(boolean b, String prompt)
 	{
-		Button noneButton = new Button(StringUtils.defaultString(prompt, "Select None"));
-		noneButton.setWidth("100%");
-		noneButton.setStyleName(ValoTheme.BUTTON_FRIENDLY);
-		noneButton.addClickListener(new ClickListener()
+		if (b)
 		{
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void buttonClick(ClickEvent event)
+			if (noneButton == null)
 			{
-				listener.selected(null);
-				grid.select(null);
+				noneButton = new Button(StringUtils.defaultString(prompt, "Select None"));
+				noneButton.setWidth("100%");
+				noneButton.setStyleName(ValoTheme.BUTTON_FRIENDLY);
+				noneButton.addClickListener(new ClickListener()
+				{
+					private static final long serialVersionUID = 1L;
 
+					@Override
+					public void buttonClick(ClickEvent event)
+					{
+						listener.selected(null);
+						grid.select(null);
+
+					}
+				});
+				grid.addComponent(noneButton);
 			}
-		});
-		grid.addComponent(noneButton);
+		}
 	}
 
 	public boolean containerContains(Object id)

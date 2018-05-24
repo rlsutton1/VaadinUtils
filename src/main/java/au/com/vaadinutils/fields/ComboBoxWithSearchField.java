@@ -196,7 +196,7 @@ public class ComboBoxWithSearchField<T extends CrudEntity, C extends Indexed & F
 		else
 		{
 			valueLabel.setStyleName(ValoTheme.LABEL_SUCCESS);
-			valueLabel.setValue(value.getName());
+			valueLabel.setValue(value.toString());
 
 		}
 
