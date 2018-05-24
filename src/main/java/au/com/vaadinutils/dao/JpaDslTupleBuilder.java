@@ -12,7 +12,7 @@ public class JpaDslTupleBuilder<E> extends JpaDslAbstract<E, Tuple>
 {
 	private List<Selection<?>> multiselects = new LinkedList<>();
 
-	JpaDslTupleBuilder(Class<E> entityClass)
+	public JpaDslTupleBuilder(Class<E> entityClass)
 	{
 		this.entityClass = entityClass;
 		builder = getEntityManager().getCriteriaBuilder();

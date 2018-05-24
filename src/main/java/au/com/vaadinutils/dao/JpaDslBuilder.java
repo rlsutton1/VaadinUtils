@@ -5,7 +5,7 @@ import javax.persistence.criteria.Root;
 
 public class JpaDslBuilder<E> extends JpaDslAbstract<E, E>
 {
-	JpaDslBuilder(Class<E> entityClass)
+	public JpaDslBuilder(Class<E> entityClass)
 	{
 		this.entityClass = entityClass;
 		builder = getEntityManager().getCriteriaBuilder();
