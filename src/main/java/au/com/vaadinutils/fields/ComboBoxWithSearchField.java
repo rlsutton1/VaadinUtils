@@ -138,7 +138,6 @@ public class ComboBoxWithSearchField<T extends CrudEntity, C extends Indexed & F
 			public void buttonClick(ClickEvent event)
 			{
 				popup.select(currentValue);
-
 			}
 
 		});
@@ -228,6 +227,7 @@ public class ComboBoxWithSearchField<T extends CrudEntity, C extends Indexed & F
 	{
 		select.setReadOnly(b);
 		super.setReadOnly(b);
+		select.setVisible(!b);
 	}
 
 	@Override
