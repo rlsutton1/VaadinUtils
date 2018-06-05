@@ -6,6 +6,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import com.vaadin.server.Resource;
+
 import au.com.vaadinutils.jasper.JasperManager.OutputFormat;
 import au.com.vaadinutils.jasper.filter.ReportFilterUIBuilder;
 import au.com.vaadinutils.jasper.parameter.ReportParameter;
@@ -229,5 +231,15 @@ public interface JasperReportProperties
 	public abstract String getDynamicJrxmlFileName();
 
 	public abstract String getCompanyName();
+
+	public abstract Resource getExportButtonIconResource();
+
+	public abstract Resource getScheduleButtonIconResource();
+
+	public abstract Resource getEmailButtonIconResource();
+
+	public abstract Resource getPdfButtonIconResource();
+
+	public abstract Resource getPreviewButtonIconResource();
 
 }

@@ -258,25 +258,13 @@ public abstract class DashBoardView extends VerticalLayout implements View
 
 		HorizontalLayout buttonLayout = new HorizontalLayout();
 		buttonLayout.setWidth("100%");
+		buttonLayout.setHeight("50");
 
-		Button newDashboard = new Button(FontAwesome.PLUS);
-		newDashboard.setDescription("New Dashboard");
-		newDashboard.setStyleName(ValoTheme.BUTTON_ICON_ONLY);
-		newDashboard.addStyleName(ValoTheme.BUTTON_FRIENDLY);
+		Button newDashboard = createNewButton();
 
 		Button rename = createRenameButton();
+		addClickListenerToRenameButton(rename);
 
-		Button copy = new Button(FontAwesome.COPY);
-		copy.setDescription("Copy");
-		copy.setStyleName(ValoTheme.BUTTON_ICON_ONLY);
-
-		Button share = new Button(FontAwesome.SHARE);
-		share.setDescription("Share");
-		share.setStyleName(ValoTheme.BUTTON_ICON_ONLY);
-
-		Button defaultButton = new Button(FontAwesome.STAR);
-		defaultButton.setDescription("Default");
-		defaultButton.setStyleName(ValoTheme.BUTTON_ICON_ONLY);
 		newDashboard.addClickListener(new ClickListener()
 		{
 
@@ -292,17 +280,27 @@ public abstract class DashBoardView extends VerticalLayout implements View
 
 		buttonLayout.addComponent(newDashboard);
 		buttonLayout.addComponent(rename);
-		buttonLayout.addComponent(createMakeDefaultButton());
+		Button createMakeDefaultButton = createMakeDefaultButton();
+		addClickListenerToDefaultButton(createMakeDefaultButton);
+
+		buttonLayout.addComponent(createMakeDefaultButton);
 		// buttonLayout.addComponent(copy);
 		// buttonLayout.addComponent(share);
 
 		createDashboardSelector();
 
-		buttonLayout.addComponent(createDeleteButton());
+		Button createDeleteButton = createDeleteButton();
+		addClickListenerToDeleteButton(createDeleteButton);
+
+		buttonLayout.addComponent(createDeleteButton);
 
 		if (canUserShareDashboards())
 		{
-			buttonLayout.addComponent(createShareButton());
+			Button createShareButton = createShareButton();
+			buttonLayout.addComponent(createShareButton);
+
+			addClickListenerToShareButton(createShareButton);
+
 		}
 
 		TabSheet selectorHolder = new TabSheet();
@@ -313,8 +311,19 @@ public abstract class DashBoardView extends VerticalLayout implements View
 
 		layout.addComponent(buttonLayout);
 
+		layout.setHeight("250");
+
 		// layout.setSizeFull();
 		return selectorHolder;
+	}
+
+	protected Button createNewButton()
+	{
+		Button newDashboard = new Button(FontAwesome.PLUS);
+		newDashboard.setDescription("New Dashboard");
+		newDashboard.setStyleName(ValoTheme.BUTTON_ICON_ONLY);
+		newDashboard.addStyleName(ValoTheme.BUTTON_FRIENDLY);
+		return newDashboard;
 	}
 
 	protected boolean canUserShareDashboards()
@@ -322,12 +331,17 @@ public abstract class DashBoardView extends VerticalLayout implements View
 		return true;
 	}
 
-	private Button createRenameButton()
+	protected Button createRenameButton()
 	{
 		Button rename = new Button(FontAwesome.EDIT);
 		rename.setDescription("Rename Dashboard");
 		rename.setStyleName(ValoTheme.BUTTON_ICON_ONLY);
 
+		return rename;
+	}
+
+	private void addClickListenerToRenameButton(Button rename)
+	{
 		rename.addClickListener(new ClickListener()
 		{
 
@@ -377,11 +391,9 @@ public abstract class DashBoardView extends VerticalLayout implements View
 
 			}
 		});
-
-		return rename;
 	}
 
-	private Button createMakeDefaultButton()
+	protected Button createMakeDefaultButton()
 	{
 
 		Button rename = new Button(FontAwesome.STAR);
@@ -389,6 +401,11 @@ public abstract class DashBoardView extends VerticalLayout implements View
 		rename.setDescription("Make Default Dashboard");
 		rename.setStyleName(ValoTheme.BUTTON_ICON_ONLY);
 
+		return rename;
+	}
+
+	private void addClickListenerToDefaultButton(Button rename)
+	{
 		rename.addClickListener(new ClickListener()
 		{
 
@@ -418,17 +435,20 @@ public abstract class DashBoardView extends VerticalLayout implements View
 
 			}
 		});
-
-		return rename;
 	}
 
-	private Button createDeleteButton()
+	protected Button createDeleteButton()
 	{
 		Button delete = new Button(FontAwesome.TRASH);
 		delete.setDescription("Delete Dashboard");
 		delete.setStyleName(ValoTheme.BUTTON_ICON_ONLY);
 		delete.addStyleName(ValoTheme.BUTTON_DANGER);
 
+		return delete;
+	}
+
+	private void addClickListenerToDeleteButton(Button delete)
+	{
 		delete.addClickListener(new ClickListener()
 		{
 
@@ -455,16 +475,20 @@ public abstract class DashBoardView extends VerticalLayout implements View
 
 			}
 		});
-		return delete;
 	}
 
-	private Button createShareButton()
+	protected Button createShareButton()
 	{
 		Button share = new Button(FontAwesome.SHARE);
 		share.setDescription("Share Dashboard");
 		share.setStyleName(ValoTheme.BUTTON_ICON_ONLY);
 		// share.addStyleName(ValoTheme.BUTTON_DANGER);
 
+		return share;
+	}
+
+	private void addClickListenerToShareButton(Button share)
+	{
 		share.addClickListener(new ClickListener()
 		{
 
@@ -525,7 +549,6 @@ public abstract class DashBoardView extends VerticalLayout implements View
 			}
 
 		});
-		return share;
 	}
 
 	protected abstract void getAccountIdToShareDashboardWith(CopyDashboardCallback callback);

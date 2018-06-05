@@ -6,6 +6,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import com.vaadin.server.Resource;
+
 import au.com.vaadinutils.jasper.JasperManager.OutputFormat;
 import au.com.vaadinutils.jasper.filter.ReportFilterUIBuilder;
 import au.com.vaadinutils.jasper.parameter.ReportParameter;
@@ -171,5 +173,35 @@ public class ChildJasperReportProperties implements JasperReportProperties
 	public String getCompanyName()
 	{
 		return this.parentReportProperties.getCompanyName();
+	}
+
+	@Override
+	public Resource getExportButtonIconResource()
+	{
+		return this.parentReportProperties.getExportButtonIconResource();
+	}
+
+	@Override
+	public Resource getScheduleButtonIconResource()
+	{
+		return this.parentReportProperties.getScheduleButtonIconResource();
+	}
+
+	@Override
+	public Resource getEmailButtonIconResource()
+	{
+		return this.parentReportProperties.getEmailButtonIconResource();
+	}
+
+	@Override
+	public Resource getPdfButtonIconResource()
+	{
+		return this.parentReportProperties.getPdfButtonIconResource();
+	}
+
+	@Override
+	public Resource getPreviewButtonIconResource()
+	{
+		return this.parentReportProperties.getPreviewButtonIconResource();
 	}
 }

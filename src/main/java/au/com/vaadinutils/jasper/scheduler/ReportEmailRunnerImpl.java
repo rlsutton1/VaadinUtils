@@ -14,6 +14,7 @@ import javax.mail.internet.AddressException;
 import org.apache.commons.mail.EmailException;
 
 import com.google.common.base.Preconditions;
+import com.vaadin.server.Resource;
 
 import au.com.vaadinutils.jasper.AttachmentType;
 import au.com.vaadinutils.jasper.JasperEmailBuilder;
@@ -263,5 +264,35 @@ public class ReportEmailRunnerImpl implements ReportEmailRunner, JasperReportPro
 	public String getCompanyName()
 	{
 		return jasperReportProperties.getCompanyName();
+	}
+
+	@Override
+	public Resource getExportButtonIconResource()
+	{
+		return jasperReportProperties.getExportButtonIconResource();
+	}
+
+	@Override
+	public Resource getScheduleButtonIconResource()
+	{
+		return jasperReportProperties.getScheduleButtonIconResource();
+	}
+
+	@Override
+	public Resource getEmailButtonIconResource()
+	{
+		return jasperReportProperties.getEmailButtonIconResource();
+	}
+
+	@Override
+	public Resource getPdfButtonIconResource()
+	{
+		return jasperReportProperties.getPdfButtonIconResource();
+	}
+
+	@Override
+	public Resource getPreviewButtonIconResource()
+	{
+		return jasperReportProperties.getPreviewButtonIconResource();
 	}
 }

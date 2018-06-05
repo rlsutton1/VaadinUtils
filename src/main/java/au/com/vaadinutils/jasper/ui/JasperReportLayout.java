@@ -1,6 +1,5 @@
 package au.com.vaadinutils.jasper.ui;
 
-import java.io.File;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
@@ -15,9 +14,9 @@ import com.vaadin.data.Item;
 import com.vaadin.event.UIEvents.PollEvent;
 import com.vaadin.event.UIEvents.PollListener;
 import com.vaadin.server.ExternalResource;
+import com.vaadin.server.Resource;
 import com.vaadin.server.StreamResource;
 import com.vaadin.server.StreamResource.StreamSource;
-import com.vaadin.server.VaadinServlet;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.AbstractComponent;
@@ -29,15 +28,14 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.JavaScript;
 import com.vaadin.ui.JavaScriptFunction;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.NativeButton;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Reindeer;
+import com.vaadin.ui.themes.ValoTheme;
 
-import au.com.vaadinutils.dao.JpaBaseDao;
 import au.com.vaadinutils.jasper.JasperManager;
 import au.com.vaadinutils.jasper.JasperManager.OutputFormat;
 import au.com.vaadinutils.jasper.JasperProgressListener;
@@ -50,9 +48,6 @@ import au.com.vaadinutils.jasper.parameter.ReportParameter;
 import au.com.vaadinutils.jasper.parameter.ReportParameterConstant;
 import au.com.vaadinutils.jasper.scheduler.JasperReportEmailWindow;
 import au.com.vaadinutils.jasper.scheduler.JasperReportSchedulerWindow;
-import au.com.vaadinutils.jasper.scheduler.ScheduleIconBuilder;
-import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailScheduleEntity;
-import au.com.vaadinutils.jasper.scheduler.entities.ReportEmailScheduleEntity_;
 import au.com.vaadinutils.listener.CancelListener;
 import au.com.vaadinutils.listener.ClickEventLogged;
 import au.com.vaadinutils.ui.WorkingDialog;
@@ -65,6 +60,8 @@ import elemental.json.JsonObject;
  */
 class JasperReportLayout extends VerticalLayout
 {
+	private static final int BUTTON_WIDTH = 50;
+
 	private static final int MAX_FILENAME_LENGTH = 100;
 
 	/**
@@ -85,11 +82,11 @@ class JasperReportLayout extends VerticalLayout
 
 	private List<ExpanderComponent> components;
 
-	private NativeButton showButton;
+	private Button showButton;
 
-	private NativeButton printButton;
+	private Button printButton;
 
-	private NativeButton exportButton;
+	private Button exportButton;
 
 	private VerticalLayout splash;
 
@@ -99,9 +96,9 @@ class JasperReportLayout extends VerticalLayout
 
 	private SplitPanel splitPanel;
 
-	private NativeButton scheduleButton;
+	private Button scheduleButton;
 
-	private NativeButton emailButton;
+	private Button emailButton;
 
 	protected JasperReportLayout(JasperReportProperties reportProperties)
 	{
@@ -266,12 +263,15 @@ class JasperReportLayout extends VerticalLayout
 		// layout.setSpacing(true);
 		layout.setSizeFull();
 
-		String buttonHeight = "" + 40;
+		String buttonHeight = "" + BUTTON_WIDTH;
 		HorizontalLayout buttonBar = new HorizontalLayout();
+		buttonBar.setStyleName("njadmin-grey-colour");
+
 		buttonBar.setSpacing(true);
-		buttonBar.setStyleName(Reindeer.LAYOUT_BLUE);
+		// buttonBar.setStyleName(Reindeer.LAYOUT_BLUE);
 		buttonBar.setWidth("100%");
-		buttonBar.setHeight(buttonHeight);
+
+		buttonBar.setHeight("" + (BUTTON_WIDTH));
 
 		buttonBar.setMargin(new MarginInfo(false, false, false, false));
 
@@ -279,31 +279,52 @@ class JasperReportLayout extends VerticalLayout
 		buttonContainer.setSizeFull();
 		buttonContainer.setWidth("230");
 
-		showButton = new NativeButton();
-		showButton.setIcon(new ExternalResource("images/seanau/Print preview.png"));
+		showButton = new Button();
+		Resource previewButtonIcon = reportProperties.getPreviewButtonIconResource();
+		if (previewButtonIcon == null)
+		{
+			previewButtonIcon = new ExternalResource("images/seanau/Print preview.png");
+		}
+		showButton.setIcon(previewButtonIcon);
 		showButton.setDescription("Preview");
-		showButton.setWidth("50");
+		showButton.setWidth("" + BUTTON_WIDTH);
 		showButton.setHeight(buttonHeight);
 		showButton.setDisableOnClick(true);
+		showButton.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
+		showButton.addStyleName(ValoTheme.BUTTON_BORDERLESS);
 		addButtonListener(showButton, OutputFormat.HTML);
 		buttonContainer.addComponent(showButton);
 
-		printButton = new NativeButton();
-		printButton.setIcon(new ExternalResource("images/seanau/Print_32.png"));
+		printButton = new Button();
+		Resource pdfButtonIcon = reportProperties.getPdfButtonIconResource();
+		if (pdfButtonIcon == null)
+		{
+			pdfButtonIcon = new ExternalResource("images/seanau/Print_32.png");
+		}
+		printButton.setIcon(pdfButtonIcon);
 		printButton.setDescription("Print (PDF)");
-		printButton.setWidth("50");
+		printButton.setWidth("" + BUTTON_WIDTH);
 		printButton.setHeight(buttonHeight);
 		printButton.setDisableOnClick(true);
+		printButton.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
+		printButton.addStyleName(ValoTheme.BUTTON_BORDERLESS);
+
 		addButtonListener(printButton, OutputFormat.PDF);
 		buttonContainer.addComponent(printButton);
 
-		exportButton = new NativeButton();
+		exportButton = new Button();
+		Resource exportButtonIcon = reportProperties.getExportButtonIconResource();
+		if (exportButtonIcon == null)
+		{
+			exportButtonIcon = new ExternalResource("images/exporttoexcel.png");
+		}
 		exportButton.setDescription("Export (Excel - CSV)");
-		exportButton.setIcon(new ExternalResource("images/exporttoexcel.png"));
-		exportButton.setWidth("50");
+		exportButton.setIcon(exportButtonIcon);
+		exportButton.setWidth("" + BUTTON_WIDTH);
 		exportButton.setDisableOnClick(true);
 		exportButton.setHeight(buttonHeight);
-		// exportButton.setStyleName(Reindeer.BUTTON_LINK);
+		exportButton.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
+		exportButton.addStyleName(ValoTheme.BUTTON_BORDERLESS);
 		addButtonListener(exportButton, OutputFormat.CSV);
 		buttonContainer.addComponent(exportButton);
 
@@ -360,11 +381,19 @@ class JasperReportLayout extends VerticalLayout
 
 	private void createEmailButton(String buttonHeight, HorizontalLayout buttonContainer)
 	{
-		emailButton = new NativeButton();
-		emailButton.setIcon(new ExternalResource("images/seanau/Send Email_32.png"));
+		emailButton = new Button();
+		Resource emailButtonIcon = reportProperties.getEmailButtonIconResource();
+		if (emailButtonIcon == null)
+		{
+			emailButtonIcon = new ExternalResource("images/seanau/Send Email_32.png");
+		}
+		emailButton.setIcon(emailButtonIcon);
 		emailButton.setDescription("Email");
-		emailButton.setWidth("50");
+		emailButton.setWidth("" + BUTTON_WIDTH);
 		emailButton.setHeight(buttonHeight);
+		emailButton.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
+		emailButton.addStyleName(ValoTheme.BUTTON_BORDERLESS);
+
 		emailButton.addClickListener(new ClickEventLogged.ClickListener()
 		{
 
@@ -381,31 +410,46 @@ class JasperReportLayout extends VerticalLayout
 
 	private void createScheduleButton(String buttonHeight, HorizontalLayout buttonContainer)
 	{
-		scheduleButton = new NativeButton();
-
-		JpaBaseDao<ReportEmailScheduleEntity, Long> dao = JpaBaseDao.getGenericDao(ReportEmailScheduleEntity.class);
-		Long count = dao.getCount(ReportEmailScheduleEntity_.JasperReportPropertiesClassName,
-				reportProperties.getReportClass().getCanonicalName());
-
-		ScheduleIconBuilder iconBuilder = new ScheduleIconBuilder();
-
-		String baseIconFileName = "Call Calendar_32";
-		String path = VaadinServlet.getCurrent().getServletContext().getRealPath("templates/images/seanau/");
-
-		// HACK: scoutmaster stores images in a different directory so if the
-		// images isn't found in the above templates directory
-		// then search in the /images/seanau director.
-		if (path == null || !new File(path).exists())
+		scheduleButton = new Button();
+		Resource scheduleButtonIcon = reportProperties.getScheduleButtonIconResource();
+		if (scheduleButtonIcon == null)
 		{
-			path = VaadinServlet.getCurrent().getServletContext().getRealPath("/images/seanau/");
+			scheduleButtonIcon = new ExternalResource("images/seanau/Call Calendar_32.png");
 		}
-		String targetFileName = baseIconFileName + "-" + count + ".png";
-		iconBuilder.buildLogo(count.intValue(), new File(path), baseIconFileName + ".png", targetFileName);
 
-		scheduleButton.setIcon(new ExternalResource("images/seanau/" + targetFileName));
+		// JpaBaseDao<ReportEmailScheduleEntity, Long> dao =
+		// JpaBaseDao.getGenericDao(ReportEmailScheduleEntity.class);
+		// Long count =
+		// dao.getCount(ReportEmailScheduleEntity_.JasperReportPropertiesClassName,
+		// reportProperties.getReportClass().getCanonicalName());
+		//
+		// ScheduleIconBuilder iconBuilder = new ScheduleIconBuilder();
+		//
+		// String baseIconFileName = "Call Calendar_32";
+		// String path =
+		// VaadinServlet.getCurrent().getServletContext().getRealPath("templates/images/seanau/");
+		//
+		// // HACK: scoutmaster stores images in a different directory so if the
+		// // images isn't found in the above templates directory
+		// // then search in the /images/seanau director.
+		// if (path == null || !new File(path).exists())
+		// {
+		// path =
+		// VaadinServlet.getCurrent().getServletContext().getRealPath("/images/seanau/");
+		// }
+		// String targetFileName = baseIconFileName + "-" + count + ".png";
+		// iconBuilder.buildLogo(count.intValue(), new File(path),
+		// baseIconFileName + ".png", targetFileName);
+		// scheduleButton.setIcon(new ExternalResource("images/seanau/" +
+		// targetFileName));
+
+		scheduleButton.setIcon(scheduleButtonIcon);
 		scheduleButton.setDescription("Schedule");
-		scheduleButton.setWidth("50");
+		scheduleButton.setWidth("" + BUTTON_WIDTH);
 		scheduleButton.setHeight(buttonHeight);
+		scheduleButton.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
+		scheduleButton.addStyleName(ValoTheme.BUTTON_BORDERLESS);
+
 		scheduleButton.addClickListener(new ClickEventLogged.ClickListener()
 		{
 
