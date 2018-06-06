@@ -899,6 +899,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 		notifyAdvancedModeListener();
 		advancedSearchLayout.setVisible(advancedSearchOn);
 		advancedSearchButton.setCaption(getAdvancedCaption());
+		advancedSearchButton.setDescription("Switch to " + getBasicCaption());
+
 	}
 
 	protected AbstractLayout getAdvancedSearchLayout()
