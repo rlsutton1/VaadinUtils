@@ -9,6 +9,7 @@ import java.util.Set;
 import org.vaadin.alump.gridstack.GridStackCoordinates;
 
 import com.vaadin.server.FontAwesome;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
@@ -42,12 +43,7 @@ public abstract class BasePortalAdder extends VerticalLayout implements PortalCo
 
 		Label label = new Label(title);
 
-		Button button = new Button(FontAwesome.PLUS.getHtml());
-		button.setDescription("Click to add '" + title + "' to the current Dashboard");
-
-		button.setCaptionAsHtml(true);
-		button.setStyleName(ValoTheme.BUTTON_TINY);
-		button.addStyleName(ValoTheme.BUTTON_FRIENDLY);
+		Button button = createAddButton(title);
 
 		label.setWidth("200");
 		button.addClickListener(new ClickListener()
@@ -72,9 +68,22 @@ public abstract class BasePortalAdder extends VerticalLayout implements PortalCo
 
 		layout.addComponent(button);
 		layout.addComponent(label);
+		layout.setComponentAlignment(label, Alignment.MIDDLE_LEFT);
+		layout.setHeight("38");
 
 		return layout;
 
+	}
+
+	protected Button createAddButton(final String title)
+	{
+		Button button = new Button(FontAwesome.PLUS.getHtml());
+		button.setDescription("Click to add '" + title + "' to the current Dashboard");
+
+		button.setCaptionAsHtml(true);
+		button.setStyleName(ValoTheme.BUTTON_TINY);
+		button.addStyleName(ValoTheme.BUTTON_FRIENDLY);
+		return button;
 	}
 
 	protected abstract Enum<?> getPortalEnum();

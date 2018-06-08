@@ -11,6 +11,7 @@ import org.apache.commons.mail.EmailException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.vaadin.server.Resource;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.UI;
 
@@ -268,5 +269,35 @@ public class SendEmailTask extends ProgressBarTask<JasperTransmission> implement
 	public String getCompanyName()
 	{
 		return "";
+	}
+
+	@Override
+	public Resource getExportButtonIconResource()
+	{
+		return null;
+	}
+
+	@Override
+	public Resource getScheduleButtonIconResource()
+	{
+		return null;
+	}
+
+	@Override
+	public Resource getEmailButtonIconResource()
+	{
+		return null;
+	}
+
+	@Override
+	public Resource getPdfButtonIconResource()
+	{
+		return null;
+	}
+
+	@Override
+	public Resource getPreviewButtonIconResource()
+	{
+		return null;
 	}
 }
