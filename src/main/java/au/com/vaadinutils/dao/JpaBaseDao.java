@@ -674,6 +674,11 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		return new JpaDslBuilder<>(entityClass);
 	}
 
+	public JpaDslCountBuilder<E> selectCount()
+	{
+		return new JpaDslCountBuilder<>(entityClass);
+	}
+
 	public JpaDslTupleBuilder<E> selectTuple()
 	{
 		return new JpaDslTupleBuilder<>(entityClass);

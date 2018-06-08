@@ -269,18 +269,6 @@ public abstract class JpaDslAbstract<E, R>
 		return builder.concat(trim, string);
 	}
 
-	public Long count()
-	{
-		CriteriaQuery<Long> query = builder.createQuery(Long.class);
-		if (predicate != null)
-		{
-			query.where(predicate);
-		}
-		query.select(builder.count(root));
-
-		return getEntityManager().createQuery(query).getSingleResult();
-	}
-
 	public <K, T> Expression<Long> count(final JoinBuilder<E, K> join, final SingularAttribute<K, T> attribute)
 	{
 		return builder.count(getJoin(join).get(attribute));
@@ -289,18 +277,6 @@ public abstract class JpaDslAbstract<E, R>
 	public <K, T> Expression<Long> count(final SingularAttribute<E, T> attribute)
 	{
 		return builder.count(root.get(attribute));
-	}
-
-	public Long countDistinct()
-	{
-		CriteriaQuery<Long> query = builder.createQuery(Long.class);
-		if (predicate != null)
-		{
-			query.where(predicate);
-		}
-		query.select(builder.countDistinct(root));
-
-		return getEntityManager().createQuery(query).getSingleResult();
 	}
 
 	/**
