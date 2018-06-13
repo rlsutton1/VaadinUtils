@@ -2,16 +2,15 @@ package au.com.vaadinutils.validator;
 
 import javax.persistence.metamodel.SingularAttribute;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.vaadin.data.Validator;
 
-import org.apache.logging.log4j.LogManager;
-
 import au.com.vaadinutils.crud.CrudEntity;
 import au.com.vaadinutils.dao.JpaBaseDao;
 import au.com.vaadinutils.dao.JpaBaseDao.Condition;
-import au.com.vaadinutils.dao.JpaDslBuilder;
+import au.com.vaadinutils.dao.JpaDslCountBuilder;
 
 public class UniqueFieldValidatorJPA<E extends CrudEntity, UNIQUE_FIELD_TYPE, FILTER_FIELD_TYPE> implements Validator
 {
@@ -84,22 +83,18 @@ public class UniqueFieldValidatorJPA<E extends CrudEntity, UNIQUE_FIELD_TYPE, FI
 	{
 		if (value != null && !("".equals(value.toString())))
 		{
-
-			JpaDslBuilder<E> q = new JpaBaseDao<E, Long>(table).select();
-
+			JpaDslCountBuilder<E> q = new JpaBaseDao<E, Long>(table).selectCount();
 			Condition<E> criteria = q.eq(matchField, (UNIQUE_FIELD_TYPE) value);
 			if (filterAttribute != null && filterCallback.getValue() != null)
 			{
 				criteria = criteria.and(q.eq(filterAttribute, filterCallback.getValue()));
 			}
-			Long count = q.where(criteria).count();
+			q.where(criteria);
+			Long count = q.count();
 			if (count > 0)
 			{
 				throw new InvalidValueException(warningMessage);
 			}
-
 		}
-
 	}
-
 }

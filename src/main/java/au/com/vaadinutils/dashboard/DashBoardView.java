@@ -43,6 +43,7 @@ import com.vaadin.ui.themes.ValoTheme;
 import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.dao.JpaBaseDao;
 import au.com.vaadinutils.dao.JpaDslBuilder;
+import au.com.vaadinutils.dao.JpaDslCountBuilder;
 import au.com.vaadinutils.editors.InputFormDialog;
 import au.com.vaadinutils.editors.InputFormDialogRecipient;
 import au.com.vaadinutils.js.JSCallWithReturnValue;
@@ -640,8 +641,10 @@ public abstract class DashBoardView extends VerticalLayout implements View
 	private long getNumberOfPortals()
 	{
 		Long account = getAccountId();
-		JpaDslBuilder<Tblportallayout> q = JpaBaseDao.getGenericDao(Tblportallayout.class).select();
-		return q.where(q.eq(Tblportallayout_.account, account)).count();
+		JpaDslCountBuilder<Tblportallayout> q = JpaBaseDao.getGenericDao(Tblportallayout.class).selectCount();
+		q.where(q.eq(Tblportallayout_.account, account));
+
+		return q.count();
 
 	}
 
