@@ -213,8 +213,7 @@ public abstract class JpaDslAbstract<E, R>
 		return new AbstractCondition<E>()
 		{
 
-			@SuppressWarnings(
-			{ "unchecked", "rawtypes" })
+			@SuppressWarnings({ "unchecked", "rawtypes" })
 			@Override
 			public Predicate getPredicates()
 			{
@@ -229,8 +228,7 @@ public abstract class JpaDslAbstract<E, R>
 		return new AbstractCondition<E>()
 		{
 
-			@SuppressWarnings(
-			{ "unchecked", "rawtypes" })
+			@SuppressWarnings({ "unchecked", "rawtypes" })
 			@Override
 			public Predicate getPredicates()
 			{
@@ -267,6 +265,23 @@ public abstract class JpaDslAbstract<E, R>
 	public Expression<String> concat(Expression<String> trim, String string)
 	{
 		return builder.concat(trim, string);
+	}
+
+	/**
+	 * call this method in the same way that you would call getResultList()...
+	 * 
+	 * so jpaDslAbstract.select().where(...).count();
+	 */
+	public Long count()
+	{
+		CriteriaQuery<Long> query = builder.createQuery(Long.class);
+		if (predicate != null)
+		{
+			query.where(predicate);
+		}
+		query.select(builder.count(root));
+
+		return getEntityManager().createQuery(query).getSingleResult();
 	}
 
 	public <K, T> Expression<Long> count(final JoinBuilder<E, K> join, final SingularAttribute<K, T> attribute)

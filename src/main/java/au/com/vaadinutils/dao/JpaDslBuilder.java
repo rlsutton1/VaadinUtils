@@ -33,37 +33,39 @@ public class JpaDslBuilder<E> extends JpaDslAbstract<E, E>
 		isJpaContainerDelegate = true;
 	}
 
-	/**
-	 * @deprecated This method is broken! You should use a JpaDslCountBuilder to
-	 *             get counts.
-	 */
-	@Deprecated
-	public Long count()
-	{
-		CriteriaQuery<Long> query = builder.createQuery(Long.class);
-		if (predicate != null)
-		{
-			query.where(predicate);
-		}
-		query.select(builder.count(root));
-
-		return getEntityManager().createQuery(query).getSingleResult();
-	}
-
-	/**
-	 * @deprecated This method is broken! You should use a JpaDslCountBuilder to
-	 *             get counts.
-	 */
-	@Deprecated
-	public Long countDistinct()
-	{
-		CriteriaQuery<Long> query = builder.createQuery(Long.class);
-		if (predicate != null)
-		{
-			query.where(predicate);
-		}
-		query.select(builder.countDistinct(root));
-
-		return getEntityManager().createQuery(query).getSingleResult();
-	}
+	// /**
+	// * @deprecated This method is broken! You should use a JpaDslCountBuilder
+	// to
+	// * get counts.
+	// */
+	// @Deprecated
+	// public Long count()
+	// {
+	// CriteriaQuery<Long> query = builder.createQuery(Long.class);
+	// if (predicate != null)
+	// {
+	// query.where(predicate);
+	// }
+	// query.select(builder.count(root));
+	//
+	// return getEntityManager().createQuery(query).getSingleResult();
+	// }
+	//
+	// /**
+	// * @deprecated This method is broken! You should use a JpaDslCountBuilder
+	// to
+	// * get counts.
+	// */
+	// @Deprecated
+	// public Long countDistinct()
+	// {
+	// CriteriaQuery<Long> query = builder.createQuery(Long.class);
+	// if (predicate != null)
+	// {
+	// query.where(predicate);
+	// }
+	// query.select(builder.countDistinct(root));
+	//
+	// return getEntityManager().createQuery(query).getSingleResult();
+	// }
 }
