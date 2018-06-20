@@ -938,6 +938,21 @@ public abstract class JpaDslAbstract<E, R>
 		};
 	}
 
+	public <V extends Comparable<? super V>> Condition<E> greaterThanOrEqualTo(final Expression<V> expression,
+			final V value)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+
+				return builder.greaterThanOrEqualTo(expression, value);
+			}
+		};
+	}
+
 	public JpaDslAbstract<E, R> groupBy(Expression<?>... expressions)
 	{
 		criteria.groupBy(expressions);
@@ -1394,6 +1409,21 @@ public abstract class JpaDslAbstract<E, R>
 			{
 
 				return builder.lessThanOrEqualTo(field.path, value);
+			}
+		};
+	}
+
+	public <V extends Comparable<? super V>> Condition<E> lessThanOrEqualTo(final Expression<V> expression,
+			final V value)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+
+				return builder.lessThanOrEqualTo(expression, value);
 			}
 		};
 	}
