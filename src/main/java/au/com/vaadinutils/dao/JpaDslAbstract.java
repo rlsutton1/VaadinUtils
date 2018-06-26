@@ -213,7 +213,8 @@ public abstract class JpaDslAbstract<E, R>
 		return new AbstractCondition<E>()
 		{
 
-			@SuppressWarnings({ "unchecked", "rawtypes" })
+			@SuppressWarnings(
+			{ "unchecked", "rawtypes" })
 			@Override
 			public Predicate getPredicates()
 			{
@@ -228,7 +229,8 @@ public abstract class JpaDslAbstract<E, R>
 		return new AbstractCondition<E>()
 		{
 
-			@SuppressWarnings({ "unchecked", "rawtypes" })
+			@SuppressWarnings(
+			{ "unchecked", "rawtypes" })
 			@Override
 			public Predicate getPredicates()
 			{
@@ -255,6 +257,12 @@ public abstract class JpaDslAbstract<E, R>
 			final SingularAttribute<E, T> attribute2)
 	{
 		return builder.coalesce(root.get(attribute1), root.get(attribute2));
+	}
+
+	public <T, J1, J2> Expression<T> coalesce(final JoinBuilder<E, J1> join1, SingularAttribute<J1, T> attribute1,
+			final JoinBuilder<E, J2> join2, final SingularAttribute<J2, T> attribute2)
+	{
+		return builder.coalesce(getJoin(join1).get(attribute1), getJoin(join2).get(attribute2));
 	}
 
 	public Expression<String> concat(Expression<String> concat, Expression<String> trim)
@@ -1163,6 +1171,19 @@ public abstract class JpaDslAbstract<E, R>
 			public Predicate getPredicates()
 			{
 				return builder.isNotNull(root.get(field));
+			}
+		};
+	}
+
+	public <V extends Comparable<? super V>> Condition<E> isNotNull(final Expression<V> expression)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+				return builder.isNotNull(expression);
 			}
 		};
 	}
