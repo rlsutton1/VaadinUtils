@@ -77,10 +77,10 @@ class JasperReportLayout extends VerticalLayout
 
 	private BrowserFrame displayPanel;
 
-	JasperManager manager;
-	private ReportFilterUIBuilder builder;
+	private transient JasperManager manager;
+	private transient ReportFilterUIBuilder builder;
 
-	private List<ExpanderComponent> components;
+	private transient List<ExpanderComponent> components;
 
 	private Button showButton;
 

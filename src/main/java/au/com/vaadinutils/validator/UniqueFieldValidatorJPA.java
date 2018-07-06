@@ -24,7 +24,7 @@ public class UniqueFieldValidatorJPA<E extends CrudEntity, UNIQUE_FIELD_TYPE, FI
 	transient Logger logger = LogManager.getLogger(UniqueFieldValidatorJPA.class);
 	private String warningMessage;
 	private SingularAttribute<E, FILTER_FIELD_TYPE> filterAttribute;
-	private FilterValueCallback<FILTER_FIELD_TYPE> filterCallback;
+	private transient FilterValueCallback<FILTER_FIELD_TYPE> filterCallback;
 
 	public UniqueFieldValidatorJPA(SingularAttribute<E, UNIQUE_FIELD_TYPE> matchField, String warningMessage,
 			SingularAttribute<E, FILTER_FIELD_TYPE> filterAttribute, FilterValueCallback<FILTER_FIELD_TYPE> callback)

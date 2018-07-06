@@ -24,6 +24,10 @@ public class JoinMetaDataList<E, K> implements JoinMetaData<E, K>
 	@Override
 	public boolean equals(Object obj)
 	{
+		if (obj == null)
+		{
+			return false;
+		}
 		JoinMetaDataList other = (JoinMetaDataList) obj;
 		return type == other.type && attribute == other.attribute && fetch == other.fetch;
 	}

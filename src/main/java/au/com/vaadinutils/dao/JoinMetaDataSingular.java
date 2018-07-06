@@ -23,6 +23,10 @@ public class JoinMetaDataSingular<E, K> implements JoinMetaData<E, K>
 	@Override
 	public boolean equals(Object obj)
 	{
+		if (obj == null)
+		{
+			return false;
+		}
 		JoinMetaDataSingular other = (JoinMetaDataSingular) obj;
 		return type == other.type && attribute == other.attribute && fetch == other.fetch;
 	}
