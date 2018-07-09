@@ -507,6 +507,7 @@ public abstract class DashBoardView extends VerticalLayout implements View
 						SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
 
 						Tblportallayout portalLayout = (Tblportallayout) dashBoardSelector.getValue();
+						portalLayout = JpaBaseDao.getGenericDao(Tblportallayout.class).findById(portalLayout.getId());
 						Tblportallayout copyLayout = new Tblportallayout();
 						copyLayout.setAccount(accountId);
 						copyLayout.setName(
