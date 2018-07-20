@@ -820,6 +820,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 			advancedSearchButton.setWidth("100");
 
 			advancedSearchOn = false;
+			notifyAdvancedModeListener();
 
 			advancedSearchButton.setImmediate(true);
 			advancedSearchButton.addClickListener(new ClickListener()
@@ -832,6 +833,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 				{
 					clearAdvancedFilters();
 					advancedSearchOn = !advancedSearchOn;
+					notifyAdvancedModeListener();
 
 					if (advancedSearchOpened(advancedSearchOn) == ShowAdvancedSearchLayout.FALSE)
 					{
@@ -878,8 +880,10 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 	public void showAdvancedSearch(boolean lockAdvancedSearch)
 	{
 		advancedSearchOn = true;
+		notifyAdvancedModeListener();
 		advancedSearchLayout.setVisible(advancedSearchOn);
 		advancedSearchButton.setCaption(getBasicCaption());
+		advancedSearchButton.setDescription("Switch to " + getBasicCaption());
 		advancedSearchButton.setStyleName(ValoTheme.BUTTON_FRIENDLY);
 
 		if (lockAdvancedSearch)
@@ -892,8 +896,11 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 	{
 		clearAdvancedFilters();
 		advancedSearchOn = false;
+		notifyAdvancedModeListener();
 		advancedSearchLayout.setVisible(advancedSearchOn);
 		advancedSearchButton.setCaption(getAdvancedCaption());
+		advancedSearchButton.setDescription("Switch to " + getAdvancedCaption());
+
 	}
 
 	protected AbstractLayout getAdvancedSearchLayout()
@@ -1702,6 +1709,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 	}
 
 	private int emptyFilterWarningCount = 3;
+	private AdvancedModeListener advancedModeListener;
 
 	protected void triggerFilter(String searchText)
 	{
@@ -2562,5 +2570,26 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 	public boolean isRowChanging()
 	{
 		return rowChanging;
+	}
+
+	@Override
+	public void addAdvancedModeListener(AdvancedModeListener listener)
+	{
+		advancedModeListener = listener;
+	}
+
+	@Override
+	public boolean isAdvancedMode()
+	{
+		return advancedSearchOn;
+	}
+
+	private void notifyAdvancedModeListener()
+	{
+		if (advancedModeListener != null)
+		{
+			advancedModeListener.advancedModeIs(advancedSearchOn);
+		}
+
 	}
 }

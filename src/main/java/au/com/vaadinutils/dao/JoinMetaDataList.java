@@ -24,6 +24,10 @@ public class JoinMetaDataList<E, K> implements JoinMetaData<E, K>
 	@Override
 	public boolean equals(Object obj)
 	{
+		if (obj == null)
+		{
+			return false;
+		}
 		JoinMetaDataList other = (JoinMetaDataList) obj;
 		return type == other.type && attribute == other.attribute && fetch == other.fetch;
 	}
@@ -38,13 +42,6 @@ public class JoinMetaDataList<E, K> implements JoinMetaData<E, K>
 	@Override
 	public Join<E, K> getJoin(Root<E> root)
 	{
-		for (Join<E, ?> join : root.getJoins())
-		{
-			if (join.getAttribute().equals(attribute) && join.getJoinType().equals(type))
-			{
-				return (Join<E, K>) join;
-			}
-		}
 		for (Fetch<E, ?> join : root.getFetches())
 		{
 			if (join.getAttribute().equals(attribute) && join.getJoinType().equals(type))
@@ -57,6 +54,15 @@ public class JoinMetaDataList<E, K> implements JoinMetaData<E, K>
 		{
 			return (Join<E, K>) root.fetch(attribute, type);
 		}
+
+		for (Join<E, ?> join : root.getJoins())
+		{
+			if (join.getAttribute().equals(attribute) && join.getJoinType().equals(type))
+			{
+				return (Join<E, K>) join;
+			}
+		}
+
 		return root.join(attribute, type);
 	}
 
@@ -64,13 +70,6 @@ public class JoinMetaDataList<E, K> implements JoinMetaData<E, K>
 	@Override
 	public Join<E, K> getJoin(Join<?, E> join)
 	{
-		for (Join<E, ?> existingJoin : join.getJoins())
-		{
-			if (existingJoin.getAttribute().equals(attribute) && existingJoin.getJoinType().equals(type))
-			{
-				return (Join<E, K>) existingJoin;
-			}
-		}
 		for (Fetch<E, ?> existingJoin : join.getFetches())
 		{
 			if (existingJoin.getAttribute().equals(attribute) && existingJoin.getJoinType().equals(type))
@@ -83,6 +82,15 @@ public class JoinMetaDataList<E, K> implements JoinMetaData<E, K>
 		{
 			return (Join<E, K>) join.fetch(attribute, type);
 		}
+
+		for (Join<E, ?> existingJoin : join.getJoins())
+		{
+			if (existingJoin.getAttribute().equals(attribute) && existingJoin.getJoinType().equals(type))
+			{
+				return (Join<E, K>) existingJoin;
+			}
+		}
+
 		return join.join(attribute, type);
 	}
 

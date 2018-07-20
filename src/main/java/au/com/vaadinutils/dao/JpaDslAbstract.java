@@ -259,6 +259,12 @@ public abstract class JpaDslAbstract<E, R>
 		return builder.coalesce(root.get(attribute1), root.get(attribute2));
 	}
 
+	public <T, J1, J2> Expression<T> coalesce(final JoinBuilder<E, J1> join1, SingularAttribute<J1, T> attribute1,
+			final JoinBuilder<E, J2> join2, final SingularAttribute<J2, T> attribute2)
+	{
+		return builder.coalesce(getJoin(join1).get(attribute1), getJoin(join2).get(attribute2));
+	}
+
 	public Expression<String> concat(Expression<String> concat, Expression<String> trim)
 	{
 		return builder.concat(concat, trim);
@@ -269,6 +275,11 @@ public abstract class JpaDslAbstract<E, R>
 		return builder.concat(trim, string);
 	}
 
+	/**
+	 * call this method in the same way that you would call getResultList()...
+	 * 
+	 * so jpaDslAbstract.select().where(...).count();
+	 */
 	public Long count()
 	{
 		CriteriaQuery<Long> query = builder.createQuery(Long.class);
@@ -289,18 +300,6 @@ public abstract class JpaDslAbstract<E, R>
 	public <K, T> Expression<Long> count(final SingularAttribute<E, T> attribute)
 	{
 		return builder.count(root.get(attribute));
-	}
-
-	public Long countDistinct()
-	{
-		CriteriaQuery<Long> query = builder.createQuery(Long.class);
-		if (predicate != null)
-		{
-			query.where(predicate);
-		}
-		query.select(builder.countDistinct(root));
-
-		return getEntityManager().createQuery(query).getSingleResult();
 	}
 
 	/**
@@ -608,6 +607,12 @@ public abstract class JpaDslAbstract<E, R>
 	public <L> JpaDslAbstract<E, R> fetch(SingularAttribute<E, L> field, JoinType type)
 	{
 		root.fetch(field, type);
+		return this;
+	}
+
+	public <K, T> JpaDslAbstract<E, R> fetch(final JoinBuilder<E, K> join, SingularAttribute<K, T> field, JoinType type)
+	{
+		getJoin(join).fetch(field, type);
 		return this;
 	}
 
@@ -956,6 +961,21 @@ public abstract class JpaDslAbstract<E, R>
 		};
 	}
 
+	public <V extends Comparable<? super V>> Condition<E> greaterThanOrEqualTo(final Expression<V> expression,
+			final V value)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+
+				return builder.greaterThanOrEqualTo(expression, value);
+			}
+		};
+	}
+
 	public JpaDslAbstract<E, R> groupBy(Expression<?>... expressions)
 	{
 		criteria.groupBy(expressions);
@@ -1151,6 +1171,19 @@ public abstract class JpaDslAbstract<E, R>
 			public Predicate getPredicates()
 			{
 				return builder.isNotNull(root.get(field));
+			}
+		};
+	}
+
+	public <V extends Comparable<? super V>> Condition<E> isNotNull(final Expression<V> expression)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+				return builder.isNotNull(expression);
 			}
 		};
 	}
@@ -1412,6 +1445,21 @@ public abstract class JpaDslAbstract<E, R>
 			{
 
 				return builder.lessThanOrEqualTo(field.path, value);
+			}
+		};
+	}
+
+	public <V extends Comparable<? super V>> Condition<E> lessThanOrEqualTo(final Expression<V> expression,
+			final V value)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+
+				return builder.lessThanOrEqualTo(expression, value);
 			}
 		};
 	}

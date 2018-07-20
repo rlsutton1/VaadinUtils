@@ -849,7 +849,7 @@ public class FormHelper<E> implements Serializable
 	{
 
 		return new EntityFieldBuilderV2<L, JPAContainer<L>>().setLabel(fieldLabel).setField(fieldName)
-				.addDisplayField(listField, null).build();
+				.addDisplayField(listField, listField.getName()).build();
 	}
 
 	/**
