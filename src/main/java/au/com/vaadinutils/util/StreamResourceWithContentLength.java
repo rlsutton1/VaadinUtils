@@ -37,8 +37,8 @@ public class StreamResourceWithContentLength extends StreamResource
 		{
 			try
 			{
-				long contentLength = contentLengthProvider.getContentLength();
 				ds.setStream(ss.getStream());
+				long contentLength = contentLengthProvider.getContentLength();
 				ds.setContentLength(contentLength);
 				ds.setParameter("Content-Length", String.valueOf(contentLength));
 				ds.setBufferSize(getBufferSize());
