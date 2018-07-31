@@ -5,7 +5,7 @@ import javax.persistence.metamodel.SingularAttribute;
 public class JpaDslSelectAttributeBuilder<E, R> extends JpaDslAbstract<E, R>
 {
 
-	public JpaDslSelectAttributeBuilder(Class<E> entityClass, SingularAttribute<E, R> resultAttribute)
+	public JpaDslSelectAttributeBuilder(Class<E> entityClass, SingularAttribute<? super E, R> resultAttribute)
 	{
 		this.entityClass = entityClass;
 		builder = getEntityManager().getCriteriaBuilder();
