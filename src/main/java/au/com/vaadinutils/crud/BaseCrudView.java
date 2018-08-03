@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.persistence.EntityNotFoundException;
+import javax.persistence.OptimisticLockException;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.apache.logging.log4j.LogManager;
@@ -1586,7 +1587,17 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 		}
 		catch (Exception e)
 		{
-			ErrorWindow.showErrorWindow(e);
+			if (e.getCause() instanceof OptimisticLockException)
+			{
+				Notification.show(
+						"Sorry, your edits can not be saved because there was an edit of this record at the same time.\n\nPlease refresh the page and try again.",
+						Type.ERROR_MESSAGE);
+
+			}
+			else
+			{
+				ErrorWindow.showErrorWindow(e);
+			}
 		}
 		finally
 		{
