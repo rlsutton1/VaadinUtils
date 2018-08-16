@@ -162,7 +162,11 @@ public class ComboBoxWithSearchFieldChooserWindow<T extends CrudEntity, C extend
 					int i = 0;
 					for (String search : sortColumns)
 					{
-						filterList[i++] = new SimpleStringFilter(search, filterString, true, false);
+						// protect against empty filters or fields
+						if (StringUtils.isNotBlank(search) && StringUtils.isNotBlank(filterString))
+						{
+							filterList[i++] = new SimpleStringFilter(search, filterString, true, false);
+						}
 					}
 					filters.add(new Or(filterList));
 
