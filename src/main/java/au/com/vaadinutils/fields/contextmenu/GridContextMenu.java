@@ -70,12 +70,17 @@ public class GridContextMenu<E> extends EntityContextMenu<E>
 		});
 	}
 
+	@SuppressWarnings("unchecked")
 	private void openContext(final GridContextClickEvent event)
+	{
+		openContext(new GridContextMenuClickEvent<>((E) event.getItemId(), event.getClientX(), event.getClientY()));
+	}
+
+	public void openContext(final GridContextMenuClickEvent<E> event)
 	{
 		try
 		{
-			@SuppressWarnings("unchecked")
-			final E itemId = (E) event.getItemId();
+			final E itemId = event.getEntity();
 			if (itemId == null)
 			{
 				return;
