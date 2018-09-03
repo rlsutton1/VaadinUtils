@@ -10,6 +10,9 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+
+import com.google.common.base.Preconditions;
 
 import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.entity.BaseCrudEntity;
@@ -28,6 +31,7 @@ public class Tblportal extends BaseCrudEntity
 	 */
 	private static final long serialVersionUID = 6749641927189770291L;
 
+	@NotNull
 	@JoinColumn(name = "layoutId")
 	private Tblportallayout portalLayout;
 
@@ -120,6 +124,13 @@ public class Tblportal extends BaseCrudEntity
 	public TblPortalData getData()
 	{
 		return data;
+
+	}
+
+	public void setData(TblPortalData data2)
+	{
+		data = data2;
+		data.setPortal(this);
 
 	}
 

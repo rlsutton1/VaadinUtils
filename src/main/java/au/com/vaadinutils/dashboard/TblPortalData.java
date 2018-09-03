@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 import au.com.vaadinutils.entity.BaseCrudEntity;
 
@@ -24,6 +25,7 @@ public class TblPortalData extends BaseCrudEntity implements Serializable
 	@Column(length = 10000000)
 	private byte[] data;
 
+	@NotNull
 	@JoinColumn(name = "portalId")
 	private Tblportal portal;
 

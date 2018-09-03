@@ -518,6 +518,8 @@ public abstract class DashBoardView extends VerticalLayout implements View
 						{
 							Tblportal copyPortal = new Tblportal();
 							copyPortal.setType(portal.getType());
+							copyLayout.addPortal(copyPortal);
+
 							EntityManagerProvider.getEntityManager().persist(copyPortal);
 
 							for (Tblportalconfig config : portal.getConfigs())
@@ -530,15 +532,22 @@ public abstract class DashBoardView extends VerticalLayout implements View
 
 							}
 
+							// this commit is added here to address a null key
+							// issue
+							// when copying a dashboard with a spreadsheet in it
+							// -bazaar
+							EntityManagerProvider.commitAndContinue();
+
 							if (portal.getData() != null && portal.getData().getData() != null)
 							{
 								TblPortalData data = new TblPortalData();
 								data.setData(portal.getData().getData());
-								data.setPortal(copyPortal);
+								copyPortal.setData(data);
+
 								EntityManagerProvider.getEntityManager().persist(data);
 							}
 
-							copyLayout.addPortal(copyPortal);
+							EntityManagerProvider.commitAndContinue();
 
 						}
 
