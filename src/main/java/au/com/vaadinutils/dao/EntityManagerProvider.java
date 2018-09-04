@@ -187,7 +187,7 @@ public enum EntityManagerProvider
 	 * 
 	 * @return
 	 */
-	public static AutoCloseable setThreadLocalEntityManagerTryWithResources()
+	public static AutoCloseableEM setThreadLocalEntityManagerTryWithResources()
 	{
 		final EntityManager em;
 
@@ -206,11 +206,11 @@ public enum EntityManagerProvider
 			em = null;
 		}
 
-		return new AutoCloseable()
+		return new AutoCloseableEM()
 		{
 
 			@Override
-			public void close() throws Exception
+			public void close()
 			{
 				if (em != null)
 				{
@@ -274,7 +274,7 @@ public enum EntityManagerProvider
 			@Override
 			public void run()
 			{
-				try (AutoCloseable closer = EntityManagerProvider.setThreadLocalEntityManagerTryWithResources())
+				try (AutoCloseableEM closer = EntityManagerProvider.setThreadLocalEntityManagerTryWithResources())
 				{
 					runnable.run();
 				}
