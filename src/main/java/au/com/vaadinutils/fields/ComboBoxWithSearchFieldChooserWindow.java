@@ -1,6 +1,7 @@
 package au.com.vaadinutils.fields;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -158,17 +159,24 @@ public class ComboBoxWithSearchFieldChooserWindow<T extends CrudEntity, C extend
 
 				if (filterString.length() > 0)
 				{
-					Filter[] filterList = new Filter[sortColumns.length];
-					int i = 0;
+					List<Filter> orFilters = new LinkedList<>();
+
 					for (String search : sortColumns)
 					{
 						// protect against empty filters or fields
 						if (StringUtils.isNotBlank(search) && StringUtils.isNotBlank(filterString))
 						{
-							filterList[i++] = new SimpleStringFilter(search, filterString, true, false);
+							if (localContainer.getType(search).isAssignableFrom(String.class))
+							{
+								orFilters.add(new SimpleStringFilter(search, filterString, true, false));
+							}
+							else
+							{
+								logger.warn("Can't text search on nested field '{}'", search);
+							}
 						}
 					}
-					filters.add(new Or(filterList));
+					filters.add(new Or(orFilters.toArray(new Filter[] {})));
 
 				}
 
