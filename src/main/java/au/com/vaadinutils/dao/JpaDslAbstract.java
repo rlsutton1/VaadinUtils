@@ -580,6 +580,20 @@ public abstract class JpaDslAbstract<E, R>
 		};
 	}
 
+	public <J, V> AbstractCondition<E> in(final SingularAttribute<E, Long> attribute,
+			final JpaDslSubquerySelectBuilder<E, V> subqueryBuilder)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+				return builder.in(root.get(attribute)).value(subqueryBuilder.getSubQuery());
+			}
+		};
+	}
+
 	public <L> JpaDslAbstract<E, R> fetch(ListAttribute<E, L> field, JoinType type)
 	{
 		root.fetch(field, type);
@@ -1767,6 +1781,17 @@ public abstract class JpaDslAbstract<E, R>
 	public <J> JpaDslSubqueryBuilder<E, J> subQuery(Class<J> target)
 	{
 		return new JpaDslSubqueryBuilder<>(target, criteria, root);
+	}
+
+	public <J, V> JpaDslSubquerySelectBuilder<E, J> subquerySelect(final Class<J> target)
+	{
+		return new JpaDslSubquerySelectBuilder<>(target, criteria, root);
+	}
+
+	public <J, V> JpaDslSubquerySelectBuilder<E, J> subquerySelect(final Class<J> target,
+			final SingularAttribute<J, Long> selectAttribute)
+	{
+		return new JpaDslSubquerySelectBuilder<>(target, criteria, root, selectAttribute);
 	}
 
 	public <T extends Number> Expression<T> sum(final SingularAttribute<E, T> attribute)
