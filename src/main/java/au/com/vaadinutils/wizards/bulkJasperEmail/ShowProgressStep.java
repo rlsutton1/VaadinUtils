@@ -100,12 +100,12 @@ public class ShowProgressStep<C extends CrudEntity> implements WizardStep, Progr
 			String email = recipient.getEmailAddress();
 			if (email != null && email.length() > 0)
 			{
-				queueTransmission(transmissions, dedupList, recipient, email, proxy);
+				queueTransmission(transmissions, dedupList, recipient, email);
 				continue;
 			}
 
 			// No email address found
-			JasperTransmission transmission = new JasperTransmission(recipient, proxy, new RecipientException(
+			JasperTransmission transmission = new JasperTransmission(recipient, new RecipientException(
 					"No email address on recipient.", recipient));
 			ShowProgressStep.this.progressTable.addRow(transmission);
 			rejected.setValue(rejected.intValue() + 1);
@@ -135,7 +135,7 @@ public class ShowProgressStep<C extends CrudEntity> implements WizardStep, Progr
 	}
 
 	private void queueTransmission(ArrayList<JasperTransmission> transmissions, HashSet<String> dedupList,
-			Recipient recipient, String toEmailAddress, JasperProxy proxy)
+			Recipient recipient, String toEmailAddress)
 	{
 		JasperTransmission transmission = new JasperTransmission(recipient);
 		if (!dedupList.contains(toEmailAddress))

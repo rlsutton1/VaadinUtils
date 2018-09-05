@@ -276,8 +276,7 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 		reportTitle = helper.bindTextField("Report", ReportEmailScheduleEntity_.reportTitle);
 		reportTitle.setReadOnly(true);
 
-		sender = helper.bindEntityField("From", ReportEmailScheduleEntity_.sender, ReportEmailSender.class,
-				ReportEmailSender_.username);
+		sender = helper.bindEntityField("From", ReportEmailScheduleEntity_.sender, ReportEmailSender_.username);
 		sender.setReadOnly(true);
 
 		outputFormat = helper.bindEnumField("Output format", ReportEmailScheduleEntity_.outputFormat.getName(),
@@ -286,7 +285,7 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 		outputFormat.removeItem(OutputFormat.HTML);
 
 		helper.bindTextField("Subject", ReportEmailScheduleEntity_.subject);
-		CKEditorEmailField message = helper.bindEditorField("Message", ReportEmailScheduleEntity_.message, false);
+		CKEditorEmailField message = helper.bindEditorField(ReportEmailScheduleEntity_.message, false);
 
 		helper.bindTextField("Report Log", ReportEmailScheduleEntity_.reportLog.getName()).setReadOnly(true);
 
@@ -349,8 +348,8 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 			options.add("" + i);
 		}
 
-		final ComboBox dayOfMonth = helper.bindComboBox(main, validatingFieldGroup,
-				ReportEmailScheduleEntity_.scheduledDayOfMonth.getName(), "Day of month", options);
+		final ComboBox dayOfMonth = helper.bindComboBox(main, ReportEmailScheduleEntity_.scheduledDayOfMonth.getName(),
+				"Day of month", options);
 		dayOfMonth.setConverter(Integer.class);
 		dayOfMonth.setNullSelectionAllowed(true);
 

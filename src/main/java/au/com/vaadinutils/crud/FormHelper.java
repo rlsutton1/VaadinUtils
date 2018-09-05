@@ -48,7 +48,6 @@ import com.vaadin.ui.CustomField;
 import com.vaadin.ui.DateField;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.PasswordField;
@@ -65,7 +64,6 @@ import au.com.vaadinutils.crud.splitFields.SplitColorPicker;
 import au.com.vaadinutils.crud.splitFields.SplitComboBox;
 import au.com.vaadinutils.crud.splitFields.SplitDateField;
 import au.com.vaadinutils.crud.splitFields.SplitEditorField;
-import au.com.vaadinutils.crud.splitFields.SplitLabel;
 import au.com.vaadinutils.crud.splitFields.SplitListSelect;
 import au.com.vaadinutils.crud.splitFields.SplitPasswordField;
 import au.com.vaadinutils.crud.splitFields.SplitTextArea;
@@ -159,7 +157,7 @@ public class FormHelper<E> implements Serializable
 		return field;
 	}
 
-	public <T extends CustomField<?>> T doBinding(String fieldLabel, SingularAttribute<?, ?> field, T customField)
+	public <T extends CustomField<?>> T doBinding(SingularAttribute<?, ?> field, T customField)
 	{
 
 		doBinding(group, field.getName(), customField);
@@ -169,7 +167,7 @@ public class FormHelper<E> implements Serializable
 
 	}
 
-	public <T extends CustomField<?>> T doBinding(String fieldLabel, SetAttribute<?, ?> field, T customField)
+	public <T extends CustomField<?>> T doBinding(SetAttribute<?, ?> field, T customField)
 	{
 
 		doBinding(group, field.getName(), customField);
@@ -179,7 +177,7 @@ public class FormHelper<E> implements Serializable
 
 	}
 
-	public <T extends CustomField<?>> T doBinding(String fieldLabel, ListAttribute<?, ?> field, T customField)
+	public <T extends CustomField<?>> T doBinding(ListAttribute<?, ?> field, T customField)
 	{
 
 		doBinding(group, field.getName(), customField);
@@ -369,28 +367,6 @@ public class FormHelper<E> implements Serializable
 		return bindDateField(form, group, fieldLabel, fieldName, "yyyy-MM-dd", Resolution.DAY);
 	}
 
-	public Label bindLabel(String fieldLabel)
-	{
-		Label field = bindLabel(form, group, fieldLabel);
-		this.fieldList.add(field);
-		return field;
-	}
-
-	public Label bindLabel(AbstractLayout form, ValidatingFieldGroup<E> group, String fieldLabel)
-	{
-		Label field = new SplitLabel(fieldLabel);
-		field.setWidth("100%");
-		form.addComponent(field);
-		return field;
-	}
-
-	public Label bindLabel(AbstractLayout form, ValidatingFieldGroup<E> group, Label field)
-	{
-		field.setWidth("100%");
-		form.addComponent(field);
-		return field;
-	}
-
 	public <M> ComboBox bindEnumField(AbstractLayout form, ValidatingFieldGroup<E> group, String fieldLabel,
 			SingularAttribute<E, M> member, Class<?> clazz)
 	{
@@ -492,8 +468,7 @@ public class FormHelper<E> implements Serializable
 		return field;
 	}
 
-	public <L> ComboBox bindComboBox(AbstractLayout form, ValidatingFieldGroup<E> fieldGroup, String fieldName,
-			String fieldLabel, Collection<?> options)
+	public <L> ComboBox bindComboBox(AbstractLayout form, String fieldName, String fieldLabel, Collection<?> options)
 	{
 		ComboBox field = new SplitComboBox(fieldLabel, options);
 		field.setNewItemsAllowed(false);
@@ -508,8 +483,7 @@ public class FormHelper<E> implements Serializable
 		return field;
 	}
 
-	public <L> ComboBox bindComboBox(AbstractLayout form, ValidatingFieldGroup<E> fieldGroup, String fieldName,
-			String fieldLabel, Container options)
+	public <L> ComboBox bindComboBox(AbstractLayout form, String fieldName, String fieldLabel, Container options)
 	{
 		ComboBox field = new SplitComboBox(fieldLabel, options);
 		field.setNewItemsAllowed(false);
@@ -524,8 +498,8 @@ public class FormHelper<E> implements Serializable
 		return field;
 	}
 
-	public <L> LegacyComboBox bindLegacyComboBox(AbstractLayout form, ValidatingFieldGroup<E> fieldGroup,
-			String fieldName, String fieldLabel, Collection<?> options)
+	public <L> LegacyComboBox bindLegacyComboBox(AbstractLayout form, String fieldName, String fieldLabel,
+			Collection<?> options)
 	{
 		LegacyComboBox field = new LegacySplitComboBox(fieldLabel, options);
 		field.setNewItemsAllowed(false);
@@ -541,29 +515,6 @@ public class FormHelper<E> implements Serializable
 
 	public <L extends CrudEntity, K> ComboBox bindEntityField(String fieldLabel, SingularAttribute<E, L> fieldName,
 			SingularAttribute<? super L, K> listFieldName)
-	{
-		return new EntityFieldBuilder<L>().setLabel(fieldLabel).setField(fieldName).setListFieldName(listFieldName)
-				.build();
-
-	}
-
-	public <L extends CrudEntity, K> ComboBox bindEntityField(String fieldLabel, SingularAttribute<E, L> fieldName,
-			SingularAttribute<L, K> listFieldName, boolean useLazyContainer)
-	{
-
-		EntityContainer<L> container = JpaBaseDao.getGenericDao(fieldName.getJavaType()).createLazyQueryContainer();
-
-		return new EntityFieldBuilder<L>().setLabel(fieldLabel).setField(fieldName).setListFieldName(listFieldName)
-				.setContainer(container).build();
-
-	}
-
-	/**
-	 * Deprecated - use EntityFieldBuilder instead
-	 */
-	@Deprecated
-	public <L extends CrudEntity> ComboBox bindEntityField(String fieldLabel, SingularAttribute<E, L> fieldName,
-			Class<L> listClazz, SingularAttribute<L, ?> listFieldName)
 	{
 		return new EntityFieldBuilder<L>().setLabel(fieldLabel).setField(fieldName).setListFieldName(listFieldName)
 				.build();
@@ -1429,7 +1380,7 @@ public class FormHelper<E> implements Serializable
 		return field;
 	}
 
-	public <M> CKEditorEmailField bindEditorField(String fieldLabel, SingularAttribute<E, M> member, boolean readonly)
+	public <M> CKEditorEmailField bindEditorField(SingularAttribute<E, M> member, boolean readonly)
 	{
 		CKEditorEmailField field = bindEditorField(form, group, member.getName(), readonly);
 		this.fieldList.add(field);

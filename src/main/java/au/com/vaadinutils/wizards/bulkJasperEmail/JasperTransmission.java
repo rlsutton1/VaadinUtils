@@ -12,7 +12,7 @@ public class JasperTransmission
 		this.recipient = recipient;
 	}
 
-	public JasperTransmission(Recipient recipient, JasperProxy proxy, Exception exception)
+	public JasperTransmission(Recipient recipient, Exception exception)
 	{
 		this.recipient = recipient;
 		this.exception = exception;

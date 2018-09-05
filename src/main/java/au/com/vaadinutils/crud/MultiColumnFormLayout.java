@@ -6,6 +6,7 @@ import java.util.Date;
 
 import javax.persistence.metamodel.SingularAttribute;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.vaadin.shared.ui.datefield.Resolution;
@@ -21,8 +22,6 @@ import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 
-import org.apache.logging.log4j.LogManager;
-
 import au.com.vaadinutils.crud.splitFields.SplitField;
 import au.com.vaadinutils.crud.splitFields.SplitLabel;
 import au.com.vaadinutils.domain.iColorFactory;
@@ -31,7 +30,7 @@ import au.com.vaadinutils.fields.ColorPickerField;
 
 public class MultiColumnFormLayout<E extends CrudEntity> extends GridLayout
 {
-	private static  transient Logger logger   =  LogManager.getLogger(MultiColumnFormLayout.class);
+	private static transient Logger logger = LogManager.getLogger(MultiColumnFormLayout.class);
 	private static final long serialVersionUID = 1L;
 	private static final int DEFAULT_LABEL_WIDTH = 120;
 	private static final int DEFAULT_FIELD_WIDTH = 100;
@@ -45,7 +44,7 @@ public class MultiColumnFormLayout<E extends CrudEntity> extends GridLayout
 	private ArrayList<AbstractComponent> fieldList = new ArrayList<AbstractComponent>();
 	private FormHelper<E> formHelper;
 
-	//final private GridLayout grid;
+	// final private GridLayout grid;
 
 	int x = 0;
 	int y = 0;
@@ -109,6 +108,7 @@ public class MultiColumnFormLayout<E extends CrudEntity> extends GridLayout
 		this.fieldWidths[column] = width;
 	}
 
+	@Override
 	public void setComponentAlignment(Component childComponent, Alignment alignment)
 	{
 		super.setComponentAlignment(childComponent, alignment);
@@ -174,8 +174,8 @@ public class MultiColumnFormLayout<E extends CrudEntity> extends GridLayout
 		x++;
 
 		String fieldWidth = getFieldWidth(x, fieldSpan);
-		logger.debug("field: {} width: {} X: {} Y: {} X1: {} Y1: {}", caption.getValue(), fieldWidth, x, y, (x
-				+ fieldSpan - 1), y);
+		logger.debug("field: {} width: {} X: {} Y: {} X1: {} Y1: {}", caption.getValue(), fieldWidth, x, y,
+				(x + fieldSpan - 1), y);
 		splitComponent.setWidth(fieldWidth);
 
 		if (!(splitComponent instanceof SplitLabel))
@@ -207,6 +207,7 @@ public class MultiColumnFormLayout<E extends CrudEntity> extends GridLayout
 	/**
 	 * Adds a new row to the grid and moves the cursor down one row.
 	 */
+	@Override
 	public void newLine()
 	{
 		x = 0;
@@ -266,8 +267,7 @@ public class MultiColumnFormLayout<E extends CrudEntity> extends GridLayout
 	 */
 	public TextField addTextField(String fieldLabel)
 	{
-		TextField field = formHelper.bindTextField(this, (ValidatingFieldGroup<E>) null, fieldLabel,
-				(String) null);
+		TextField field = formHelper.bindTextField(this, (ValidatingFieldGroup<E>) null, fieldLabel, (String) null);
 
 		this.fieldList.add(field);
 		return field;
@@ -325,8 +325,8 @@ public class MultiColumnFormLayout<E extends CrudEntity> extends GridLayout
 		return field;
 	}
 
-	public DateField bindDateField(String fieldLabel, SingularAttribute<E, ? extends Date> dateField,
-			String dateFormat, Resolution resolution)
+	public DateField bindDateField(String fieldLabel, SingularAttribute<E, ? extends Date> dateField, String dateFormat,
+			Resolution resolution)
 	{
 		DateField field = formHelper.bindDateField(this, fieldGroup, fieldLabel, dateField, dateFormat, resolution);
 		this.fieldList.add(field);
@@ -336,20 +336,6 @@ public class MultiColumnFormLayout<E extends CrudEntity> extends GridLayout
 	public DateField bindDateField(String fieldLabel, String fieldName, String dateFormat, Resolution resolution)
 	{
 		DateField field = formHelper.bindDateField(this, fieldGroup, fieldLabel, fieldName, dateFormat, resolution);
-		this.fieldList.add(field);
-		return field;
-	}
-
-	public Label bindLabel(String fieldLabel)
-	{
-		Label field = formHelper.bindLabel(this, fieldGroup, fieldLabel);
-		this.fieldList.add(field);
-		return field;
-	}
-
-	public Label bindLabel(Label label)
-	{
-		Label field = formHelper.bindLabel(this, fieldGroup, label);
 		this.fieldList.add(field);
 		return field;
 	}
@@ -413,7 +399,8 @@ public class MultiColumnFormLayout<E extends CrudEntity> extends GridLayout
 	 * @return
 	 */
 	@Deprecated
-	public <L extends CrudEntity> ComboBox bindEntityField(String fieldLabel, String fieldName, Class<L> listClazz, String listFieldName)
+	public <L extends CrudEntity> ComboBox bindEntityField(String fieldLabel, String fieldName, Class<L> listClazz,
+			String listFieldName)
 	{
 		ComboBox field = formHelper.bindEntityField(this, fieldGroup, fieldLabel, fieldName, listClazz, listFieldName);
 		this.fieldList.add(field);
@@ -430,17 +417,17 @@ public class MultiColumnFormLayout<E extends CrudEntity> extends GridLayout
 	 * @return
 	 */
 	@Deprecated
-	public <L extends CrudEntity> ComboBox bindEntityField(String fieldLabel, SingularAttribute<E, L> fieldName, Class<L> listClazz,
-			SingularAttribute<L, ?> listFieldName)
+	public <L extends CrudEntity> ComboBox bindEntityField(String fieldLabel, SingularAttribute<E, L> fieldName,
+			Class<L> listClazz, SingularAttribute<L, ?> listFieldName)
 	{
 		ComboBox field = formHelper.bindEntityField(this, fieldGroup, fieldLabel, fieldName, listClazz, listFieldName);
 		this.fieldList.add(field);
 		return field;
 	}
 
-	public ComboBox bindComboBox(String fieldLabel, String fieldName,Collection<?> options)
+	public ComboBox bindComboBox(String fieldLabel, String fieldName, Collection<?> options)
 	{
-		ComboBox field = formHelper.bindComboBox(this, fieldGroup, fieldName,fieldLabel, options);
+		ComboBox field = formHelper.bindComboBox(this, fieldName, fieldLabel, options);
 		this.fieldList.add(field);
 		return field;
 	}
@@ -460,6 +447,7 @@ public class MultiColumnFormLayout<E extends CrudEntity> extends GridLayout
 		return this.formHelper;
 	}
 
+	@Override
 	public void setReadOnly(boolean readOnly)
 	{
 		if (this.fieldGroup.getItemDataSource() != null)
@@ -482,6 +470,7 @@ public class MultiColumnFormLayout<E extends CrudEntity> extends GridLayout
 	 * @param columnIndex
 	 * @param ratio
 	 */
+	@Override
 	public void setColumnExpandRatio(int columnIndex, float ratio)
 	{
 		super.setColumnExpandRatio(columnIndex, ratio);

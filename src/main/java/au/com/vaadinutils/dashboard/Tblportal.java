@@ -12,8 +12,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-import com.google.common.base.Preconditions;
-
 import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.entity.BaseCrudEntity;
 

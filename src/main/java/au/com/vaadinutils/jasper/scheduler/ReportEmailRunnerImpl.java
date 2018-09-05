@@ -53,7 +53,7 @@ public class ReportEmailRunnerImpl implements ReportEmailRunner, JasperReportPro
 
 		jasperReportProperties = new JasperReportPropertiesAlternateFile(schedule.getReportTitle(),
 				schedule.getReportFileName(), jasperReportProperties);
-		Collection<ReportParameter<?>> params = buildParams(schedule, scheduledTime, this);
+		Collection<ReportParameter<?>> params = buildParams(schedule, scheduledTime);
 
 		JasperManager manager = new JasperManager(this);
 		if (manager.checkQueueSize() > 0)
@@ -100,8 +100,7 @@ public class ReportEmailRunnerImpl implements ReportEmailRunner, JasperReportPro
 
 	}
 
-	private Collection<ReportParameter<?>> buildParams(ReportEmailSchedule schedule, Date scheduledTime,
-			JasperReportProperties jasperReportProperties)
+	private Collection<ReportParameter<?>> buildParams(ReportEmailSchedule schedule, Date scheduledTime)
 	{
 
 		Collection<ReportParameter<?>> params = new HashSet<ReportParameter<?>>();
