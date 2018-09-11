@@ -89,6 +89,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 		implements RowChangeListener<E>, Selected<E>, DirtyListener, ButtonListener, ParentCrud<E>
 {
 
+	private static final String LOCKING_EXCEPTION_USER_MESSAGE = "Sorry, your edits can not be saved because there was an edit of this record at the same time.\n\nPlease refresh the page and try again.";
 	private static transient Logger logger = LogManager.getLogger(BaseCrudView.class);
 	private static final long serialVersionUID = 1L;
 
@@ -1463,7 +1464,10 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 			buttonLayout.setDefaultState();
 
 		}
-
+		catch (org.eclipse.persistence.exceptions.OptimisticLockException e)
+		{
+			Notification.show(LOCKING_EXCEPTION_USER_MESSAGE, Type.ERROR_MESSAGE);
+		}
 		catch (Exception e)
 		{
 			if (e instanceof InvalidValueException)
@@ -1473,6 +1477,10 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 			else if (e.getCause() instanceof InvalidValueException)
 			{
 				handleInvalidValueException((InvalidValueException) e.getCause());
+			}
+			else if (e.getCause() instanceof org.eclipse.persistence.exceptions.OptimisticLockException)
+			{
+				Notification.show(LOCKING_EXCEPTION_USER_MESSAGE, Type.ERROR_MESSAGE);
 			}
 			else
 			{
@@ -1589,9 +1597,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 		{
 			if (e.getCause() instanceof OptimisticLockException)
 			{
-				Notification.show(
-						"Sorry, your edits can not be saved because there was an edit of this record at the same time.\n\nPlease refresh the page and try again.",
-						Type.ERROR_MESSAGE);
+				Notification.show(LOCKING_EXCEPTION_USER_MESSAGE, Type.ERROR_MESSAGE);
 
 			}
 			else
