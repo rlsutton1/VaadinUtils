@@ -1434,7 +1434,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 			EntityManagerProvider.getEntityManager().getEntityManagerFactory().getCache().evict(entityClass,
 					newEntity.getId());
 
-			newEntity = EntityManagerProvider.merge(newEntity);
+			newEntity = EntityManagerProvider.getEntityManager().find(entityClass, newEntity.getId());
 			postSaveAction(newEntity);
 			EntityManagerProvider.getEntityManager().flush();
 
@@ -1479,6 +1479,10 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 				handleInvalidValueException((InvalidValueException) e.getCause());
 			}
 			else if (e.getCause() instanceof org.eclipse.persistence.exceptions.OptimisticLockException)
+			{
+				Notification.show(LOCKING_EXCEPTION_USER_MESSAGE, Type.ERROR_MESSAGE);
+			}
+			else if (e instanceof javax.persistence.OptimisticLockException)
 			{
 				Notification.show(LOCKING_EXCEPTION_USER_MESSAGE, Type.ERROR_MESSAGE);
 			}

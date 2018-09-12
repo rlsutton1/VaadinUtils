@@ -607,7 +607,10 @@ public class TimePicker extends HorizontalLayout implements Field<Date>
 	@Override
 	public void discard() throws SourceException
 	{
-		setValues(datasource.getValue());
+		if (datasource != null)
+		{
+			setValues(datasource.getValue());
+		}
 	}
 
 	@Override
