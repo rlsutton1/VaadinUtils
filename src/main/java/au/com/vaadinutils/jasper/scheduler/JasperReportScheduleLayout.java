@@ -256,7 +256,6 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	@SuppressWarnings("deprecation")
 	public TabSheet buildEditor(ValidatingFieldGroup<ReportEmailScheduleEntity> validatingFieldGroup)
 	{
 
