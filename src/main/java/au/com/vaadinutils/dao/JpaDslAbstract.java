@@ -207,8 +207,8 @@ public abstract class JpaDslAbstract<E, R>
 		return root.get(field).as(String.class);
 	}
 
-	public <V extends Comparable<? super V>> Condition<E> between(final JoinBuilder<E, ? super V> joinBuilder,
-			final SingularAttribute<? super V, Date> field, final Date start, final Date end)
+	public <V > Condition<E> between(final JoinBuilder<E,  V> joinBuilder,
+			final SingularAttribute< V, Date> field, final Date start, final Date end)
 	{
 		return new AbstractCondition<E>()
 		{
@@ -223,8 +223,8 @@ public abstract class JpaDslAbstract<E, R>
 		};
 	}
 
-	public <V extends Comparable<? super V>> Condition<E> between(final JoinBuilder<E, ? super V> joinBuilder,
-			final SingularAttribute<? super V, Long> field, final Long start, final Long end)
+	public <V> Condition<E> between(final JoinBuilder<E, V> joinBuilder,
+			final SingularAttribute< V, Long> field, final Long start, final Long end)
 	{
 		return new AbstractCondition<E>()
 		{
