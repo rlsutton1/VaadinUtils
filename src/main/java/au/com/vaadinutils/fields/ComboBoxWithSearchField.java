@@ -64,6 +64,7 @@ public class ComboBoxWithSearchField<T extends CrudEntity, C extends Indexed & F
 
 		holder = new CssLayout();
 		select = new PopupButtonCustom("", holder);
+		select.setId(caption + "Combo");
 
 		popup = new ComboBoxWithSearchFieldChooserWindow<T, C>(getSelectionListener(), type, caption, container,
 				headingBuilder, sortColumns, advancedSearchProvider, advancedSearchListener);

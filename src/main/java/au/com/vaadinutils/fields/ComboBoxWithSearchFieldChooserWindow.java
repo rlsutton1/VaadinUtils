@@ -256,6 +256,8 @@ public class ComboBoxWithSearchFieldChooserWindow<T extends CrudEntity, C extend
 		holder.setHeight("300");
 		holder.addComponent(grid);
 
+		grid.setId("PopupGrid");
+
 		return holder;
 	}
 

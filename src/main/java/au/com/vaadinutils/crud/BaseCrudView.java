@@ -820,6 +820,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 			advancedSearchButton.setDescription("Switch to " + getAdvancedCaption());
 			advancedSearchButton.setStyleName(ValoTheme.BUTTON_FRIENDLY);
 			advancedSearchButton.setWidth("100");
+			advancedSearchButton.setId("advancedSearchButtonId");
 
 			advancedSearchOn = false;
 			notifyAdvancedModeListener();
@@ -1498,7 +1499,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 
 				if (selected && entityTable.getCurrent() != null)
 				{
-					container.removeItem(entityTable.getCurrent());
+					container.removeItem(entityTable.getCurrent().getItemId());
 				}
 			}
 			buttonLayout.setDefaultState();
@@ -2096,7 +2097,9 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 	@Override
 	public boolean isDirty()
 	{
-		return fieldGroup.isModified() || newEntity != null;
+		boolean isNewEntity = newEntity != null;
+		boolean modified = fieldGroup.isModified();
+		return modified || isNewEntity;
 	}
 
 	/**
