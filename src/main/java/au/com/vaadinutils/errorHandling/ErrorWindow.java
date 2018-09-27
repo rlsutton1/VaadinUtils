@@ -33,6 +33,7 @@ import com.vaadin.ui.themes.ValoTheme;
 
 public class ErrorWindow
 {
+	public static final String ERROR_WINDOW_CLOSE_BUTTON = "ErrorWindowCloseButton";
 	private Button close = new Button("OK");
 	private Label uploadStatus = new Label("&nbsp;", ContentMode.HTML);
 
@@ -356,6 +357,8 @@ public class ErrorWindow
 
 		});
 		close.setStyleName(ValoTheme.BUTTON_DANGER);
+
+		close.setId(ERROR_WINDOW_CLOSE_BUTTON);
 
 		layout.addComponent(message);
 		layout.addComponent(describe);

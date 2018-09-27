@@ -4,11 +4,10 @@ import java.util.List;
 
 import javax.persistence.metamodel.SingularAttribute;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.vaadin.data.Validator;
-
-import org.apache.logging.log4j.LogManager;
 
 import au.com.vaadinutils.crud.BaseCrudView;
 import au.com.vaadinutils.crud.ChildCrudEntity;
@@ -73,13 +72,13 @@ public class UniqueFieldValidator<E extends CrudEntity, F> implements Validator
 				{
 					Object id = message.getId();
 					Object currentId = crud.getCurrent().getId();
-					if (message instanceof ChildCrudEntity)
+					if (message instanceof ChildCrudEntity && ((ChildCrudEntity) message).getGuid() != null)
 					{
 						id = ((ChildCrudEntity) message).getGuid();
 						currentId = ((ChildCrudEntity) crud.getCurrent()).getGuid();
 					}
 
-					if (!id.equals(currentId))
+					if (id != null && !id.equals(currentId))
 					{
 						logger.error(warningMessage);
 						throw new InvalidValueException(warningMessage);
