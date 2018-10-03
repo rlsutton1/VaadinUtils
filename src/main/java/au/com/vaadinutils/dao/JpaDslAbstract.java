@@ -1,5 +1,6 @@
 package au.com.vaadinutils.dao;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -381,6 +382,30 @@ public abstract class JpaDslAbstract<E, R>
 			}
 		};
 	}
+	
+	public <K> Condition<E> eq(final Expression<K> expression, final Expression<K> expression2)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+				return builder.equal(expression, expression2);
+			}
+		};
+	}
+	
+	public <J,V> Expression<BigDecimal> round(JoinBuilder<E,J> join, SingularAttribute<J,V> number)
+	{
+		return builder.function("round", BigDecimal.class, asString(join, number), builder.literal(2));
+	}
+	
+	public <T> Expression<BigDecimal> round(SingularAttribute<E,T> number)
+	{
+		return builder.function("round", BigDecimal.class, asExpression(number), builder.literal(2));
+	}
+
 
 	public <K> Condition<E> eq(final Expression<K> expression, final K value)
 	{
