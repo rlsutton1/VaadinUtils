@@ -138,6 +138,28 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		return new JpaDslSelectAttributeBuilder<>(entityClass, attribute);
 	}
 
+	public Collection<E> findByIds(Collection<Long> ids)
+	{
+		if (ids == null || ids.isEmpty())
+		{
+			// moved the logger to here, so it isn't needlessly constructed for
+			// every JpaBaseDao Object
+			Logger logger = LogManager.getLogger();
+			logger.warn("No keys provided for findById on entity " + entityClass);
+			if (logger.isDebugEnabled())
+			{
+				Exception e = new Exception("No keys Provided for entity " + entityClass);
+				logger.debug(e, e);
+			}
+			return null;
+		}
+
+		final JpaDslBuilder<E> q = select();
+		q.where(q.in(getIdField(), ids));
+
+		return q.getResultList();
+	}
+
 	@Override
 	public E findById(K id)
 	{
