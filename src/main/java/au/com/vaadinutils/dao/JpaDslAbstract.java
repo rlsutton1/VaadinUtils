@@ -889,7 +889,7 @@ public abstract class JpaDslAbstract<E, R>
 			}
 		};
 	}
-
+	
 	public <J, V extends Comparable<? super V>> Condition<E> greaterThanOrEqualTo(
 			final ListAttribute<? super E, J> joinAttribute, final JoinType joinType,
 			final SingularAttribute<J, V> field, final V value)
@@ -918,6 +918,20 @@ public abstract class JpaDslAbstract<E, R>
 			{
 				Join<E, J> join = getJoin(joinAttribute, joinType);
 				return builder.greaterThan(join.get(field), root.get(value));
+			}
+		};
+	}
+	
+	public <J, V extends Comparable<? super V>> Condition<E> greaterThan(final JoinBuilder<E, J> join,
+			final SingularAttribute<J, V> field, final SingularAttribute<E, V> field2)
+	{
+		return new AbstractCondition<E>()
+		{
+
+			@Override
+			public Predicate getPredicates()
+			{
+				return builder.greaterThan(getJoin(join).get(field), root.get(field2));
 			}
 		};
 	}
