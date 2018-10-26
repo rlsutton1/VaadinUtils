@@ -37,10 +37,12 @@ import au.com.vaadinutils.jasper.parameter.ReportParameter;
 import au.com.vaadinutils.jasper.servlet.VaadinJasperPrintServlet;
 import au.com.vaadinutils.jasper.ui.CleanupCallback;
 import au.com.vaadinutils.jasper.ui.JasperReportProperties;
+import net.sf.jasperreports.engine.DefaultJasperReportsContext;
 import net.sf.jasperreports.engine.JRBand;
 import net.sf.jasperreports.engine.JRElement;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JRParameter;
+import net.sf.jasperreports.engine.JRPropertiesUtil;
 import net.sf.jasperreports.engine.JRStaticText;
 import net.sf.jasperreports.engine.JRTextField;
 import net.sf.jasperreports.engine.JasperPrint;
@@ -66,6 +68,7 @@ import net.sf.jasperreports.engine.type.VerticalAlignEnum;
 import net.sf.jasperreports.engine.type.WhenNoDataTypeEnum;
 import net.sf.jasperreports.engine.util.JRLoader;
 import net.sf.jasperreports.engine.util.JRSwapFile;
+import net.sf.jasperreports.engine.util.LocalJasperReportsContext;
 import net.sf.jasperreports.export.CsvReportConfiguration;
 import net.sf.jasperreports.export.HtmlReportConfiguration;
 import net.sf.jasperreports.export.PdfReportConfiguration;
@@ -246,7 +249,13 @@ public class JasperManager implements Runnable
 			public void export(JasperPrint jasper_print, OutputStream stream, SimpleReportExportConfiguration config,
 					Map<String, byte[]> images) throws JRException
 			{
-				JRCsvExporter exporter = new JRCsvExporter();
+
+				// allow crosstab's to expand fully on a CSV export
+				LocalJasperReportsContext context = new LocalJasperReportsContext(
+						DefaultJasperReportsContext.getInstance());
+				context.setProperty(JRPropertiesUtil.PROPERTY_PREFIX + "crosstab.ignore.width", "true");
+
+				JRCsvExporter exporter = new JRCsvExporter(context);
 				exporter.setExporterInput(new SimpleExporterInput(jasper_print));
 				exporter.setConfiguration((CsvReportConfiguration) config);
 				SimpleWriterExporterOutput output = new SimpleWriterExporterOutput(stream);
