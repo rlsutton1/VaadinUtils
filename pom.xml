@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>au.com.vaadinutils</groupId>
@@ -47,7 +48,8 @@
 	</pluginRepositories>
 	<distributionManagement>
 		<repository>
-			<!-- these properties are stored in settings.xml, this is handy if you want to deploy to your own repository -->
+			<!-- these properties are stored in settings.xml, this is handy if you 
+				want to deploy to your own repository -->
 			<id>${distribution.id}</id>
 			<name>${distribution.name}</name>
 			<url>${distribution.url}</url>
@@ -218,7 +220,7 @@
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-			<version>23.0</version>
+			<version>20.0</version>
 		</dependency>
 
 		<dependency>
