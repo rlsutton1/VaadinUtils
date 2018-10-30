@@ -45,6 +45,14 @@
 			</snapshots>
 		</pluginRepository>
 	</pluginRepositories>
+	<distributionManagement>
+		<repository>
+			<!-- these properties are stored in settings.xml, this is handy if you want to deploy to your own repository -->
+			<id>${distribution.id}</id>
+			<name>${distribution.name}</name>
+			<url>${distribution.url}</url>
+		</repository>
+	</distributionManagement>
 	<build>
 
 
@@ -210,7 +218,7 @@
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-			<version>18.0</version>
+			<version>23.0</version>
 		</dependency>
 
 		<dependency>
