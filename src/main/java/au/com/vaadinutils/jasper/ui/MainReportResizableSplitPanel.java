@@ -15,8 +15,8 @@ public class MainReportResizableSplitPanel extends HorizontalSplitPanel implemen
 	MainReportResizableSplitPanel(int width)
 	{
 		this.setSizeFull();
-		setSplitPosition(235);
-		setMinSplitPosition(235, Unit.PIXELS);
+		setSplitPosition(width);
+		setMinSplitPosition(width, Unit.PIXELS);
 
 	}
 

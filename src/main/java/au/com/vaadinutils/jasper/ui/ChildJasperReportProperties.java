@@ -204,4 +204,11 @@ public class ChildJasperReportProperties implements JasperReportProperties
 	{
 		return this.parentReportProperties.getPreviewButtonIconResource();
 	}
+
+	@Override
+	public Resource getFavouriteButtonIconResource()
+	{
+		return this.parentReportProperties.getFavouriteButtonIconResource();
+
+	}
 }

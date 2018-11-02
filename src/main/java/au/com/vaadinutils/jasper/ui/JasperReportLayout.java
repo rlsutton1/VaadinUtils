@@ -23,6 +23,7 @@ import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.BrowserFrame;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.JavaScript;
@@ -36,6 +37,9 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Reindeer;
 import com.vaadin.ui.themes.ValoTheme;
 
+import au.com.vaadinutils.dao.JpaBaseDao;
+import au.com.vaadinutils.editors.InputDialog;
+import au.com.vaadinutils.editors.Recipient;
 import au.com.vaadinutils.jasper.JasperManager;
 import au.com.vaadinutils.jasper.JasperManager.OutputFormat;
 import au.com.vaadinutils.jasper.JasperProgressListener;
@@ -48,6 +52,8 @@ import au.com.vaadinutils.jasper.parameter.ReportParameter;
 import au.com.vaadinutils.jasper.parameter.ReportParameterConstant;
 import au.com.vaadinutils.jasper.scheduler.JasperReportEmailWindow;
 import au.com.vaadinutils.jasper.scheduler.JasperReportSchedulerWindow;
+import au.com.vaadinutils.jasper.scheduler.entities.ReportSave;
+import au.com.vaadinutils.jasper.scheduler.entities.ReportSaveParameter;
 import au.com.vaadinutils.listener.CancelListener;
 import au.com.vaadinutils.listener.ClickEventLogged;
 import au.com.vaadinutils.ui.WorkingDialog;
@@ -87,6 +93,8 @@ class JasperReportLayout extends VerticalLayout
 	private Button printButton;
 
 	private Button exportButton;
+
+	private Button favouriteButton;
 
 	private VerticalLayout splash;
 
@@ -277,7 +285,7 @@ class JasperReportLayout extends VerticalLayout
 
 		HorizontalLayout buttonContainer = new HorizontalLayout();
 		buttonContainer.setSizeFull();
-		buttonContainer.setWidth("230");
+		buttonContainer.setWidth("280");
 
 		showButton = new Button();
 		Resource previewButtonIcon = reportProperties.getPreviewButtonIconResource();
@@ -328,6 +336,8 @@ class JasperReportLayout extends VerticalLayout
 		addButtonListener(exportButton, OutputFormat.CSV);
 		buttonContainer.addComponent(exportButton);
 
+		createFavouriteButton(buttonHeight, buttonContainer);
+
 		createEmailButton(buttonHeight, buttonContainer);
 		createScheduleButton(buttonHeight, buttonContainer);
 		if (reportProperties instanceof JasperReportPopUp)
@@ -377,6 +387,72 @@ class JasperReportLayout extends VerticalLayout
 		layout.addComponent(csv);
 
 		return layout;
+	}
+
+	private void createFavouriteButton(String buttonHeight, HorizontalLayout buttonContainer)
+	{
+		favouriteButton = new Button();
+		Resource favouriteButtonIcon = reportProperties.getFavouriteButtonIconResource();
+		if (favouriteButtonIcon == null)
+		{
+			favouriteButtonIcon = new ExternalResource("images/favourite.png");
+		}
+		favouriteButton.setDescription("Favourite");
+		favouriteButton.setIcon(favouriteButtonIcon);
+		favouriteButton.setWidth("" + BUTTON_WIDTH);
+		favouriteButton.setDisableOnClick(true);
+		favouriteButton.setHeight(buttonHeight);
+		favouriteButton.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
+		favouriteButton.addStyleName(ValoTheme.BUTTON_BORDERLESS);
+		favouriteButton.addClickListener(new ClickListener()
+		{
+
+			@Override
+			public void buttonClick(ClickEvent event)
+			{
+				new InputDialog(UI.getCurrent(), "Save Favourite", "Provide a name for the faviourite", new Recipient()
+				{
+
+					@Override
+					public boolean onOK(String input)
+					{
+
+						Collection<ReportParameter<?>> params = builder.getReportParameters();
+
+						ReportSave reportSave = new ReportSave();
+						reportSave.setReportClass(reportProperties.getReportClass().getName());
+						reportSave.setUserDescription(input);
+
+						for (ReportParameter<?> param : params)
+						{
+							ReportSaveParameter reportSaveparam = new ReportSaveParameter();
+
+							for (String pname : param.getParameterNames())
+							{
+
+								reportSaveparam.setParameterName(param.getLabel(pname));
+								reportSaveparam.setTextualRepresentation(param.getDisplayValue(pname));
+								reportSaveparam.setParameterValue(param.getValue(pname).toString());
+								reportSave.addParameter(reportSaveparam);
+								JpaBaseDao.getEntityManager().persist(reportSaveparam);
+							}
+						}
+						JpaBaseDao.getEntityManager().persist(reportSave);
+						return true;
+
+					}
+
+					@Override
+					public boolean onCancel()
+					{
+						return true;
+					}
+				});
+
+			}
+		});
+
+		buttonContainer.addComponent(favouriteButton);
 	}
 
 	private void createEmailButton(String buttonHeight, HorizontalLayout buttonContainer)

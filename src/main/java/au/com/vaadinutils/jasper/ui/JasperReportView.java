@@ -14,7 +14,8 @@ public abstract class JasperReportView extends HorizontalLayout implements View
 	public static final String NAME = "ReportView";
 	private static final long serialVersionUID = 1L;
 
-	// static private final transient Logger logger = org.apache.logging.log4j.LogManager.getLogger();
+	// static private final transient Logger logger =
+	// org.apache.logging.log4j.LogManager.getLogger();
 
 	private JasperReportLayout report = null;
 
@@ -26,6 +27,7 @@ public abstract class JasperReportView extends HorizontalLayout implements View
 	protected JasperReportView()
 	{
 	}
+
 	protected void setReport(JasperReportProperties reportProperties)
 	{
 		report = new JasperReportLayout(reportProperties);
@@ -35,9 +37,9 @@ public abstract class JasperReportView extends HorizontalLayout implements View
 	public void enter(ViewChangeEvent event)
 	{
 		Preconditions.checkState(report != null);
-		
+
 		this.setSizeFull();
-		report.initScreen(new MainReportResizableSplitPanel(235));
+		report.initScreen(new MainReportResizableSplitPanel(285));
 		this.addComponent(report);
 
 	}

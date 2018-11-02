@@ -242,4 +242,6 @@ public interface JasperReportProperties
 
 	public abstract Resource getPreviewButtonIconResource();
 
+	public abstract Resource getFavouriteButtonIconResource();
+
 }

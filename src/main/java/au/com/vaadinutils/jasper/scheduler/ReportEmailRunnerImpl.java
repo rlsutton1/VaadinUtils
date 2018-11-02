@@ -294,4 +294,11 @@ public class ReportEmailRunnerImpl implements ReportEmailRunner, JasperReportPro
 	{
 		return jasperReportProperties.getPreviewButtonIconResource();
 	}
+
+	@Override
+	public Resource getFavouriteButtonIconResource()
+	{
+		return jasperReportProperties.getFavouriteButtonIconResource();
+
+	}
 }

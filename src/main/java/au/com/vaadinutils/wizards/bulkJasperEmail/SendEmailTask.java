@@ -300,4 +300,10 @@ public class SendEmailTask extends ProgressBarTask<JasperTransmission> implement
 	{
 		return null;
 	}
+
+	@Override
+	public Resource getFavouriteButtonIconResource()
+	{
+		return null;
+	}
 }

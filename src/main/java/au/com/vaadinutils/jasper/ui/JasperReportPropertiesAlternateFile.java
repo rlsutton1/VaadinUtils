@@ -191,4 +191,11 @@ public class JasperReportPropertiesAlternateFile implements JasperReportProperti
 	{
 		return reportPropertiesTemplate.getPreviewButtonIconResource();
 	}
+
+	@Override
+	public Resource getFavouriteButtonIconResource()
+	{
+		return reportPropertiesTemplate.getFavouriteButtonIconResource();
+
+	}
 }
