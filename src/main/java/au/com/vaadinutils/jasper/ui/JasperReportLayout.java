@@ -406,6 +406,7 @@ class JasperReportLayout extends VerticalLayout
 		favouriteButton.addStyleName(ValoTheme.BUTTON_BORDERLESS);
 		favouriteButton.addClickListener(new ClickListener()
 		{
+			private static final long serialVersionUID = 1L;
 
 			@Override
 			public void buttonClick(ClickEvent event)
@@ -422,6 +423,8 @@ class JasperReportLayout extends VerticalLayout
 						ReportSave reportSave = new ReportSave();
 						reportSave.setReportClass(reportProperties.getReportClass().getName());
 						reportSave.setUserDescription(input);
+
+						reportSave.setUser(reportProperties.getUsername());
 
 						for (ReportParameter<?> param : params)
 						{

@@ -95,4 +95,14 @@ public class ReportSaveParameter implements Serializable
 			return false;
 		return true;
 	}
+
+	public String getParameterValue()
+	{
+		return parameterValue;
+	}
+
+	public Long getId()
+	{
+		return id;
+	}
 }

@@ -79,4 +79,10 @@ public class ReportSave implements Serializable
 		return id;
 	}
 
+	public void setUser(String username)
+	{
+		this.user = username;
+
+	}
+
 }
