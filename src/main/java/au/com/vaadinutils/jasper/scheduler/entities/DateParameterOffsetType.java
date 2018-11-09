@@ -1,6 +1,5 @@
 package au.com.vaadinutils.jasper.scheduler.entities;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.joda.time.DateTime;
@@ -9,25 +8,25 @@ public enum DateParameterOffsetType
 {
 	CONSTANT("Select date")
 	{
+
 		@Override
-		public String convertStartDate(Date parameterTime, Date scheduledDate, DateParameterType formatType)
+		public Date convertStartDate(Date parameterTime, Date scheduledDate, DateParameterType formatType)
 		{
-			SimpleDateFormat formatter = new SimpleDateFormat(formatType.getDateFormat());
-			return formatter.format(parameterTime);
+			return parameterTime;
 		}
 
 		@Override
-		public String convertEndDate(Date parameterTime, Date scheduledDate, DateParameterType formatType)
+		public Date convertEndDate(Date parameterTime, Date scheduledDate, DateParameterType formatType)
 		{
-			SimpleDateFormat formatter = new SimpleDateFormat(formatType.getDateFormat());
-			return formatter.format(parameterTime);
+			return parameterTime;
 		}
 	},
 
 	TODAY("Current day")
 	{
+
 		@Override
-		public String convertStartDate(Date parameterTime, Date scheduledDate, DateParameterType formatType)
+		public Date convertStartDate(Date parameterTime, Date scheduledDate, DateParameterType formatType)
 		{
 			Date result;
 			DateTime scheduled = new DateTime(scheduledDate);
@@ -41,13 +40,11 @@ public enum DateParameterOffsetType
 						.toDate();
 
 			}
-			SimpleDateFormat formatter = new SimpleDateFormat(formatType.getDateFormat());
-			return formatter.format(result);
-
+			return result;
 		}
 
 		@Override
-		public String convertEndDate(Date parameterTime, Date scheduledDate, DateParameterType formatType)
+		public Date convertEndDate(Date parameterTime, Date scheduledDate, DateParameterType formatType)
 		{
 			Date result;
 			DateTime scheduled = new DateTime(scheduledDate);
@@ -61,14 +58,14 @@ public enum DateParameterOffsetType
 						.plusMinutes(new DateTime(parameterTime).getMinuteOfDay()).toDate();
 
 			}
-			SimpleDateFormat formatter = new SimpleDateFormat(formatType.getDateFormat());
-			return formatter.format(result);
+			return result;
 		}
 	},
 	YESTERDAY("Previous day")
 	{
+
 		@Override
-		public String convertStartDate(Date parameterTime, Date scheduledDate, DateParameterType formatType)
+		public Date convertStartDate(Date parameterTime, Date scheduledDate, DateParameterType formatType)
 		{
 			Date result;
 			DateTime scheduled = new DateTime(scheduledDate);
@@ -82,12 +79,11 @@ public enum DateParameterOffsetType
 						.plusMinutes(new DateTime(parameterTime).getMinuteOfDay()).toDate();
 
 			}
-			SimpleDateFormat formatter = new SimpleDateFormat(formatType.getDateFormat());
-			return formatter.format(result);
+			return result;
 		}
 
 		@Override
-		public String convertEndDate(Date parameterTime, Date scheduledDate, DateParameterType formatType)
+		public Date convertEndDate(Date parameterTime, Date scheduledDate, DateParameterType formatType)
 		{
 			Date result;
 			DateTime scheduled = new DateTime(scheduledDate);
@@ -101,130 +97,125 @@ public enum DateParameterOffsetType
 						.toDate();
 
 			}
-			SimpleDateFormat formatter = new SimpleDateFormat(formatType.getDateFormat());
-			return formatter.format(result);
+			return result;
 		}
 	},
 	THIS_WEEK("Current week")
 	{
+
 		@Override
-		public String convertStartDate(Date parameterTime, Date scheduledDate, DateParameterType formatType)
+		public Date convertStartDate(Date parameterTime, Date scheduledDate, DateParameterType formatType)
 		{
 			Date result;
 			DateTime scheduled = new DateTime(scheduledDate);
 
 			result = scheduled.withDayOfWeek(1).withTimeAtStartOfDay().toDate();
 
-			SimpleDateFormat formatter = new SimpleDateFormat(formatType.getDateFormat());
-			return formatter.format(result);
+			return result;
 		}
 
 		@Override
-		public String convertEndDate(Date parameterTime, Date scheduledDate, DateParameterType formatType)
+		public Date convertEndDate(Date parameterTime, Date scheduledDate, DateParameterType formatType)
 		{
 			Date result;
 			DateTime scheduled = new DateTime(scheduledDate);
 
 			result = scheduled.withDayOfWeek(1).withTimeAtStartOfDay().plusWeeks(1).toDate();
 
-			SimpleDateFormat formatter = new SimpleDateFormat(formatType.getDateFormat());
-			return formatter.format(result);
+			return result;
 		}
 	},
 	LAST_WEEK("Previous week")
 	{
+
 		@Override
-		public String convertStartDate(Date parameterTime, Date scheduledDate, DateParameterType formatType)
+		public Date convertStartDate(Date parameterTime, Date scheduledDate, DateParameterType formatType)
 		{
 			Date result;
 			DateTime scheduled = new DateTime(scheduledDate);
 
 			result = scheduled.withDayOfWeek(1).withTimeAtStartOfDay().plusWeeks(-1).toDate();
 
-			SimpleDateFormat formatter = new SimpleDateFormat(formatType.getDateFormat());
-			return formatter.format(result);
+			return result;
 		}
 
 		@Override
-		public String convertEndDate(Date parameterTime, Date scheduledDate, DateParameterType formatType)
+		public Date convertEndDate(Date parameterTime, Date scheduledDate, DateParameterType formatType)
 		{
 			Date result;
 			DateTime scheduled = new DateTime(scheduledDate);
 
 			result = scheduled.withDayOfWeek(1).withTimeAtStartOfDay().toDate();
 
-			SimpleDateFormat formatter = new SimpleDateFormat(formatType.getDateFormat());
-			return formatter.format(result);
+			return result;
 		}
 	},
 	THIS_MONTH("Current month")
 	{
+
 		@Override
-		public String convertStartDate(Date parameterTime, Date scheduledDate, DateParameterType formatType)
+		public Date convertStartDate(Date parameterTime, Date scheduledDate, DateParameterType formatType)
 		{
 			Date result;
 			DateTime scheduled = new DateTime(scheduledDate);
 
 			result = scheduled.withDayOfMonth(1).withTimeAtStartOfDay().toDate();
 
-			SimpleDateFormat formatter = new SimpleDateFormat(formatType.getDateFormat());
-			return formatter.format(result);
+			return result;
 		}
 
 		@Override
-		public String convertEndDate(Date parameterTime, Date scheduledDate, DateParameterType formatType)
+		public Date convertEndDate(Date parameterTime, Date scheduledDate, DateParameterType formatType)
 		{
 			Date result;
 			DateTime scheduled = new DateTime(scheduledDate);
 
 			result = scheduled.withDayOfMonth(1).withTimeAtStartOfDay().plusMonths(1).toDate();
 
-			SimpleDateFormat formatter = new SimpleDateFormat(formatType.getDateFormat());
-			return formatter.format(result);
+			return result;
 		}
 	},
 	LAST_MONTH("Previous month")
 	{
+
 		@Override
-		public String convertStartDate(Date parameterTime, Date scheduledDate, DateParameterType formatType)
+		public Date convertStartDate(Date parameterTime, Date scheduledDate, DateParameterType formatType)
 		{
 			Date result;
 			DateTime scheduled = new DateTime(scheduledDate);
 
 			result = scheduled.withDayOfMonth(1).withTimeAtStartOfDay().minusMonths(1).toDate();
 
-			SimpleDateFormat formatter = new SimpleDateFormat(formatType.getDateFormat());
-			return formatter.format(result);
+			return result;
 		}
 
 		@Override
-		public String convertEndDate(Date parameterTime, Date scheduledDate, DateParameterType formatType)
+		public Date convertEndDate(Date parameterTime, Date scheduledDate, DateParameterType formatType)
 		{
 			Date result;
 			DateTime scheduled = new DateTime(scheduledDate);
 
 			result = scheduled.withDayOfMonth(1).withTimeAtStartOfDay().toDate();
 
-			SimpleDateFormat formatter = new SimpleDateFormat(formatType.getDateFormat());
-			return formatter.format(result);
+			return result;
 		}
 	};
 
 	String name;
-	
+
 	DateParameterOffsetType(String name)
 	{
 		this.name = name;
 	}
-	
+
 	@Override
 	public String toString()
 	{
 		return name;
 	}
-	
-	abstract public String convertStartDate(Date parameterTime, Date scheduledDate, DateParameterType formatType);
 
-	abstract public String convertEndDate(Date parameterTime, Date scheduledDate, DateParameterType formatType);
+	public abstract Date convertStartDate(Date parameterTime, Date scheduledDate, DateParameterType formatType);
+
+	public abstract Date convertEndDate(Date parameterTime, Date scheduledDate, DateParameterType formatType);
 
 }

@@ -1,16 +1,20 @@
 package au.com.vaadinutils.jasper.ui;
 
 import java.io.InputStream;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 
 import com.google.common.base.Preconditions;
 import com.vaadin.data.Item;
+import com.vaadin.data.Property.ReadOnlyException;
+import com.vaadin.data.util.converter.Converter.ConversionException;
 import com.vaadin.event.UIEvents.PollEvent;
 import com.vaadin.event.UIEvents.PollListener;
 import com.vaadin.server.ExternalResource;
@@ -37,9 +41,12 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Reindeer;
 import com.vaadin.ui.themes.ValoTheme;
 
+import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.dao.JpaBaseDao;
+import au.com.vaadinutils.dao.JpaDslBuilder;
 import au.com.vaadinutils.editors.InputDialog;
 import au.com.vaadinutils.editors.Recipient;
+import au.com.vaadinutils.errorHandling.ErrorWindow;
 import au.com.vaadinutils.jasper.JasperManager;
 import au.com.vaadinutils.jasper.JasperManager.OutputFormat;
 import au.com.vaadinutils.jasper.JasperProgressListener;
@@ -54,6 +61,8 @@ import au.com.vaadinutils.jasper.scheduler.JasperReportEmailWindow;
 import au.com.vaadinutils.jasper.scheduler.JasperReportSchedulerWindow;
 import au.com.vaadinutils.jasper.scheduler.entities.ReportSave;
 import au.com.vaadinutils.jasper.scheduler.entities.ReportSaveParameter;
+import au.com.vaadinutils.jasper.scheduler.entities.ReportSave_;
+import au.com.vaadinutils.jasper.scheduler.entities.SaveType;
 import au.com.vaadinutils.listener.CancelListener;
 import au.com.vaadinutils.listener.ClickEventLogged;
 import au.com.vaadinutils.ui.WorkingDialog;
@@ -376,6 +385,49 @@ class JasperReportLayout extends VerticalLayout
 			}
 			layout.addComponent(filterPanel);
 			layout.setExpandRatio(filterPanel, 1.0f);
+
+			try
+			{
+				ReportSave reportSave = UI.getCurrent().getSession().getAttribute(ReportSave.class);
+
+				if (reportSave != null)
+				{
+					for (ReportParameter<?> rp : builder.getReportParameters())
+					{
+						for (String paramterName : rp.getParameterNames())
+						{
+							for (ReportSaveParameter saved : reportSave.getParameters())
+							{
+								if (saved.getParameterName().equals(rp.getLabel(paramterName)))
+								{
+									try
+									{
+										if (StringUtils.isNotBlank(saved.getMetaData()))
+										{
+											rp.applySaveMetaData(saved.getMetaData());
+										}
+										else
+										{
+											rp.setValueAsString(saved.getParameterValue(), paramterName);
+										}
+
+									}
+									catch (ReadOnlyException | ConversionException | ParseException e)
+									{
+										ErrorWindow.showErrorWindow(e);
+									}
+								}
+							}
+
+						}
+					}
+				}
+			}
+			catch (Exception e)
+			{
+				logger.error(e, e);
+			}
+
 		}
 
 		// hidden frame for downloading csv
@@ -387,6 +439,7 @@ class JasperReportLayout extends VerticalLayout
 		layout.addComponent(csv);
 
 		return layout;
+
 	}
 
 	private void createFavouriteButton(String buttonHeight, HorizontalLayout buttonContainer)
@@ -418,6 +471,11 @@ class JasperReportLayout extends VerticalLayout
 					public boolean onOK(String input)
 					{
 
+						if (StringUtils.length(input) >= 500)
+						{
+							Notification.show("The name must be less than 500 characters", Type.ERROR_MESSAGE);
+							return false;
+						}
 						Collection<ReportParameter<?>> params = builder.getReportParameters();
 
 						ReportSave reportSave = new ReportSave();
@@ -425,19 +483,25 @@ class JasperReportLayout extends VerticalLayout
 						reportSave.setUserDescription(input);
 
 						reportSave.setUser(reportProperties.getUsername());
+						reportSave.setSaveType(SaveType.FAVOURITE);
 
 						for (ReportParameter<?> param : params)
 						{
-							ReportSaveParameter reportSaveparam = new ReportSaveParameter();
 
 							for (String pname : param.getParameterNames())
 							{
+								if (StringUtils.isNotBlank(param.getLabel(pname)))
+								{
+									ReportSaveParameter reportSaveparam = new ReportSaveParameter();
+									reportSaveparam.setParameterName(param.getLabel(pname));
+									reportSaveparam.setTextualRepresentation(param.getDisplayValue(pname));
+									reportSaveparam.setParameterValue(param.getValue(pname).toString());
+									reportSaveparam.setMetaData(param.getSaveMetaData());
+									reportSaveparam.setMetaDataComment(param.getMetaDataComment());
 
-								reportSaveparam.setParameterName(param.getLabel(pname));
-								reportSaveparam.setTextualRepresentation(param.getDisplayValue(pname));
-								reportSaveparam.setParameterValue(param.getValue(pname).toString());
-								reportSave.addParameter(reportSaveparam);
-								JpaBaseDao.getEntityManager().persist(reportSaveparam);
+									reportSave.addParameter(reportSaveparam);
+									JpaBaseDao.getEntityManager().persist(reportSaveparam);
+								}
 							}
 						}
 						JpaBaseDao.getEntityManager().persist(reportSave);
@@ -555,6 +619,10 @@ class JasperReportLayout extends VerticalLayout
 				try
 				{
 
+					createFrequentlyUsed();
+
+					createHistory();
+
 					printButton.setEnabled(false);
 					exportButton.setEnabled(false);
 					showButton.setEnabled(false);
@@ -582,6 +650,79 @@ class JasperReportLayout extends VerticalLayout
 				{
 
 				}
+			}
+
+			private void createHistory()
+			{
+				Collection<ReportParameter<?>> params = builder.getReportParameters();
+
+				ReportSave reportSave = new ReportSave();
+				reportSave.setReportClass(reportProperties.getReportClass().getName());
+				reportSave.setUserDescription("");
+
+				reportSave.setUser(reportProperties.getUsername());
+				reportSave.setSaveType(SaveType.HISTORY);
+				JpaBaseDao.getEntityManager().persist(reportSave);
+
+				for (ReportParameter<?> param : params)
+				{
+
+					for (String pname : param.getParameterNames())
+					{
+						if (StringUtils.isNotBlank(param.getLabel(pname)))
+						{
+							ReportSaveParameter reportSaveparam = new ReportSaveParameter();
+							reportSaveparam.setParameterName(param.getLabel(pname));
+							reportSaveparam.setTextualRepresentation(param.getDisplayValue(pname));
+							reportSaveparam.setParameterValue(param.getValue(pname).toString());
+							reportSaveparam.setMetaData(param.getSaveMetaData());
+							reportSaveparam.setMetaDataComment(param.getMetaDataComment());
+							reportSave.addParameter(reportSaveparam);
+							JpaBaseDao.getEntityManager().persist(reportSaveparam);
+						}
+					}
+				}
+
+				// remove excess history
+				JpaDslBuilder<ReportSave> q = new JpaBaseDao<>(ReportSave.class).select();
+				List<ReportSave> history = q
+						.where(q.eq(ReportSave_.user, reportProperties.getUsername())
+								.and(q.eq(ReportSave_.saveType, SaveType.HISTORY)))
+						.orderBy(ReportSave_.lastUsed, true).getResultList();
+				if (history.size() > 50)
+				{
+					ReportSave old = history.get(0);
+					for (ReportSaveParameter param : old.getParameters())
+					{
+						EntityManagerProvider.remove(param);
+					}
+					EntityManagerProvider.remove(old);
+				}
+
+			}
+
+			private void createFrequentlyUsed()
+			{
+				JpaDslBuilder<ReportSave> q = new JpaBaseDao<>(ReportSave.class).select();
+				ReportSave reportSave = q
+						.where(q.eq(ReportSave_.reportClass, reportProperties.getReportClass().getName())
+								.and(q.eq(ReportSave_.user, reportProperties.getUsername())
+										.and(q.eq(ReportSave_.saveType, SaveType.FREQUENTLY_USED))))
+						.getSingleResultOrNull();
+
+				if (reportSave == null)
+				{
+					reportSave = new ReportSave();
+					reportSave.setReportClass(reportProperties.getReportClass().getName());
+					reportSave.setUserDescription("Frequently used");
+
+					reportSave.setUser(reportProperties.getUsername());
+					reportSave.setSaveType(SaveType.FREQUENTLY_USED);
+
+					JpaBaseDao.getEntityManager().persist(reportSave);
+
+				}
+				reportSave.incrementRunCounter();
 			}
 		});
 	}

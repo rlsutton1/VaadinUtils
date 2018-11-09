@@ -81,6 +81,7 @@ public class ReportParameterEnum<T extends Enum<T>> extends ReportParameter<Enum
 		field.setValue(Enum.valueOf(enumClass, value));
 
 	}
+
 	@Override
 	public boolean isDateField()
 	{
@@ -93,5 +94,21 @@ public class ReportParameterEnum<T extends Enum<T>> extends ReportParameter<Enum
 		throw new RuntimeException("Not implemented");
 	}
 
+	@Override
+	public String getSaveMetaData()
+	{
+		return "";
+	}
 
+	@Override
+	public void applySaveMetaData(String metaData)
+	{
+		// NO OP
+	}
+
+	@Override
+	public String getMetaDataComment()
+	{
+		return "";
+	}
 }

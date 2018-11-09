@@ -8,14 +8,13 @@ import javax.persistence.metamodel.SingularAttribute;
 
 import org.apache.logging.log4j.Logger;
 
-import com.vaadin.addon.jpacontainer.JPAContainer;
-import com.vaadin.addon.jpacontainer.QueryModifierDelegate;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.sort.SortOrder;
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.filter.SimpleStringFilter;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
@@ -45,18 +44,21 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 		implements ReportParameterSelectionListener<T>
 {
 
+	private static final String ALL = "ALL";
 	protected Grid grid;
 	private Long defaultValue = null;
-	JPAContainer<T> container = null;
+	BeanItemContainer<T> container = null;
 	protected VerticalLayout layout = new VerticalLayout();
 	protected String caption;
 	Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 	protected SingularAttribute<T, String> displayField;
+	private Class<T> tableClass;
 
 	public ReportParameterTable(String caption, String parameterName, Class<T> tableClass,
 			SingularAttribute<T, String> displayField)
 	{
 		super(caption, parameterName);
+		this.tableClass = tableClass;
 		init(caption, tableClass, displayField);
 		setSelectionMode(SelectionMode.MULTI);
 	}
@@ -65,6 +67,7 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 			SingularAttribute<T, String> displayField, Long defaultValue)
 	{
 		super(caption, parameterName);
+		this.tableClass = tableClass;
 		init(caption, tableClass, displayField);
 		this.defaultValue = defaultValue;
 		setSelectionMode(SelectionMode.MULTI);
@@ -225,6 +228,8 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 						layout.setExpandRatio(grid, 1);
 						// layout.setComponentAlignment(selectAll,
 						// Alignment.BOTTOM_RIGHT);
+
+						loadContainerItems(container, tableClass);
 					}
 					catch (Exception e)
 					{
@@ -249,24 +254,24 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 	 * @param displayField
 	 * @return
 	 */
-	protected JPAContainer<T> createContainer(Class<T> tableClass, final SingularAttribute<T, String> displayField)
+	private BeanItemContainer<T> createContainer(Class<T> tableClass, final SingularAttribute<T, String> displayField)
 	{
-		JPAContainer<T> cont = container = JpaBaseDao.getGenericDao(tableClass).createVaadinContainer();
+		BeanItemContainer<T> cont = new BeanItemContainer<>(tableClass);
+
 		cont.sort(new Object[] { displayField.getName() }, new boolean[] { true });
 
-		cont.setQueryModifierDelegate(getQueryModifierDelegate());
 		return cont;
 	}
 
-	/**
-	 * override this method when providing a QueryModifierDelegate to filter the
-	 * rows visible in the table
-	 * 
-	 * @return
-	 */
-	protected QueryModifierDelegate getQueryModifierDelegate()
+	public void loadContainer()
 	{
-		return null;
+		loadContainerItems(container, tableClass);
+	}
+
+	protected void loadContainerItems(BeanItemContainer<T> container, Class<T> tableClass)
+	{
+		container.removeAllItems();
+		container.addAll(JpaBaseDao.getGenericDao(tableClass).findAll());
 	}
 
 	@Override
@@ -365,7 +370,14 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 		Collection<Long> ids = new LinkedList<>();
 		for (Object id : grid.getSelectedRows())
 		{
-			ids.add((Long) id);
+			if (id instanceof CrudEntity)
+			{
+				ids.add(((CrudEntity) id).getId());
+			}
+			else
+			{
+				ids.add((Long) id);
+			}
 		}
 		return ids;
 	}
@@ -386,7 +398,7 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 
 		try
 		{
-			Collection<Object> ids = grid.getSelectedRows();
+			Collection<Long> ids = getSelectedIds();
 			String selection = "";
 			for (Object id : ids)
 			{
@@ -561,7 +573,9 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 			{
 				try
 				{
-					grid.select(id);
+					T entity = JpaBaseDao.getGenericDao(tableClass).findById(id);
+
+					grid.select(entity);
 				}
 				catch (IllegalArgumentException e)
 				{
@@ -586,10 +600,53 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 	}
 
 	@Override
-	public Collection<Object> getValue()
+	public Collection<Long> getValue()
 	{
+		List<Long> ids = new LinkedList<>();
+		for (Object entity : grid.getSelectedRows())
+		{
+			if (entity instanceof CrudEntity)
+			{
+				ids.add(((CrudEntity) entity).getId());
+			}
+			else
+			{
+				ids.add((Long) entity);
+			}
+		}
 
-		return grid.getSelectedRows();
+		return ids;
+	}
+
+	@Override
+	public String getSaveMetaData()
+	{
+		boolean isAll = grid.getSelectedRows().size() == container.size();
+		if (isAll)
+		{
+			return ALL;
+		}
+		return "";
+	}
+
+	@Override
+	public void applySaveMetaData(String metaData)
+	{
+		if (ALL.equalsIgnoreCase(metaData))
+		{
+			selectAll();
+		}
+	}
+
+	@Override
+	public String getMetaDataComment()
+	{
+		boolean isAll = grid.getSelectedRows().size() == container.size();
+		if (isAll)
+		{
+			return ALL;
+		}
+		return "";
 	}
 
 }

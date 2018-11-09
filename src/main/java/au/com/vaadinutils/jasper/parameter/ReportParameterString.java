@@ -16,7 +16,7 @@ public class ReportParameterString extends ReportParameter<String>
 
 	public ReportParameterString(String caption, String parameterName)
 	{
-		super( caption,parameterName);
+		super(caption, parameterName);
 		field = new TextField();
 		field.setCaption(caption);
 	}
@@ -43,7 +43,7 @@ public class ReportParameterString extends ReportParameter<String>
 	public void setDefaultValue(String defaultValue)
 	{
 		field.setValue(defaultValue);
-		
+
 	}
 
 	@Override
@@ -63,10 +63,11 @@ public class ReportParameterString extends ReportParameter<String>
 	{
 		return super.validateField(field);
 	}
-	
+
 	public ReportParameter<?> setNotEmpty()
 	{
-		Validator validator = new Validator(){
+		Validator validator = new Validator()
+		{
 
 			/**
 			 * 
@@ -77,9 +78,10 @@ public class ReportParameterString extends ReportParameter<String>
 			public void validate(Object value) throws InvalidValueException
 			{
 				logger.info(value);
-				
-			}};
-			field.addValidator(validator);
+
+			}
+		};
+		field.addValidator(validator);
 		return this;
 	}
 
@@ -87,8 +89,9 @@ public class ReportParameterString extends ReportParameter<String>
 	public void setValueAsString(String value, String parameterName)
 	{
 		field.setValue(value);
-		
+
 	}
+
 	@Override
 	public boolean isDateField()
 	{
@@ -101,5 +104,22 @@ public class ReportParameterString extends ReportParameter<String>
 		throw new RuntimeException("Not implemented");
 	}
 
+	@Override
+	public String getSaveMetaData()
+	{
+		return "";
+	}
+
+	@Override
+	public void applySaveMetaData(String metaData)
+	{
+		// NO OP
+	}
+
+	@Override
+	public String getMetaDataComment()
+	{
+		return "";
+	}
 
 }

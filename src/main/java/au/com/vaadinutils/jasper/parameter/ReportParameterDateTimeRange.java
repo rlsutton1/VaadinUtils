@@ -3,19 +3,25 @@ package au.com.vaadinutils.jasper.parameter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.joda.time.DateTime;
 
 import com.google.common.base.Preconditions;
 import com.vaadin.data.Property.ReadOnlyException;
+import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.Validator;
 import com.vaadin.data.util.converter.Converter.ConversionException;
+import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.datefield.Resolution;
+import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.DateField;
 import com.vaadin.ui.VerticalLayout;
 
+import au.com.vaadinutils.jasper.scheduler.entities.DateParameterOffsetType;
 import au.com.vaadinutils.jasper.scheduler.entities.DateParameterType;
 
 public class ReportParameterDateTimeRange extends ReportParameter<String>
@@ -28,6 +34,7 @@ public class ReportParameterDateTimeRange extends ReportParameter<String>
 	protected final String startParameterName;
 
 	int endAdjustment = 0;
+	protected ComboBox offsetType;
 
 	/**
 	 * 
@@ -145,6 +152,7 @@ public class ReportParameterDateTimeRange extends ReportParameter<String>
 	@Override
 	public String getValue(String parameterName)
 	{
+
 		SimpleDateFormat sdf = new SimpleDateFormat(parameterFormat);
 
 		return sdf.format(getDate(parameterName));
@@ -152,18 +160,21 @@ public class ReportParameterDateTimeRange extends ReportParameter<String>
 
 	public Date getDate(String parameterName)
 	{
+
+		DateParameterOffsetType type = (DateParameterOffsetType) offsetType.getValue();
 		Date value;
 		if (parameterName.equalsIgnoreCase(startParameterName))
 		{
-			value = startfield.getValue();
+			value = type.convertStartDate(startfield.getValue(), new Date(), getDateParameterType());
 		}
 		else if (parameterName.equalsIgnoreCase(endParameterName))
 		{
 			value = new DateTime(endfield.getValue()).plusDays(endAdjustment).toDate();
+			value = type.convertEndDate(value, new Date(), getDateParameterType());
 		}
 		else
 		{
-			throw new RuntimeException("Attempt to retrieve invalid parameter name " + parameterName
+			throw new RuntimeException("Attempt to retrieve invalid date parameter name " + parameterName
 					+ " valid names are " + startParameterName + "," + endParameterName);
 		}
 		return value;
@@ -173,8 +184,41 @@ public class ReportParameterDateTimeRange extends ReportParameter<String>
 	public Component getComponent()
 	{
 		VerticalLayout layout = new VerticalLayout();
-		layout.addComponent(startfield);
-		layout.addComponent(endfield);
+
+		List<DateParameterOffsetType> types = new LinkedList<>();
+		for (DateParameterOffsetType type : DateParameterOffsetType.values())
+		{
+			types.add(type);
+		}
+
+		offsetType = new ComboBox("Date Options", types);
+		offsetType.setImmediate(true);
+		offsetType.setNullSelectionAllowed(false);
+		offsetType.setWidth("140");
+		offsetType.setValue(DateParameterOffsetType.CONSTANT);
+
+		offsetType.addValueChangeListener(new ValueChangeListener()
+		{
+
+			private static final long serialVersionUID = 7081417825842355432L;
+
+			@Override
+			public void valueChange(ValueChangeEvent event)
+			{
+				DateParameterOffsetType offsetTypeValue = (DateParameterOffsetType) event.getProperty().getValue();
+				startfield.setVisible(offsetTypeValue == DateParameterOffsetType.CONSTANT);
+				endfield.setVisible(offsetTypeValue == DateParameterOffsetType.CONSTANT);
+
+			}
+		});
+		layout.addComponent(offsetType);
+
+		VerticalLayout inset = new VerticalLayout();
+		inset.setMargin(new MarginInfo(false, false, false, true));
+
+		inset.addComponent(startfield);
+		inset.addComponent(endfield);
+		layout.addComponent(inset);
 		return layout;
 	}
 
@@ -200,18 +244,18 @@ public class ReportParameterDateTimeRange extends ReportParameter<String>
 	@Override
 	public String getDisplayValue(String parameterName)
 	{
+
+		Date date = getDate(parameterName);
 		if ("ReportParameterEndDate".equalsIgnoreCase(parameterName))
 		{
 			// actual end date will be 25/10/2017 00:00:00.0 but we want to
 			// display 24/10/2017
-			SimpleDateFormat format = new SimpleDateFormat(parameterFormat);
 
-			String tmp = format.format(new DateTime(getDate(parameterName)).minusDays(endAdjustment).toDate());
-
-			return tmp;
+			date = new DateTime(date).minusDays(endAdjustment).toDate();
 
 		}
-		return new SimpleDateFormat(startfield.getDateFormat()).format(getDate(parameterName));
+
+		return new SimpleDateFormat(startfield.getDateFormat()).format(date);
 	}
 
 	@Override
@@ -237,6 +281,7 @@ public class ReportParameterDateTimeRange extends ReportParameter<String>
 	{
 		SimpleDateFormat sdf = new SimpleDateFormat(parameterFormat);
 		DateField field;
+
 		if (parameterName.equalsIgnoreCase(startParameterName))
 		{
 			field = startfield;
@@ -298,4 +343,21 @@ public class ReportParameterDateTimeRange extends ReportParameter<String>
 		return "From";
 	}
 
+	@Override
+	public String getSaveMetaData()
+	{
+		return ((DateParameterOffsetType) offsetType.getValue()).name();
+	}
+
+	@Override
+	public void applySaveMetaData(String metaData)
+	{
+		offsetType.setValue(DateParameterOffsetType.valueOf(metaData));
+	}
+
+	@Override
+	public String getMetaDataComment()
+	{
+		return ((DateParameterOffsetType) offsetType.getValue()).toString();
+	}
 }

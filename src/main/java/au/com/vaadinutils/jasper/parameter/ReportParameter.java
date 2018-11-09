@@ -54,6 +54,25 @@ public abstract class ReportParameter<T>
 
 	public abstract void setDefaultValue(T defaultValue);
 
+	/**
+	 * 
+	 * @return return a String representation of any meta data required to
+	 *         rebuild this ReportParameter.
+	 */
+	public abstract String getSaveMetaData();
+
+	/**
+	 * reconfigure this ReportParameter using the provided (previously stored)
+	 * meta data
+	 */
+	public abstract void applySaveMetaData(String metaData);
+
+	/**
+	 * 
+	 * @return a user friendly String encompassing the meaning of the meta data
+	 */
+	public abstract String getMetaDataComment();
+
 	public Set<String> getParameterNames()
 	{
 		return parameters;

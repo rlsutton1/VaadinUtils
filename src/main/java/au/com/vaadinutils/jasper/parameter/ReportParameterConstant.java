@@ -129,4 +129,22 @@ public class ReportParameterConstant<T> extends ReportParameter<T>
 		throw new RuntimeException("Not implemented");
 	}
 
+	@Override
+	public String getSaveMetaData()
+	{
+		return "";
+	}
+
+	@Override
+	public void applySaveMetaData(String metaData)
+	{
+		// NO OP
+	}
+
+	@Override
+	public String getMetaDataComment()
+	{
+		return "";
+	}
+
 }

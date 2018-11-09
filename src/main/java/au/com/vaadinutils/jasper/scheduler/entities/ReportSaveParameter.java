@@ -35,6 +35,9 @@ public class ReportSaveParameter implements Serializable
 
 	String parameterValue;
 
+	String metaData;
+	String metaDataComment;
+
 	String textualRepresentation;
 
 	public String getParameterName()
@@ -104,5 +107,25 @@ public class ReportSaveParameter implements Serializable
 	public Long getId()
 	{
 		return id;
+	}
+
+	public void setMetaData(String metaData)
+	{
+		this.metaData = metaData;
+	}
+
+	public void setMetaDataComment(String metaDataComment)
+	{
+		this.metaDataComment = metaDataComment;
+	}
+
+	public String getMetaData()
+	{
+		return metaData;
+	}
+
+	public String getMetaDataComment()
+	{
+		return metaDataComment;
 	}
 }

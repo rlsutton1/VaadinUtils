@@ -9,8 +9,8 @@ import au.com.vaadinutils.crud.FormHelper;
 import au.com.vaadinutils.jasper.scheduler.entities.DateParameterType;
 import au.com.vaadinutils.jasper.ui.JasperReportProperties;
 
-public class ReportParameterReportChooser<T extends Enum<T> & ReportChooser> extends ReportParameter<Enum<T>> implements
-		ReportChooser
+public class ReportParameterReportChooser<T extends Enum<T> & ReportChooser> extends ReportParameter<Enum<T>>
+		implements ReportChooser
 {
 
 	private ComboBox field;
@@ -128,6 +128,24 @@ public class ReportParameterReportChooser<T extends Enum<T> & ReportChooser> ext
 	public DateParameterType getDateParameterType()
 	{
 		throw new RuntimeException("Not implemented");
+	}
+
+	@Override
+	public String getSaveMetaData()
+	{
+		return "";
+	}
+
+	@Override
+	public void applySaveMetaData(String metaData)
+	{
+		// NO OP
+	}
+
+	@Override
+	public String getMetaDataComment()
+	{
+		return "";
 	}
 
 }

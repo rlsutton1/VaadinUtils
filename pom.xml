@@ -410,7 +410,7 @@
 		<dependency>
 			<groupId>org.vaadin</groupId>
 			<artifactId>viritin</artifactId>
-			<version>1.61</version>
+			<version>1.62</version>
 		</dependency>
 		<dependency>
 			<groupId>org.vaadin.addons</groupId>

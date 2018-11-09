@@ -11,6 +11,6 @@ public interface ReportParameterSelectionListener<E extends CrudEntity>
 
 	void addSelectionListener(ValueChangeListener listener);
 
-	Collection<Object> getValue();
+	Collection<Long> getValue();
 
 }

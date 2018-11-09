@@ -1,19 +1,34 @@
 package au.com.vaadinutils.jasper.scheduler.entities;
 
 import java.io.Serializable;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.NotNull;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import com.google.common.base.Preconditions;
 
 /**
  * The persistent class for the tblcampaignallocation database table.
@@ -24,6 +39,7 @@ import javax.persistence.TemporalType;
 public class ReportSave implements Serializable
 {
 	private static final long serialVersionUID = 1L;
+	private static transient Logger logger = LogManager.getLogger();
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,6 +52,17 @@ public class ReportSave implements Serializable
 
 	@Temporal(TemporalType.TIMESTAMP)
 	Date lastUsed = new Date();
+
+	public Date getLastUsed()
+	{
+		return lastUsed;
+	}
+
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	SaveType saveType;
+
+	long runCount = 0;
 
 	String reportClass;
 
@@ -69,6 +96,7 @@ public class ReportSave implements Serializable
 
 	public void addParameter(ReportSaveParameter reportSaveparam)
 	{
+		Preconditions.checkArgument(StringUtils.isNotBlank(reportSaveparam.getParameterName()));
 		parameters.add(reportSaveparam);
 		reportSaveparam.setParent(this);
 
@@ -82,6 +110,60 @@ public class ReportSave implements Serializable
 	public void setUser(String username)
 	{
 		this.user = username;
+
+	}
+
+	public void setSaveType(SaveType saveType)
+	{
+		this.saveType = saveType;
+	}
+
+	public void incrementRunCounter()
+	{
+		runCount++;
+
+	}
+
+	public SaveType getSaveType()
+	{
+		return saveType;
+	}
+
+	int historyHash;
+
+	@PrePersist
+	@PreUpdate
+	void setHistoryHash()
+	{
+		String hashString = reportClass;
+		for (ReportSaveParameter param : getSortedReportParameters())
+		{
+			hashString += "-" + param.getParameterName() + ":" + param.getTextualRepresentation();
+		}
+
+		historyHash = hashString.hashCode();
+		logger.warn(hashString);
+
+		logger.warn("Setting historyHash to " + historyHash + " for " + id + " param count is " + parameters.size());
+
+	}
+
+	public List<ReportSaveParameter> getSortedReportParameters()
+	{
+		List<ReportSaveParameter> params = new LinkedList<>();
+		params.addAll(parameters);
+		Collections.sort(params, new Comparator<ReportSaveParameter>()
+		{
+
+			@Override
+			public int compare(ReportSaveParameter o1, ReportSaveParameter o2)
+			{
+				return StringUtils.defaultIfBlank(o1.getParameterName(), "")
+						.compareTo(StringUtils.defaultIfBlank(o2.getParameterName(), ""));
+			}
+
+		});
+		return Collections.unmodifiableList(params);
 
 	}
 
