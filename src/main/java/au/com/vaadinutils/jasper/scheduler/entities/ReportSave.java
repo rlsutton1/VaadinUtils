@@ -17,16 +17,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import com.google.common.base.Preconditions;
 
@@ -39,7 +35,6 @@ import com.google.common.base.Preconditions;
 public class ReportSave implements Serializable
 {
 	private static final long serialVersionUID = 1L;
-	private static transient Logger logger = LogManager.getLogger();
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -127,25 +122,6 @@ public class ReportSave implements Serializable
 	public SaveType getSaveType()
 	{
 		return saveType;
-	}
-
-	int historyHash;
-
-	@PrePersist
-	@PreUpdate
-	void setHistoryHash()
-	{
-		String hashString = reportClass;
-		for (ReportSaveParameter param : getSortedReportParameters())
-		{
-			hashString += "-" + param.getParameterName() + ":" + param.getTextualRepresentation();
-		}
-
-		historyHash = hashString.hashCode();
-		logger.warn(hashString);
-
-		logger.warn("Setting historyHash to " + historyHash + " for " + id + " param count is " + parameters.size());
-
 	}
 
 	public List<ReportSaveParameter> getSortedReportParameters()
