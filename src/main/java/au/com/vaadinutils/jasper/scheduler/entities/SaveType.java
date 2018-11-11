@@ -2,5 +2,5 @@ package au.com.vaadinutils.jasper.scheduler.entities;
 
 public enum SaveType
 {
-	FAVOURITE, FREQUENTLY_USED, HISTORY
+	FAVOURITES, FREQUENTLY_USED, HISTORY
 }

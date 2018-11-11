@@ -483,7 +483,7 @@ class JasperReportLayout extends VerticalLayout
 						reportSave.setUserDescription(input);
 
 						reportSave.setUser(reportProperties.getUsername());
-						reportSave.setSaveType(SaveType.FAVOURITE);
+						reportSave.setSaveType(SaveType.FAVOURITES);
 
 						for (ReportParameter<?> param : params)
 						{
