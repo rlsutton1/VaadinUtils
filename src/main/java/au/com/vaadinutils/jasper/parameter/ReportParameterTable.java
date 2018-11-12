@@ -516,7 +516,7 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 				// the report parameter is saved
 				if (item != null)
 				{
-					selection += "" + item.getItemProperty(displayField.getName()) + ",";
+					selection += "" + item.getItemProperty(displayField.getName()).getValue() + ",";
 				}
 				if (ctr > 2)
 				{

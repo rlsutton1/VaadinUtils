@@ -23,4 +23,20 @@ public class ReportParameterTableSingleSelect<T extends CrudEntity> extends Repo
 		setSelectionMode(SelectionMode.SINGLE);
 	}
 
+	@Override
+	public String getSaveMetaData()
+	{
+		return "";
+	}
+
+	@Override
+	public void applySaveMetaData(String metaData)
+	{
+	}
+
+	@Override
+	public String getMetaDataComment()
+	{
+		return "";
+	}
 }
