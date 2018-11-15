@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.joda.time.DateTime;
+import org.joda.time.Duration;
 
 import com.google.common.base.Preconditions;
 import com.vaadin.data.Property.ReadOnlyException;
@@ -104,6 +105,34 @@ public class ReportParameterDateTimeRange extends ReportParameter<String>
 		createValidators();
 
 		endAdjustment = -1;
+
+	}
+
+	public void setMaxDateRange(final int maxDays)
+	{
+		Validator validator = new Validator()
+		{
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void validate(Object value) throws InvalidValueException
+			{
+				if (endfield.getValue() != null && startfield.getValue() != null)
+				{
+					DateTime end = new DateTime(endfield.getValue());
+					DateTime start = new DateTime(startfield.getValue());
+					Duration duration = new Duration(end, start);
+					if (Math.abs(duration.getStandardDays()) > maxDays)
+					{
+						throw new InvalidValueException("A maximum of " + maxDays + " days is allowed");
+					}
+				}
+
+			}
+		};
+
+		startfield.addValidator(validator);
+		endfield.addValidator(validator);
 
 	}
 

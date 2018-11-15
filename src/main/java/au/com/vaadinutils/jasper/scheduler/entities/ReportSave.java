@@ -143,4 +143,9 @@ public class ReportSave implements Serializable
 
 	}
 
+	public String getUser()
+	{
+		return user;
+	}
+
 }
