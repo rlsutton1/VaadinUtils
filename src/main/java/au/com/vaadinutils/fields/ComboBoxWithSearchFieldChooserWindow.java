@@ -332,4 +332,9 @@ public class ComboBoxWithSearchFieldChooserWindow<T extends CrudEntity, C extend
 
 	}
 
+	public void triggerFilter()
+	{
+		grid.triggerFilter();
+	}
+
 }

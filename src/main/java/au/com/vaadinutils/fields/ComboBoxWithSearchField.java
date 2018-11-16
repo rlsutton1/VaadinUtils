@@ -313,4 +313,9 @@ public class ComboBoxWithSearchField<T extends CrudEntity, C extends Indexed & F
 
 	}
 
+	public void triggerFilter()
+	{
+		popup.triggerFilter();
+	}
+
 }
