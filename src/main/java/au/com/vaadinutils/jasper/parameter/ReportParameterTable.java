@@ -1,8 +1,10 @@
 package au.com.vaadinutils.jasper.parameter;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.metamodel.SingularAttribute;
 
@@ -187,12 +189,25 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 
 						grid.setContainerDataSource(container);
 
-						new GridHeadingPropertySet.Builder<T>().createColumn(caption, displayField.getName())
+						// build lower case id's map, so we get the case of the
+						// id right
+						Map<String, String> idCaseMap = new HashMap<>();
+						for (Object id : container.getSortableContainerPropertyIds())
+						{
+							idCaseMap.put(((String) id).toLowerCase(), (String) id);
+						}
+
+						new GridHeadingPropertySet.Builder<T>()
+								.createColumn(caption, idCaseMap.get(displayField.getName().toLowerCase()))
 								.setLockedState(true).build().applyToGrid(grid);
 
-						List<SortOrder> orders = new LinkedList<>();
-						orders.add(new SortOrder(displayField.getName(), SortDirection.ASCENDING));
-						grid.setSortOrder(orders);
+						if (idCaseMap.containsKey(displayField.getName().toLowerCase()))
+						{
+							List<SortOrder> orders = new LinkedList<>();
+							orders.add(new SortOrder(idCaseMap.get(displayField.getName().toLowerCase()),
+									SortDirection.ASCENDING));
+							grid.setSortOrder(orders);
+						}
 
 						final Label selectionCount = new Label("0 selected");
 
