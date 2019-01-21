@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.vaadin.addon.jpacontainer.EntityItem;
@@ -15,8 +16,6 @@ import com.vaadin.event.ItemClickEvent.ItemClickListener;
 import com.vaadin.shared.MouseEventDetails.MouseButton;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.themes.ValoTheme;
-
-import org.apache.logging.log4j.LogManager;
 
 import au.com.vaadinutils.errorHandling.ErrorWindow;
 
@@ -95,7 +94,15 @@ public class EntityTable<E> extends Table implements EntityList<E>
 						// deleted.
 						{
 							EntityItem<E> entity = EntityTable.this.entityContainer.getItem(entityId); // .getEntity();
-							EntityTable.this.rowChangeListener.rowChanged(entity);
+							if (entity != null)
+							{
+								EntityTable.this.rowChangeListener.rowChanged(entity);
+							}
+							else
+							{
+								logger.warn("Entity is null, this probably isn't good.");
+								EntityTable.this.rowChangeListener.rowChanged(null);
+							}
 						}
 						else
 						{
