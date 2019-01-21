@@ -1117,14 +1117,21 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 			private void performAction(final Object entityId, final CrudAction<E> action)
 			{
 				EntityItem<E> entity = container.getItem(entityId);
-
-				if (interceptAction(action, entity))
+				if (entity != null)
 				{
-					action.exec(BaseCrudView.this, entity);
+
+					if (interceptAction(action, entity))
+					{
+						action.exec(BaseCrudView.this, entity);
+					}
+					container.commit();
+					container.refreshItem(entity.getItemId());
+					// actionCombo.select(actionCombo.getNullSelectionItemId());
 				}
-				container.commit();
-				container.refreshItem(entity.getItemId());
-				// actionCombo.select(actionCombo.getNullSelectionItemId());
+				else
+				{
+					Notification.show("You must select a row first", Type.ERROR_MESSAGE);
+				}
 			}
 
 			private void performActionWithWaitDialog(final Object entityId, final CrudAction<E> action)
