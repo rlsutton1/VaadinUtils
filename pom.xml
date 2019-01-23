@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>au.com.vaadinutils</groupId>
 	<artifactId>VaadinUtils</artifactId>
-	<version>0.1.2-j1.8.1</version>
+	<version>0.1.2-j1.8.1-7.0.0.10</version>
 
 
 	<properties>
