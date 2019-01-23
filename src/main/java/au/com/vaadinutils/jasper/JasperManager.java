@@ -27,8 +27,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.google.common.base.Preconditions;
-import com.vaadin.server.Page;
-import com.vaadin.server.VaadinServlet;
 import com.vaadin.server.WrappedSession;
 import com.vaadin.ui.UI;
 
@@ -132,7 +130,7 @@ public class JasperManager implements Runnable
 
 			@Override
 			public void export(JasperPrint jasper_print, OutputStream stream, SimpleReportExportConfiguration config,
-					Map<String, byte[]> images) throws JRException
+					Map<String, byte[]> images, String baseUrl) throws JRException
 			{
 				JRPdfExporter exporter = new JRPdfExporter();
 				exporter.setExporterInput(new SimpleExporterInput(jasper_print));
@@ -171,7 +169,7 @@ public class JasperManager implements Runnable
 
 			@Override
 			public void export(JasperPrint jasper_print, OutputStream stream, SimpleReportExportConfiguration config,
-					final Map<String, byte[]> images) throws JRException
+					final Map<String, byte[]> images, String baseUrl) throws JRException
 			{
 				HtmlExporter exporter = new HtmlExporter();
 
@@ -179,21 +177,14 @@ public class JasperManager implements Runnable
 
 				exporter.setExporterInput(new SimpleExporterInput(jasper_print));
 				final String imageUrl;
-				if (VaadinServlet.getCurrent() != null)
-				{
-					String context = VaadinServlet.getCurrent().getServletContext().getContextPath();
-					int contextIndex = Page.getCurrent().getLocation().toString().lastIndexOf(context);
-					String baseurl = Page.getCurrent().getLocation().toString().substring(0,
-							contextIndex + context.length() + 1);
 
-					imageUrl = baseurl + "VaadinJasperPrintServlet?image=";
-
-				}
-				else
+				String separator = "";
+				if (!baseUrl.endsWith("/"))
 				{
-					imageUrl = "";
-					logger.warn("Vaadin Servlet doens't have a current context");
+					separator = "/";
 				}
+
+				imageUrl = baseUrl + separator + "VaadinJasperPrintServlet?image=";
 
 				exporter.setConfiguration((HtmlReportConfiguration) config);
 
@@ -247,7 +238,7 @@ public class JasperManager implements Runnable
 
 			@Override
 			public void export(JasperPrint jasper_print, OutputStream stream, SimpleReportExportConfiguration config,
-					Map<String, byte[]> images) throws JRException
+					Map<String, byte[]> images, String baseUrl) throws JRException
 			{
 
 				// allow crosstab's to expand fully on a CSV export
@@ -279,7 +270,7 @@ public class JasperManager implements Runnable
 		abstract public AttachmentType getAttachementType();
 
 		abstract public void export(JasperPrint jasper_print, OutputStream stream,
-				SimpleReportExportConfiguration config, Map<String, byte[]> images) throws JRException;
+				SimpleReportExportConfiguration config, Map<String, byte[]> images, String baseUrl) throws JRException;
 
 		abstract public SimpleReportExportConfiguration getConfig();
 
@@ -1008,7 +999,8 @@ public class JasperManager implements Runnable
 				outputStream = new PipedOutputStream(inputStream);
 				writerReady.countDown();
 
-				exportMethod.export(jasper_print, outputStream, getPageMonitorConfig(exportMethod.getConfig()), images);
+				exportMethod.export(jasper_print, outputStream, getPageMonitorConfig(exportMethod.getConfig()), images,
+						reportProperties.getBaseUrl());
 
 				imagesrcs = (images.size() <= 0) ? null : new DataSource[images.size()];
 				if (imagesrcs != null)

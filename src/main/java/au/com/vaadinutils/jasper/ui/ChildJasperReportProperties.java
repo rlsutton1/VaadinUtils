@@ -211,4 +211,11 @@ public class ChildJasperReportProperties implements JasperReportProperties
 		return this.parentReportProperties.getFavouriteButtonIconResource();
 
 	}
+
+	@Override
+	public String getBaseUrl()
+	{
+		return this.parentReportProperties.getBaseUrl();
+
+	}
 }

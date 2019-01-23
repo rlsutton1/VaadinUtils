@@ -198,4 +198,10 @@ public class JasperReportPropertiesAlternateFile implements JasperReportProperti
 		return reportPropertiesTemplate.getFavouriteButtonIconResource();
 
 	}
+
+	@Override
+	public String getBaseUrl()
+	{
+		return reportPropertiesTemplate.getBaseUrl();
+	}
 }

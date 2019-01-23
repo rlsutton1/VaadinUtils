@@ -306,4 +306,10 @@ public class SendEmailTask extends ProgressBarTask<JasperTransmission> implement
 	{
 		return null;
 	}
+
+	@Override
+	public String getBaseUrl()
+	{
+		return null;
+	}
 }

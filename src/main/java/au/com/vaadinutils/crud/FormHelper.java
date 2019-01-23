@@ -1248,7 +1248,7 @@ public class FormHelper<E> implements Serializable
 			component.setContainerDataSource(container);
 			component.setConverter(new MultiSelectConverter(component, Set.class));
 
-			component.setWidth("100%");
+			component.setWidth("90%");
 			component.setId(label.replace(" ", ""));
 			component.setImmediate(true);
 			component.setNullSelectionAllowed(true);

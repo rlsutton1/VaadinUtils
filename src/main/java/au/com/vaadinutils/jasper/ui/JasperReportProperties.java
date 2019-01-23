@@ -244,4 +244,6 @@ public interface JasperReportProperties
 
 	public abstract Resource getFavouriteButtonIconResource();
 
+	public abstract String getBaseUrl();
+
 }

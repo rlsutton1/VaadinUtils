@@ -303,4 +303,11 @@ public class ReportEmailRunnerImpl implements ReportEmailRunner, JasperReportPro
 		return jasperReportProperties.getFavouriteButtonIconResource();
 
 	}
+
+	@Override
+	public String getBaseUrl()
+	{
+		return jasperReportProperties.getBaseUrl();
+
+	}
 }
