@@ -161,13 +161,13 @@ public class ValidatingFieldGroup<E> extends FieldGroup
 		{
 			if (field.isModified())
 			{
-				logger.warn("Dirty: {} {}", field.getCaption(), field.getClass().getSimpleName());
+				logger.info("Dirty: {} {}", field.getCaption(), field.getClass().getSimpleName());
 				String value = null;
 				if (field.getValue() != null)
 				{
 					value = field.getValue().toString();
 				}
-				logger.warn("Dirty value: " + StringUtils.abbreviate(value, 40));
+				logger.info("Dirty value: " + StringUtils.abbreviate(value, 40));
 
 				return true;
 			}
