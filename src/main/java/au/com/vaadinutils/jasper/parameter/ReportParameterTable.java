@@ -8,6 +8,7 @@ import java.util.Map;
 
 import javax.persistence.metamodel.SingularAttribute;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 
 import com.vaadin.data.Container.Filter;
@@ -531,7 +532,9 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 				// the report parameter is saved
 				if (item != null)
 				{
-					selection += "" + item.getItemProperty(displayField.getName()).getValue() + ",";
+					String propertyName = resolvePropertyName(displayField.getName());
+
+					selection += "" + item.getItemProperty(propertyName).getValue() + ",";
 				}
 				if (ctr > 2)
 				{
@@ -563,6 +566,26 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 			}
 			throw new RuntimeException(e);
 		}
+	}
+
+	/**
+	 * properties can have different cases, this method tries to find the
+	 * property disregarding the case.
+	 * 
+	 * @return the resolved property name with the correct case
+	 */
+	private String resolvePropertyName(String propertyName)
+	{
+		Collection<?> propertyIds = grid.getContainerDataSource().getContainerPropertyIds();
+
+		for (Object pid : propertyIds)
+		{
+			if (StringUtils.equalsIgnoreCase(propertyName, (String) pid))
+			{
+				propertyName = (String) pid;
+			}
+		}
+		return propertyName;
 	}
 
 	@Override
