@@ -574,16 +574,27 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 	 * 
 	 * @return the resolved property name with the correct case
 	 */
-	private String resolvePropertyName(String propertyName)
+	protected String resolvePropertyName(String propertyName)
 	{
 		Collection<?> propertyIds = grid.getContainerDataSource().getContainerPropertyIds();
 
+		boolean resolved = false;
 		for (Object pid : propertyIds)
 		{
 			if (StringUtils.equalsIgnoreCase(propertyName, (String) pid))
 			{
+				if (!propertyName.equals(pid))
+				{
+					logger.warn("Corrected property name from " + propertyName + " to " + pid);
+				}
+				resolved = true;
 				propertyName = (String) pid;
 			}
+		}
+		if (!resolved)
+		{
+			logger.error("The supplied propertyName " + propertyName + " couldn't be mapped to any of the ids -> "
+					+ propertyIds);
 		}
 		return propertyName;
 	}
