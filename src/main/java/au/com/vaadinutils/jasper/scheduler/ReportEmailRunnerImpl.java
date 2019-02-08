@@ -2,6 +2,7 @@ package au.com.vaadinutils.jasper.scheduler;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.util.Collection;
 import java.util.Date;
@@ -40,7 +41,7 @@ public class ReportEmailRunnerImpl implements ReportEmailRunner, JasperReportPro
 	@Override
 	public boolean runReport(ReportEmailSchedule schedule, Date scheduledTime, JasperEmailSettings emailSettings)
 			throws InterruptedException, IOException, EmailException, InstantiationException, IllegalAccessException,
-			AddressException, ClassNotFoundException
+			AddressException, ClassNotFoundException, URISyntaxException
 	{
 		Preconditions.checkNotNull(schedule.getSendersEmailAddress(), "Missing senders email address.");
 		Preconditions.checkNotNull(schedule.getRecipients(), "Missing recipient email address");

@@ -1,6 +1,7 @@
 package au.com.vaadinutils.jasper.scheduler;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Date;
 
 import javax.mail.internet.AddressException;
@@ -17,7 +18,8 @@ public interface ReportEmailRunner
 	 * @param schedule
 	 * @param scheduleTime
 	 * @param emailSettings
-	 * @return true if the report was run, false if the system is busy and the report should be tried again later
+	 * @return true if the report was run, false if the system is busy and the
+	 *         report should be tried again later
 	 * @throws InterruptedException
 	 * @throws IOException
 	 * @throws EmailException
@@ -25,8 +27,10 @@ public interface ReportEmailRunner
 	 * @throws IllegalAccessException
 	 * @throws AddressException
 	 * @throws ClassNotFoundException
+	 * @throws URISyntaxException
 	 */
 	public boolean runReport(ReportEmailSchedule schedule, Date scheduleTime, JasperEmailSettings emailSettings)
-			throws InterruptedException, IOException, EmailException, InstantiationException, IllegalAccessException, AddressException, ClassNotFoundException;
+			throws InterruptedException, IOException, EmailException, InstantiationException, IllegalAccessException,
+			AddressException, ClassNotFoundException, URISyntaxException;
 
 }
