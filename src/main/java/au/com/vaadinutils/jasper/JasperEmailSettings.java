@@ -1,21 +1,22 @@
 package au.com.vaadinutils.jasper;
 
+import java.net.URISyntaxException;
 
 public interface JasperEmailSettings
 {
 
-	String getSmtpFQDN();
+	String getSmtpFQDN() throws URISyntaxException;
 
-	Integer getSmtpPort();
+	Integer getSmtpPort() throws URISyntaxException;
 
-	boolean isAuthRequired();
+	boolean isAuthRequired() throws URISyntaxException;
 
-	String getUsername();
+	String getUsername() throws URISyntaxException;
 
-	String getPassword();
+	String getPassword() throws URISyntaxException;
 
-	boolean getUseSSL();
+	boolean getUseSSL() throws URISyntaxException;
 
-	String getBounceEmailAddress();
+	String getBounceEmailAddress() throws URISyntaxException;
 
 }

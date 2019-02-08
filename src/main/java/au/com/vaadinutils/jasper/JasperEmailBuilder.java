@@ -1,6 +1,7 @@
 package au.com.vaadinutils.jasper;
 
 import java.io.File;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 import javax.activation.DataSource;
@@ -103,7 +104,7 @@ public class JasperEmailBuilder
 		return this;
 	}
 
-	public void send(boolean debug) throws EmailException
+	public void send(boolean debug) throws EmailException, URISyntaxException
 	{
 
 		Preconditions.checkNotNull(fromAddress);
