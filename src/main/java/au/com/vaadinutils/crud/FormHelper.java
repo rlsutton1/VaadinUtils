@@ -34,6 +34,7 @@ import com.vaadin.data.Container.Filterable;
 import com.vaadin.data.Container.Indexed;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.fieldgroup.FieldGroup;
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.shared.ui.datefield.Resolution;
 import com.vaadin.ui.AbstractComponent;
@@ -801,6 +802,15 @@ public class FormHelper<E> implements Serializable
 
 		return new EntityFieldBuilderV2<L, JPAContainer<L>>().setLabel(fieldLabel).setField(fieldName)
 				.addDisplayField(listField, listField.getName()).build();
+	}
+
+	public <L extends CrudEntity, K> ComboBoxWithSearchField<L, BeanItemContainer<L>> bindEntityFieldV2(
+			String fieldLabel, SingularAttribute<E, L> fieldName, SingularAttribute<? super L, K> listField,
+			BeanItemContainer<L> container)
+	{
+
+		return new EntityFieldBuilderV2<L, BeanItemContainer<L>>().setLabel(fieldLabel).setField(fieldName)
+				.addDisplayField(listField, listField.getName()).setContainer(container).build();
 	}
 
 	/**
