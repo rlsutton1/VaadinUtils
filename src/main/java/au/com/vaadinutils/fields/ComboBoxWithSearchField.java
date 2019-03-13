@@ -10,6 +10,7 @@ import com.vaadin.data.Container.Filterable;
 import com.vaadin.data.Container.Indexed;
 import com.vaadin.data.Validator;
 import com.vaadin.data.Validator.InvalidValueException;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Component;
@@ -44,6 +45,7 @@ public class ComboBoxWithSearchField<T extends CrudEntity, C extends Indexed & F
 
 	Logger logger = LogManager.getLogger();
 	private String nullLabel = NOT_SELECTED;
+	private Button clear;
 
 	public ComboBoxWithSearchField(String caption, Class<? extends T> type, C container, Builder<T> headingBuilder,
 			String[] sortColumns)
@@ -71,6 +73,31 @@ public class ComboBoxWithSearchField<T extends CrudEntity, C extends Indexed & F
 
 		select.setContent(popup.getPopupContent2());
 
+		clear = new Button("X");
+		clear.addClickListener(new ClickListener()
+		{
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void buttonClick(ClickEvent event)
+			{
+				getSelectionListener().selected(null);
+
+			}
+		});
+
+		clear.setVisible(false);
+
+	}
+
+	/**
+	 * handy when you want to start with the chooser open
+	 */
+	public void showPopUp()
+	{
+		popup.select(currentValue);
+		select.setPopupVisible(true);
 	}
 
 	public void setPopupWidth(String width)
@@ -145,6 +172,7 @@ public class ComboBoxWithSearchField<T extends CrudEntity, C extends Indexed & F
 
 		holder.addComponent(valueLabel);
 		holder.addComponent(select);
+		holder.addComponent(clear);
 		holder.setWidth(FormHelper.STANDARD_COMBO_WIDTH);
 		valueLabel.setWidth("100%");
 
@@ -274,6 +302,7 @@ public class ComboBoxWithSearchField<T extends CrudEntity, C extends Indexed & F
 	public void setAllowNull(boolean b)
 	{
 		allowNull = b;
+		clear.setVisible(b);
 
 	}
 
