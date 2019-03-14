@@ -98,4 +98,10 @@ public abstract class BaseCrudEntity implements ChildCrudEntity, Serializable
 		}
 		return true;
 	}
+
+	@Override
+	public String toString()
+	{
+		return getName();
+	}
 }
