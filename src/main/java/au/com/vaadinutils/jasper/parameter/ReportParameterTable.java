@@ -519,7 +519,7 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 	 * 
 	 * @return the resolved property name with the correct case
 	 */
-	String findContainerPropertyIdIgnoreCase(String id, Collection<?> collection)
+	protected String findContainerPropertyIdIgnoreCase(String id, Collection<?> collection)
 	{
 		Map<String, String> idMap = new HashMap<>();
 		for (Object entry : collection)
