@@ -8,7 +8,6 @@ import java.util.Map;
 
 import javax.persistence.metamodel.SingularAttribute;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 
 import com.vaadin.data.Container.Filter;
@@ -514,6 +513,24 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 		return String.class.getCanonicalName();
 	}
 
+	/**
+	 * properties can have different cases, this method tries to find the
+	 * property disregarding the case.
+	 * 
+	 * @return the resolved property name with the correct case
+	 */
+	String findContainerPropertyIdIgnoreCase(String id, Collection<?> collection)
+	{
+		Map<String, String> idMap = new HashMap<>();
+		for (Object entry : collection)
+		{
+			idMap.put(((String) entry).toLowerCase(), (String) entry);
+		}
+
+		return idMap.get(id.toLowerCase());
+
+	}
+
 	@Override
 	public String getDisplayValue(String parameterName)
 	{
@@ -532,9 +549,11 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 				// the report parameter is saved
 				if (item != null)
 				{
-					String propertyName = resolvePropertyName(displayField.getName());
 
-					selection += "" + item.getItemProperty(propertyName).getValue() + ",";
+					String fieldId = findContainerPropertyIdIgnoreCase(displayField.getName(),
+							grid.getContainerDataSource().getContainerPropertyIds());
+
+					selection += "" + item.getItemProperty(fieldId).getValue() + ",";
 				}
 				if (ctr > 2)
 				{
@@ -566,37 +585,6 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 			}
 			throw new RuntimeException(e);
 		}
-	}
-
-	/**
-	 * properties can have different cases, this method tries to find the
-	 * property disregarding the case.
-	 * 
-	 * @return the resolved property name with the correct case
-	 */
-	protected String resolvePropertyName(String propertyName)
-	{
-		Collection<?> propertyIds = grid.getContainerDataSource().getContainerPropertyIds();
-
-		boolean resolved = false;
-		for (Object pid : propertyIds)
-		{
-			if (StringUtils.equalsIgnoreCase(propertyName, (String) pid))
-			{
-				if (!propertyName.equals(pid))
-				{
-					logger.warn("Corrected property name from " + propertyName + " to " + pid);
-				}
-				resolved = true;
-				propertyName = (String) pid;
-			}
-		}
-		if (!resolved)
-		{
-			logger.error("The supplied propertyName " + propertyName + " couldn't be mapped to any of the ids -> "
-					+ propertyIds);
-		}
-		return propertyName;
 	}
 
 	@Override
