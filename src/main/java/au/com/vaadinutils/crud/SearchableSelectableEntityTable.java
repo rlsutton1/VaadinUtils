@@ -82,6 +82,14 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 		this.addComponent(selectableTable);
 		this.setExpandRatio(selectableTable, 1);
 		addRightClickSelect();
+		completeInit();
+	}
+
+	/**
+	 * overload this if you want to prevent the initial table fill
+	 */
+	protected void completeInit()
+	{
 		triggerFilter();
 	}
 
@@ -211,7 +219,7 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 			{
 				searchField.setValue("");
 				clearAdvancedFilters();
-				triggerFilter();
+				completeInit();
 
 			}
 
@@ -241,7 +249,7 @@ public abstract class SearchableSelectableEntityTable<E> extends VerticalLayout
 					advancedSearchLayout.setVisible(advancedSearchOn);
 					if (!advancedSearchOn)
 					{
-						triggerFilter();
+						completeInit();
 					}
 					if (!advancedSearchOn)
 					{
