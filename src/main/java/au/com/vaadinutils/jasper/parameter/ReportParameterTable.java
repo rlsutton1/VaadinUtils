@@ -513,6 +513,18 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 		return String.class.getCanonicalName();
 	}
 
+	String findContainerPropertyIdIgnoreCase(String id, Collection<?> collection)
+	{
+		Map<String, String> idMap = new HashMap<>();
+		for (Object entry : collection)
+		{
+			idMap.put(((String) entry).toLowerCase(), (String) entry);
+		}
+
+		return idMap.get(id.toLowerCase());
+
+	}
+
 	@Override
 	public String getDisplayValue(String parameterName)
 	{
@@ -531,7 +543,11 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 				// the report parameter is saved
 				if (item != null)
 				{
-					selection += "" + item.getItemProperty(displayField.getName()).getValue() + ",";
+
+					String fieldId = findContainerPropertyIdIgnoreCase(displayField.getName(),
+							grid.getContainerDataSource().getContainerPropertyIds());
+
+					selection += "" + item.getItemProperty(fieldId).getValue() + ",";
 				}
 				if (ctr > 2)
 				{
