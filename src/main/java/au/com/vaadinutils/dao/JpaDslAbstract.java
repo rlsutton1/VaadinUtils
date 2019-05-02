@@ -14,6 +14,8 @@ import java.util.Map.Entry;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
+import javax.persistence.criteria.AbstractQuery;
+import javax.persistence.criteria.CommonAbstractCriteria;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
@@ -30,6 +32,7 @@ import javax.persistence.metamodel.SetAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.apache.logging.log4j.Logger;
+import org.eclipse.persistence.config.QueryHints;
 import org.eclipse.persistence.jpa.JpaQuery;
 
 import com.google.common.base.Preconditions;
@@ -208,8 +211,8 @@ public abstract class JpaDslAbstract<E, R>
 		return root.get(field).as(String.class);
 	}
 
-	public <V > Condition<E> between(final JoinBuilder<E,  V> joinBuilder,
-			final SingularAttribute< V, Date> field, final Date start, final Date end)
+	public <V> Condition<E> between(final JoinBuilder<E, V> joinBuilder, final SingularAttribute<V, Date> field,
+			final Date start, final Date end)
 	{
 		return new AbstractCondition<E>()
 		{
@@ -224,8 +227,8 @@ public abstract class JpaDslAbstract<E, R>
 		};
 	}
 
-	public <V> Condition<E> between(final JoinBuilder<E, V> joinBuilder,
-			final SingularAttribute< V, Long> field, final Long start, final Long end)
+	public <V> Condition<E> between(final JoinBuilder<E, V> joinBuilder, final SingularAttribute<V, Long> field,
+			final Long start, final Long end)
 	{
 		return new AbstractCondition<E>()
 		{
@@ -283,14 +286,17 @@ public abstract class JpaDslAbstract<E, R>
 	 */
 	public Long count()
 	{
-		CriteriaQuery<Long> query = builder.createQuery(Long.class);
+		CriteriaQuery<Long> criteria = builder.createQuery(Long.class);
 		if (predicate != null)
 		{
-			query.where(predicate);
+			criteria.where(predicate);
 		}
-		query.select(builder.count(root));
+		criteria.select(builder.count(root));
 
-		return getEntityManager().createQuery(query).getSingleResult();
+		TypedQuery<Long> query = getEntityManager().createQuery(criteria);
+		JpaSettings.setQueryHints(query);
+
+		return query.getSingleResult();
 	}
 
 	public <K, T> Expression<Long> count(final JoinBuilder<E, K> join, final SingularAttribute<K, T> attribute)
@@ -318,6 +324,7 @@ public abstract class JpaDslAbstract<E, R>
 			deleteCriteria.where(predicate);
 		}
 		Query query = getEntityManager().createQuery(deleteCriteria);
+		JpaSettings.setQueryHints(query);
 
 		if (limit != null)
 		{
@@ -382,7 +389,7 @@ public abstract class JpaDslAbstract<E, R>
 			}
 		};
 	}
-	
+
 	public <K> Condition<E> eq(final Expression<K> expression, final Expression<K> expression2)
 	{
 		return new AbstractCondition<E>()
@@ -395,17 +402,16 @@ public abstract class JpaDslAbstract<E, R>
 			}
 		};
 	}
-	
-	public <J,V> Expression<BigDecimal> round(JoinBuilder<E,J> join, SingularAttribute<J,V> number)
+
+	public <J, V> Expression<BigDecimal> round(JoinBuilder<E, J> join, SingularAttribute<J, V> number)
 	{
 		return builder.function("round", BigDecimal.class, asString(join, number), builder.literal(2));
 	}
-	
-	public <T> Expression<BigDecimal> round(SingularAttribute<E,T> number)
+
+	public <T> Expression<BigDecimal> round(SingularAttribute<E, T> number)
 	{
 		return builder.function("round", BigDecimal.class, asExpression(number), builder.literal(2));
 	}
-
 
 	public <K> Condition<E> eq(final Expression<K> expression, final K value)
 	{
@@ -889,7 +895,7 @@ public abstract class JpaDslAbstract<E, R>
 			}
 		};
 	}
-	
+
 	public <J, V extends Comparable<? super V>> Condition<E> greaterThanOrEqualTo(
 			final ListAttribute<? super E, J> joinAttribute, final JoinType joinType,
 			final SingularAttribute<J, V> field, final V value)
@@ -921,7 +927,7 @@ public abstract class JpaDslAbstract<E, R>
 			}
 		};
 	}
-	
+
 	public <J, V extends Comparable<? super V>> Condition<E> greaterThan(final JoinBuilder<E, J> join,
 			final SingularAttribute<J, V> field, final SingularAttribute<E, V> field2)
 	{
@@ -1789,6 +1795,7 @@ public abstract class JpaDslAbstract<E, R>
 			criteria.orderBy(orders);
 		}
 		TypedQuery<R> query = getEntityManager().createQuery(criteria);
+		JpaSettings.setQueryHints(query);
 
 		if (limit != null)
 		{
@@ -1871,6 +1878,7 @@ public abstract class JpaDslAbstract<E, R>
 
 		}
 		Query query = getEntityManager().createQuery(updateCriteria);
+		JpaSettings.setQueryHints(query);
 
 		if (limit != null)
 		{
@@ -1905,6 +1913,7 @@ public abstract class JpaDslAbstract<E, R>
 			updateCriteria.set(attribute, value);
 		}
 		Query query = getEntityManager().createQuery(updateCriteria);
+		JpaSettings.setQueryHints(query);
 
 		if (limit != null)
 		{
