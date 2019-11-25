@@ -3,6 +3,7 @@ package au.com.vaadinutils.search;
 import org.vaadin.viritin.button.MButton;
 import org.vaadin.viritin.fields.MTable;
 import org.vaadin.viritin.fields.MTextField;
+import org.vaadin.viritin.fields.MValueChangeListener;
 import org.vaadin.viritin.layouts.MHorizontalLayout;
 import org.vaadin.viritin.layouts.MVerticalLayout;
 
@@ -37,6 +38,16 @@ public class SearchableSelect<T> extends MVerticalLayout
 
 		setMargin(false);
 
+	}
+
+	public void setSelectorHeight(String height)
+	{
+		selector.setHeight(height);
+	}
+
+	public void setSelectorWidth(String width)
+	{
+		selector.setWidth(width);
 	}
 
 	@SuppressWarnings("deprecation")
@@ -97,6 +108,11 @@ public class SearchableSelect<T> extends MVerticalLayout
 
 		searchPanel = new MHorizontalLayout().add(clearButton, searchField).expand(searchField);
 
+	}
+
+	public void addSelectionListener(MValueChangeListener<T> listener)
+	{
+		selector.addMValueChangeListener(listener);
 	}
 
 	public T getSelection()
