@@ -69,6 +69,12 @@ public class HeadingPropertySet
 
 		public AddingColumn<E> setColumnGenerator(ColumnGenerator columnGenerator);
 
+		public AddingColumn<E> createColumn(String heading, String propertyId);
+
+		public <T> AddingColumn<E> createColumn(String heading, SingularAttribute<E, T> headingPropertyId);
+
+		public HeadingPropertySet build();
+
 	}
 
 	public static class Builder<E> implements AddingColumn<E>, Start<E>
