@@ -133,7 +133,14 @@ public class JSCallWithReturnValue
 				if (!done)
 				{
 					done = true;
-					callback.callback(arguments.getString(0));
+					if (arguments.length() > 0)
+					{
+						callback.callback(arguments.getString(0));
+					}
+					else
+					{
+						callback.callback(null);
+					}
 				}
 				else
 				{

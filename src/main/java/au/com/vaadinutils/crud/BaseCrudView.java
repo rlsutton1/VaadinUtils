@@ -21,6 +21,7 @@ import javax.persistence.EntityNotFoundException;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.metamodel.SingularAttribute;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.vaadin.dialogs.ConfirmDialog;
@@ -686,7 +687,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 	private void buildSearchBar()
 	{
 		AbstractLayout group = new HorizontalLayout();
-		if (UI.getCurrent().getTheme().equals(ValoTheme.class.getSimpleName()))
+		if (StringUtils.equals(UI.getCurrent().getTheme(), ValoTheme.class.getSimpleName()))
 		{
 			group = new CssLayout();
 			group.addStyleName("v-component-group");
