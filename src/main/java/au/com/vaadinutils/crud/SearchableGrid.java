@@ -98,13 +98,19 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 
 	public void addComponentAsFirst(Component component)
 	{
-		mainLayout.addComponentAsFirst(component);
+		if (mainLayout != null)
+		{
+			mainLayout.addComponentAsFirst(component);
+		}
 
 	}
 
 	public void addComponent(Component component)
 	{
-		mainLayout.addComponent(component);
+		if (mainLayout != null)
+		{
+			mainLayout.addComponent(component);
+		}
 	}
 
 	/**
@@ -160,7 +166,7 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 		return "Override getTitle() to set a custom title.";
 	}
 
-	private CrudSecurityManager getSecurityManager()
+	protected CrudSecurityManager getSecurityManager()
 	{
 		return SecurityManagerFactoryProxy.getSecurityManager(this.getClass());
 	}
