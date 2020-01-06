@@ -11,6 +11,7 @@ import javax.servlet.ServletResponse;
 
 import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.dao.EntityWorker;
+import au.com.vaadinutils.errorHandling.ErrorWindow;
 
 public class EntityManagerInjectorFilter implements Filter
 {
@@ -41,7 +42,7 @@ public class EntityManagerInjectorFilter implements Filter
 		}
 		catch (Exception e1)
 		{
-			logger.error(e1, e1);
+			ErrorWindow.showErrorWindow(e1);
 		}
 	}
 
