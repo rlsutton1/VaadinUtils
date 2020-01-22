@@ -2,11 +2,10 @@ package au.com.vaadinutils.validator;
 
 import javax.persistence.metamodel.SingularAttribute;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.vaadin.data.Validator;
-
-import org.apache.logging.log4j.LogManager;
 
 import au.com.vaadinutils.crud.BaseCrudView;
 import au.com.vaadinutils.crud.CrudEntity;
@@ -39,7 +38,7 @@ public class UniqueFieldValidatorWithContainerFilters<E extends CrudEntity, F> i
 	@Override
 	public void validate(Object value) throws InvalidValueException
 	{
-		if (value != null && crud.getCurrent()!=null)
+		if (value != null && crud.getCurrent() != null)
 		{
 			for (Object id : crud.getContainer().getItemIds())
 			{
@@ -51,7 +50,7 @@ public class UniqueFieldValidatorWithContainerFilters<E extends CrudEntity, F> i
 					if (existingValue != null && existingValue.equals(value))
 					{
 						String message2 = "'" + matchField.getName() + "' must be unique";
-						logger.error(message2);
+						logger.warn(message2);
 						throw new InvalidValueException(message2);
 					}
 				}
