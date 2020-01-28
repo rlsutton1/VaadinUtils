@@ -537,7 +537,7 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 			if (item != null)
 			{
 				ReportEmailScheduleEntity entity = item.getEntity();
-				reportProperties = entity.getJasperReportPropertiesClass().newInstance();
+				reportProperties = entity.getJasperReportPropertiesClass().getDeclaredConstructor().newInstance();
 				builder = reportProperties.getFilterBuilder();
 				List<ExpanderComponent> paramComponents = builder.buildLayout(true);
 				for (ExpanderComponent componet : paramComponents)
@@ -776,7 +776,7 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 			if (bParam instanceof ReportChooser)
 			{
 				ReportChooser chooser = (ReportChooser) bParam;
-				JasperReportProperties props = entityItem.getJasperReportPropertiesClass().newInstance();
+				JasperReportProperties props = entityItem.getJasperReportPropertiesClass().getDeclaredConstructor().newInstance();
 				JasperReportProperties newProps = chooser.getReportProperties(props);
 
 				entityItem.setReportFilename(newProps.getReportFileName());

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.vaadin.teemu.wizards.WizardStep;
 
@@ -15,8 +16,6 @@ import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
-
-import org.apache.logging.log4j.LogManager;
 
 import au.com.vaadinutils.crud.CrudEntity;
 import au.com.vaadinutils.fields.PoJoTable;
@@ -57,8 +56,8 @@ public class ShowProgressStep<C extends CrudEntity> implements WizardStep, Progr
 		VerticalLayout layout = new VerticalLayout();
 		layout.setSizeFull();
 
-		progressTable = new PoJoTable<JasperTransmission>(JasperTransmission.class, new String[] { "Description",
-				"RecipientEmailAddress", "Exception" });
+		progressTable = new PoJoTable<JasperTransmission>(JasperTransmission.class,
+				new String[] { "Description", "RecipientEmailAddress", "Exception" });
 		progressTable.setColumnWidth("Description", 80);
 		progressTable.setColumnWidth("RecipientEmailAddress", 100);
 		progressTable.setColumnExpandRatio("Exception", 1);
@@ -66,7 +65,7 @@ public class ShowProgressStep<C extends CrudEntity> implements WizardStep, Progr
 		progressDescription = new Label();
 		layout.addComponent(progressDescription);
 		layout.setMargin(true);
-		indicator = new ProgressBar(new Float(0.0));
+		indicator = new ProgressBar((float) 0.0);
 		indicator.setHeight("30px");
 		indicator.setIndeterminate(false);
 		indicator.setImmediate(true);
@@ -105,8 +104,8 @@ public class ShowProgressStep<C extends CrudEntity> implements WizardStep, Progr
 			}
 
 			// No email address found
-			JasperTransmission transmission = new JasperTransmission(recipient, new RecipientException(
-					"No email address on recipient.", recipient));
+			JasperTransmission transmission = new JasperTransmission(recipient,
+					new RecipientException("No email address on recipient.", recipient));
 			ShowProgressStep.this.progressTable.addRow(transmission);
 			rejected.setValue(rejected.intValue() + 1);
 		}
@@ -165,6 +164,7 @@ public class ShowProgressStep<C extends CrudEntity> implements WizardStep, Progr
 	/**
 	 * you better get a lock on the UI before calling this method!
 	 */
+	@Override
 	public final void taskProgress(final int count, final int max, final JasperTransmission status)
 	{
 
@@ -186,6 +186,7 @@ public class ShowProgressStep<C extends CrudEntity> implements WizardStep, Progr
 
 	}
 
+	@Override
 	public final void taskComplete(final int sent)
 	{
 		UI ui = UI.getCurrent();

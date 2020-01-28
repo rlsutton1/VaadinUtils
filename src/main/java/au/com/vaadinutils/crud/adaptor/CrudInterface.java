@@ -1,5 +1,6 @@
 package au.com.vaadinutils.crud.adaptor;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import com.vaadin.addon.jpacontainer.EntityItem;
@@ -47,6 +48,8 @@ public interface CrudInterface<E extends CrudEntity>
 
 	void resetFilters(JPAContainer<E> container);
 
-	EntityItem<E> createNewEntity(EntityItem<E> newEntity, E previousEntity) throws InstantiationException, IllegalAccessException;
+	EntityItem<E> createNewEntity(EntityItem<E> newEntity, E previousEntity)
+			throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException,
+			NoSuchMethodException, SecurityException;
 
 }

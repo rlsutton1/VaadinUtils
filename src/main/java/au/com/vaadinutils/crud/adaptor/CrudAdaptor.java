@@ -1,5 +1,6 @@
 package au.com.vaadinutils.crud.adaptor;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import javax.persistence.metamodel.SingularAttribute;
@@ -35,7 +36,8 @@ public interface CrudAdaptor<P, E extends CrudEntity>
 
 	JPAContainer<E> getContainer();
 
-	E preNew(E previousEntity) throws InstantiationException, IllegalAccessException;
+	E preNew(E previousEntity) throws InstantiationException, IllegalAccessException, IllegalArgumentException,
+			InvocationTargetException, NoSuchMethodException, SecurityException;
 
 	void disallowNew(boolean b);
 

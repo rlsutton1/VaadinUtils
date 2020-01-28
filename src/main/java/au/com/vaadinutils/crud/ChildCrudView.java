@@ -1,5 +1,6 @@
 package au.com.vaadinutils.crud;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
@@ -184,11 +185,12 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 		P tmp;
 		try
 		{
-			tmp = parentType.newInstance();
+			tmp = parentType.getDeclaredConstructor().newInstance();
 			tmp.setId(-1L);
 			parentFilter = new Compare.Equal(childKey, tmp);
 		}
-		catch (InstantiationException | IllegalAccessException e)
+		catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+				| NoSuchMethodException | SecurityException e)
 		{
 			loggerChildCrud.warn("Failed to instance " + parentType + " to create bogus parent filter");
 
@@ -968,13 +970,25 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 	 * @return
 	 * @throws IllegalAccessException
 	 * @throws InstantiationException
+	 * @throws SecurityException
+	 * @throws NoSuchMethodException
+	 * @throws InvocationTargetException
+	 * @throws IllegalArgumentException
 	 */
 	protected Object translateParentId(Object parentId2) throws InstantiationException, IllegalAccessException
 	{
 
 		Preconditions.checkNotNull(parentId2,
 				"attempt to translate null parent id in " + entityClass.getCanonicalName());
-		P tmp = parentType.newInstance();
+		final P tmp;
+		try
+		{
+			tmp = parentType.getDeclaredConstructor().newInstance();
+		}
+		catch (Exception e)
+		{
+			throw new RuntimeException(e);
+		}
 		Preconditions.checkNotNull(tmp, "failed to create instance of " + entityClass.getCanonicalName());
 		tmp.setId((Long) parentId2);
 		Preconditions.checkArgument(tmp.getId() != null,

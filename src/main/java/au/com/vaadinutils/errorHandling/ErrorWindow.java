@@ -110,7 +110,7 @@ public class ErrorWindow
 				id += getBuildVersion();
 
 				// prevent hashcode being negative
-				Long hashId = new Long(id.hashCode()) + new Long(Integer.MAX_VALUE);
+				Long hashId = (long) id.hashCode() + (long) Integer.MAX_VALUE;
 				id = "" + hashId;
 
 				// add the message after the hash id is calculated

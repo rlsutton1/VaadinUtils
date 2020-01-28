@@ -1,6 +1,7 @@
 package au.com.vaadinutils.crud;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -157,6 +158,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 	}
 
 	protected void init(Class<E> entityClass, JPAContainer<E> container, HeadingPropertySet headings)
+			throws IllegalArgumentException, SecurityException
 	{
 		this.entityClass = entityClass;
 		this.container = container;
@@ -2265,8 +2267,13 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 	 *
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
+	 * @throws SecurityException
+	 * @throws NoSuchMethodException
+	 * @throws InvocationTargetException
+	 * @throws IllegalArgumentException
 	 */
-	protected void createNewEntity(E previousEntity) throws InstantiationException, IllegalAccessException
+	protected void createNewEntity(E previousEntity) throws InstantiationException, IllegalAccessException,
+			IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException
 	{
 		newEntity = container.createEntityItem(preNew(previousEntity));
 	}
@@ -2297,10 +2304,15 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 	 * @return
 	 * @throws IllegalAccessException
 	 * @throws InstantiationException
+	 * @throws SecurityException
+	 * @throws NoSuchMethodException
+	 * @throws InvocationTargetException
+	 * @throws IllegalArgumentException
 	 */
-	protected E preNew(E previousEntity) throws InstantiationException, IllegalAccessException
+	protected E preNew(E previousEntity) throws InstantiationException, IllegalAccessException,
+			IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException
 	{
-		return entityClass.newInstance();
+		return entityClass.getDeclaredConstructor().newInstance();
 	}
 
 	/**

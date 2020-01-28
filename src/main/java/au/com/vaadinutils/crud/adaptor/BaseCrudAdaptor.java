@@ -1,5 +1,6 @@
 package au.com.vaadinutils.crud.adaptor;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import javax.persistence.metamodel.SingularAttribute;
@@ -100,14 +101,16 @@ public class BaseCrudAdaptor<P, E extends CrudEntity> extends BaseCrudView<E> im
 	}
 
 	@Override
-	public void createNewEntity(E previousEntity) throws InstantiationException, IllegalAccessException
+	public void createNewEntity(E previousEntity) throws InstantiationException, IllegalAccessException,
+			IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException
 	{
 		super.createNewEntity(previousEntity);
 		newEntity = client.createNewEntity(newEntity, previousEntity);
 	}
 
 	@Override
-	public E preNew(E previousEntity) throws InstantiationException, IllegalAccessException
+	public E preNew(E previousEntity) throws InstantiationException, IllegalAccessException, IllegalArgumentException,
+			InvocationTargetException, NoSuchMethodException, SecurityException
 	{
 		return client.preNew(super.preNew(previousEntity), previousEntity);
 	}

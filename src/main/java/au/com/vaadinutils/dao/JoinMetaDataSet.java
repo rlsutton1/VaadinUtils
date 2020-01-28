@@ -23,18 +23,36 @@ public class JoinMetaDataSet<E, K> implements JoinMetaData<E, K>
 	@Override
 	public boolean equals(Object obj)
 	{
+		if (this == obj)
+			return true;
 		if (obj == null)
-		{
 			return false;
-		}
+		if (getClass() != obj.getClass())
+			return false;
 		JoinMetaDataSet other = (JoinMetaDataSet) obj;
-		return type == other.type && attribute == other.attribute && fetch == other.fetch;
+		if (attribute == null)
+		{
+			if (other.attribute != null)
+				return false;
+		}
+		else if (!attribute.equals(other.attribute))
+			return false;
+		if (fetch != other.fetch)
+			return false;
+		if (type != other.type)
+			return false;
+		return true;
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return type.hashCode() + attribute.hashCode() + new Boolean(fetch).hashCode();
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((attribute == null) ? 0 : attribute.hashCode());
+		result = prime * result + (fetch ? 1231 : 1237);
+		result = prime * result + ((type == null) ? 0 : type.hashCode());
+		return result;
 	}
 
 	@SuppressWarnings("unchecked")

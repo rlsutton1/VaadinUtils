@@ -27,7 +27,6 @@ import javax.persistence.metamodel.SingularAttribute;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.eclipse.persistence.config.QueryHints;
 import org.vaadin.addons.lazyquerycontainer.EntityContainer;
 
 import com.google.common.base.Preconditions;
@@ -131,7 +130,7 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 			}
 			return null;
 		}
-		return getEntityManager().find(entityClass, new Long(id));
+		return getEntityManager().find(entityClass, (long) id);
 	}
 
 	public <T> JpaDslSelectAttributeBuilder<E, T> select(SingularAttribute<? super E, T> attribute)

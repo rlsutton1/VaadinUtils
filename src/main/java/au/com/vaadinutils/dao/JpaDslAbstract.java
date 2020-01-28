@@ -14,8 +14,6 @@ import java.util.Map.Entry;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
-import javax.persistence.criteria.AbstractQuery;
-import javax.persistence.criteria.CommonAbstractCriteria;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
@@ -32,7 +30,6 @@ import javax.persistence.metamodel.SetAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.apache.logging.log4j.Logger;
-import org.eclipse.persistence.config.QueryHints;
 import org.eclipse.persistence.jpa.JpaQuery;
 
 import com.google.common.base.Preconditions;
@@ -217,8 +214,7 @@ public abstract class JpaDslAbstract<E, R>
 		return new AbstractCondition<E>()
 		{
 
-			@SuppressWarnings(
-			{ "unchecked", "rawtypes" })
+			@SuppressWarnings({ "unchecked", "rawtypes" })
 			@Override
 			public Predicate getPredicates()
 			{
@@ -233,8 +229,7 @@ public abstract class JpaDslAbstract<E, R>
 		return new AbstractCondition<E>()
 		{
 
-			@SuppressWarnings(
-			{ "unchecked", "rawtypes" })
+			@SuppressWarnings({ "unchecked", "rawtypes" })
 			@Override
 			public Predicate getPredicates()
 			{

@@ -1,5 +1,7 @@
 package au.com.vaadinutils.menu;
 
+import java.lang.reflect.InvocationTargetException;
+
 import org.apache.logging.log4j.Logger;
 
 import com.vaadin.shared.ui.BorderStyle;
@@ -20,6 +22,7 @@ public enum ActionType
 			{
 				private static final long serialVersionUID = 1L;
 
+				@Override
 				public void menuSelected(MenuItem selectedItem)
 				{
 					UI.getCurrent().getNavigator().navigateTo(viewmap.getViewName());
@@ -37,6 +40,7 @@ public enum ActionType
 			{
 				private static final long serialVersionUID = 1L;
 
+				@Override
 				public void menuSelected(MenuItem selectedItem)
 				{
 					UI.getCurrent().getPage().open(menu.url(), "");
@@ -55,6 +59,7 @@ public enum ActionType
 			{
 				private static final long serialVersionUID = 1L;
 
+				@Override
 				public void menuSelected(MenuItem selectedItem)
 				{
 					if (menu.windowSizer() != WindowSizerNull.class)
@@ -62,13 +67,12 @@ public enum ActionType
 						// dynamically sized window!
 						try
 						{
-							WindowSizer sizer = menu.windowSizer().newInstance();
-							UI.getCurrent()
-									.getPage()
-									.open(menu.url(), menu.windowName(), sizer.width(), sizer.height(),
-											BorderStyle.DEFAULT);
+							WindowSizer sizer = menu.windowSizer().getDeclaredConstructor().newInstance();
+							UI.getCurrent().getPage().open(menu.url(), menu.windowName(), sizer.width(), sizer.height(),
+									BorderStyle.DEFAULT);
 						}
-						catch (InstantiationException | IllegalAccessException e)
+						catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+								| InvocationTargetException | NoSuchMethodException | SecurityException e)
 						{
 							logger.error(e, e);
 						}
@@ -76,8 +80,8 @@ public enum ActionType
 					}
 					else if (menu.width() > 0 && menu.height() > 0)
 					{
-						UI.getCurrent().getPage()
-								.open(menu.url(), menu.windowName(), menu.width(), menu.height(), BorderStyle.DEFAULT);
+						UI.getCurrent().getPage().open(menu.url(), menu.windowName(), menu.width(), menu.height(),
+								BorderStyle.DEFAULT);
 
 					}
 					else

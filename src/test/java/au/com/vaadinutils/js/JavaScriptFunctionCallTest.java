@@ -17,21 +17,21 @@ public class JavaScriptFunctionCallTest
 	@Test
 	public void testNumberArg()
 	{
-		JavaScriptFunctionCall func = new JavaScriptFunctionCall("fred", new Integer(1));
+		JavaScriptFunctionCall func = new JavaScriptFunctionCall("fred", 1);
 		assertTrue(func.getCall().equals("fred(1);"));
 	}
 
 	@Test
 	public void testNumber2Arg()
 	{
-		JavaScriptFunctionCall func = new JavaScriptFunctionCall("fred", new Integer(1), new Integer(2));
+		JavaScriptFunctionCall func = new JavaScriptFunctionCall("fred", 1, 2);
 		assertTrue(func.getCall().equals("fred(1,2);"));
 	}
 
 	@Test
 	public void testNumberAndBooleanArg()
 	{
-		JavaScriptFunctionCall func = new JavaScriptFunctionCall("fred", new Integer(1), new Integer(2), true);
+		JavaScriptFunctionCall func = new JavaScriptFunctionCall("fred", 1, 2, true);
 		assertTrue(func.getCall().equals("fred(1,2,true);"));
 	}
 
