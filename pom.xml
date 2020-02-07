@@ -82,7 +82,6 @@
 					<toolchains>
 						<jdk>
 							<version>1.7</version>
-							<vendor>openJDK</vendor>
 						</jdk>
 					</toolchains>
 				</configuration>
