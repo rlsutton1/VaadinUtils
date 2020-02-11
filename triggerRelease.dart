@@ -31,6 +31,7 @@ void main() {
   'git pull'.run;
   'git add .'.run;
   'git commit -m "for version $version"'.run;
+  'git push'.run;
   'git tag -a $version -m "$version"'.run;
   'git push origin tag $version'.run;
 }
