@@ -20,14 +20,12 @@ import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import javax.persistence.metamodel.Attribute;
 import javax.persistence.metamodel.EntityType;
 import javax.persistence.metamodel.Metamodel;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.vaadin.addons.lazyquerycontainer.EntityContainer;
 
 import com.google.common.base.Preconditions;
 import com.vaadin.addon.jpacontainer.JPAContainer;
@@ -523,26 +521,6 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		JPAContainer<E> container = new JPAContainer<>(entityClass);
 		container.setEntityProvider(new BatchingPerRequestEntityProvider<>(entityClass));
 		return container;
-
-	}
-
-	public EntityContainer<E> createLazyQueryContainer()
-	{
-		EntityManager em = getEntityManager();
-		boolean compositeItmes = true;
-
-		boolean detachedEntities = true;
-		String propertyId = getIdField().getName();
-		boolean applicationManagedTransactions = true;
-		EntityContainer<E> entityContainer = new EntityContainer<>(em, entityClass, propertyId, Integer.MAX_VALUE,
-				applicationManagedTransactions, detachedEntities, compositeItmes);
-
-		for (Attribute<? super E, ?> attrib : getIdField().getDeclaringType().getAttributes())
-		{
-			entityContainer.addContainerProperty(attrib.getName(), attrib.getJavaType(), null, true, true);
-		}
-
-		return entityContainer;
 
 	}
 

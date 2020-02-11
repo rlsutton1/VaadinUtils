@@ -23,10 +23,10 @@ import javax.validation.ConstraintViolationException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.vaadin.addons.lazyquerycontainer.EntityContainer;
 import org.vaadin.ui.LegacyComboBox;
 
 import com.google.common.base.Preconditions;
+import com.vaadin.addon.jpacontainer.EntityContainer;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.fieldfactory.SingleSelectConverter;
 import com.vaadin.data.Container;
@@ -921,19 +921,7 @@ public class FormHelper<E> implements Serializable
 			return component;
 		}
 
-		public EntityFieldBuilder<L> useLazyContainer()
-		{
-			container = new JpaBaseDao<L, Long>(listClazz).createLazyQueryContainer();
-			return this;
-		}
-
 		public EntityFieldBuilder<L> setContainer(JPAContainer<L> container)
-		{
-			this.container = container;
-			return this;
-		}
-
-		public EntityFieldBuilder<L> setContainer(EntityContainer<L> container)
 		{
 			this.container = container;
 			return this;
@@ -1375,11 +1363,6 @@ public class FormHelper<E> implements Serializable
 			return this;
 		}
 
-		public TwinColSelectBuilder<L> useLazyContainer()
-		{
-			container = new JpaBaseDao<L, Long>(listClazz).createLazyQueryContainer();
-			return this;
-		}
 	}
 
 	public <M> CKEditorEmailField bindEditorField(AbstractLayout form, ValidatingFieldGroup<E> group,
