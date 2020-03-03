@@ -335,25 +335,19 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 			Integer limit)
 	{
 
-		CriteriaBuilder builder = getEntityManager().getCriteriaBuilder();
+		JpaDslBuilder<E> q = select();
+		JpaDslAbstract<E, E> c = q.where(q.eq(vKey, value));
 
-		CriteriaQuery<E> criteria = builder.createQuery(entityClass);
-
-		Root<E> root = criteria.from(entityClass);
-		criteria.select(root);
-		criteria.where(builder.equal(root.get(vKey), value));
 		if (order != null)
 		{
-			criteria.orderBy(builder.asc(root.get(order)));
+			c = c.orderBy(order, true);
 		}
 
-		TypedQuery<E> query = getEntityManager().createQuery(criteria);
-		JpaSettings.setQueryHints(query);
 		if (limit != null)
 		{
-			query = query.setMaxResults(limit);
+			c = c.limit(limit);
 		}
-		return query.getResultList();
+		return c.getResultList();
 
 	}
 
@@ -412,29 +406,43 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 	public <SK> List<E> findAllByAttributes(AttributesHashMap<E> attributes, SingularAttribute<E, SK> order)
 	{
 
-		final CriteriaBuilder builder = getEntityManager().getCriteriaBuilder();
+		return findAllByAttributes(attributes, order, null);
 
-		final CriteriaQuery<E> criteria = builder.createQuery(entityClass);
+	}
 
-		final Root<E> root = criteria.from(entityClass);
-		criteria.select(root);
+	public <SK> List<E> findAllByAttributes(AttributesHashMap<E> attributes, SingularAttribute<E, SK> order,
+			Integer limit)
+	{
 
-		Predicate where = builder.conjunction();
+		JpaDslBuilder<E> q = select();
+		Condition<E> c = null;
 		for (Entry<SingularAttribute<E, Object>, Object> attr : attributes.entrySet())
 		{
-			where = builder.and(where, builder.equal(root.get(attr.getKey()), attr.getValue()));
+
+			if (c == null)
+			{
+				c = q.eq(attr.getKey(), attr.getValue());
+			}
+			else
+			{
+				c = c.and(q.eq(attr.getKey(), attr.getValue()));
+			}
+
 		}
-		criteria.where(where);
+
+		JpaDslAbstract<E, E> w = q.where(c);
 
 		if (order != null)
 		{
-			criteria.orderBy(builder.asc(root.get(order)));
+			w = w.orderBy(order, true);
+		}
+		if (limit != null)
+		{
+			w.limit(limit);
 		}
 
-		TypedQuery<E> query = getEntityManager().createQuery(criteria);
-		JpaSettings.setQueryHints(query);
+		return w.getResultList();
 
-		return query.getResultList();
 	}
 
 	/**
@@ -446,14 +454,12 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 	 */
 	public E findOneByAnyAttributes(AttributesHashMap<E> attributes)
 	{
-		E ret = null;
-		List<E> results = findAllByAnyAttributes(attributes, null);
-		if (results.size() > 0)
+		List<E> result = findAllByAttributes(attributes, null, 1);
+		if (result.isEmpty())
 		{
-			ret = results.get(0);
+			return null;
 		}
-
-		return ret;
+		return result.get(0);
 	}
 
 	/**
@@ -470,29 +476,30 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 	public <SK> List<E> findAllByAnyAttributes(AttributesHashMap<E> attributes, SingularAttribute<E, SK> order)
 	{
 
-		final CriteriaBuilder builder = getEntityManager().getCriteriaBuilder();
-
-		final CriteriaQuery<E> criteria = builder.createQuery(entityClass);
-
-		final Root<E> root = criteria.from(entityClass);
-		criteria.select(root);
-
-		Predicate where = builder.conjunction();
+		JpaDslBuilder<E> q = select();
+		Condition<E> c = null;
 		for (Entry<SingularAttribute<E, Object>, Object> attr : attributes.entrySet())
 		{
-			where = builder.or(where, builder.equal(root.get(attr.getKey()), attr.getValue()));
+
+			if (c == null)
+			{
+				c = q.eq(attr.getKey(), attr.getValue());
+			}
+			else
+			{
+				c = c.or(q.eq(attr.getKey(), attr.getValue()));
+			}
+
 		}
-		criteria.where(where);
+
+		JpaDslAbstract<E, E> w = q.where(c);
 
 		if (order != null)
 		{
-			criteria.orderBy(builder.asc(root.get(order)));
+			w = w.orderBy(order, true);
 		}
 
-		TypedQuery<E> query = getEntityManager().createQuery(criteria);
-		JpaSettings.setQueryHints(query);
-
-		return query.getResultList();
+		return w.getResultList();
 	}
 
 	/**
@@ -504,16 +511,9 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 	 */
 	public <V> Long getCount(SingularAttribute<E, V> vKey, V value)
 	{
-		CriteriaBuilder qb = getEntityManager().getCriteriaBuilder();
-		CriteriaQuery<Long> cq = qb.createQuery(Long.class);
-		Root<E> root = cq.from(entityClass);
-		cq.select(qb.count(root));
-		cq.where(qb.equal(root.get(vKey), value));
 
-		TypedQuery<Long> query = getEntityManager().createQuery(cq);
-		JpaSettings.setQueryHints(query);
-
-		return query.getSingleResult();
+		JpaDslBuilder<E> q = select();
+		return q.where(q.eq(vKey, value)).count();
 	}
 
 	public JPAContainer<E> createVaadinContainer()
@@ -604,26 +604,6 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 		JpaSettings.setQueryHints(query);
 
 		return query.executeUpdate();
-	}
-
-	public <V, J> List<E> findAllByAttributeJoin(SingularAttribute<E, J> joinAttr, SingularAttribute<J, V> vKey,
-			V value, JoinType joinType)
-	{
-
-		CriteriaBuilder builder = getEntityManager().getCriteriaBuilder();
-
-		CriteriaQuery<E> criteria = builder.createQuery(entityClass);
-
-		Root<E> root = criteria.from(entityClass);
-
-		Join<E, J> join = root.join(joinAttr, joinType);
-
-		criteria.where(builder.equal(join.get(vKey), value));
-
-		TypedQuery<E> query = getEntityManager().createQuery(criteria);
-		JpaSettings.setQueryHints(query);
-
-		return query.getResultList();
 	}
 
 	public <V, J> int deleteAllByAttributeJoin(SingularAttribute<J, V> vKey, V value, SingularAttribute<E, J> joinAttr)

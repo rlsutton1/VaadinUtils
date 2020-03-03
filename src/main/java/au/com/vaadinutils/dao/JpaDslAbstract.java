@@ -34,6 +34,7 @@ import org.eclipse.persistence.jpa.JpaQuery;
 
 import com.google.common.base.Preconditions;
 
+import au.com.vaadinutils.crud.CrudEntity;
 import au.com.vaadinutils.dao.JpaBaseDao.Condition;
 
 /**
@@ -436,39 +437,45 @@ public abstract class JpaDslAbstract<E, R>
 
 	public <J, V> Condition<E> eq(final JoinBuilder<E, J> join, final SingularAttribute<J, V> field, final V value)
 	{
+		final V finalValue = convertEntityToCopy(value);
+
 		return new AbstractCondition<E>()
 		{
 
 			@Override
 			public Predicate getPredicates()
 			{
-				return builder.equal(getJoin(join).get(field), value);
+				return builder.equal(getJoin(join).get(field), finalValue);
 			}
 		};
 	}
 
 	public <J, V> Condition<E> eq(final JoinBuilder<E, J> join, final ListAttribute<J, V> field, final V value)
 	{
+		final V finalValue = convertEntityToCopy(value);
+
 		return new AbstractCondition<E>()
 		{
 
 			@Override
 			public Predicate getPredicates()
 			{
-				return builder.equal(getJoin(join).get(field), value);
+				return builder.equal(getJoin(join).get(field), finalValue);
 			}
 		};
 	}
 
 	public <J, V> Condition<E> eq(final JoinBuilder<E, J> join, final SetAttribute<J, V> field, final V value)
 	{
+		final V finalValue = convertEntityToCopy(value);
+
 		return new AbstractCondition<E>()
 		{
 
 			@Override
 			public Predicate getPredicates()
 			{
-				return builder.equal(getJoin(join).get(field), value);
+				return builder.equal(getJoin(join).get(field), finalValue);
 			}
 		};
 	}
@@ -509,6 +516,8 @@ public abstract class JpaDslAbstract<E, R>
 	public <J, V> Condition<E> equal(final ListAttribute<? super E, J> joinAttribute, final JoinType joinType,
 			final SingularAttribute<J, V> field, final V value)
 	{
+		final V finalValue = convertEntityToCopy(value);
+
 		return new AbstractCondition<E>()
 		{
 
@@ -516,7 +525,7 @@ public abstract class JpaDslAbstract<E, R>
 			public Predicate getPredicates()
 			{
 				Join<E, J> join = getJoin(joinAttribute, joinType);
-				return builder.equal(join.get(field), value);
+				return builder.equal(join.get(field), finalValue);
 			}
 		};
 	}
@@ -524,13 +533,15 @@ public abstract class JpaDslAbstract<E, R>
 	public <L> Condition<E> equal(final ListAttribute<E, L> field, final L value)
 	{
 
+		final L finalValue = convertEntityToCopy(value);
+
 		return new AbstractCondition<E>()
 		{
 
 			@Override
 			public Predicate getPredicates()
 			{
-				return builder.equal(root.get(field), value);
+				return builder.equal(root.get(field), finalValue);
 			}
 		};
 	}
@@ -538,6 +549,8 @@ public abstract class JpaDslAbstract<E, R>
 	public <J, V> Condition<E> equal(final SetAttribute<? super E, J> joinAttribute, final JoinType joinType,
 			final SingularAttribute<J, V> field, final V value)
 	{
+		final V finalValue = convertEntityToCopy(value);
+
 		return new AbstractCondition<E>()
 		{
 
@@ -545,7 +558,7 @@ public abstract class JpaDslAbstract<E, R>
 			public Predicate getPredicates()
 			{
 				Join<E, J> join = getJoin(joinAttribute, joinType);
-				return builder.equal(join.get(field), value);
+				return builder.equal(join.get(field), finalValue);
 			}
 		};
 	}
@@ -553,13 +566,15 @@ public abstract class JpaDslAbstract<E, R>
 	public <L> Condition<E> equal(final SetAttribute<E, L> field, final L value)
 	{
 
+		final L finalValue = convertEntityToCopy(value);
+
 		return new AbstractCondition<E>()
 		{
 
 			@Override
 			public Predicate getPredicates()
 			{
-				return builder.equal(root.get(field), value);
+				return builder.equal(root.get(field), finalValue);
 			}
 		};
 	}
@@ -567,6 +582,8 @@ public abstract class JpaDslAbstract<E, R>
 	public <J, V> Condition<E> equal(final SingularAttribute<? super E, J> joinAttribute, final JoinType joinType,
 			final SingularAttribute<J, V> field, final V value)
 	{
+		final V finalValue = convertEntityToCopy(value);
+
 		return new AbstractCondition<E>()
 		{
 
@@ -574,7 +591,7 @@ public abstract class JpaDslAbstract<E, R>
 			public Predicate getPredicates()
 			{
 				Join<E, J> join = getJoin(joinAttribute, joinType);
-				return builder.equal(join.get(field), value);
+				return builder.equal(join.get(field), finalValue);
 			}
 		};
 	}
@@ -582,15 +599,57 @@ public abstract class JpaDslAbstract<E, R>
 	public <L> Condition<E> equal(final SingularAttribute<? super E, L> field, final L value)
 	{
 
+		final L finalValue = convertEntityToCopy(value);
+
 		return new AbstractCondition<E>()
 		{
 
 			@Override
 			public Predicate getPredicates()
 			{
-				return builder.equal(root.get(field), value);
+				return builder.equal(root.get(field), finalValue);
 			}
 		};
+	}
+
+	/**
+	 * this method exists so that the JPA cache won't include an entity and all
+	 * of it's attached entities in a query cache as a part of the query
+	 * criteria as that is really bad because JPA doesn't manage that aspect of
+	 * the cache size.
+	 * 
+	 * @param <L>
+	 * @param value
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	private <L> L convertEntityToCopy(final L value)
+	{
+		L valueRef = value;
+		if (valueRef instanceof CrudEntity)
+		{
+			Long id = ((CrudEntity) valueRef).getId();
+			CrudEntity crudEntity;
+			try
+			{
+				crudEntity = (CrudEntity) valueRef.getClass().newInstance();
+
+				crudEntity.setId(id);
+				if (crudEntity.getId() != id)
+				{
+					throw new RuntimeException("Set id failed!");
+				}
+				valueRef = (L) crudEntity;
+			}
+			catch (Exception e)
+			{
+				logger.error(e, e);
+			}
+
+		}
+
+		final L finalValue = valueRef;
+		return finalValue;
 	}
 
 	public <J> AbstractCondition<E> exists(final JpaDslSubqueryBuilder<E, J> subquery)
