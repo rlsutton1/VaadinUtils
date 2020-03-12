@@ -241,6 +241,7 @@ public class ErrorWindow
 		exemptedExceptions.put("ClientAbortException", new HashSet<String>());
 		exemptedExceptions.put("SocketException", new HashSet<String>());
 		exemptedExceptions.put("UIDetachedException", new HashSet<String>());
+		exemptedExceptions.put("CloseNowException", new HashSet<String>());
 
 		HashSet<String> suppressedRuntimeExceptions = new HashSet<String>();
 		suppressedRuntimeExceptions.add("Couldn't attach to writer stream");
