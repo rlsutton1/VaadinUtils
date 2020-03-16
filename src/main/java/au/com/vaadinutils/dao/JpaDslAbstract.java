@@ -635,9 +635,13 @@ public abstract class JpaDslAbstract<E, R>
 				crudEntity = (CrudEntity) valueRef.getClass().newInstance();
 
 				crudEntity.setId(id);
-				if (crudEntity.getId() != id)
+				if (id == null && crudEntity.getId() != null)
 				{
-					throw new RuntimeException("Set id failed!");
+					throw new RuntimeException("Set id failed! for class " + valueRef.getClass());
+				}
+				else if (id != null && !id.equals(crudEntity.getId()))
+				{
+					throw new RuntimeException("Set id failed! for class " + valueRef.getClass());
 				}
 				valueRef = (L) crudEntity;
 			}
