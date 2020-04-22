@@ -108,6 +108,7 @@
 			<plugin>
 				<groupId>org.bsc.maven</groupId>
 				<artifactId>maven-processor-plugin</artifactId>
+				<version>3.3.3</version>
 				<executions>
 					<execution>
 						<id>process</id>
@@ -149,6 +150,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>3.1.1</version>
 				<configuration>
 					<additionalparam>${javadoc.opts}</additionalparam>
 				</configuration>
