@@ -10,7 +10,6 @@ import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
-import javax.persistence.Table;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaDelete;
@@ -632,24 +631,8 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 	 */
 	public long getCount()
 	{
-		String entityName = entityClass.getSimpleName();
-		Table annotation = entityClass.getAnnotation(Table.class);
-		String tableName;
-		if (annotation != null)
-		{
-			tableName = annotation.name();
-		}
-		else
-		{
-			tableName = entityName;
-		}
-
-		String qry = "select count(" + entityName + ") from " + tableName + " " + entityName;
-		Query query = getEntityManager().createQuery(qry);
-		JpaSettings.setQueryHints(query);
-		Number countResult = (Number) query.getSingleResult();
-		return countResult.longValue();
-
+		JpaDslBuilder<E> q = select();
+		return q.count();
 	}
 
 	public void flush()
