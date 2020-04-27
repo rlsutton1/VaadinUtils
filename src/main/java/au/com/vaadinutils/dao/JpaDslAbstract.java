@@ -1624,6 +1624,10 @@ public abstract class JpaDslAbstract<E, R>
 
 	public JpaDslAbstract<E, R> limit(int limit)
 	{
+		if (limit == 0)
+		{
+			logger.error("Limit 0 will result in no limit, I doubt this is what you intended");
+		}
 		this.limit = limit;
 		return this;
 	}
