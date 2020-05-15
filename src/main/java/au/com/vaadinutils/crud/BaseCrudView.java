@@ -1425,7 +1425,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 			if (newEntity == null)
 			{
 				throw new RuntimeException(
-						"An error occurred, unable to retrieve updated record. Failed to save changes");
+						"An error occurred, unable to retrieve updated record. Failed to save changes "
+								+ this.getClass());
 			}
 
 			newEntity = EntityManagerProvider.getEntityManager().merge(newEntity);
