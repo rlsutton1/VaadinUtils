@@ -3,6 +3,8 @@ package au.com.vaadinutils.crud;
 import java.lang.annotation.Annotation;
 import java.util.Collection;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.vaadin.teemusa.gridextensions.refresher.GridRefresher;
 
 import com.vaadin.data.Container;
@@ -45,6 +47,8 @@ import au.com.vaadinutils.menu.Menus;
 
 public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends CustomComponent
 {
+
+	Logger logger = LogManager.getLogger();
 	private static final long serialVersionUID = 1L;
 
 	private boolean initialised;
@@ -320,14 +324,24 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 	protected void triggerFilter(String searchText)
 	{
 		boolean advancedSearchActive = advancedSearchOn;
-		Filter filter = getContainerFilter(searchText, advancedSearchActive);
-		if (filter == null)
+		try
 		{
-			resetFilters();
+			Filter filter = getContainerFilter(searchText, advancedSearchActive);
+			if (filter == null)
+			{
+				resetFilters();
+			}
+			else
+			{
+				applyFilter(filter);
+			}
 		}
-		else
+		catch (Exception e)
 		{
-			applyFilter(filter);
+
+			throw new RuntimeException("The following error is most likely is caused by " + this.getClass()
+					+ " valid container ID's are " + container.getContainerPropertyIds(), e);
+
 		}
 	}
 
