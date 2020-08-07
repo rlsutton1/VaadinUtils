@@ -143,7 +143,7 @@ public abstract class SearchableGrid<E, T extends Indexed & Filterable> extends 
 	public void beforeClientResponse(boolean initial)
 	{
 		super.beforeClientResponse(initial);
-		if (!initialised)
+		if (!initialised && headingPropertySet != null)
 		{
 			headingPropertySet.applySettingsToColumns();
 			initialised = true;
