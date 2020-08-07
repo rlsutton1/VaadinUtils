@@ -316,8 +316,8 @@ public class JSCallWithReturnValue
 			@Override
 			public void run()
 			{
-				logger.error(jsToExecute + " -> Timeout " + RESPONSE_TIMEOUT_MS + " requested at " + requestedAt + "ms",
-						trace);
+				logger.error(
+						jsToExecute + " -> Timeout " + RESPONSE_TIMEOUT_MS + " requested at " + requestedAt + "ms");
 
 			}
 		};
