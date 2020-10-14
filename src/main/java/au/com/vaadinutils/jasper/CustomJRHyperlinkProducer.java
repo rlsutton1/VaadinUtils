@@ -18,13 +18,17 @@ public class CustomJRHyperlinkProducer implements JRHyperlinkProducer
 {
 
 	Logger logger = org.apache.logging.log4j.LogManager.getLogger();
-	
+
 	@Override
 	public String getHyperlink(JRPrintHyperlink hyperlink)
 	{
 		String ref = hyperlink.getHyperlinkReference();
 		if (ref == null)
 			return ref;
+		if (ref.contains("ui#"))
+		{
+			return ("javascript:window.open('" + ref + "', 'report-link')");
+		}
 		try
 		{
 
@@ -32,7 +36,7 @@ public class CustomJRHyperlinkProducer implements JRHyperlinkProducer
 			String query = ref;
 			if (query.contains("?"))
 			{
-				query = query.substring(query.indexOf("?")+1);
+				query = query.substring(query.indexOf("?") + 1);
 			}
 			String[] pairs = query.split("&");
 			for (String pair : pairs)
@@ -92,7 +96,7 @@ public class CustomJRHyperlinkProducer implements JRHyperlinkProducer
 
 		catch (UnsupportedEncodingException e)
 		{
-			logger.error(e,e);
+			logger.error(e, e);
 		}
 		return "javascript:alert('Test')";
 	}
