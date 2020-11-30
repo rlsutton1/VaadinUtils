@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.vaadin.alump.gridstack.GridStackCoordinates;
 
 import com.vaadin.server.FontAwesome;
@@ -16,6 +18,8 @@ import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
@@ -27,6 +31,7 @@ public abstract class BasePortalAdder extends VerticalLayout implements PortalCo
 	private static final long serialVersionUID = 1L;
 	private String portalLayoutGuid;
 	private PortalResizeListener resizeListener;
+	Logger logger = LogManager.getLogger();
 
 	public BasePortalAdder(String portalLayoutGuid)
 	{
@@ -152,15 +157,21 @@ public abstract class BasePortalAdder extends VerticalLayout implements PortalCo
 	@Override
 	public void setValue(Tblportal portal, String key, int value)
 	{
-		portal.setConfigValue(key, "" + value);
+		setValue(portal, key, "" + value);
 
 	}
 
 	@Override
 	public void setValue(Tblportal portal, String key, String value)
 	{
-		portal.setConfigValue(key, value);
-
+		if (portal != null)
+		{
+			portal.setConfigValue(key, value);
+		}
+		else
+		{
+			logger.error("Call to BasePortalAdder.setValue where portal is null and key =" + key + ", value =" + value);
+		}
 	}
 
 	@Override
