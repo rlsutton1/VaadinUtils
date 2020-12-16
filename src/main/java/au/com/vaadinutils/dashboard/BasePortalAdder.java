@@ -18,8 +18,6 @@ import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
@@ -137,6 +135,11 @@ public abstract class BasePortalAdder extends VerticalLayout implements PortalCo
 	@Override
 	public void deleteValuesLike(Tblportal portal, String baseKey)
 	{
+		if (portal == null)
+		{
+			logger.warn("NULL portal");
+			return;
+		}
 		Set<Tblportalconfig> removeList = new HashSet<>();
 		for (Tblportalconfig config : portal.getConfigs())
 		{
