@@ -45,7 +45,7 @@ public class ReportEmailRunnerImpl implements ReportEmailRunner, JasperReportPro
 			AddressException, ClassNotFoundException, URISyntaxException, IllegalArgumentException,
 			InvocationTargetException, NoSuchMethodException, SecurityException
 	{
-		Preconditions.checkNotNull(schedule.getSendersEmailAddress(), "Missing senders email address.");
+		Preconditions.checkNotNull(EmailFromAddressFactory.getFromEmailAddress(), "Missing senders email address.");
 		Preconditions.checkNotNull(schedule.getRecipients(), "Missing recipient email address");
 		Preconditions.checkArgument(schedule.getRecipients().size() > 0, "Missing recipient email address");
 
@@ -70,7 +70,7 @@ public class ReportEmailRunnerImpl implements ReportEmailRunner, JasperReportPro
 		try
 		{
 			AttachmentType attachementType = outputFormat.getAttachementType();
-			builder.setFrom(schedule.getSendersEmailAddress().toString()).setSubject(schedule.subject())
+			builder.setFrom(EmailFromAddressFactory.getFromEmailAddress()).setSubject(schedule.subject())
 
 					.setHtmlBody(schedule.message()).addAttachement(export.getBodyAsDataSource(
 							schedule.getReportTitle() + attachementType.getFileExtension(), attachementType));
@@ -237,19 +237,6 @@ public class ReportEmailRunnerImpl implements ReportEmailRunner, JasperReportPro
 	public Class<? extends JasperReportProperties> getReportClass()
 	{
 		return jasperReportProperties.getReportClass();
-	}
-
-	@Override
-	public String getUserEmailAddress()
-	{
-		try
-		{
-			return schedule.getSendersEmailAddress().toString();
-		}
-		catch (AddressException e)
-		{
-			throw new RuntimeException(e);
-		}
 	}
 
 	@Override

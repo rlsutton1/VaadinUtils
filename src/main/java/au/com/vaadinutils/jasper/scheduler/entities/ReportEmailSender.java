@@ -7,6 +7,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import au.com.vaadinutils.crud.CrudEntity;
+
 @Entity
 @Table(name = "tblreportemailsender")
 public class ReportEmailSender implements CrudEntity
@@ -24,13 +25,6 @@ public class ReportEmailSender implements CrudEntity
 
 	boolean isAdmin;
 
-	String emailAddress;
-
-	public String getEmail()
-	{
-		return emailAddress;
-	}
-
 	public void setUserName(String username2)
 	{
 		username = username2;
@@ -40,31 +34,25 @@ public class ReportEmailSender implements CrudEntity
 	@Override
 	public String toString()
 	{
-		return username ;
-	}
-
-	public void setEmailAddress(String userEmailAddress)
-	{
-		emailAddress = userEmailAddress;
-
+		return username;
 	}
 
 	@Override
 	public Long getId()
 	{
-	    return iID;
+		return iID;
 	}
 
 	@Override
 	public void setId(Long id)
 	{
-	   iID=id;
-	    
+		iID = id;
+
 	}
 
 	@Override
 	public String getName()
 	{
-	   return username;
+		return username;
 	}
 }

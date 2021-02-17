@@ -139,12 +139,6 @@ public class JasperReportPropertiesAlternateFile implements JasperReportProperti
 	}
 
 	@Override
-	public String getUserEmailAddress()
-	{
-		return reportPropertiesTemplate.getUserEmailAddress();
-	}
-
-	@Override
 	public Enum<?> getReportIdentifier()
 	{
 		return reportPropertiesTemplate.getReportIdentifier();

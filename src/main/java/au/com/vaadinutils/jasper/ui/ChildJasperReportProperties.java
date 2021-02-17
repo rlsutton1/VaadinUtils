@@ -151,13 +151,6 @@ public class ChildJasperReportProperties implements JasperReportProperties
 	}
 
 	@Override
-	public String getUserEmailAddress()
-	{
-
-		return this.parentReportProperties.getUserEmailAddress();
-	}
-
-	@Override
 	public Enum<?> getReportIdentifier()
 	{
 		return this.parentReportProperties.getReportIdentifier();

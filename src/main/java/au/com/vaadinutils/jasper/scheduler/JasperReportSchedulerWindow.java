@@ -36,13 +36,15 @@ public class JasperReportSchedulerWindow extends Window
 
 		try
 		{
-			new InternetAddress(reportProperties.getUserEmailAddress());
+			new InternetAddress(EmailFromAddressFactory.getFromEmailAddress());
 
 		}
 		catch (Exception e)
 		{
-			Notification.show("Your email address (" + reportProperties.getUserEmailAddress()
-					+ ") is invalid, go to accounts and fix your email address.", Type.ERROR_MESSAGE);
+			Notification.show(
+					"Your from email address (" + EmailFromAddressFactory.getFromEmailAddress()
+							+ ") is invalid, go to System settings and fix your from email address.",
+					Type.ERROR_MESSAGE);
 			return;
 		}
 
@@ -98,17 +100,18 @@ public class JasperReportSchedulerWindow extends Window
 
 				try
 				{
-					new InternetAddress(reportProperties.getUserEmailAddress());
+					new InternetAddress(EmailFromAddressFactory.getFromEmailAddress());
 
 				}
 				catch (Exception e)
 				{
-					Notification.show("Your email address (" + reportProperties.getUserEmailAddress()
-							+ ") is invalid, go to accounts and fix your email address.", Type.ERROR_MESSAGE);
+					Notification.show(
+							"Your from email address (" + EmailFromAddressFactory.getFromEmailAddress()
+									+ ") is invalid, go to System settings and fix your from email address.",
+							Type.ERROR_MESSAGE);
 					return null;
 				}
 
-				reportEmailSender.setEmailAddress(reportProperties.getUserEmailAddress());
 				schedule.setSender(reportEmailSender);
 
 				return schedule;

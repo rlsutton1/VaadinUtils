@@ -246,13 +246,6 @@ public class SendEmailTask extends ProgressBarTask<JasperTransmission> implement
 	}
 
 	@Override
-	public String getUserEmailAddress()
-	{
-
-		return null;
-	}
-
-	@Override
 	public Enum<?> getReportIdentifier()
 	{
 

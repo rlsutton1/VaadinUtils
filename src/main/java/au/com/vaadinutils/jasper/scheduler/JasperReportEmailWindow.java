@@ -49,13 +49,13 @@ public class JasperReportEmailWindow extends Window
 
 		try
 		{
-			new InternetAddress(props.getUserEmailAddress());
+			new InternetAddress(EmailFromAddressFactory.getFromEmailAddress());
 
 		}
 		catch (Exception e)
 		{
-			Notification.show("Your email address (" + props.getUserEmailAddress()
-					+ ") is invalid, go to accounts and fix your email address.", Type.ERROR_MESSAGE);
+			Notification.show("From email address (" + EmailFromAddressFactory.getFromEmailAddress()
+					+ ") is invalid, go to System settings and fix your email address.", Type.ERROR_MESSAGE);
 			return;
 		}
 
@@ -274,7 +274,6 @@ public class JasperReportEmailWindow extends Window
 
 		ReportEmailSender reportEmailSender = new ReportEmailSender();
 		reportEmailSender.setUserName(reportProperties.getUsername());
-		reportEmailSender.setEmailAddress(reportProperties.getUserEmailAddress());
 		schedule.setSender(reportEmailSender);
 
 		entityManager.persist(reportEmailSender);

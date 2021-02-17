@@ -207,13 +207,6 @@ public interface JasperReportProperties
 	public abstract Class<? extends JasperReportProperties> getReportClass();
 
 	/**
-	 * Email address to use in the 'From' field when sending reports via emails
-	 * 
-	 * @return
-	 */
-	public abstract String getUserEmailAddress();
-
-	/**
 	 * Multiple reports can be accessed from a single ReportView via the
 	 * ReportChooserReportParameter, so it is necessary to be able to identify a
 	 * report as belonging to a ReportView

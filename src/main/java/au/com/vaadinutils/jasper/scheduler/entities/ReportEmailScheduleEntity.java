@@ -7,9 +7,6 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.mail.Address;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -24,8 +21,6 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
-
-import com.google.common.base.Preconditions;
 
 import au.com.vaadinutils.crud.CrudEntity;
 import au.com.vaadinutils.jasper.JasperManager.OutputFormat;
@@ -221,13 +216,6 @@ public class ReportEmailScheduleEntity implements Serializable, CrudEntity, Repo
 	public boolean hasSenderEmailAddress()
 	{
 		return sender != null;
-	}
-
-	@Override
-	public Address getSendersEmailAddress() throws AddressException
-	{
-		Preconditions.checkNotNull(sender, "You should call hasSenderEmailAddress first to check if there is a sender");
-		return new InternetAddress(sender.getEmail());
 	}
 
 	@Override
