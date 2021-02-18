@@ -42,7 +42,7 @@ public class JasperReportCompiler
 		if (checkIfReportNeedsCompile(sourcePath, outputPath, reportName))
 		{
 			report = compileReport(jasperDesign, sourcePath, outputPath, reportName);
-	 	}
+		}
 		else
 		{
 			File outputReport = new File(outputPath.getAbsolutePath() + "/" + reportName + ".jasper");
@@ -59,20 +59,19 @@ public class JasperReportCompiler
 		String name = reportName;
 		if (!name.contains(".jrxml"))
 		{
-			name = name+".jrxml";
+			name = name + ".jrxml";
 		}
 		File sourceReport = new File(sourcePath.getAbsoluteFile() + "/" + name);
 		return JRXmlLoader.load(sourceReport);
 
 	}
 
-	public JasperReport compileReport( final File sourcePath, final File outputPath,
-			String reportName) throws Throwable
+	public JasperReport compileReport(final File sourcePath, final File outputPath, String reportName) throws Throwable
 	{
 		String name = reportName;
 		if (!name.contains(".jasper"))
 		{
-			name = name+".jasper";
+			name = name + ".jasper";
 		}
 		JasperReport jasperReport = null;
 		JasperDesign jasperDesign = getDesignFile(sourcePath, reportName);
@@ -88,7 +87,7 @@ public class JasperReportCompiler
 			throw new RuntimeException(subReportException);
 		return jasperReport;
 	}
-	
+
 	public JasperReport compileReport(JasperDesign jasperDesign, final File sourcePath, final File outputPath,
 			String reportName) throws Throwable
 	{
@@ -96,7 +95,7 @@ public class JasperReportCompiler
 		File outputReport = new File(outputPath.getAbsolutePath() + "/" + reportName + ".jasper");
 		jasperReport = JasperCompileManager.compileReport(jasperDesign);
 		JRSaver.saveObject(jasperReport, outputReport);
-		logger.warn("Saving compiled report : " + outputReport.getAbsolutePath());
+		logger.info("Saving compiled report : " + outputReport.getAbsolutePath());
 
 		// Compile sub reports
 		JRElementsVisitor.visitReport(jasperReport, createVisitor(sourcePath, outputPath));
@@ -185,7 +184,7 @@ public class JasperReportCompiler
 					if (completedSubReports.contains(subReportName))
 						return;
 					completedSubReports.add(subReportName);
-					compileReport( sourcePath, outputPath, subReportName);
+					compileReport(sourcePath, outputPath, subReportName);
 				}
 				catch (Throwable e)
 				{

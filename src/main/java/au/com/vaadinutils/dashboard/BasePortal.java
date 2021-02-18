@@ -339,9 +339,13 @@ public abstract class BasePortal extends VerticalLayout implements Portal
 
 				}
 			}
+			catch (NullPointerException e)
+			{
+				logger.warn("This seems to be a race condition, we are just ignoring it... " + e.getMessage());
+			}
 			catch (Exception e)
 			{
-				logger.warn(e);
+				logger.error(e);
 			}
 
 		}

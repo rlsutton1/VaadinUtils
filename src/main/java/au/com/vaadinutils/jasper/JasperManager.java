@@ -862,7 +862,7 @@ public class JasperManager implements Runnable
 		}
 		else
 		{
-			logger.warn("No vaadin UI present");
+			logger.info("No vaadin UI present");
 		}
 
 		stop = false;
@@ -920,7 +920,7 @@ public class JasperManager implements Runnable
 		boolean initialized = false;
 		try
 		{
-			logger.warn("{} permits are available", concurrentLimit.availablePermits());
+			logger.info("{} permits are available", concurrentLimit.availablePermits());
 			concurrentLimit.acquire();
 			initialized = true;
 			inQueue = false;
@@ -990,9 +990,9 @@ public class JasperManager implements Runnable
 				return;
 			}
 
-			logger.warn("Output stream is ready");
+			logger.info("Output stream is ready");
 			progressListener.outputStreamReady();
-			logger.warn("Waiting for reader stream");
+			logger.info("Waiting for reader stream");
 			if (readerReady.await(10, TimeUnit.SECONDS))
 			{
 

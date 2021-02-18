@@ -130,7 +130,7 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 		}
 		else
 		{
-			logger.warn("No vaadin session available, not setting up UI");
+			logger.info("No vaadin session available, not setting up UI");
 		}
 
 	}
@@ -258,7 +258,7 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 		}
 		else
 		{
-			logger.warn("No vaadin session available, not setting up UI");
+			logger.info("No vaadin session available, not setting up UI");
 		}
 	}
 
@@ -375,7 +375,7 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 		}
 		else
 		{
-			logger.warn("No vaadin session available, not setting up UI");
+			logger.info("No vaadin session available, not setting up UI");
 		}
 
 	}
