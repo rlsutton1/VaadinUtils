@@ -15,8 +15,8 @@ class GenericListenerManager<K> implements ListenerManager<K>
 	private Map<K, Date> listeners = createSet();
 
 	/**
-	 * I considered weak references, but if you pass in an anonoumous listener
-	 * it could be GC'd immediately
+	 * I considered weak references, but if you pass in an anonymous listener it
+	 * could be GC'd immediately
 	 * 
 	 * @return
 	 */
@@ -92,6 +92,7 @@ class GenericListenerManager<K> implements ListenerManager<K>
 		return !listeners.isEmpty();
 	}
 
+	@Override
 	public void destroy()
 	{
 		listeners.clear();
