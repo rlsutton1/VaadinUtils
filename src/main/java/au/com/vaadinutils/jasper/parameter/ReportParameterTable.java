@@ -111,7 +111,9 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 					{
 						grid.setSelectionMode(SelectionMode.MULTI);
 
-						grid.setSelectionModel(new Grid.MultiSelectionModel());
+						Grid.MultiSelectionModel selectionModel = new Grid.MultiSelectionModel();
+						selectionModel.setSelectionLimit(5000);
+						grid.setSelectionModel(selectionModel);
 					}
 					else if (mode == SelectionMode.SINGLE)
 					{
