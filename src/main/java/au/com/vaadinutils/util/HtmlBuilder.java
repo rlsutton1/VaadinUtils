@@ -1,8 +1,6 @@
 package au.com.vaadinutils.util;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import com.vaadin.shared.ui.colorpicker.Color;
 
@@ -10,8 +8,6 @@ public class HtmlBuilder
 {
 	private String safeText = "";
 	private HtmlBuilderLabel label;
-
-	Logger logger = LogManager.getLogger();
 
 	public HtmlBuilder()
 	{
@@ -119,7 +115,6 @@ public class HtmlBuilder
 	 */
 	public HtmlBuilder html(String html)
 	{
-		logger.warn("Adding raw html to Html Builder!!!");
 		return add(html);
 	}
 
