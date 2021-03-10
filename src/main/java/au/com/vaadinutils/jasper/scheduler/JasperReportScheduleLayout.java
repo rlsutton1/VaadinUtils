@@ -209,7 +209,7 @@ public class JasperReportScheduleLayout extends BaseCrudView<ReportEmailSchedule
 		}
 		catch (Exception e)
 		{
-			Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
+			Notification.show(e.getClass().getSimpleName(), Type.ERROR_MESSAGE);
 			logger.error(e, e);
 		}
 	}

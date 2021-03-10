@@ -170,7 +170,7 @@ public abstract class SingleEntityWizardStep<E extends CrudEntity> implements Wi
 			if (e.getCause() instanceof ConstraintViolationException)
 				FormHelper.showConstraintViolation(((ConstraintViolationException) e.getCause()));
 			else
-				Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
+				Notification.show(e.getClass().getSimpleName(), Type.ERROR_MESSAGE);
 		}
 		return valid;
 	}

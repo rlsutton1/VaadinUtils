@@ -754,7 +754,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 			catch (PersistenceException e)
 			{
 				loggerChildCrud.error(e, e);
-				Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
+				Notification.show(e.getClass().getSimpleName(), Type.ERROR_MESSAGE);
 			}
 			catch (ConstraintViolationException e)
 			{
@@ -774,13 +774,13 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 				else
 				{
 					loggerChildCrud.error(e, e);
-					Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
+					Notification.show(e.getClass().getSimpleName(), Type.ERROR_MESSAGE);
 				}
 			}
 			catch (Exception e)
 			{
 				loggerChildCrud.error(e, e);
-				Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
+				Notification.show(e.getClass().getSimpleName(), Type.ERROR_MESSAGE);
 			}
 
 			finally

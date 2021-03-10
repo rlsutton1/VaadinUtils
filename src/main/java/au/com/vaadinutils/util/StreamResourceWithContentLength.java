@@ -56,7 +56,7 @@ public class StreamResourceWithContentLength extends StreamResource
 						@Override
 						public void run()
 						{
-							Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
+							Notification.show(e.getClass().getSimpleName(), Type.ERROR_MESSAGE);
 
 						}
 					});
