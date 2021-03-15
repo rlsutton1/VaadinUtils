@@ -321,7 +321,8 @@ public class ErrorWindow
 		layout.setMargin(true);
 		layout.setSpacing(true);
 
-		final Label message = new Label("<b>An error has occurred.<br><br>Reference:</b> " + reference);
+		final Label message = new Label(
+				"<b>An error has occurred (" + causeClass + ").<br><br>Reference:</b> " + reference);
 		message.setContentMode(ContentMode.HTML);
 
 		Label describe = new Label("<b>Please describe what you were doing when this error occured (Optional)<b>");

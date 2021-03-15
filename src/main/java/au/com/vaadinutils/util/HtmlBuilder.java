@@ -43,8 +43,11 @@ public class HtmlBuilder
 	private HtmlBuilder add(String text)
 	{
 		safeText += text;
+		if (label != null)
+		{
+			label.setValue(this);
+		}
 		return this;
-
 	}
 
 	public String getSafeText()
@@ -64,12 +67,12 @@ public class HtmlBuilder
 
 	public HtmlBuilder color(String text, Color color)
 	{
-		return add("<font color=" + color.getCSS() + ">" + StringEscapeUtils.escapeHtml(text) + "</font>");
+		return add("<font color='" + color.getCSS() + "'>" + StringEscapeUtils.escapeHtml(text) + "</font>");
 	}
 
 	public HtmlBuilder boldColor(String text, Color fontColor)
 	{
-		return add("<font color=" + fontColor.getCSS() + "><b>" + StringEscapeUtils.escapeHtml(text) + "</b></font>");
+		return add("<font color='" + fontColor.getCSS() + "'><b>" + StringEscapeUtils.escapeHtml(text) + "</b></font>");
 	}
 
 	public HtmlBuilder greenBold(String text)
@@ -84,7 +87,7 @@ public class HtmlBuilder
 
 	public HtmlBuilder colorSize(String text, Color color, int size)
 	{
-		return add("<font size=\"" + size + "\"color=" + color.getCSS() + ">" + StringEscapeUtils.escapeHtml(text)
+		return add("<font size='" + size + "' color='" + color.getCSS() + "'>" + StringEscapeUtils.escapeHtml(text)
 				+ "</font>");
 
 	}
@@ -96,7 +99,7 @@ public class HtmlBuilder
 
 	public HtmlBuilder headingColor(String text, int size, Color color)
 	{
-		return add("<h" + size + ">" + "<font size=\"" + size + "\"color=" + color.getCSS() + ">"
+		return add("<h" + size + ">" + "<font size='" + size + "' color='" + color.getCSS() + "'>"
 				+ StringEscapeUtils.escapeHtml(text) + "</font>" + "</h" + size + ">");
 
 	}
