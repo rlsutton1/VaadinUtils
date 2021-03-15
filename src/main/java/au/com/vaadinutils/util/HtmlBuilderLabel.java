@@ -33,6 +33,10 @@ public class HtmlBuilderLabel extends Label
 		super.setContentMode(contentMode);
 	}
 
+	/**
+	 * do not use this, call build() to get an HtmlBuilder or directly instance
+	 * an HtmlBuilder
+	 */
 	@Deprecated
 	@Override
 	public void setValue(String newStringValue)
@@ -45,6 +49,11 @@ public class HtmlBuilderLabel extends Label
 		super.setValue(builder.getSafeText());
 	}
 
+	/**
+	 * creates a new builder, and clears the contents of this label
+	 * 
+	 * @return HtmlBuilder
+	 */
 	public HtmlBuilder builder()
 	{
 		return new HtmlBuilder(this);

@@ -16,6 +16,7 @@ public class HtmlBuilder
 	HtmlBuilder(HtmlBuilderLabel htmlBuilderLabel)
 	{
 		label = htmlBuilderLabel;
+		label.setValue(this);
 	}
 
 	public HtmlBuilder(String text)
@@ -79,13 +80,6 @@ public class HtmlBuilder
 	public HtmlBuilder space()
 	{
 		return add("&nbsp");
-	}
-
-	public HtmlBuilderLabel setValue()
-	{
-		label.setValue(this);
-		return label;
-
 	}
 
 	public HtmlBuilder colorSize(String text, Color color, int size)
