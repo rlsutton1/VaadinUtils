@@ -60,9 +60,9 @@ import net.sf.jasperreports.engine.export.JRExportProgressMonitor;
 import net.sf.jasperreports.engine.export.JRPdfExporter;
 import net.sf.jasperreports.engine.fill.FillListener;
 import net.sf.jasperreports.engine.fill.JRSwapFileVirtualizer;
-import net.sf.jasperreports.engine.type.HorizontalAlignEnum;
+import net.sf.jasperreports.engine.type.HorizontalTextAlignEnum;
 import net.sf.jasperreports.engine.type.ModeEnum;
-import net.sf.jasperreports.engine.type.VerticalAlignEnum;
+import net.sf.jasperreports.engine.type.VerticalTextAlignEnum;
 import net.sf.jasperreports.engine.type.WhenNoDataTypeEnum;
 import net.sf.jasperreports.engine.util.JRLoader;
 import net.sf.jasperreports.engine.util.JRSwapFile;
@@ -523,9 +523,9 @@ public class JasperManager implements Runnable
 		paramElement.setY(maxY + 2);
 		paramElement.setFontName("Arial");
 		paramElement.setBold(true);
-		paramElement.setFontSize(12);
-		paramElement.setHorizontalAlignment(HorizontalAlignEnum.CENTER);
-		paramElement.setVerticalAlignment(VerticalAlignEnum.MIDDLE);
+		paramElement.setFontSize(12.0f);
+		paramElement.setHorizontalTextAlign(HorizontalTextAlignEnum.CENTER);
+		paramElement.setVerticalTextAlign(VerticalTextAlignEnum.MIDDLE);
 
 		targetBand.addElement(paramElement);
 		maxY = paramElement.getY() + paramElement.getHeight();
@@ -562,12 +562,12 @@ public class JasperManager implements Runnable
 					labelElement.setHeight(20);
 					labelElement.setBackcolor(new Color(208, 208, 208));
 					labelElement.setMode(ModeEnum.OPAQUE);
-					labelElement.setVerticalAlignment(VerticalAlignEnum.MIDDLE);
+					labelElement.setVerticalTextAlign(VerticalTextAlignEnum.MIDDLE);
 
 					labelElement.setX(0);
 					labelElement.setY(maxY);
 					labelElement.setFontName("SansSerif");
-					labelElement.setFontSize(12);
+					labelElement.setFontSize(12.0f);
 					targetBand.addElement(labelElement);
 
 					JRDesignTextField valueElement = new JRDesignTextField();
@@ -580,8 +580,8 @@ public class JasperManager implements Runnable
 					valueElement.setX(125);
 					valueElement.setY(maxY);
 					valueElement.setFontName("SansSerif");
-					valueElement.setFontSize(12);
-					valueElement.setVerticalAlignment(VerticalAlignEnum.MIDDLE);
+					valueElement.setFontSize(12.0f);
+					valueElement.setVerticalTextAlign(VerticalTextAlignEnum.MIDDLE);
 
 					targetBand.addElement(valueElement);
 					maxY = valueElement.getY() + valueElement.getHeight();
