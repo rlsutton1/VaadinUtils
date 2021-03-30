@@ -173,7 +173,7 @@ public abstract class BasePortalAdder extends VerticalLayout implements PortalCo
 		}
 		else
 		{
-			logger.error("Call to BasePortalAdder.setValue where portal is null and key =" + key + ", value =" + value);
+			logger.warn("Call to BasePortalAdder.setValue where portal is null and key =" + key + ", value =" + value);
 		}
 	}
 
