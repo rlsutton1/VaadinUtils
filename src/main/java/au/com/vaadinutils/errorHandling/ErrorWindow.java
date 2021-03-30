@@ -160,7 +160,7 @@ public class ErrorWindow
 						if (lastTime == null || lastTime.elapsed(TimeUnit.SECONDS) > 2)
 						{
 
-							displayVaadinErrorWindow(finalCauseClass, finalId, time, finalId, finalTrace, reference);
+							displayVaadinErrorWindow(finalCauseClass, time, finalId, finalTrace, reference);
 
 							UI.getCurrent().getSession().setAttribute("Last Time Error Window Shown",
 									Stopwatch.createStarted());
@@ -273,8 +273,8 @@ public class ErrorWindow
 		return false;
 	}
 
-	private void displayVaadinErrorWindow(final String causeClass, final String id, final Date time,
-			final String finalId, final String finalTrace, final String reference)
+	private void displayVaadinErrorWindow(final String causeClass, final Date time, final String finalId,
+			final String finalTrace, final String reference)
 	{
 
 		// generate screen shot!
@@ -288,7 +288,7 @@ public class ErrorWindow
 			public void screenshotComplete(ScreenshotImage image)
 			{
 				image.getImageData();
-				showWindow(causeClass, id, time, finalId, finalTrace, reference, image.getImageData());
+				showWindow(causeClass, time, finalId, finalTrace, reference, image.getImageData());
 				window.close();
 
 			}
@@ -304,15 +304,15 @@ public class ErrorWindow
 
 	}
 
-	private void showWindow(String causeClass, String id, final Date time, final String finalId,
-			final String finalTrace, final String reference, final byte[] imageData)
+	private void showWindow(String causeClass, final Date time, final String finalId, final String finalTrace,
+			final String reference, final byte[] imageData)
 	{
 		final Window window = new Window();
 		UI.getCurrent().addWindow(window);
 		window.setModal(true);
 		window.center();
 		window.setResizable(false);
-		window.setCaption("Error " + id);
+		window.setCaption("Error " + finalId);
 		window.setClosable(false);
 
 		// window.setHeight("50%");
@@ -331,6 +331,16 @@ public class ErrorWindow
 		final TextArea notes = new TextArea();
 		notes.setWidth("100%");
 		final String supportEmail = getTargetEmailAddress();
+		try
+		{
+			generateEmail(time, finalId, finalTrace, reference, "Check the logs for user notes", supportEmail,
+					getViewName(), getUserName(), getUserEmail(), imageData);
+		}
+		catch (Exception e)
+		{
+			logger.error(e, e);
+			Notification.show("Error sending error report", Type.ERROR_MESSAGE);
+		}
 
 		close.addClickListener(new ClickListener()
 		{
@@ -340,20 +350,8 @@ public class ErrorWindow
 			@Override
 			public void buttonClick(ClickEvent event)
 			{
-				try
-				{
-					generateEmail(time, finalId, finalTrace, reference, notes.getValue(), supportEmail, getViewName(),
-							getUserName(), getUserEmail(), imageData);
-				}
-				catch (Exception e)
-				{
-					logger.error(e, e);
-					Notification.show("Error sending error report", Type.ERROR_MESSAGE);
-				}
-				finally
-				{
-					window.close();
-				}
+				logger.error(finalId + " User notes: " + notes.getValue());
+				window.close();
 			}
 
 		});
