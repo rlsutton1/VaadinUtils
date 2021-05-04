@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -36,6 +37,8 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 
 import au.com.bytecode.opencsv.CSVWriter;
+import au.com.vaadinutils.dao.AutoCloseableEM;
+import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.fields.ClickableLabel;
 import au.com.vaadinutils.jasper.AttachmentType;
 import au.com.vaadinutils.util.PipedOutputStreamWrapper;
@@ -46,20 +49,22 @@ public class ContainerCSVExport<E>
 
 	PipedOutputStreamWrapper stream = new PipedOutputStreamWrapper();
 	Logger logger = org.apache.logging.log4j.LogManager.getLogger();
-	private HeadingPropertySet headingsSet;
-	private Table table;
+
 	private LinkedHashMap<String, Object> extraColumnHeadersAndPropertyIds;
+	private ByteArrayInputStream result;
+	UI ui = UI.getCurrent();
+	Label waitLabel = new Label("Please wait Generating CSV file...");
+
+	private volatile boolean abort = false;
 
 	public ContainerCSVExport(final String fileName, final Table table, final HeadingPropertySet headingsSet)
 	{
 
-		this.table = table;
-		this.headingsSet = headingsSet;
 		final Window window = new Window();
 		window.setCaption("Download " + fileName + " CSV data");
 		window.center();
 		window.setHeight("100");
-		window.setWidth("300");
+		window.setWidth("400");
 		window.setModal(true);
 
 		HorizontalLayout layout = new HorizontalLayout();
@@ -70,12 +75,46 @@ public class ContainerCSVExport<E>
 		UI.getCurrent().addWindow(window);
 		window.setVisible(true);
 
-		final Button downloadButton = createDownloadButton(fileName, window);
+		layout.addComponent(waitLabel);
 
-		layout.addComponent(downloadButton);
-		layout.setComponentAlignment(downloadButton, Alignment.MIDDLE_CENTER);
+		new Thread(() -> {
 
-		layout.addComponent(downloadButton);
+			ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
+			BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(arrayOutputStream));
+
+			try (AutoCloseableEM closer = EntityManagerProvider.setThreadLocalEntityManagerTryWithResources())
+			{
+				export(table, bufferedWriter, headingsSet);
+				result = new ByteArrayInputStream(arrayOutputStream.toByteArray());
+			}
+			catch (IOException e)
+			{
+				logger.error(e, e);
+				Notification.show(e.getMessage());
+			}
+			finally
+			{
+				ui.access(new Runnable()
+				{
+
+					@Override
+					public void run()
+					{
+						final Button downloadButton = createDownloadButton(fileName, window);
+
+						layout.removeComponent(waitLabel);
+						layout.addComponent(downloadButton);
+						layout.setComponentAlignment(downloadButton, Alignment.MIDDLE_CENTER);
+
+					}
+				});
+			}
+		}).start();
+
+		window.addCloseListener((e) -> {
+			result = null;
+			abort = true;
+		});
 
 	}
 
@@ -91,53 +130,7 @@ public class ContainerCSVExport<E>
 			@Override
 			public InputStream getStream()
 			{
-
-				try
-				{
-					ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
-					BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(arrayOutputStream));
-
-					export(table, bufferedWriter, headingsSet);
-					return new ByteArrayInputStream(arrayOutputStream.toByteArray());
-				}
-				catch (Throwable e)
-				{
-					logger.error(e, e);
-					Notification.show(e.getMessage());
-				}
-				finally
-				{
-					Runnable runner = new Runnable()
-					{
-
-						@Override
-						public void run()
-						{
-							try
-							{
-								Thread.sleep(500);
-
-								UI.getCurrent().access(new Runnable()
-								{
-
-									@Override
-									public void run()
-									{
-										window.close();
-
-									}
-								});
-							}
-							catch (InterruptedException e)
-							{
-								logger.error(e, e);
-							}
-
-						}
-					};
-					new Thread(runner, "Dialog closer").start();
-				}
-				return null;
+				return result;
 			}
 		};
 
@@ -174,13 +167,34 @@ public class ContainerCSVExport<E>
 		properties.addAll(headerPropertyMap.values());
 
 		int ctr = 0;
-		for (Object id : table.getContainerDataSource().getItemIds())
+		Collection<?> itemIds = table.getContainerDataSource().getItemIds();
+		for (Object id : itemIds)
 		{
 			writeRow(writer, table, id, properties);
 			ctr++;
-			if (ctr > 100000)
+			if (abort)
 			{
-				writer.writeNext(new String[] { "Export stopped at 100,000 lines." });
+				writer.flush();
+				return;
+			}
+			if (ctr % 759 == 0)
+			{
+				logger.warn("Processing " + ctr + " / " + itemIds.size());
+				int localCtr = ctr;
+				ui.access(new Runnable()
+				{
+
+					@Override
+					public void run()
+					{
+						waitLabel.setValue("Please wait Generating CSV file... " + localCtr + " / " + (itemIds.size()));
+
+					}
+				});
+			}
+			if (ctr > 1000000)
+			{
+				writer.writeNext(new String[] { "Export stopped at 1_000_000 lines." });
 				break;
 			}
 		}
@@ -216,9 +230,9 @@ public class ContainerCSVExport<E>
 					{
 						value = new HtmlToPlainText().getPlainText(Jsoup.parse(itemProperty.getValue().toString()));
 					}
-					if(value instanceof Link)
+					if (value instanceof Link)
 					{
-					    value = new HtmlToPlainText().getPlainText(Jsoup.parse(itemProperty.getValue().toString()));
+						value = new HtmlToPlainText().getPlainText(Jsoup.parse(itemProperty.getValue().toString()));
 					}
 					if (value != null)
 					{
@@ -264,9 +278,9 @@ public class ContainerCSVExport<E>
 								value = "";
 							}
 						}
-						if(value instanceof Link)
+						if (value instanceof Link)
 						{
-						    value = new HtmlToPlainText().getPlainText(Jsoup.parse(((Link) value).getCaption()));
+							value = new HtmlToPlainText().getPlainText(Jsoup.parse(((Link) value).getCaption()));
 						}
 					}
 					if (value == null)
