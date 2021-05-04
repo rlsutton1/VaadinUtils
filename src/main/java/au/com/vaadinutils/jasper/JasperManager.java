@@ -81,7 +81,6 @@ import net.sf.jasperreports.export.SimpleWriterExporterOutput;
 import net.sf.jasperreports.web.servlets.AsyncJasperPrintAccessor;
 import net.sf.jasperreports.web.servlets.ReportExecutionStatus;
 
-@SuppressWarnings("deprecation")
 public class JasperManager implements Runnable
 {
 	private JasperReport jasperReport;
