@@ -143,7 +143,7 @@ public class ErrorWindow
 
 		if (!isExempted(cause))
 		{
-			if (UI.getCurrent() != null)
+			if (UI.getCurrent() != null && UI.getCurrent().isAttached())
 			{
 				UI.getCurrent().access(new Runnable()
 				{
