@@ -2330,9 +2330,10 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 	public void reloadDataFromDB(Long itemId)
 	{
 		Object selectedId = null;
-		if (entityTable.getCurrent() != null)
+		EntityItem<E> current = entityTable.getCurrent();
+		if (current != null)
 		{
-			selectedId = entityTable.getCurrent().getItemId();
+			selectedId = current.getItemId();
 		}
 
 		EntityManagerProvider.getEntityManager().getTransaction().commit();
