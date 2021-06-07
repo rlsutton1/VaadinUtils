@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.Logger;
@@ -33,7 +34,17 @@ public class JSCallWithReturnValue
 	private Exception trace;
 
 	// setting the pool size to 1, we will hopefully never execute any events
-	private final static ScheduledExecutorService pool = Executors.newScheduledThreadPool(1);
+	private final static ScheduledExecutorService pool = Executors.newScheduledThreadPool(1, new ThreadFactory()
+	{
+		@Override
+		public Thread newThread(Runnable r)
+		{
+			Thread t = Executors.defaultThreadFactory().newThread(r);
+			t.setName(JSCallWithReturnValue.class.getSimpleName());
+			t.setDaemon(true);
+			return t;
+		}
+	});
 
 	/**
 	 * 
