@@ -36,6 +36,7 @@ public class ReportParameterDateTimeRange extends ReportParameter<String>
 
 	int endAdjustment = 0;
 	protected ComboBox offsetType;
+	private boolean beforeTodayOnly = false;
 
 	/**
 	 * 
@@ -75,6 +76,11 @@ public class ReportParameterDateTimeRange extends ReportParameter<String>
 		endfield.setValidationVisible(true);
 		createValidators();
 		this.endAdjustment = endAdjustment;
+	}
+
+	public void setBeforeTodayOnly(boolean beforeTodayOnly)
+	{
+		this.beforeTodayOnly = beforeTodayOnly;
 	}
 
 	public void addValueChangeListener(ValueChangeListener listener)
@@ -174,6 +180,11 @@ public class ReportParameterDateTimeRange extends ReportParameter<String>
 					throw new InvalidValueException("Start date must be before the end date");
 				}
 
+				if (beforeTodayOnly && endfield.getValue().after(DateTime.now().withTimeAtStartOfDay().toDate()))
+				{
+					throw new InvalidValueException("Can not report on the current day.");
+				}
+
 			}
 		});
 	}
@@ -217,7 +228,10 @@ public class ReportParameterDateTimeRange extends ReportParameter<String>
 		List<DateParameterOffsetType> types = new LinkedList<>();
 		for (DateParameterOffsetType type : DateParameterOffsetType.values())
 		{
-			types.add(type);
+			if (type != DateParameterOffsetType.TODAY || !beforeTodayOnly)
+			{
+				types.add(type);
+			}
 		}
 
 		offsetType = new ComboBox("Date Options", types);
