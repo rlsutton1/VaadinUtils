@@ -325,13 +325,14 @@ public class JpaBaseDao<E, K> implements Dao<E, K>
 
 	}
 
-	public <V, SK> List<E> findAllByAttribute(SingularAttribute<E, V> vKey, V value, SingularAttribute<E, SK> order)
+	public <V, SK> List<E> findAllByAttribute(SingularAttribute<E, V> vKey, V value,
+			SingularAttribute<? super E, SK> order)
 	{
 		return findAllByAttribute(vKey, value, order, null);
 	}
 
-	public <V, SK> List<E> findAllByAttribute(SingularAttribute<E, V> vKey, V value, SingularAttribute<E, SK> order,
-			Integer limit)
+	public <V, SK> List<E> findAllByAttribute(SingularAttribute<E, V> vKey, V value,
+			SingularAttribute<? super E, SK> order, Integer limit)
 	{
 
 		JpaDslBuilder<E> q = select();
