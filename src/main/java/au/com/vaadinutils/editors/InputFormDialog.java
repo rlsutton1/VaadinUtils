@@ -2,6 +2,7 @@ package au.com.vaadinutils.editors;
 
 import java.util.Iterator;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 
 import com.vaadin.data.Validator.InvalidValueException;
@@ -106,7 +107,14 @@ public class InputFormDialog extends Window
 				}
 				catch (InvalidValueException e)
 				{
-					Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
+					if (StringUtils.length(e.getMessage()) == 0)
+					{
+						Notification.show(e.getClass().getSimpleName(), Type.ERROR_MESSAGE);
+					}
+					else
+					{
+						Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
+					}
 				}
 				catch (Exception e)
 				{

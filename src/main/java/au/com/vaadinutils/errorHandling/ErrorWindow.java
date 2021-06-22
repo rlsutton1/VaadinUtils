@@ -422,7 +422,7 @@ public class ErrorWindow
 		}
 		catch (Exception e)
 		{
-			logger.error(e, e);
+			logger.error(e);
 		}
 		return "Error getting View name";
 	}
@@ -435,7 +435,7 @@ public class ErrorWindow
 		}
 		catch (Exception e)
 		{
-			logger.error(e, e);
+			logger.error(e);
 		}
 		return "Error getting Support Company Name";
 	}
@@ -448,7 +448,7 @@ public class ErrorWindow
 		}
 		catch (Exception e)
 		{
-			logger.error(e, e);
+			logger.error(e);
 		}
 		return "Error getting Target Email Address";
 	}
@@ -461,7 +461,7 @@ public class ErrorWindow
 		}
 		catch (Exception e)
 		{
-			logger.error(e, e);
+			logger.error(e);
 		}
 		return "Error getting user email";
 	}
@@ -474,7 +474,7 @@ public class ErrorWindow
 		}
 		catch (Exception e)
 		{
-			logger.error(e, e);
+			logger.error(e);
 		}
 		return "Error getting build Version";
 	}
@@ -487,7 +487,7 @@ public class ErrorWindow
 		}
 		catch (Exception e)
 		{
-			logger.error(e, e);
+			logger.error(e);
 		}
 		return "Error getting user name";
 	}
@@ -500,7 +500,7 @@ public class ErrorWindow
 		}
 		catch (Exception e)
 		{
-			logger.error(e, e);
+			logger.error(e);
 		}
 		return "Error getting System name";
 	}
