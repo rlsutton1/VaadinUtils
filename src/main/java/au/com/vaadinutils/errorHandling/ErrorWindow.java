@@ -250,6 +250,7 @@ public class ErrorWindow
 		HashSet<String> ioSet = new HashSet<String>();
 		ioSet.add("Pipe closed");
 		ioSet.add("Pipe not connected");
+		ioSet.add("Broken pipe");
 		exemptedExceptions.put("IOException", ioSet);
 
 		Set<String> expectedMessage = exemptedExceptions.get(cause.getClass().getSimpleName());
