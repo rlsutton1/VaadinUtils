@@ -48,7 +48,7 @@ public class EntityManagerWrapper implements EntityManager
 		
 		final Exception here = new Exception("Entity Manager Still Open");
 		
-		future = ex.scheduleAtFixedRate(new Runnable()
+		future = ex.scheduleWithFixedDelay(new Runnable()
 		{
 			
 			@Override

@@ -50,7 +50,7 @@ public class Scheduler implements Runnable
 		this.emailSettings = emailSettings;
 		this.dbManager = dbManager;
 
-		future = schedulerpool.scheduleAtFixedRate(this, 1, 1, TimeUnit.MINUTES);
+		future = schedulerpool.scheduleWithFixedDelay(this, 1, 1, TimeUnit.MINUTES);
 
 		CrudEventDistributer.addListener(JasperReportScheduleLayout.class, new CrudEventListener()
 		{
