@@ -39,6 +39,8 @@ public class ErrorWindow
 
 	static Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 
+	private volatile static boolean shutdown = false;
+
 	/**
 	 * throttle for sending emails about errors the user hasn't seen. Allow
 	 * busting to 20 emails in a minute, over the long term limit to 1 email per
@@ -67,6 +69,12 @@ public class ErrorWindow
 
 	}
 
+	public static void shutdown()
+	{
+		logger.error("Shutting down");
+		shutdown = true;
+	}
+
 	public static void showErrorWindow(Throwable e)
 	{
 		new ErrorWindow(true).internalShowErrorWindow(e);
@@ -77,6 +85,11 @@ public class ErrorWindow
 	private void internalShowErrorWindow(Throwable error)
 	{
 
+		if (shutdown)
+		{
+			logger.error("Shutting down... " + error.getMessage());
+			return;
+		}
 		try
 		{
 			ViolationConstraintHandler.expandException(error);
@@ -252,6 +265,10 @@ public class ErrorWindow
 		ioSet.add("Pipe not connected");
 		ioSet.add("Broken pipe");
 		exemptedExceptions.put("IOException", ioSet);
+
+		HashSet<String> sqlExempt = new HashSet<String>();
+		sqlExempt.add("Server shutdown in progress");
+		exemptedExceptions.put("SQLNonTransientConnectionException", sqlExempt);
 
 		Set<String> expectedMessage = exemptedExceptions.get(cause.getClass().getSimpleName());
 		if (expectedMessage != null)
