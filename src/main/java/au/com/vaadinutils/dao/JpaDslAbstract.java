@@ -96,7 +96,7 @@ public abstract class JpaDslAbstract<E, R>
 	protected CriteriaBuilder builder;
 
 	private Integer limit = null;
-	Predicate predicate = null;
+	protected Predicate predicate = null;
 	private Integer startPosition = null;
 
 	protected CriteriaQuery<R> criteria;
@@ -1846,7 +1846,7 @@ public abstract class JpaDslAbstract<E, R>
 
 	}
 
-	TypedQuery<R> prepareQuery()
+	protected TypedQuery<R> prepareQuery()
 	{
 		if (predicate != null)
 		{
