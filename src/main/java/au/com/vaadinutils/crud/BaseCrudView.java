@@ -146,6 +146,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 	private DragAndDropListener dragAndDropListener;
 	private boolean rowChanging;
 	private Button clearButton;
+	private boolean isNew = false;
 
 	protected BaseCrudView()
 	{
@@ -1224,6 +1225,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 	@Override
 	public void cancelClicked()
 	{
+		isNew = false;
 		fieldGroup.discard();
 		for (ChildCrudListener<E> child : childCrudListeners)
 		{
@@ -1447,7 +1449,8 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 					newEntity.getId());
 
 			newEntity = EntityManagerProvider.getEntityManager().find(entityClass, newEntity.getId());
-			postSaveAction(newEntity);
+			postSaveAction(newEntity, isNew);
+			isNew = false;
 			EntityManagerProvider.getEntityManager().flush();
 
 			reloadDataFromDB(newEntity.getId());
@@ -1638,7 +1641,14 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 
 	/**
 	 * called after a record has been committed to the database
+	 * 
+	 * @param isNew
 	 */
+	protected void postSaveAction(E entityItem, boolean isNew)
+	{
+		postSaveAction(entityItem);
+	}
+
 	protected void postSaveAction(E entityItem)
 	{
 
@@ -2277,6 +2287,7 @@ public abstract class BaseCrudView<E extends CrudEntity> extends VerticalLayout
 			IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException
 	{
 		newEntity = container.createEntityItem(preNew(previousEntity));
+		isNew = true;
 	}
 
 	/**
