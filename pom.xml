@@ -12,7 +12,7 @@
 		<vaadin.version>7.7.17</vaadin.version>
 		<vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
 		<jasperreports.version>6.4.1</jasperreports.version>
-        <releaseVersion>0.2.49</releaseVersion>
+		<releaseVersion>0.2.49</releaseVersion>
 	</properties>
 
 
@@ -96,20 +96,11 @@
 				<version>1.1.1</version> <executions> <execution> <id>generate-rebel-xml</id> 
 				<phase>process-resources</phase> <goals> <goal>generate</goal> </goals> </execution> 
 				</executions> </plugin> -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.0</version>
-				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
-				</configuration>
-			</plugin>
 
 			<plugin>
 				<groupId>org.bsc.maven</groupId>
 				<artifactId>maven-processor-plugin</artifactId>
-				<version>3.3.3</version>
+				<version>4.5</version>
 				<executions>
 					<execution>
 						<id>process</id>
@@ -118,6 +109,7 @@
 						</goals>
 						<phase>generate-sources</phase>
 						<configuration>
+							<compilerArguments>-source 8 -target 8</compilerArguments>
 							<processors>
 								<processor>org.apache.openjpa.persistence.meta.AnnotationProcessor6</processor>
 							</processors>
@@ -136,6 +128,17 @@
 					</dependency>
 				</dependencies>
 			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.8.0</version>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
+			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
@@ -148,18 +151,18 @@
 					</execution>
 				</executions>
 			</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-javadoc-plugin</artifactId>
-					<configuration>
-						<additionalparam>-Xdoclint:all -Xdoclint:-missing</additionalparam>
-						<additionalOptions>-Xdoclint:all -Xdoclint:-missing</additionalOptions>
-						<additionalJOptions>
-							<additionalJOption>-Xdoclint:all</additionalJOption>
-							<additionalJOption>-Xdoclint:-missing</additionalJOption>
-						</additionalJOptions>
-					</configuration>
-				</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<configuration>
+					<additionalparam>-Xdoclint:all -Xdoclint:-missing</additionalparam>
+					<additionalOptions>-Xdoclint:all -Xdoclint:-missing</additionalOptions>
+					<additionalJOptions>
+						<additionalJOption>-Xdoclint:all</additionalJOption>
+						<additionalJOption>-Xdoclint:-missing</additionalJOption>
+					</additionalJOptions>
+				</configuration>
+			</plugin>
 
 		</plugins>
 		<pluginManagement>
