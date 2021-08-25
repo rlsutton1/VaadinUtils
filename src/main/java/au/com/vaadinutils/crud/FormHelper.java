@@ -32,6 +32,7 @@ import com.vaadin.addon.jpacontainer.fieldfactory.SingleSelectConverter;
 import com.vaadin.data.Container;
 import com.vaadin.data.Container.Filterable;
 import com.vaadin.data.Container.Indexed;
+import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.BeanItemContainer;
@@ -1455,8 +1456,8 @@ public class FormHelper<E> implements Serializable
 		while (iter.hasNext())
 		{
 			Object itemId = iter.next();
-			container.addItem(itemId);
-			container.getItem(itemId).getItemProperty(fieldName).setValue(hashMap.get(itemId));
+			Item item = container.addItem(itemId);
+			item.getItemProperty(fieldName).setValue(hashMap.get(itemId));
 		}
 
 		return container;
