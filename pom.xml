@@ -392,7 +392,7 @@
 		<dependency>
 			<groupId>org.vaadin.addons</groupId>
 			<artifactId>screenshot</artifactId>
-			<version>0.4.1.2</version>
+			<version>1.4.1.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.vaadin.teemusa</groupId>
