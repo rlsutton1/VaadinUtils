@@ -7,7 +7,7 @@ version: 2
 updates:
   - package-ecosystem: "maven" # See documentation for possible values
     directory: "/" # Location of package manifests
-    target-branch: "VaadinUtils 1.2-j1.8-update-deps"
+    target-branch: "1.2-j1.8-update-deps"
     schedule:
       interval: "daily"
 
