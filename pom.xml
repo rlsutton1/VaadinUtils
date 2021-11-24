@@ -233,7 +233,7 @@
 		<dependency>
 			<groupId>org.vaadin.addons</groupId>
 			<artifactId>aceeditor</artifactId>
-			<version>0.8.14</version>
+			<version>0.8.20</version>
 		</dependency>
 
 		<dependency>
