@@ -227,7 +227,7 @@
 		<dependency>
 			<groupId>com.vaadin.addon</groupId>
 			<artifactId>jpacontainer</artifactId>
-			<version>3.2.1-nj</version>
+			<version>4.0.0</version>
 		</dependency>
 
 		<dependency>
