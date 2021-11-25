@@ -12,7 +12,7 @@
 		<vaadin.version>7.7.17</vaadin.version>
 		<vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
 		<jasperreports.version>6.4.1</jasperreports.version>
-        <releaseVersion>0.2.52</releaseVersion>
+		<releaseVersion>0.2.52</releaseVersion>
 	</properties>
 
 
@@ -96,7 +96,7 @@
 			<plugin>
 				<groupId>org.bsc.maven</groupId>
 				<artifactId>maven-processor-plugin</artifactId>
-				<version>4.5</version>
+				<version>4.5-jdk8</version>
 				<executions>
 					<execution>
 						<id>process</id>
@@ -257,8 +257,14 @@
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-validator-annotation-processor</artifactId>
-			<version>7.0.1.Final</version>
+			<version>5.2.4.Final</version>
 			<scope>compile</scope>
+		</dependency>
+	
+		<dependency>
+			<groupId>javax.validation</groupId>
+			<artifactId>validation-api</artifactId>
+			<version>2.0.1.Final</version>
 		</dependency>
 
 		<dependency>
