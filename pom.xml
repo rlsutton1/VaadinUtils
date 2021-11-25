@@ -270,7 +270,7 @@
 		<dependency>
 			<groupId>org.vaadin.addons</groupId>
 			<artifactId>ckeditor-wrapper-for-vaadin</artifactId>
-			<version>7.10.10</version>
+			<version>7.12.9</version>
 		</dependency>
 
 		<dependency>
