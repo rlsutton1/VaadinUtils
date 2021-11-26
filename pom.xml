@@ -356,7 +356,7 @@
 		<dependency>
 			<groupId>org.vaadin.alump.gridstack</groupId>
 			<artifactId>gridstack-addon</artifactId>
-			<version>0.3.1-nj</version>
+			<version>0.4.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.vaadin</groupId>
