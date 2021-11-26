@@ -35,7 +35,6 @@ import au.com.vaadinutils.jasper.parameter.ReportParameter;
 import au.com.vaadinutils.jasper.servlet.VaadinJasperPrintServlet;
 import au.com.vaadinutils.jasper.ui.CleanupCallback;
 import au.com.vaadinutils.jasper.ui.JasperReportProperties;
-import net.sf.jasperreports.engine.DefaultJasperReportsContext;
 import net.sf.jasperreports.engine.JRBand;
 import net.sf.jasperreports.engine.JRElement;
 import net.sf.jasperreports.engine.JRException;
@@ -45,6 +44,7 @@ import net.sf.jasperreports.engine.JRStaticText;
 import net.sf.jasperreports.engine.JRTextField;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.SimpleJasperReportsContext;
 import net.sf.jasperreports.engine.design.JRDesignBand;
 import net.sf.jasperreports.engine.design.JRDesignElement;
 import net.sf.jasperreports.engine.design.JRDesignExpression;
@@ -66,7 +66,6 @@ import net.sf.jasperreports.engine.type.VerticalTextAlignEnum;
 import net.sf.jasperreports.engine.type.WhenNoDataTypeEnum;
 import net.sf.jasperreports.engine.util.JRLoader;
 import net.sf.jasperreports.engine.util.JRSwapFile;
-import net.sf.jasperreports.engine.util.LocalJasperReportsContext;
 import net.sf.jasperreports.export.CsvReportConfiguration;
 import net.sf.jasperreports.export.HtmlReportConfiguration;
 import net.sf.jasperreports.export.PdfReportConfiguration;
@@ -241,8 +240,7 @@ public class JasperManager implements Runnable
 			{
 
 				// allow crosstab's to expand fully on a CSV export
-				LocalJasperReportsContext context = new LocalJasperReportsContext(
-						DefaultJasperReportsContext.getInstance());
+				SimpleJasperReportsContext context = new SimpleJasperReportsContext();
 				context.setProperty(JRPropertiesUtil.PROPERTY_PREFIX + "crosstab.ignore.width", "true");
 
 				JRCsvExporter exporter = new JRCsvExporter(context);
@@ -521,7 +519,7 @@ public class JasperManager implements Runnable
 		paramElement.setX(0);
 		paramElement.setY(maxY + 2);
 		paramElement.setFontName("Arial");
-		paramElement.setBold(true);
+		paramElement.setBold((Boolean) true);
 		paramElement.setFontSize(12.0f);
 		paramElement.setHorizontalTextAlign(HorizontalTextAlignEnum.CENTER);
 		paramElement.setVerticalTextAlign(VerticalTextAlignEnum.MIDDLE);
