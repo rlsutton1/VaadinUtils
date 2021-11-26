@@ -12,7 +12,7 @@
 		<vaadin.version>7.7.17</vaadin.version>
 		<vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
 		<jasperreports.version>6.17.0</jasperreports.version>
-        <releaseVersion>0.2.54</releaseVersion>
+        <releaseVersion>0.2.55</releaseVersion>
 	</properties>
 
 
