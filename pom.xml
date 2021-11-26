@@ -12,7 +12,7 @@
 		<vaadin.version>7.7.17</vaadin.version>
 		<vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
 		<jasperreports.version>6.17.0</jasperreports.version>
-		<releaseVersion>0.2.52</releaseVersion>
+        <releaseVersion>0.2.54</releaseVersion>
 	</properties>
 
 
@@ -72,14 +72,16 @@
 						</goals>
 						<phase>generate-sources</phase>
 						<configuration>
-							<compilerArguments>-source 8 -target 8</compilerArguments>
 							<processors>
 								<processor>org.apache.openjpa.persistence.meta.AnnotationProcessor6</processor>
 							</processors>
 							<optionMap>
 								<openjpa.metamodel>true</openjpa.metamodel>
+								<!-- set source version to 5 to prevent timestamps being generated 
+									which causes git to constantly need to commit otherwise identical files -->
+								<openjpa.source>5</openjpa.source>
 							</optionMap>
-							<outputDirectory>${basedir}/src/generated</outputDirectory>
+							<outputDirectory>${basedir}/src/main/generated</outputDirectory>
 						</configuration>
 					</execution>
 				</executions>
