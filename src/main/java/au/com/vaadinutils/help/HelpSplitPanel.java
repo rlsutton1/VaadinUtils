@@ -76,6 +76,7 @@ public class HelpSplitPanel extends HorizontalLayout implements View, HelpPageLi
 
 		addDetachListener((e) -> {
 			HelpSplitPanel.this.component = null;
+			Page.getCurrent().removeBrowserWindowResizeListener(resizeListener);
 		});
 
 	}
@@ -87,6 +88,7 @@ public class HelpSplitPanel extends HorizontalLayout implements View, HelpPageLi
 
 	boolean helpHiding = false;
 	private VerticalLayout innerSecondPanel;
+	private BrowserWindowResizeListener resizeListener;
 
 	@Override
 	public void enter(ViewChangeEvent event)
@@ -134,7 +136,7 @@ public class HelpSplitPanel extends HorizontalLayout implements View, HelpPageLi
 
 		addComponent(innerSecondPanel);
 
-		Page.getCurrent().addBrowserWindowResizeListener(new BrowserWindowResizeListener()
+		resizeListener = new BrowserWindowResizeListener()
 		{
 
 			private static final long serialVersionUID = -8548907013566961812L;
@@ -151,7 +153,8 @@ public class HelpSplitPanel extends HorizontalLayout implements View, HelpPageLi
 
 			}
 
-		});
+		};
+		Page.getCurrent().addBrowserWindowResizeListener(resizeListener);
 
 	}
 
