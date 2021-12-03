@@ -88,9 +88,41 @@ public class JasperReportCompiler
 		return jasperReport;
 	}
 
+	/**
+	 * If you need to configure the compiler, here is some example code which
+	 * will probably save you a LOT of time.
+	 * 
+	 * For NJADMIN, this configuration is in JasperDefaults.setDefaults()
+	 * 
+	 * import org.eclipse.jdt.internal.compiler.impl.CompilerOptions;
+	 * 
+	 * import net.sf.jasperreports.engine.DefaultJasperReportsContext;
+	 * 
+	 * import net.sf.jasperreports.engine.JRPropertiesUtil;
+	 * 
+	 * final JRPropertiesUtil jrProperties =
+	 * JRPropertiesUtil.getInstance(DefaultJasperReportsContext.getInstance());
+	 * 
+	 * jrProperties.setProperty(CompilerOptions.OPTION_Source,
+	 * CompilerOptions.VERSION_1_8);
+	 * 
+	 * jrProperties.setProperty(CompilerOptions.OPTION_Compliance,
+	 * CompilerOptions.VERSION_1_8);
+	 * 
+	 * jrProperties.setProperty(CompilerOptions.OPTION_TargetPlatform,
+	 * CompilerOptions.VERSION_1_8);
+	 * 
+	 * @param jasperDesign
+	 * @param sourcePath
+	 * @param outputPath
+	 * @param reportName
+	 * @return
+	 * @throws Throwable
+	 */
 	public JasperReport compileReport(JasperDesign jasperDesign, final File sourcePath, final File outputPath,
 			String reportName) throws Throwable
 	{
+
 		JasperReport jasperReport = null;
 		File outputReport = new File(outputPath.getAbsolutePath() + "/" + reportName + ".jasper");
 		jasperReport = JasperCompileManager.compileReport(jasperDesign);
