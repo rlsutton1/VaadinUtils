@@ -285,8 +285,6 @@ class JasperReportLayout extends VerticalLayout
 				csv = null;
 				splitPanel = null;
 				JavaScript.getCurrent().removeFunction("au.com.noojee.reportDrillDown");
-				logger.error("Nulling out builder");
-				// removeAllComponents();
 			}
 		});
 
@@ -927,8 +925,6 @@ class JasperReportLayout extends VerticalLayout
 				csv = null;
 				splitPanel = null;
 				JavaScript.getCurrent().removeFunction("au.com.noojee.reportDrillDown");
-				removeAllComponents();
-				logger.error("Nulling out builder");
 			}
 		});
 
