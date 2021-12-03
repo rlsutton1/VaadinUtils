@@ -6,15 +6,15 @@ import com.vaadin.server.DownloadStream;
 import com.vaadin.server.StreamResource;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
-import com.vaadin.ui.UI;
 
 import au.com.vaadinutils.errorHandling.ErrorWindow;
+import au.com.vaadinutils.ui.UIReference;
 
 public class StreamResourceWithContentLength extends StreamResource
 {
 
 	private ContentLengthProviderStreamSource contentLengthProvider;
-	UI ui = UI.getCurrent();
+	UIReference ui = new UIReference();
 
 	Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 

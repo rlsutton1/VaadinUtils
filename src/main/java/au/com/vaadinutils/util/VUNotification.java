@@ -5,7 +5,8 @@ import org.apache.logging.log4j.Logger;
 import com.vaadin.server.Page;
 import com.vaadin.shared.Position;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.UI;
+
+import au.com.vaadinutils.ui.UIReference;
 
 public class VUNotification extends Notification
 {
@@ -17,18 +18,10 @@ public class VUNotification extends Notification
 		super(caption);
 	}
 
-	private static UI getUI()
+	private static UIReference getUI()
 	{
-		UI ui = UI.getCurrent();
-		if (ui == null)
-		{
-			throw new RuntimeException("You appear to be calling from a worker thread, no UI is available");
-		}
-		if (!ui.isAttached())
-		{
-			logger.warn("The UI is nolonger attached, cant deliver message to user");
-		}
-		return ui;
+		return new UIReference();
+
 	}
 
 	public static void show(final String caption, final Type type)

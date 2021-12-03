@@ -65,6 +65,7 @@ import au.com.vaadinutils.jasper.scheduler.entities.ReportSave_;
 import au.com.vaadinutils.jasper.scheduler.entities.SaveType;
 import au.com.vaadinutils.listener.CancelListener;
 import au.com.vaadinutils.listener.ClickEventLogged;
+import au.com.vaadinutils.ui.UIReference;
 import au.com.vaadinutils.ui.WorkingDialog;
 import elemental.json.JsonArray;
 import elemental.json.JsonObject;
@@ -268,6 +269,25 @@ class JasperReportLayout extends VerticalLayout
 				}
 			}
 
+		});
+
+		this.addDetachListener(new DetachListener()
+		{
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void detach(DetachEvent event)
+			{
+
+				builder = null;
+				reportProperties = null;
+				components = null;
+				csv = null;
+				splitPanel = null;
+				JavaScript.getCurrent().removeFunction("au.com.noojee.reportDrillDown");
+				logger.error("Nulling out builder");
+				// removeAllComponents();
+			}
 		});
 
 	}
@@ -855,9 +875,15 @@ class JasperReportLayout extends VerticalLayout
 				printButton.setEnabled(true);
 				exportButton.setEnabled(true);
 				showButton.setEnabled(true);
-				for (ExpanderComponent componet : components)
+
+				// do null check, as we null out components to prevent memory
+				// leaks
+				if (components != null)
 				{
-					componet.getComponent().setEnabled(true);
+					for (ExpanderComponent componet : components)
+					{
+						componet.getComponent().setEnabled(true);
+					}
 				}
 
 				dialog.close();
@@ -883,8 +909,34 @@ class JasperReportLayout extends VerticalLayout
 
 	private void getStreamConnectorRefreshListener(final JasperManager.OutputFormat outputFormat)
 	{
-		UI.getCurrent().setPollInterval(500);
-		UI.getCurrent().addPollListener(new PollListener()
+		UIReference ui = new UIReference();
+		ui.setPollInterval(500);
+		PollListener pollListener = pollListener(outputFormat, ui);
+		ui.addPollListener(pollListener);
+		this.addDetachListener(new DetachListener()
+		{
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void detach(DetachEvent event)
+			{
+				ui.removePollListener(pollListener);
+				builder = null;
+				reportProperties = null;
+				components = null;
+				csv = null;
+				splitPanel = null;
+				JavaScript.getCurrent().removeFunction("au.com.noojee.reportDrillDown");
+				removeAllComponents();
+				logger.error("Nulling out builder");
+			}
+		});
+
+	}
+
+	private PollListener pollListener(final JasperManager.OutputFormat outputFormat, UIReference ui)
+	{
+		return new PollListener()
 		{
 
 			private static final long serialVersionUID = -5641305025399715756L;
@@ -912,7 +964,7 @@ class JasperReportLayout extends VerticalLayout
 					{
 						getDisplayPanel().setSource(resource);
 					}
-					UI.getCurrent().removePollListener(this);
+					ui.removePollListener(this);
 
 				}
 
@@ -941,8 +993,7 @@ class JasperReportLayout extends VerticalLayout
 
 				return name + outputFormat.getFileExtension();
 			}
-		});
-
+		};
 	}
 
 	private void showCsvSplash()

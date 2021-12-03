@@ -41,6 +41,7 @@ import au.com.vaadinutils.dao.AutoCloseableEM;
 import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.fields.ClickableLabel;
 import au.com.vaadinutils.jasper.AttachmentType;
+import au.com.vaadinutils.ui.UIReference;
 import au.com.vaadinutils.util.PipedOutputStreamWrapper;
 
 public class ContainerCSVExport<E>
@@ -52,7 +53,7 @@ public class ContainerCSVExport<E>
 
 	private LinkedHashMap<String, Object> extraColumnHeadersAndPropertyIds;
 	private ByteArrayInputStream result;
-	UI ui = UI.getCurrent();
+	UIReference ui = new UIReference();
 	Label waitLabel = new Label("Please wait Generating CSV file...");
 
 	private volatile boolean abort = false;

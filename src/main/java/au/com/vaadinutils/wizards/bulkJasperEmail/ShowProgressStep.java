@@ -19,6 +19,7 @@ import com.vaadin.ui.VerticalLayout;
 
 import au.com.vaadinutils.crud.CrudEntity;
 import au.com.vaadinutils.fields.PoJoTable;
+import au.com.vaadinutils.ui.UIReference;
 import au.com.vaadinutils.ui.WorkingDialog;
 import au.com.vaadinutils.util.MutableInteger;
 import au.com.vaadinutils.util.ProgressBarWorker;
@@ -38,6 +39,7 @@ public class ShowProgressStep<C extends CrudEntity> implements WizardStep, Progr
 	private MutableInteger queued = new MutableInteger(0);
 	private MutableInteger rejected = new MutableInteger(0);
 	private WorkingDialog workDialog;
+	UIReference ui = new UIReference();
 
 	public ShowProgressStep(WizardView<?, ?, ?> wizardView)
 	{
@@ -167,37 +169,17 @@ public class ShowProgressStep<C extends CrudEntity> implements WizardStep, Progr
 	@Override
 	public final void taskProgress(final int count, final int max, final JasperTransmission status)
 	{
-
-		UI ui = UI.getCurrent();
-		if (ui == null)
-		{
-			throw new RuntimeException("You appear to be calling from a worker thread, no UI is available");
-		}
-		if (!ui.isAttached())
-		{
-			logger.warn("The UI is nolonger attached, cant deliver message to user");
-		}
-
 		String message = "Sending: " + count + " of " + max + " messages.";
 		progressDescription.setValue(message);
 		indicator.setValue((float) count / max);
 		workDialog.progress(count, max, message);
 		ShowProgressStep.this.progressTable.addRow(status);
-
 	}
 
 	@Override
 	public final void taskComplete(final int sent)
 	{
-		UI ui = UI.getCurrent();
-		if (ui == null)
-		{
-			throw new RuntimeException("You appear to be calling from a worker thread, no UI is available");
-		}
-		if (!ui.isAttached())
-		{
-			logger.warn("The UI is nolonger attached, cant deliver message to user");
-		}
+
 		sendComplete = true;
 		indicator.setValue(1.0f);
 

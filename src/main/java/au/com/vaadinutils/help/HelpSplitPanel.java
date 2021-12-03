@@ -74,6 +74,10 @@ public class HelpSplitPanel extends HorizontalLayout implements View, HelpPageLi
 
 		this.setImmediate(true);
 
+		addDetachListener((e) -> {
+			HelpSplitPanel.this.component = null;
+		});
+
 	}
 
 	public View getView()

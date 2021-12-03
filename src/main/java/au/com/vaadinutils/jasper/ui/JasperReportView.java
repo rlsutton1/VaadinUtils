@@ -22,6 +22,7 @@ public abstract class JasperReportView extends HorizontalLayout implements View
 	protected JasperReportView(JasperReportProperties reportProperties)
 	{
 		report = new JasperReportLayout(reportProperties);
+
 	}
 
 	protected JasperReportView()
@@ -41,6 +42,17 @@ public abstract class JasperReportView extends HorizontalLayout implements View
 		this.setSizeFull();
 		report.initScreen(new MainReportResizableSplitPanel(285));
 		this.addComponent(report);
+
+		addDetachListener(new DetachListener()
+		{
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void detach(DetachEvent event)
+			{
+				report = null;
+			}
+		});
 
 	}
 

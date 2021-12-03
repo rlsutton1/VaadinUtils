@@ -8,7 +8,6 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.ProgressBar;
-import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
@@ -47,7 +46,7 @@ public class WorkingDialog extends Window implements ProgressListener<String>
 	private CompleteListener completeListener;
 	private VerticalLayout layout;
 
-	final UI ui;
+	final UIReference ui;
 
 	/**
 	 * Displays a dialog designed to be shown when a long running task is in
@@ -74,7 +73,7 @@ public class WorkingDialog extends Window implements ProgressListener<String>
 	public WorkingDialog(String caption, String message, CancelListener listener)
 	{
 		super(caption);
-		ui = UI.getCurrent();
+		ui = new UIReference();
 		this.setModal(true);
 		this.setClosable(false);
 		this.setResizable(false);
@@ -132,7 +131,7 @@ public class WorkingDialog extends Window implements ProgressListener<String>
 	@Override
 	public void close()
 	{
-		ui.accessSynchronously(new Runnable()
+		ui.access(new Runnable()
 		{
 			@Override
 			public void run()
@@ -215,7 +214,7 @@ public class WorkingDialog extends Window implements ProgressListener<String>
 
 	public void addUserComponent(final Component component)
 	{
-		ui.accessSynchronously(new Runnable()
+		ui.access(new Runnable()
 		{
 			@Override
 			public void run()
@@ -241,7 +240,7 @@ public class WorkingDialog extends Window implements ProgressListener<String>
 	@Override
 	public void complete(int sent)
 	{
-		ui.accessSynchronously(new Runnable()
+		ui.access(new Runnable()
 		{
 
 			@Override
@@ -265,7 +264,7 @@ public class WorkingDialog extends Window implements ProgressListener<String>
 	@Override
 	public void exception(Exception e)
 	{
-		ui.accessSynchronously(new Runnable()
+		ui.access(new Runnable()
 		{
 
 			@Override

@@ -1,17 +1,16 @@
 package au.com.vaadinutils.util;
 
-import com.vaadin.ui.UI;
+import au.com.vaadinutils.ui.UIReference;
 
 public abstract class ProgressBarTask<T>
 {
 	private ProgressTaskListener<T> listener;
 
-	final UI ui;
+	final UIReference ui = new UIReference();
 
 	public ProgressBarTask(ProgressTaskListener<T> listener)
 	{
 		this.listener = listener;
-		ui = UI.getCurrent();
 	}
 
 	public void run()
@@ -26,12 +25,12 @@ public abstract class ProgressBarTask<T>
 	 * 
 	 * @param ui
 	 */
-	abstract public void runUI(UI ui);
+	abstract public void runUI(UIReference ui);
 
 	protected void taskComplete(final int sent)
 	{
 
-		ui.accessSynchronously(new Runnable()
+		ui.access(new Runnable()
 		{
 			@Override
 			public void run()
@@ -45,7 +44,7 @@ public abstract class ProgressBarTask<T>
 
 	public void taskProgress(final int count, final int max, final T status)
 	{
-		ui.accessSynchronously(new Runnable()
+		ui.access(new Runnable()
 		{
 
 			@Override
@@ -60,7 +59,7 @@ public abstract class ProgressBarTask<T>
 
 	public void taskItemError(final T status)
 	{
-		ui.accessSynchronously(new Runnable()
+		ui.access(new Runnable()
 		{
 
 			@Override
@@ -76,7 +75,7 @@ public abstract class ProgressBarTask<T>
 
 	public void taskException(final Exception e)
 	{
-		ui.accessSynchronously(new Runnable()
+		ui.access(new Runnable()
 		{
 
 			@Override

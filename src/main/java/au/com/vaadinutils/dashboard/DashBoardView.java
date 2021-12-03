@@ -48,6 +48,7 @@ import au.com.vaadinutils.editors.InputFormDialog;
 import au.com.vaadinutils.editors.InputFormDialogRecipient;
 import au.com.vaadinutils.js.JSCallWithReturnValue;
 import au.com.vaadinutils.js.JavaScriptCallback;
+import au.com.vaadinutils.ui.UIReference;
 
 /** A start view for navigating to the main view */
 
@@ -66,7 +67,7 @@ public abstract class DashBoardView extends VerticalLayout implements View
 
 	private SliderPanel dashboardsSlider;
 
-	UI ui = UI.getCurrent();
+	UIReference ui = new UIReference();
 
 	private boolean loadJQuery;
 
@@ -116,13 +117,11 @@ public abstract class DashBoardView extends VerticalLayout implements View
 			public void callback(Boolean value)
 			{
 
-				final UI ui = UI.getCurrent();
-
-				new Thread(getLoadRunner(preparing, ui), "Dash Board Delayed Loader").start();
+				new Thread(getLoadRunner(preparing), "Dash Board Delayed Loader").start();
 
 			}
 
-			private Runnable getLoadRunner(final Label preparing, final UI ui)
+			private Runnable getLoadRunner(final Label preparing)
 			{
 				return new Runnable()
 				{

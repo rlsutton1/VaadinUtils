@@ -27,6 +27,7 @@ import au.com.vaadinutils.jasper.parameter.ReportParameter;
 import au.com.vaadinutils.jasper.ui.CleanupCallback;
 import au.com.vaadinutils.jasper.ui.JasperReportProperties;
 import au.com.vaadinutils.listener.CancelListener;
+import au.com.vaadinutils.ui.UIReference;
 import au.com.vaadinutils.util.ProgressBarTask;
 import au.com.vaadinutils.util.ProgressTaskListener;
 import au.com.vaadinutils.util.VUNotification;
@@ -48,7 +49,7 @@ public class SendEmailTask extends ProgressBarTask<JasperTransmission> implement
 	}
 
 	@Override
-	public void runUI(UI ui)
+	public void runUI(UIReference ui)
 	{
 		try
 		{
