@@ -128,7 +128,7 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 					}
 				}
 			};
-			ui.accessSynchronously(runner);
+			ui.access(runner);
 		}
 		else
 		{
@@ -255,7 +255,7 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 
 				}
 			};
-			ui.accessSynchronously(runner);
+			ui.access(runner);
 
 		}
 		else
@@ -373,7 +373,7 @@ public class ReportParameterTable<T extends CrudEntity> extends ReportParameter<
 					});
 				}
 			};
-			ui.accessSynchronously(runner);
+			ui.access(runner);
 		}
 		else
 		{
