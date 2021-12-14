@@ -35,6 +35,7 @@ import au.com.vaadinutils.jasper.parameter.ReportParameter;
 import au.com.vaadinutils.jasper.servlet.VaadinJasperPrintServlet;
 import au.com.vaadinutils.jasper.ui.CleanupCallback;
 import au.com.vaadinutils.jasper.ui.JasperReportProperties;
+import au.com.vaadinutils.ui.Expiry;
 import net.sf.jasperreports.engine.JRBand;
 import net.sf.jasperreports.engine.JRElement;
 import net.sf.jasperreports.engine.JRException;
@@ -908,6 +909,20 @@ public class JasperManager implements Runnable
 
 	static final LinkedBlockingQueue<QueueEntry> jobQueue = new LinkedBlockingQueue<>();
 
+	int getUsedMemoryPercent()
+	{
+		Runtime rt = Runtime.getRuntime();
+
+		double total = rt.totalMemory();
+		double free = rt.freeMemory();
+		double used = total - free;
+
+		double max = rt.maxMemory();
+
+		return (int) ((used / max) * 100.0);
+
+	}
+
 	@Override
 	public void run()
 	{
@@ -917,8 +932,50 @@ public class JasperManager implements Runnable
 		boolean initialized = false;
 		try
 		{
+			Expiry expiry = new Expiry(TimeUnit.HOURS, 1);
 			logger.info("{} permits are available", concurrentLimit.availablePermits());
-			concurrentLimit.acquire();
+
+			if (!concurrentLimit.tryAcquire(1, TimeUnit.HOURS))
+			{
+				throw new RuntimeException("Jasper Report Queue Timeout");
+			}
+
+			// wait for heap space
+
+			int sleep = 1000;
+			int oneSecond = (int) (1000.0 / sleep);
+			if (oneSecond < 1)
+			{
+				oneSecond = 1;
+			}
+			int ctr = 0;
+			while (getUsedMemoryPercent() > 70)
+			{
+
+				if (stop)
+				{
+					return;
+				}
+				TimeUnit.MILLISECONDS.sleep(sleep);
+				if (expiry.isExpired())
+				{
+					throw new RuntimeException("Jasper Report Heap Size Timeout");
+				}
+				queueEntry.setStatus("System is busy, waiting...");
+
+				if (ctr % (oneSecond * 60) == 0)
+				{
+					logger.warn("Requesting GC");
+					Runtime.getRuntime().gc();
+				}
+				ctr++;
+
+			}
+			if (stop)
+			{
+				return;
+			}
+
 			initialized = true;
 			inQueue = false;
 

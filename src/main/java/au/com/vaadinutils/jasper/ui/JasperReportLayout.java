@@ -940,7 +940,7 @@ class JasperReportLayout extends VerticalLayout
 			@Override
 			public void poll(PollEvent event)
 			{
-				logger.warn("Checking if report is ready...");
+				// logger.warn("Checking if report is ready...");
 				if (streamReady && !streamConnected)
 				{
 					// jasper manager is ready, so get the report stream and set
