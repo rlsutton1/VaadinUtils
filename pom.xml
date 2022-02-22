@@ -12,7 +12,7 @@
 		<vaadin.version>7.7.17</vaadin.version>
 		<vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
 		<jasperreports.version>6.17.0</jasperreports.version>
-        <releaseVersion>0.2.66</releaseVersion>
+        <releaseVersion>0.2.67</releaseVersion>
 	</properties>
 
 
@@ -99,8 +99,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.8.1</version>
 				<configuration>
-					<source>11</source>
-					<target>11</target>
+					<source>8</source>
+					<target>8</target>
 				</configuration>
 			</plugin>
 
