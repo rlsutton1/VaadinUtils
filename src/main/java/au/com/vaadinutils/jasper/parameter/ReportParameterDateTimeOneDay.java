@@ -21,7 +21,7 @@ public class ReportParameterDateTimeOneDay extends ReportParameterDateTimeRange
 	public ReportParameterDateTimeOneDay(String caption, String startParameterName, String endParameterName,
 			Resolution resolution, String displayFormat, String parameterFormat)
 	{
-		super(caption, startParameterName, endParameterName, resolution, displayFormat, parameterFormat, 0);
+		super(caption, startParameterName, endParameterName, resolution, displayFormat, parameterFormat, 0, 1);
 	}
 
 	@Override
