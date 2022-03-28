@@ -52,7 +52,7 @@ public class ReportParameterDateTimeRange extends ReportParameter<String>
 	 *            - format of the value passed to ireport
 	 */
 	public ReportParameterDateTimeRange(String caption, String startParameterName, String endParameterName,
-			Resolution resolution, String displayFormat, String parameterFormat, int endAdjustment)
+			Resolution resolution, String displayFormat, String parameterFormat, int endAdjustment, int maxDateRange)
 	{
 		super(caption, new String[] { startParameterName, endParameterName });
 		Preconditions.checkNotNull(startParameterName);
@@ -76,6 +76,7 @@ public class ReportParameterDateTimeRange extends ReportParameter<String>
 		endfield.setValidationVisible(true);
 		createValidators();
 		this.endAdjustment = endAdjustment;
+		setMaxDateRange(maxDateRange);
 	}
 
 	public void setBeforeTodayOnly(boolean beforeTodayOnly)
@@ -114,7 +115,7 @@ public class ReportParameterDateTimeRange extends ReportParameter<String>
 
 	}
 
-	public void setMaxDateRange(final int maxDays)
+	private void setMaxDateRange(final int maxDays)
 	{
 		Validator validator = new Validator()
 		{
