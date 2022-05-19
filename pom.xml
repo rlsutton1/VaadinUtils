@@ -221,7 +221,8 @@
 		<dependency>
 			<groupId>org.vaadin.addons</groupId>
 			<artifactId>ckeditor-wrapper-for-vaadin</artifactId>
-			<version>7.12.9</version>
+			<!-- stuck on this version, later versions have a bug with sticky table row selection -->
+			<version>7.10.10</version>
 		</dependency>
 
 		<dependency>
