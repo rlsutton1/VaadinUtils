@@ -17,6 +17,7 @@ import org.vaadin.addons.screenshot.ScreenshotListener;
 import org.vaadin.addons.screenshot.ScreenshotMimeType;
 
 import com.google.common.base.Stopwatch;
+import com.google.common.util.concurrent.RateLimiter;
 import com.vaadin.server.DefaultErrorHandler;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button;
@@ -34,8 +35,6 @@ import com.vaadin.ui.themes.ValoTheme;
 public class ErrorWindow
 {
 	public static final String ERROR_WINDOW_CLOSE_BUTTON = "ErrorWindowCloseButton";
-	private Button close = new Button("OK");
-	private Label uploadStatus = new Label("&nbsp;", ContentMode.HTML);
 
 	static Logger logger = org.apache.logging.log4j.LogManager.getLogger();
 
@@ -62,6 +61,7 @@ public class ErrorWindow
 			}
 
 		});
+
 	}
 
 	ErrorWindow(boolean noUI)
@@ -81,13 +81,19 @@ public class ErrorWindow
 	}
 
 	static final ThreadLocal<String> lastSeenError = new ThreadLocal<>();
+	static final RateLimiter shutdownLogRateLimiter = RateLimiter.create(0.1);
 
 	private void internalShowErrorWindow(Throwable error)
 	{
 
 		if (shutdown)
 		{
-			logger.error("Shutting down... " + error.getMessage());
+			if (shutdownLogRateLimiter.tryAcquire())
+			{
+				// If we are shutting down, we can't use the logger
+				System.out.println("Shutting down... " + error.getMessage());
+				error.printStackTrace();
+			}
 			return;
 		}
 		try
@@ -325,6 +331,9 @@ public class ErrorWindow
 	private void showWindow(String causeClass, final Date time, final String finalId, final String finalTrace,
 			final String reference, final byte[] imageData)
 	{
+		Button close = new Button("OK");
+		Label uploadStatus = new Label("&nbsp;", ContentMode.HTML);
+
 		final Window window = new Window();
 		UI.getCurrent().addWindow(window);
 		window.setModal(true);
