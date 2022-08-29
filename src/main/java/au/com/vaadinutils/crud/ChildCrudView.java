@@ -33,6 +33,8 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 
+import au.com.vaadinutils.crud.events.CrudEventDistributer;
+import au.com.vaadinutils.crud.events.CrudEventType;
 import au.com.vaadinutils.dao.EntityManagerProvider;
 import au.com.vaadinutils.dao.JpaBaseDao;
 import au.com.vaadinutils.errorHandling.ErrorWindow;
@@ -509,6 +511,7 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 		{
 			EntityManagerProvider.remove(entity);
 		}
+		CrudEventDistributer.publishEvent(this, CrudEventType.DELETE, entity);
 		parentCrud.reloadDataFromDB();
 		entityTable.select(null);
 
@@ -722,16 +725,20 @@ public abstract class ChildCrudView<P extends CrudEntity, E extends ChildCrudEnt
 						// If we leave the save button active, clicking it again
 						// duplicates the record
 						// rightLayout.setVisible(false);
+						CrudEventDistributer.publishEvent(this, CrudEventType.CREATE, newEntity.getEntity());
 					}
 					else
 					{
+
 						EntityItem<E> current = entityTable.getCurrent();
 						if (current != null)
 						{
 							interceptSaveValues(current);
 							// container.commit();
+							CrudEventDistributer.publishEvent(this, CrudEventType.EDIT, current.getEntity());
 						}
 					}
+
 				}
 				else
 				{

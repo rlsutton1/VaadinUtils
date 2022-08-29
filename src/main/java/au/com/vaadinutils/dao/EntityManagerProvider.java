@@ -56,7 +56,7 @@ import au.com.vaadinutils.errorHandling.ErrorWindow;
  *
  * @formatter:on
  *
- * 				You can use the @Link
+ *               You can use the @Link
  *               au.com.vaadinutils.filter.EntityManagerInjectorFilter and @Link
  *               au.com.vaadinutils.filter.AtmosphereFilter to do the injection
  *               or make up your own methods.
@@ -216,7 +216,10 @@ public enum EntityManagerProvider
 				{
 					try
 					{
-						em.getTransaction().commit();
+						if (em.getTransaction().isActive())
+						{
+							em.getTransaction().commit();
+						}
 					}
 					catch (ConstraintViolationException e)
 					{
