@@ -88,4 +88,27 @@ public class ReportParameterDateTimeOneDay extends ReportParameterDateTimeRange
 
 	}
 
+	@Override
+	public String getSaveMetaData()
+	{
+		// this might need to be implemented for this report to work scheduled,
+		// see ReportParameterDateTimeRange
+		return "";
+	}
+
+	@Override
+	public void applySaveMetaData(String metaData)
+	{
+		// this might need to be implemented for this report to work scheduled,
+		// see ReportParameterDateTimeRange
+	}
+
+	@Override
+	public String getMetaDataComment()
+	{
+		// this might need to be implemented for this report to work scheduled,
+		// see ReportParameterDateTimeRange
+		return "";
+	}
+
 }
