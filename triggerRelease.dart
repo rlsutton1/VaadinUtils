@@ -1,7 +1,9 @@
 #! /usr/bin/env dcli
+
 import 'dart:io';
 
-import 'package:dshell/dshell.dart';
+import 'package:dcli/dcli.dart';
+import 'package:path/path.dart';
 
 /// comment
 
@@ -9,7 +11,8 @@ void main() {
   int major;
   int minor;
   int rev = 0;
-  var dir = dirname(Settings().scriptPath);
+
+  var dir = dirname(DartScript.self.pathToScript);
   print(dir);
   read(join(dir, "pom.xml")).forEach((line) {
     if (line.contains("<releaseVersion>")) {
