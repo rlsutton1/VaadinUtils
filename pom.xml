@@ -11,8 +11,8 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<vaadin.version>7.7.17</vaadin.version>
 		<vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
-		<jasperreports.version>6.20.0</jasperreports.version>
-        <releaseVersion>0.2.81</releaseVersion>
+		<jasperreports.version>6.20.3</jasperreports.version>
+        <releaseVersion>0.2.82</releaseVersion>
 	</properties>
 
 
