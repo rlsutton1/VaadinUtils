@@ -8,8 +8,8 @@ import 'package:path/path.dart';
 /// comment
 
 void main() {
-  int major;
-  int minor;
+  int major = 0;
+  int minor = 0;
   int rev = 0;
 
   var dir = dirname(DartScript.self.pathToScript);
